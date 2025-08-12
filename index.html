@@ -3,427 +3,490 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بازی شهر مافیا - در حال بارگذاری</title>
+    <title>شهر مافیا</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* --- MAFIA CLASSIC THEME (BROWN & GOLD) --- */
+        /* --- MAFIA CITY - CLASSIC BROWN THEME --- */
+
         :root {
-            --mafia-brown-dark: #3a2e24;      /* Deep, rich brown for background */
-            --mafia-brown-medium: #614f3c;   /* Warmer, wood-like brown for panels */
-            --mafia-brown-light: #8a765a;    /* Lighter brown for highlights */
-            --mafia-gold-accent: #e6c88e;    /* Muted, classic gold/beige */
-            --mafia-gold-dark: #c9a868;      /* Darker shade of the gold accent */
-            --mafia-text-cream: #f2e8d9;     /* Off-white/cream for main text */
-            --mafia-text-dark: #29211b;      /* Very dark brown for text on light surfaces */
-            --mafia-panel-border: #33281e;   /* Dark border for panels */
-            --mafia-panel-border-light: #a38c6d;
-            --clash-green: #59a845;
-            --clash-green-dark: #3a752b;
-            --clash-red: #c74243;
-            --clash-red-dark: #8f2a2b;
+            --mafia-brown-darkest: #1a1613;
+            --mafia-brown-dark: #2c2521;
+            --mafia-brown-medium: #4a3f37;
+            --mafia-gold: #e0c9a6;
+            --mafia-gold-dark: #b89e7c;
+            --mafia-text-light: #f0e6d8;
+            --mafia-text-dark: #2c2521;
+            --mafia-red: #a63c3c;
+            --mafia-red-dark: #7a2c2c;
+            --mafia-green: #5a8a5a;
+            --mafia-green-dark: #416641;
+            --mafia-glow: rgba(224, 201, 166, 0.4);
         }
 
-        /* --- KEYFRAME ANIMATIONS (Unchanged) --- */
-        @keyframes clash-panel-intro {
-            0% { opacity: 0; transform: scale(0.8) translateY(-30px); }
-            70% { opacity: 1; transform: scale(1.05) translateY(0); }
-            100% { opacity: 1; transform: scale(1) translateY(0); }
+        /* --- KEYFRAME ANIMATIONS --- */
+        @keyframes panel-intro {
+            from { opacity: 0; transform: scale(0.9) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
         }
+
         @keyframes breathe {
-            0%, 100% { transform: scale(1); box-shadow: 0 6px 0 #8c7854; }
-            50% { transform: scale(1.04); box-shadow: 0 8px 12px rgba(0,0,0,0.3), 0 8px 0 #8c7854; }
+            0%, 100% { transform: scale(1); box-shadow: 0 4px 0 var(--mafia-gold-dark); }
+            50% { transform: scale(1.03); box-shadow: 0 6px 10px rgba(0,0,0,0.4), 0 5px 0 var(--mafia-gold-dark); }
         }
-        @keyframes subtle-pan {
-            0% { background-position: 0% 0%; }
-            100% { background-position: 200% 200%; }
-        }
+        
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
+        
         @keyframes fadeInScaleUp {
             from { opacity: 0; transform: scale(0.8); }
             to { opacity: 1; transform: scale(1); }
         }
+        
         @keyframes pulseGlow {
-            0%, 100% { filter: drop-shadow(0 0 8px rgba(230, 200, 142, 0.4)); }
-            50% { filter: drop-shadow(0 0 16px rgba(230, 200, 142, 0.8)); }
+            0%, 100% { filter: drop-shadow(0 0 10px var(--mafia-glow)); }
+            50% { filter: drop-shadow(0 0 20px rgba(224, 201, 166, 0.7)); }
         }
+        
         @keyframes tipFadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* --- GENERAL STYLES --- */
         body {
             font-family: 'Vazirmatn', sans-serif;
-            color: var(--mafia-text-cream);
-            background-color: var(--mafia-brown-dark); /* Dark brown background */
-            background-image: url('https://www.transparenttextures.com/patterns/dark-wood.png'); /* Wood texture */
+            color: var(--mafia-text-light);
+            background-color: var(--mafia-brown-darkest);
+            background-image: radial-gradient(circle at center, var(--mafia-brown-dark) 0%, var(--mafia-brown-darkest) 80%), url('https://www.transparenttextures.com/patterns/dark-wood.png');
             overflow: hidden;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-            position: relative;
+            -webkit-user-select: none;
             user-select: none;
         }
 
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0; left: 0;
-            width: 200%; height: 200%;
-            background-image: url('https://www.transparenttextures.com/patterns/dust.png');
-            opacity: 0.2;
-            z-index: 0;
-            animation: subtle-pan 120s linear infinite;
-        }
-
-        .clash-font {
-            font-family: 'Lilita One', cursive;
-            letter-spacing: 1px;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-        
-        /* --- PANEL STYLES (Adapted to Mafia Theme) --- */
-        .panel-clash {
-            background-color: var(--mafia-brown-medium);
-            border: 4px solid var(--mafia-panel-border);
-            border-top-color: var(--mafia-brown-light);
-            border-left-color: var(--mafia-brown-light);
+        .panel-mafia {
+            background-color: rgba(26, 22, 19, 0.85); /* Slightly transparent dark brown */
+            backdrop-filter: blur(8px);
+            border: 2px solid var(--mafia-brown-medium);
             border-radius: 16px;
-            box-shadow: 0 8px 15px rgba(0,0,0,0.4), inset 0 2px 4px rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5), inset 0 1px 2px rgba(240, 230, 216, 0.1);
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
             position: relative;
         }
-        .panel-clash::before, .panel-clash::after {
-            content: '';
-            position: absolute;
-            width: 12px;
-            height: 12px;
-            background: var(--mafia-gold-accent);
-            border-radius: 50%;
-            border: 2px solid var(--mafia-panel-border);
-            box-shadow: 0 0 3px #000;
-        }
-        .panel-clash::before { top: 10px; left: 10px; }
-        .panel-clash::after { top: 10px; right: 10px; }
 
         .panel-hidden {
             opacity: 0;
-            transform: scale(0.9) translateY(-20px);
+            transform: scale(0.95) translateY(-10px);
             pointer-events: none;
             visibility: hidden;
         }
+
         .panel-visible {
             opacity: 1;
             transform: scale(1) translateY(0);
             visibility: visible;
-            animation: clash-panel-intro 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            animation: panel-intro 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
         }
 
-        /* --- BUTTON STYLES (Adapted to Mafia Theme) --- */
-        .btn-clash {
-            border-radius: 12px;
+        .btn-mafia {
+            border-radius: 10px;
             font-weight: bold;
-            text-transform: uppercase;
-            transition: all 0.1s ease-out;
+            transition: all 0.15s ease-out;
             cursor: pointer;
             position: relative;
             white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.3);
         }
-        .btn-clash-primary {
-            background: linear-gradient(to bottom, #d4b98c, var(--mafia-gold-accent));
-            border: 2px solid var(--mafia-panel-border);
-            box-shadow: 0 6px 0 #8c7854;
-            padding: 12px 30px;
-            font-size: 1.25rem;
+        .btn-mafia:disabled {
+            filter: grayscale(80%) brightness(0.8);
+            cursor: not-allowed;
+            box-shadow: 0 2px 0 #555 !important;
+            transform: translateY(0) !important;
+        }
+        
+        .btn-mafia-primary {
+            background: linear-gradient(to bottom, var(--mafia-gold), var(--mafia-gold-dark));
+            border: 1px solid #c8b08f;
             color: var(--mafia-text-dark);
-            text-shadow: 1px 1px 1px rgba(255,255,255,0.3);
+            box-shadow: 0 4px 0 #8a7458;
+            padding: 12px 30px;
+            font-size: 1.2rem;
         }
-        .btn-clash-primary:hover {
-            background: linear-gradient(to bottom, #e8d0a9, #d4b98c);
+        .btn-mafia-primary:hover:not(:disabled) {
+            background: linear-gradient(to bottom, #f0d9b6, #c8ae8c);
             transform: translateY(-2px);
-            box-shadow: 0 8px 0 #8c7854;
+            box-shadow: 0 6px 0 #8a7458;
         }
-        .btn-clash-primary:active {
-            transform: translateY(4px) !important;
-            box-shadow: 0 2px 0 #8c7854 !important;
+        .btn-mafia-primary:active:not(:disabled) {
+            transform: translateY(2px) !important;
+            box-shadow: 0 2px 0 #8a7458 !important;
+            transition-duration: 0.05s;
         }
+        
         #start-game-btn.breathing {
             animation: breathe 2.5s ease-in-out infinite;
         }
-        
-        .btn-clash-secondary {
-            background: linear-gradient(to bottom, #8a765a, #73624c);
-            border: 2px solid var(--mafia-panel-border);
-            box-shadow: 0 5px 0 #4a3f33;
+
+        .btn-mafia-secondary {
+            background-color: var(--mafia-brown-medium);
+            border: 1px solid var(--mafia-gold-dark);
+            box-shadow: 0 4px 0 #332a23;
+            color: var(--mafia-text-light);
             padding: 10px 22px;
             font-size: 1rem;
-            color: var(--mafia-text-cream);
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
         }
-         .btn-clash-secondary:hover {
-            background: linear-gradient(to bottom, #a18e74, #8a765a);
+        .btn-mafia-secondary:hover:not(:disabled) {
+            background-color: #5c4e45;
             transform: translateY(-2px);
-            box-shadow: 0 7px 0 #4a3f33;
+            box-shadow: 0 6px 0 #332a23;
         }
-        .btn-clash-secondary:active {
-            transform: translateY(3px) !important;
-            box-shadow: 0 2px 0 #4a3f33 !important;
+        .btn-mafia-secondary:active:not(:disabled) {
+            transform: translateY(2px) !important;
+            box-shadow: 0 2px 0 #332a23 !important;
+            transition-duration: 0.05s;
         }
 
-        /* --- INPUT STYLES (Adapted to Mafia Theme) --- */
-        .input-clash {
-            background-color: var(--mafia-panel-border);
-            border: 2px solid #33281e;
-            color: var(--mafia-text-cream);
-            border-radius: 10px;
+        .input-mafia {
+            background-color: var(--mafia-brown-dark);
+            border: 1px solid var(--mafia-brown-medium);
+            color: var(--mafia-text-light);
+            border-radius: 8px;
             padding: 12px;
             font-size: 1rem;
-            box-shadow: inset 0 3px 6px rgba(0,0,0,0.4);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
+            transition: all 0.2s ease;
+            -webkit-user-select: auto;
+            user-select: auto;
+            touch-action: manipulation;
         }
-        .input-clash:focus {
+        .input-mafia:focus {
             outline: none;
-            border-color: var(--mafia-gold-accent);
-            box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 0 10px var(--mafia-gold-accent);
+            border-color: var(--mafia-gold);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.4), 0 0 10px var(--mafia-glow);
         }
+        .input-mafia.invalid { border-color: var(--mafia-red); }
+        .input-mafia:read-only { background-color: #312822; cursor: default; }
 
-        /* --- SCREEN & LOADING STYLES --- */
+        .loader {
+            border: 6px solid var(--mafia-brown-medium);
+            border-top: 6px solid var(--mafia-gold);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--mafia-brown-dark); }
+        ::-webkit-scrollbar-thumb { background: var(--mafia-gold-dark); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--mafia-gold); }
+
         .screen {
-            position: absolute; top: 0; left: 0;
-            width: 100%; height: 100vh;
-            padding: 10px;
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100vh;
+            padding: 15px;
             box-sizing: border-box;
-            opacity: 0; visibility: hidden;
+            opacity: 0;
+            visibility: hidden;
             transition: opacity 0.5s ease-in-out, visibility 0.5s;
-            display: flex; flex-direction: column; align-items: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-y: auto;
             z-index: 1;
         }
         .screen.active { opacity: 1; visibility: visible; position: relative; }
-
+        
         #loading-screen { 
             justify-content: center; 
-            background: radial-gradient(circle, rgba(74, 58, 42, 0.7) 0%, rgba(41, 33, 27, 0.9) 80%);
+            background: radial-gradient(circle, rgba(44, 37, 33, 0.5) 0%, rgba(26, 22, 19, 0.8) 70%);
         }
         
         #loading-content-box {
-            display: flex; flex-direction: column; align-items: center;
-            text-align: center; width: 100%; max-width: 450px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            width: 100%;
+            max-width: 450px;
         }
         #loading-logo {
-            max-width: 280px; width: 70%; margin-bottom: 1.5rem;
-            animation: fadeInScaleUp 1s ease-out, pulseGlow 3s infinite 1s;
+            max-width: 320px;
+            width: 80%;
+            margin-bottom: 1.5rem;
+            animation: fadeInScaleUp 1s ease-out, pulseGlow 3.5s infinite 1s;
+        }
+        #loading-title {
+            font-size: 3.5rem;
+            color: var(--mafia-gold);
+            font-weight: 700;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
+            margin-bottom: 2rem;
+            animation: fadeInScaleUp 1.2s ease-out;
         }
         #loading-progress-bar-container {
-            width: 100%; background-color: var(--mafia-panel-border);
-            border: 3px solid #33281e; border-radius: 12px;
-            padding: 4px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
-            margin-top: 1.5rem; margin-bottom: 0.75rem;
+            width: 100%;
+            max-width: 350px;
+            background-color: var(--mafia-brown-dark);
+            border: 1px solid var(--mafia-brown-medium);
+            border-radius: 50px;
+            padding: 5px;
+            box-shadow: inset 0 3px 6px rgba(0,0,0,0.6);
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
         }
         #loading-progress-bar-fill {
-            height: 18px; width: 0%;
-            background: linear-gradient(to right, var(--mafia-gold-dark), var(--mafia-gold-accent));
-            border-radius: 8px;
-            transition: width 0.5s ease-out;
-            box-shadow: 0 0 10px var(--mafia-gold-accent);
+            height: 15px;
+            width: 0%; /* JS Controlled */
+            background: linear-gradient(to right, var(--mafia-gold-dark), var(--mafia-gold));
+            border-radius: 50px;
+            transition: width 0.4s ease-out;
+            box-shadow: 0 0 12px var(--mafia-glow);
         }
         #loading-message {
-            font-size: 1.1rem; font-weight: bold;
-            color: var(--mafia-text-cream);
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--mafia-text-light);
             text-shadow: 1px 1px 2px #000;
             min-height: 28px;
+            transition: all 0.3s ease;
         }
         #loading-tip {
-            margin-top: 2rem; font-size: 0.9rem; color: #e0d0b8;
-            font-style: italic; background-color: rgba(0,0,0,0.25);
-            padding: 8px 12px; border-radius: 8px;
+            margin-top: 2.5rem;
+            font-size: 0.95rem;
+            color: var(--mafia-gold);
+            font-style: italic;
+            background-color: rgba(0,0,0,0.3);
+            padding: 10px 15px;
+            border-radius: 12px;
             min-height: 50px;
-            display: flex; align-items: center; justify-content: center;
-            animation: tipFadeIn 0.8s ease-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: tipFadeIn 0.8s ease-out 1.5s backwards;
         }
-        
-        /* Placeholder for main screen content after loading */
-        #main-screen {
-             justify-content: center;
-        }
-        .hidden {
-            display: none !important;
-        }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
-
-    <!-- Loading Screen (Starts as Active) -->
+    
+    <!-- Mafia-themed Loading Screen -->
     <div id="loading-screen" class="screen active">
         <div id="loading-content-box">
-            <!-- Logo: The URL is from your original file -->
-            <img id="loading-logo" src="https://up.20script.ir/file/7e7a-Copilot-20250812-110015-removebg-preview.png" alt="لوگوی بازی شهر مافیا">
+            <div id="loading-logo">
+                <!-- SVG Logo inspired by the user's image -->
+                <svg viewBox="0 0 300 170" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style="color: var(--mafia-gold);">
+                    <defs>
+                        <filter id="glow">
+                            <feGaussianBlur stdDeviation="3.5" result="coloredBlur"/>
+                            <feMerge>
+                                <feMergeNode in="coloredBlur"/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
+                    </defs>
+                    <g style="filter: url(#glow);">
+                        <!-- Central Figure -->
+                        <path d="M150 20 C135 20 125 30 125 45 L125 85 Q125 95 130 100 L170 100 Q175 95 175 85 L175 45 C175 30 165 20 150 20 Z M150 25 A 20 20 0 0 1 170 45 V 50 H 130 V 45 A 20 20 0 0 1 150 25 Z"/>
+                        <rect x="110" y="90" width="80" height="40" rx="5"/>
+                        <!-- Left Figure -->
+                        <path opacity="0.7" d="M90 40 C80 40 70 50 70 60 L70 90 Q70 95 75 98 L110 98 Q115 95 115 90 L115 60 C115 50 105 40 90 40 Z M90 45 A 15 15 0 0 1 105 60 V 65 H 75 V 60 A 15 15 0 0 1 90 45 Z"/>
+                        <rect opacity="0.7" x="50" y="95" width="70" height="35" rx="5"/>
+                        <!-- Right Figure -->
+                        <path opacity="0.7" d="M210 40 C200 40 190 50 190 60 L190 90 Q190 95 195 98 L230 98 Q235 95 235 90 L235 60 C235 50 225 40 210 40 Z M210 45 A 15 15 0 0 1 225 60 V 65 H 195 V 60 A 15 15 0 0 1 210 45 Z"/>
+                        <rect opacity="0.7" x="180" y="95" width="70" height="35" rx="5"/>
+                        <!-- Text Box -->
+                        <rect x="70" y="135" width="160" height="30" rx="5"/>
+                        <text x="150" y="156" font-family="Vazirmatn, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#2c2521">ESCORT GAME</text>
+                    </g>
+                </svg>
+            </div>
+            <h1 id="loading-title">شهر مافیا</h1>
             
-            <!-- Game Title with Mafia Theme Colors -->
-            <h1 class="text-4xl sm:text-5xl font-bold clash-font text-[var(--mafia-gold-accent)]" style="text-shadow: 3px 3px 0px var(--mafia-text-dark), 5px 5px 8px rgba(0,0,0,0.7);">شهر مافیا</h1>
-            
-            <!-- Progress Bar -->
             <div id="loading-progress-bar-container">
                 <div id="loading-progress-bar-fill"></div>
             </div>
             
-            <!-- Loading Status Message -->
-            <p id="loading-message" class="text-lg">در حال آماده سازی...</p>
+            <p id="loading-message">در حال آماده سازی...</p>
             
-            <!-- Loading Tip -->
-            <p id="loading-tip">✨ در حال جستجو در آرشیوهای مخفی... ✨</p>
+            <p id="loading-tip" class="hidden">✨ در حال جستجو در آرشیوهای مخفی... ✨</p>
         </div>
     </div>
 
-    <!-- Main Screen (Hidden by default, becomes active after loading) -->
+    <!-- The rest of your game screens will go here -->
+    <!-- For demonstration, I'm adding a simple placeholder main screen -->
     <div id="main-screen" class="screen">
-        <div class="panel-clash p-8 text-center">
-            <h1 class="text-4xl clash-font text-[var(--mafia-gold-accent)]" style="text-shadow: 2px 2px 2px #000;">به شهر مافیا خوش آمدید</h1>
-            <p class="mt-4 text-lg">اتصال به سرور با موفقیت انجام شد.</p>
-            <button id="start-game-btn" class="btn-clash btn-clash-primary clash-font mt-8">شروع بازی</button>
+        <div class="panel-mafia p-8 max-w-lg w-full panel-visible">
+            <h1 class="text-4xl font-bold text-center mb-4" style="color: var(--mafia-gold);">به شهر مافیا خوش آمدید</h1>
+            <p class="text-center mb-6">لودینگ با موفقیت انجام شد و شما به سرور متصل شدید.</p>
+            <button id="restart-btn" class="btn-mafia btn-mafia-primary w-full">شروع مجدد</button>
         </div>
     </div>
+
 
     <script type="module">
         // --- JAVASCRIPT LOGIC ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        // import { getFirestore } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
-        // Import Firebase functions from the official CDN
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.12.2/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.12.2/firebase-auth.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.12.2/firebase-analytics.js";
-
-        // Your NEW web app's Firebase configuration
+        // --- USER'S NEW FIREBASE CONFIG ---
         const firebaseConfig = {
             apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
             authDomain: "mafia-9fcbf.firebaseapp.com",
             projectId: "mafia-9fcbf",
-            storageBucket: "mafia-9fcbf.appspot.com", // Corrected storage bucket domain
+            storageBucket: "mafia-9fcbf.appspot.com",
             messagingSenderId: "471627157488",
             appId: "1:471627157488:web:92f008548a5596619a5735",
             measurementId: "G-0PDHDWC6NV"
         };
         
-        // --- Global Variables ---
         let app;
         let auth;
-        let analytics;
+        // let db; // Firestore can be enabled later if needed
+        let isAuthReady = false;
 
         // --- DOM Elements ---
-        const loadingScreen = document.getElementById('loading-screen');
-        const loadingProgressBarFill = document.getElementById('loading-progress-bar-fill');
-        const loadingMessage = document.getElementById('loading-message');
-        const loadingTip = document.getElementById('loading-tip');
-        const mainScreen = document.getElementById('main-screen');
+        let loadingScreen, loadingProgressBarFill, loadingMessage, loadingTip;
+        let mainScreen;
         let tipInterval;
 
-        /**
-         * Shows a specific screen and hides others.
-         * @param {HTMLElement} screenElement The screen to make active.
-         */
         function showScreen(screenElement) {
             if (!screenElement) return;
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             screenElement.classList.add('active');
         }
 
-        /**
-         * Simulates the loading process with dynamic messages and tips.
-         */
-        function simulateLoading() {
+        // --- ENHANCED LOADING SIMULATION & LOGIC ---
+        function updateLoadingProgress(percentage, message, tip = null) {
+            if (loadingProgressBarFill) {
+                loadingProgressBarFill.style.width = `${percentage}%`;
+            }
+            if (loadingMessage) {
+                loadingMessage.textContent = message;
+            }
+            if (tip && loadingTip) {
+                loadingTip.classList.remove('hidden');
+                loadingTip.innerHTML = tip;
+            }
+        }
+        
+        function startLoadingSequence() {
             const tips = [
-                "✨ آیا می‌دانستید نقش «گادفادر» یا «پدرخوانده» قدرتمندترین شهروند بازی است؟",
-                "✨ در سناریوی «شب‌های مافیا»، نقش «دکتر لکتر» می‌تواند خودش را فقط یک بار نجات دهد.",
-                "✨ «آل کاپون»، یکی از معروف‌ترین گنگسترهای تاریخ، سرانجام به خاطر فرار مالیاتی دستگیر شد.",
-                "✨ فیلم «رفقای خوب» (Goodfellas) بر اساس داستان واقعی «هنری هیل»، گنگستر سابق، ساخته شده است.",
-                "✨ اصطلاح «Omertà» به قانون سکوت در بین اعضای مافیا اشاره دارد."
+                "✨ آیا می‌دانستید «آل کاپون» سرانجام به خاطر فرار مالیاتی دستگیر شد؟",
+                "✨ در سناریوی «شب‌های مافیا»، نقش «دکتر لکتر» فقط یک بار می‌تواند خودش را نجات دهد.",
+                "✨ اصطلاح «Omertà» به قانون سکوت در بین اعضای مافیا اشاره دارد.",
+                "✨ فیلم «پدرخوانده» بر اساس رمانی به همین نام از «ماریو پوزو» ساخته شده است.",
+                "✨ شهر «کورلئونه» در سیسیل، به عنوان زادگاه خانواده‌های مافیایی معروف است."
             ];
             let currentTipIndex = Math.floor(Math.random() * tips.length);
             
-            if (loadingTip) loadingTip.innerHTML = tips[currentTipIndex];
-
-            // Change tip every 4 seconds
+            // Show the first tip immediately
+            if (loadingTip) {
+                 loadingTip.classList.remove('hidden');
+                 loadingTip.style.animation = 'none';
+                 loadingTip.offsetHeight;
+                 loadingTip.style.animation = 'tipFadeIn 0.8s ease-out';
+                 loadingTip.innerHTML = tips[currentTipIndex];
+            }
+            
+            // Start changing tips
             tipInterval = setInterval(() => {
                 currentTipIndex = (currentTipIndex + 1) % tips.length;
                 if (loadingTip) {
                     loadingTip.style.animation = 'none';
-                    loadingTip.offsetHeight; // Trigger reflow to restart animation
+                    loadingTip.offsetHeight; // Trigger reflow
                     loadingTip.style.animation = 'tipFadeIn 0.8s ease-out';
                     loadingTip.innerHTML = tips[currentTipIndex];
                 }
-            }, 4000);
+            }, 5000);
 
-            // Stage 1: Initial connection
-            setTimeout(() => {
-                if (loadingProgressBarFill) loadingProgressBarFill.style.width = '30%';
-                if (loadingMessage) loadingMessage.textContent = 'در حال برقراری ارتباط با سرور...';
-            }, 500);
-
-            // Stage 2: Preparing UI
-            setTimeout(() => {
-                if (loadingProgressBarFill) loadingProgressBarFill.style.width = '65%';
-                if (loadingMessage) loadingMessage.textContent = 'آماده‌سازی رابط کاربری...';
-            }, 1500);
+            // Initial state
+            updateLoadingProgress(10, 'در حال آماده سازی...');
         }
 
-        /**
-         * Initializes Firebase app, auth, and sets up the auth state listener.
-         */
         async function initFirebase() {
             try {
+                updateLoadingProgress(30, 'در حال برقراری ارتباط با سرور...');
                 app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
-                analytics = getAnalytics(app); // Initialize Analytics
-                console.log("Firebase initialized successfully.");
+                // db = getFirestore(app); // Can be enabled later
+                console.log("Firebase Initialized.");
 
-                // Listen for authentication state changes
-                onAuthStateChanged(auth, (user) => {
+                onAuthStateChanged(auth, async (user) => {
+                    updateLoadingProgress(60, 'احراز هویت انجام شد...');
                     if (user) {
-                        // User is signed in anonymously.
-                        console.log("User is signed in:", user.uid);
+                        console.log("User is signed in anonymously:", user.uid);
+                        // Here you could load user data if you had any
                     } else {
-                        // User is signed out, or no user exists. Sign in anonymously.
-                        console.log("No user found. Attempting to sign in anonymously.");
-                        signInAnonymously(auth).catch((error) => {
-                            console.error("Anonymous sign-in failed:", error);
-                            if (loadingMessage) loadingMessage.textContent = "خطا در احراز هویت.";
-                        });
+                        console.log("No user found, attempting to sign in anonymously.");
+                        await signInAnonymously(auth);
                     }
+                    isAuthReady = true;
 
-                    // Once auth state is confirmed (either signed in or initiated sign-in)
-                    // we complete the loading sequence.
-                    if (loadingScreen.classList.contains('active')) {
-                        clearInterval(tipInterval); // Stop changing tips
-                        if (loadingProgressBarFill) loadingProgressBarFill.style.width = '100%';
-                        if (loadingMessage) loadingMessage.textContent = "خوش آمدید!";
-                        
-                        // Wait a moment, then transition to the main screen
-                        setTimeout(() => {
-                            if (mainScreen) showScreen(mainScreen);
-                        }, 800);
-                    }
+                    // Final stage of loading
+                    updateLoadingProgress(100, 'خوش آمدید!');
+                    clearInterval(tipInterval); // Stop changing tips
+                    
+                    setTimeout(() => {
+                        if(mainScreen) showScreen(mainScreen);
+                    }, 1200); // Wait a moment to show "Welcome"
                 });
 
             } catch (error) {
                 console.error("Firebase initialization error:", error);
-                if (loadingMessage) loadingMessage.textContent = "خطا در اتصال به سرور بازی.";
-                if (loadingProgressBarFill) {
-                    loadingProgressBarFill.style.background = "var(--clash-red)";
-                }
+                updateLoadingProgress(100, "خطا در اتصال به سرور!", "⚠️ لطفاً اتصال اینترنت خود را بررسی کنید.");
+                if(loadingProgressBarFill) loadingProgressBarFill.style.background = 'var(--mafia-red)';
+                clearInterval(tipInterval);
+            }
+        }
+        
+        function setupEventListeners() {
+            // Placeholder for future buttons
+            const restartBtn = document.getElementById('restart-btn');
+            if(restartBtn) {
+                restartBtn.addEventListener('click', () => {
+                    window.location.reload();
+                });
             }
         }
 
-        /**
-         * Main function to start the game initialization process.
-         */
         function initializeGame() {
-            simulateLoading(); // Start the visual loading simulation
-            initFirebase();    // Start the real connection to the server
+            // Query DOM elements
+            loadingScreen = document.getElementById('loading-screen');
+            loadingProgressBarFill = document.getElementById('loading-progress-bar-fill');
+            loadingMessage = document.getElementById('loading-message');
+            loadingTip = document.getElementById('loading-tip');
+            mainScreen = document.getElementById('main-screen');
+
+            if (!navigator.onLine) {
+                 updateLoadingProgress(100, "عدم اتصال به اینترنت", "⚠️ لطفاً اتصال خود را بررسی کرده و صفحه را رفرش کنید.");
+                 if(loadingProgressBarFill) loadingProgressBarFill.style.background = 'var(--mafia-red)';
+                return;
+            }
+
+            // Start the whole process
+            startLoadingSequence();
+            setupEventListeners();
+            initFirebase();
         }
 
-        // Run the game initializer when the DOM is fully loaded.
-        document.addEventListener('DOMContentLoaded', initializeGame);
+        // Run the game
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeGame);
+        } else {
+            initializeGame();
+        }
 
     </script>
 </body>
