@@ -3,171 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>شهر مافیا - ساخت حساب</title>
+    <title>شهر مافیا - ایجاد حساب</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
-    <style>
-        /* --- General Setup & Variables --- */
-        :root {
-            --wood-dark: #3a2e29;
-            --wood-medium: #6f4e37;
-            --accent-gold: #e0cda9;
-            --text-light: #f5f5dc; /* Beige */
-            --glow-color: rgba(255, 200, 100, 0.7);
-            --info-color: #a9cce0;
-        }
-
-        /* --- Animations --- */
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes fadeInScaleUp { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
-        @keyframes pulseGlow {
-            0%, 100% { filter: drop-shadow(0 0 8px rgba(224, 205, 169, 0.4)); }
-            50% { filter: drop-shadow(0 0 16px var(--glow-color)); }
-        }
-
-        /* --- Body & Background --- */
-        html, body {
-            height: 100%; margin: 0; overflow-x: hidden;
-        }
-        body {
-            font-family: 'Vazirmatn', sans-serif;
-            background-color: var(--wood-dark);
-            background-image: url('https://www.transparenttextures.com/patterns/wood-pattern.png');
-            color: var(--text-light);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 1rem;
-            box-sizing: border-box;
-            user-select: none;
-        }
-
-        /* --- Auth Container --- */
-        #auth-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            max-width: 420px;
-            padding: 2.5rem 2rem;
-            box-sizing: border-box;
-            background-color: rgba(0, 0, 0, 0.35); /* --- حالت شیشه‌ای --- */
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(224, 205, 169, 0.2);
-            border-radius: 15px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
-            animation: fadeInScaleUp 1s ease-out;
-        }
-
-        /* --- Logo & Title --- */
-        #auth-logo {
-            width: 50%;
-            max-width: 180px;
-            margin-bottom: 1rem;
-            filter: drop-shadow(0 0 10px var(--glow-color));
-        }
-        h1 {
-            font-size: 2rem;
-            font-weight: 900;
-            color: var(--accent-gold);
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-            margin: 0 0 1.5rem 0;
-        }
-
-        /* --- Form Styling --- */
-        .auth-form {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-        .input-group {
-            width: 100%;
-            position: relative;
-        }
-        .form-input {
-            width: 100%;
-            padding: 12px 15px;
-            font-family: 'Vazirmatn', sans-serif;
-            font-size: 1rem;
-            color: var(--text-light);
-            background-color: rgba(0,0,0,0.4);
-            border: 2px solid var(--wood-medium);
-            border-radius: 8px;
-            box-sizing: border-box;
-            transition: border-color 0.3s, box-shadow 0.3s;
-        }
-        .form-input::placeholder { color: rgba(245, 245, 220, 0.5); }
-        .form-input:focus {
-            outline: none;
-            border-color: var(--accent-gold);
-            box-shadow: 0 0 10px rgba(224, 205, 169, 0.5);
-        }
-        .submit-button {
-            margin-top: 0.5rem;
-            padding: 12px 25px;
-            font-family: 'Vazirmatn', sans-serif;
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--wood-dark);
-            background-color: var(--accent-gold);
-            border: 2px solid #b4886c;
-            border-radius: 8px;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-            transition: all 0.2s ease;
-        }
-        .submit-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
-            background-color: #f3e5ca;
-        }
-        
-        /* --- Links & Messages --- */
-        #form-message {
-            margin-top: 1rem;
-            font-weight: 700;
-            color: var(--info-color);
-            min-height: 24px;
-        }
-        .form-link {
-            margin-top: 1.5rem;
-            font-size: 0.9rem;
-            color: rgba(245, 245, 220, 0.8);
-        }
-        .form-link a {
-            color: var(--accent-gold);
-            text-decoration: none;
-            font-weight: 700;
-            transition: text-shadow 0.3s;
-        }
-        .form-link a:hover {
-            text-shadow: 0 0 5px var(--glow-color);
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div id="auth-container">
-        <img id="auth-logo" src="https://up.20script.ir/file/28e7-Copilot-20250812-110015-removebg-preview.png" alt="لوگوی بازی مافیا">
-        <h1>ساخت حساب جدید</h1>
+    <div class="auth-container">
+        <img class="logo-image" src="https://up.20script.ir/file/28e7-Copilot-20250812-110015-removebg-preview.png" alt="لوگوی بازی مافیا">
+        <h1>ایجاد حساب جدید</h1>
 
-        <form id="registration-form" class="auth-form" novalidate>
-            <div class="input-group">
-                <input type="text" id="username" class="form-input" placeholder="نام کاربری" required>
+        <form id="registration-form">
+            <div class="form-group">
+                <label for="username">نام کاربری</label>
+                <input type="text" id="username" class="form-input" placeholder="یک نام کاربری انتخاب کنید" required>
             </div>
-            <div class="input-group">
-                <input type="email" id="email" class="form-input" placeholder="ایمیل" required>
+            <div class="form-group">
+                <label for="email">ایمیل</label>
+                <input type="email" id="email" class="form-input" placeholder="ایمیل خود را وارد کنید" required>
             </div>
-            <div class="input-group">
-                <input type="password" id="password" class="form-input" placeholder="رمز عبور" required>
+            <div class="form-group">
+                <label for="password">رمز عبور</label>
+                <input type="password" id="password" class="form-input" placeholder="یک رمز عبور قوی انتخاب کنید" required>
             </div>
-            <button type="submit" class="submit-button">ثبت نام</button>
+            
+            <button type="submit" id="submit-btn" class="btn">ساخت حساب</button>
         </form>
 
-        <p id="form-message"></p>
+        <p id="status-message" class="status-message"></p>
 
         <p class="form-link">
             حساب کاربری دارید؟ <a href="login.html">وارد شوید</a>
@@ -175,18 +40,26 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const registrationForm = document.getElementById('registration-form');
-            const formMessage = document.getElementById('form-message');
+        const form = document.getElementById('registration-form');
+        const submitBtn = document.getElementById('submit-btn');
+        const statusMessage = document.getElementById('status-message');
 
-            registrationForm.addEventListener('submit', (event) => {
-                event.preventDefault(); // جلوگیری از ارسال فرم
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'کمی صبر کنید...';
+            statusMessage.textContent = '';
+            statusMessage.className = 'status-message'; // Reset classes
+
+            setTimeout(() => {
+                statusMessage.textContent = 'این بخش به زودی فعال خواهد شد...';
+                statusMessage.classList.add('info');
                 
-                // نمایش پیام "به زودی"
-                formMessage.textContent = 'این قابلیت به زودی اضافه خواهد شد...';
-            });
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'ساخت حساب';
+            }, 2000);
         });
     </script>
-
 </body>
 </html>
