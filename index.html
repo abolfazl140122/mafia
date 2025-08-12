@@ -2,231 +2,290 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>بازی مافیا - در حال بارگذاری</title>
-
-    <!-- =================================================================== -->
-    <!--          استایل های CSS برای ظاهر برنامه (تم و انیمیشن)          -->
-    <!-- =================================================================== -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>شهر مافیا - در حال بارگذاری...</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        /* تنظیمات کلی و متغیرهای رنگی برای تم چوبی */
+        /* --- General Setup --- */
         :root {
-            --wood-dark: #3a2e24;       /* قهوه‌ای تیره برای پس‌زمینه */
-            --wood-medium: #5c483a;    /* قهوه‌ای متوسط */
-            --wood-light: #8a705a;     /* قهوه‌ای روشن برای حاشیه‌ها */
-            --text-color: #f0e5d8;      /* رنگ متن کرم مانند */
-            --accent-color: #e7a256;    /* رنگ نارنجی/طلایی برای تاکید */
-            --error-color: #ff6b6b;      /* رنگ قرمز برای خطا */
+            --wood-dark: #3a2e29;
+            --wood-medium: #6f4e37;
+            --wood-panel: #5a3d2b;
+            --accent-gold: #e0cda9;
+            --text-light: #f5f5dc; /* Beige */
+            --glow-color: rgba(255, 200, 100, 0.7);
+            --error-color: #c06c5c;
+            --success-color: #8fbc8f;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        /* --- Animations --- */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
-        body {
-            font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; /* استفاده از فونت وزیرمتن در صورت وجود */
-            background-color: var(--wood-dark);
-            /* بافت چوبی زیبا برای پس‌زمینه */
-            background-image: url('https://www.transparenttextures.com/patterns/wood-pattern.png');
-            color: var(--text-color);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden; /* جلوگیری از اسکرول */
+        @keyframes fadeInScaleUp {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
         }
 
-        /* کانتینر اصلی لودینگ */
-        .loading-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            padding: 20px;
-            /* افکت شیشه‌ای مات برای جذابیت بیشتر */
-            background: rgba(40, 30, 20, 0.4);
-            backdrop-filter: blur(5px);
-            border-radius: 20px;
-            border: 1px solid rgba(138, 112, 90, 0.5);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        }
-
-        /* استایل و انیمیشن لوگو */
-        .logo-container {
-            margin-bottom: 40px;
-        }
-
-        .logo-container img {
-            max-width: 200px; /* اندازه مناسب برای موبایل */
-            filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5));
-            animation: pulse 2.5s infinite ease-in-out;
-        }
-
-        /* انیمیشن نبض برای لوگو */
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-                filter: drop-shadow(0 0 5px rgba(231, 162, 86, 0.3));
-            }
-            50% {
-                transform: scale(1.05);
-                filter: drop-shadow(0 0 20px rgba(231, 162, 86, 0.7));
-            }
-            100% {
-                transform: scale(1);
-                filter: drop-shadow(0 0 5px rgba(231, 162, 86, 0.3));
-            }
-        }
-
-        /* بخش وضعیت (اسپینر و پیام) */
-        .status-box {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-        }
-
-        #status-message {
-            font-size: 1.1rem;
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
-
-        /* انیمیشن اسپینر لودینگ */
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid var(--wood-light);
-            border-top: 4px solid var(--accent-color);
-            border-radius: 50%;
-            animation: spin 1.5s linear infinite;
-            transition: opacity 0.5s, height 0.5s, width 0.5s;
+        @keyframes pulseGlow {
+            0%, 100% { filter: drop-shadow(0 0 8px rgba(224, 205, 169, 0.3)); }
+            50% { filter: drop-shadow(0 0 16px var(--glow-color)); }
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
-        /* کلاس کمکی برای مخفی کردن اسپینر با انیمیشن */
-        .spinner.hidden {
-            opacity: 0;
-            height: 0;
-            width: 0;
-            border: none;
-            margin-top: -20px; /* جبران فضای خالی شده */
+
+        /* --- Body & Background --- */
+        html, body {
+            height: 100%;
+            margin: 0;
+            overflow: hidden; /* Prevent scrollbars */
+        }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: var(--wood-dark);
+            /* Subtle wood texture background */
+            background-image: url('https://www.transparenttextures.com/patterns/wood-pattern.png');
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            -webkit-user-select: none; /* For better feel on mobile */
+            user-select: none;
+        }
+
+        /* --- Loading Screen Container --- */
+        #loading-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 400px;
+            padding: 2rem;
+            box-sizing: border-box;
+            background-color: rgba(0, 0, 0, 0.2);
+            animation: fadeIn 1.5s ease-out;
+        }
+
+        /* --- Logo Styling --- */
+        #loading-logo {
+            width: 80%;
+            max-width: 280px;
+            margin-bottom: 1.5rem;
+            animation: fadeInScaleUp 1s ease-out, pulseGlow 3s infinite 1s;
+        }
+
+        /* --- Game Title --- */
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--accent-gold);
+            text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.7);
+            margin: 0 0 2rem 0;
+        }
+
+        /* --- Progress Bar --- */
+        #progress-container {
+            width: 100%;
+            background-color: var(--wood-dark);
+            border: 3px solid #2b1f1a;
+            border-radius: 50px;
+            padding: 5px;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6);
+            margin-bottom: 1rem;
+        }
+
+        #progress-bar {
+            height: 15px;
+            width: 0%; /* Initial width */
+            background: linear-gradient(to right, #b4886c, var(--accent-gold));
+            border-radius: 50px;
+            transition: width 0.5s ease-out; /* Smooth animation */
+            box-shadow: 0 0 10px var(--glow-color);
+        }
+
+        /* --- Status Messages --- */
+        #status-message {
+            font-size: 1.1rem;
+            min-height: 28px; /* Prevents layout shift */
+            font-weight: 700;
+            text-shadow: 1px 1px 2px #000;
+            transition: color 0.5s ease;
+        }
+
+        #status-message.error {
+            color: var(--error-color);
+        }
+        
+        #status-message.success {
+            color: var(--success-color);
+        }
+
+        /* --- Spinner & Icons --- */
+        .spinner {
+            display: inline-block;
+            width: 1em;
+            height: 1em;
+            border: 2px solid rgba(245, 245, 220, 0.5);
+            border-top-color: var(--text-light);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+        
+        /* --- Retry Button --- */
+        #retry-button {
+            display: none; /* Hidden by default */
+            margin-top: 1.5rem;
+            padding: 10px 25px;
+            font-family: 'Vazirmatn', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--wood-dark);
+            background-color: var(--accent-gold);
+            border: 2px solid #b4886c;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            transition: all 0.2s ease;
+        }
+        
+        #retry-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.4);
+            background-color: #f3e5ca;
         }
     </style>
 </head>
 <body>
 
-    <!-- =================================================================== -->
-    <!--                      ساختار HTML صفحه لودینگ                        -->
-    <!-- =================================================================== -->
-    <div class="loading-container">
-        <div class="logo-container">
-            <!-- لوگوی گروه شما -->
-            <img src="https://up4u.ir/dl/free/9e4-Copilot_20250812_110015-removebg-preview.png" alt="لوگوی بازی مافیا">
+    <div id="loading-screen">
+        <img id="loading-logo" src="https://up.20script.ir/file/28e7-Copilot-20250812-110015-removebg-preview.png" alt="لوگوی بازی مافیا">
+        <h1>شهر مافیا</h1>
+        
+        <div id="progress-container">
+            <div id="progress-bar"></div>
         </div>
+        
+        <p id="status-message">
+            <span id="status-text">در حال آماده‌سازی...</span>
+            <span id="status-icon"></span>
+        </p>
 
-        <div class="status-box">
-            <!-- انیمیشن اسپینر لودینگ -->
-            <div class="spinner" id="spinner"></div>
-            <!-- پیام وضعیت -->
-            <p id="status-message">در حال برقراری ارتباط با سرور...</p>
-        </div>
+        <button id="retry-button">تلاش مجدد</button>
     </div>
 
-    <!-- =================================================================== -->
-    <!--        اسکریپت های Firebase و منطق برنامه (JavaScript)             -->
-    <!-- =================================================================== -->
-    <!-- Firebase SDKs - حتما باید قبل از کد شما باشند -->
-    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-analytics-compat.js"></script>
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-analytics.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
 
-    <script>
-        // صبر میکنیم تا کل صفحه و محتوای آن بارگذاری شود
-        document.addEventListener('DOMContentLoaded', () => {
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
+            authDomain: "mafia-9fcbf.firebaseapp.com",
+            projectId: "mafia-9fcbf",
+            storageBucket: "mafia-9fcbf.firebasestorage.app",
+            messagingSenderId: "471627157488",
+            appId: "1:471627157488:web:92f008548a5596619a5735",
+            measurementId: "G-0PDHDWC6NV"
+        };
+        
+        // --- DOM Elements ---
+        const progressBar = document.getElementById('progress-bar');
+        const statusText = document.getElementById('status-text');
+        const statusIcon = document.getElementById('status-icon');
+        const statusMessage = document.getElementById('status-message');
+        const retryButton = document.getElementById('retry-button');
 
-            const spinner = document.getElementById('spinner');
-            const statusMessage = document.getElementById('status-message');
-
-            // =========================================================================
-            // هشدار: این کلیدها عمومی هستند. لطفاً آنها را با کلیدهای جدید و خصوصی
-            // خود جایگزین کنید و هرگز آنها را در کد عمومی به اشتراک نگذارید.
-            // =========================================================================
-            const firebaseConfig = {
-                apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg", // <<< این را عوض کنید
-                authDomain: "mafia-9fcbf.firebaseapp.com",
-                projectId: "mafia-9fcbf",
-                storageBucket: "mafia-9fcbf.appspot.com", // معمولا .appspot.com صحیح است
-                messagingSenderId: "471627157488",
-                appId: "1:471627157488:web:92f008548a5596619a5735",
-                measurementId: "G-0PDHDWC6NV"
-            };
-
-            // تابع اصلی برای بررسی وضعیت و شروع برنامه
-            async function initializeApp() {
-                // مرحله ۱: بررسی اتصال به اینترنت مرورگر
-                if (!navigator.onLine) {
-                    updateStatus('خطا: اتصال به اینترنت برقرار نیست!', true);
-                    // تلاش مجدد بعد از وصل شدن اینترنت
-                    window.addEventListener('online', () => location.reload());
-                    return;
-                }
-
-                // مرحله ۲: تلاش برای اتصال به Firebase
-                try {
-                    // مقداردهی اولیه Firebase
-                    const app = firebase.initializeApp(firebaseConfig);
-                    // برای تست اتصال، یک سرویس مثل Firestore را فراخوانی میکنیم
-                    const firestore = firebase.firestore();
-                    firebase.analytics(app);
-
-                    // تست یک عملیات خواندن کوچک برای اطمینان از صحت قوانین امنیتی و اتصال
-                    // این یک تست پیشرفته‌تر است که مطمئن شویم واقعا به دیتابیس وصل هستیم
-                    await firestore.collection('status').doc('ping').get();
-
-                    // اگر همه چیز موفق بود
-                    updateStatus('اتصال با موفقیت برقرار شد!', false, true);
-
-                    // با یک تاخیر کوتاه، کاربر را به صفحه اصلی بازی هدایت میکنیم
-                    setTimeout(() => {
-                        statusMessage.textContent = 'در حال انتقال به لابی بازی...';
-                        // در آینده، این خط را برای رفتن به صفحه اصلی فعال کنید:
-                        // window.location.href = 'lobby.html'; 
-                        console.log("آماده انتقال به صفحه لابی.");
-                    }, 2000); // 2 ثانیه تاخیر برای نمایش پیام موفقیت
-
-                } catch (error) {
-                    console.error("خطا در اتصال به Firebase: ", error);
-                    updateStatus('خطا: ارتباط با سرور بازی برقرار نشد!', true);
-                }
+        // --- Main Application Logic ---
+        async function initializeGame() {
+            // Reset UI for retries
+            retryButton.style.display = 'none';
+            statusMessage.classList.remove('error', 'success');
+            
+            // 1. Check for internet connection
+            if (!navigator.onLine) {
+                showError("عدم اتصال به اینترنت!", true);
+                return;
             }
 
-            // تابع کمکی برای بروزرسانی پیام وضعیت و اسپینر
-            function updateStatus(message, isError = false, isSuccess = false) {
-                statusMessage.textContent = message;
+            // 2. Start visual loading simulation
+            updateProgress(25, "در حال آماده‌سازی...", '<span class="spinner"></span>');
+
+            // 3. Simulate initial setup and then connect to Firebase
+            setTimeout(() => {
+                connectToFirebase();
+            }, 1000);
+        }
+        
+        async function connectToFirebase() {
+            updateProgress(70, "در حال برقراری ارتباط با سرور...", '<span class="spinner"></span>');
+            
+            try {
+                // Initialize Firebase
+                const app = initializeApp(firebaseConfig);
+                const analytics = getAnalytics(app);
+                const auth = getAuth(app);
                 
-                if (isError) {
-                    statusMessage.style.color = 'var(--error-color)';
-                    spinner.classList.add('hidden'); // در صورت خطا، اسپینر را مخفی کن
-                } else if (isSuccess) {
-                    statusMessage.style.color = 'var(--accent-color)';
-                    // اگر موفق بود هم اسپینر را مخفی میکنیم چون کارش تمام شده
-                     spinner.classList.add('hidden');
-                } else {
-                    statusMessage.style.color = 'var(--text-color)';
-                }
+                // Sign in anonymously to check server connectivity
+                await signInAnonymously(auth);
+
+                // If we reach here, connection is successful
+                handleSuccess();
+
+            } catch (error) {
+                console.error("Firebase Connection Error:", error);
+                showError("خطا در اتصال به سرور!", true);
             }
+        }
 
-            // اجرای برنامه
-            initializeApp();
-        });
+        function handleSuccess() {
+            updateProgress(100, "اتصال موفق!", '✔️');
+            statusMessage.classList.add('success');
+            
+            // After a short delay, redirect to the main game page
+            setTimeout(() => {
+                statusText.textContent = "خوش آمدید! در حال ورود به بازی...";
+                // In a real application, you would redirect here:
+                // window.location.href = 'main.html'; 
+                console.log("آماده برای ورود به صفحه اصلی بازی.");
+            }, 1500);
+        }
+
+        function showError(message, showRetry = false) {
+            updateProgress(progressBar.style.width.replace('%',''), message, '❌');
+            statusMessage.classList.add('error');
+
+            if (showRetry) {
+                retryButton.style.display = 'block';
+            }
+        }
+
+        function updateProgress(percentage, text, iconHtml = '') {
+            if (progressBar) progressBar.style.width = `${percentage}%`;
+            if (statusText) statusText.textContent = text;
+            if (statusIcon) statusIcon.innerHTML = iconHtml;
+        }
+        
+        // --- Event Listeners ---
+        retryButton.addEventListener('click', initializeGame);
+
+        // --- Start the process on page load ---
+        document.addEventListener('DOMContentLoaded', initializeGame);
+
     </script>
-
 </body>
 </html>
