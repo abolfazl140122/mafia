@@ -3,229 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>شهر مافیا - ایجاد حساب کاربری</title>
+    <title>شهر مافیا - ورود به حساب</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        /* --- General Setup & Variables (Copied from index.html for consistency) --- */
         :root {
-            --wood-dark: #3a2e29;
-            --wood-medium: #6f4e37;
-            --wood-panel: #5a3d2b;
-            --accent-gold: #e0cda9;
-            --text-light: #f5f5dc; /* Beige */
-            --glow-color: rgba(255, 200, 100, 0.7);
-            --error-color: #c06c5c;
-            --info-color: #87ceeb; /* Sky blue for info messages */
+            --wood-dark: #3a2e29; --wood-medium: #6f4e37; --accent-gold: #e0cda9;
+            --text-light: #f5f5dc; --glow-color: rgba(255, 200, 100, 0.7);
+            --error-color: #c06c5c; --success-color: #8fbc8f;
         }
 
-        /* --- Animations --- */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* --- Body & Background --- */
-        html, body {
-            height: 100%;
-            margin: 0;
-            overflow-x: hidden;
-            overflow-y: auto;
-        }
-
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeInScaleUp { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        
+        html, body { height: 100%; margin: 0; overflow: hidden; }
         body {
-            font-family: 'Vazirmatn', sans-serif;
-            background-color: var(--wood-dark);
+            font-family: 'Vazirmatn', sans-serif; background-color: var(--wood-dark);
             background-image: url('https://www.transparenttextures.com/patterns/wood-pattern.png');
-            color: var(--text-light);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 2rem 0;
-            -webkit-user-select: none;
-            user-select: none;
+            color: var(--text-light); display: flex; align-items: center; justify-content: center;
+            text-align: center; user-select: none;
         }
 
-        /* --- Authentication Form Container --- */
-        .auth-container {
-            width: 90%;
-            max-width: 450px;
-            padding: 2.5rem 2rem;
-            background-color: var(--wood-panel);
-            border: 4px solid #2b1f1a;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(0,0,0,0.4);
-            animation: fadeIn 1s ease-out;
+        #main-container {
+            display: flex; flex-direction: column; align-items: center;
+            width: 100%; max-width: 420px; padding: 2rem; box-sizing: border-box;
+            background: rgba(0,0,0,0.3) url('https://www.transparenttextures.com/patterns/worn-dots.png');
+            border: 4px solid #2b1f1a; border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 15px rgba(0,0,0,0.4);
+            animation: fadeInScaleUp 1s ease-out;
         }
 
+        #auth-logo {
+            width: 50%; max-width: 180px; margin-bottom: 1rem;
+            filter: drop-shadow(0 0 10px var(--glow-color));
+        }
+        
         h1 {
-            font-size: 2.2rem;
-            font-weight: 900;
-            color: var(--accent-gold);
-            text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.7);
-            margin: 0 0 2rem 0;
-        }
-
-        /* --- Input Fields Styling --- */
-        .input-group {
-            position: relative;
-            margin-bottom: 1.5rem;
+            font-size: 2rem; font-weight: 700; color: var(--accent-gold);
+            text-shadow: 2px 2px 4px #000; margin: 0 0 1.5rem 0;
         }
         
-        .input-group .icon {
-            position: absolute;
-            top: 50%;
-            right: 15px;
-            transform: translateY(-50%);
-            color: var(--accent-gold);
-            opacity: 0.6;
-            pointer-events: none;
-        }
+        /* --- Loading Styles (Same as index.html but simplified) --- */
+        #loading-section { width: 100%; transition: opacity 0.5s ease, transform 0.5s ease; }
+        #progress-container { width: 100%; background-color: var(--wood-dark); border: 3px solid #2b1f1a; border-radius: 50px; padding: 5px; box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6); margin-bottom: 1rem; }
+        #progress-bar { height: 15px; width: 0%; background: linear-gradient(to right, #b4886c, var(--accent-gold)); border-radius: 50px; transition: width 0.5s ease-out; box-shadow: 0 0 10px var(--glow-color); }
+        #status-message { font-size: 1.1rem; min-height: 28px; font-weight: 700; text-shadow: 1px 1px 2px #000; transition: color 0.5s ease; }
+        #status-message.error { color: var(--error-color); }
+        .spinner { display: inline-block; width: 1em; height: 1em; border: 2px solid rgba(245, 245, 220, 0.5); border-top-color: var(--text-light); border-radius: 50%; animation: spin 1s linear infinite; margin-left: 8px; vertical-align: middle; }
 
-        .input-field {
-            width: 100%;
-            padding: 12px 45px 12px 15px; /* Padding for icon */
-            font-family: 'Vazirmatn', sans-serif;
-            font-size: 1rem;
-            background-color: var(--wood-dark);
-            border: 2px solid var(--wood-medium);
-            border-radius: 8px;
-            color: var(--text-light);
-            box-sizing: border-box;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .input-field::placeholder {
-            color: rgba(245, 245, 220, 0.5);
-        }
-
-        .input-field:focus {
-            outline: none;
-            border-color: var(--accent-gold);
-            box-shadow: 0 0 10px var(--glow-color);
-        }
-        
-        .input-field:focus + .icon {
-            opacity: 1;
-        }
-
-        /* --- Button Styling --- */
-        .submit-btn {
-            width: 100%;
-            padding: 15px;
-            margin-top: 1rem;
-            font-family: 'Vazirmatn', sans-serif;
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--wood-dark);
-            background: linear-gradient(to bottom, #f3e5ca, var(--accent-gold));
-            border: 2px solid #b4886c;
-            border-radius: 8px;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-            transition: all 0.2s ease;
-            text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3);
-        }
-
-        .submit-btn:hover:not(:disabled) {
-            transform: translateY(-3px);
-            box-shadow: 0 7px 10px rgba(0,0,0,0.4);
-        }
-
-        .submit-btn:active:not(:disabled) {
-            transform: translateY(-1px);
-        }
-        
-        /* --- Links and Messages --- */
-        .switch-form-link {
-            margin-top: 2rem;
-            font-size: 0.9rem;
-        }
-
-        .switch-form-link a {
-            color: var(--accent-gold);
-            font-weight: 700;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .switch-form-link a:hover {
-            color: #fff;
-            text-decoration: underline;
-        }
-        
-        #response-message {
-            display: none; /* Hidden by default */
-            margin-top: 1.5rem;
-            padding: 10px;
-            border-radius: 5px;
-            font-weight: 700;
-            animation: fadeIn 0.5s;
-            color: var(--info-color);
-            background-color: rgba(0,0,0,0.3);
-            border: 1px solid var(--info-color);
-        }
+        /* --- Form Styles --- */
+        #login-form { display: none; /* Initially hidden */ width: 100%; animation: fadeIn 1s ease; }
+        .form-group { width: 100%; margin-bottom: 1rem; position: relative; }
+        .auth-input { width: 100%; padding: 12px 15px; font-family: 'Vazirmatn', sans-serif; font-size: 1rem; color: var(--text-light); background-color: var(--wood-dark); border: 2px solid var(--wood-medium); border-radius: 8px; box-sizing: border-box; transition: all 0.3s ease; box-shadow: inset 0 2px 5px rgba(0,0,0,0.5); }
+        .auth-input::placeholder { color: #a9a9a9; }
+        .auth-input:focus { outline: none; border-color: var(--accent-gold); box-shadow: inset 0 2px 5px rgba(0,0,0,0.5), 0 0 10px var(--glow-color); }
+        #submit-button { width: 100%; padding: 12px 25px; font-size: 1.1rem; font-weight: 700; color: var(--wood-dark); background-color: var(--accent-gold); border: 2px solid #b4886c; border-radius: 8px; cursor: pointer; margin-top: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: all 0.2s ease; }
+        #submit-button:hover { transform: translateY(-2px); box-shadow: 0 6px 8px rgba(0,0,0,0.4); background-color: #f3e5ca; }
+        .form-link { margin-top: 1.5rem; color: var(--accent-gold); text-decoration: none; font-weight: 400; transition: color 0.2s; display: block; }
+        .form-link:hover { color: var(--text-light); }
     </style>
 </head>
 <body>
 
-    <div class="auth-container">
-        <h1>ایجاد حساب کاربری</h1>
-        
-        <form id="registration-form" novalidate>
-            <div class="input-group">
-                <input type="email" id="email" class="input-field" placeholder="ایمیل خود را وارد کنید" required>
-                <!-- SVG Icon for Email -->
-                <span class="icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M.05 3.555A2 2 0 0 1 2 2h12a2 2 0 0 1 1.95 1.555L8 8.414.05 3.555ZM0 4.697v7.104l5.803-3.558L0 4.697ZM6.761 8.83l-6.57 4.027A2 2 0 0 0 2 14h12a2 2 0 0 0 1.808-1.144l-6.57-4.027L8 9.586l-1.239-.757Zm3.436-.586L16 11.803V4.697l-5.803 3.558Z"/>
-                    </svg>
-                </span>
-            </div>
+    <div id="main-container">
+        <img id="auth-logo" src="https://up.20script.ir/file/28e7-Copilot-20250812-110015-removebg-preview.png" alt="لوگوی بازی مافیا">
+        <h1>ورود به حساب کاربری</h1>
 
-            <div class="input-group">
-                <input type="password" id="password" class="input-field" placeholder="رمز عبور" required>
-                <!-- SVG Icon for Password -->
-                 <span class="icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
-                    </svg>
-                </span>
-            </div>
+        <!-- Loading Section -->
+        <div id="loading-section">
+            <div id="progress-container"><div id="progress-bar"></div></div>
+            <p id="status-message">
+                <span id="status-text">در حال آماده‌سازی...</span>
+                <span id="status-icon"></span>
+            </p>
+        </div>
 
-            <div class="input-group">
-                <input type="password" id="password-confirm" class="input-field" placeholder="تکرار رمز عبور" required>
-                 <span class="icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
-                    </svg>
-                </span>
+        <!-- Login Form Section -->
+        <form id="login-form" novalidate>
+            <div class="form-group">
+                <input type="email" id="email" class="auth-input" placeholder="ایمیل" required>
             </div>
-
-            <button type="submit" class="submit-btn">ثبت نام</button>
+            <div class="form-group">
+                <input type="password" id="password" class="auth-input" placeholder="رمز عبور" required>
+            </div>
+            <button type="submit" id="submit-button">ورود</button>
+            <a href="Registration.html" class="form-link">حساب جدید می‌سازید؟</a>
         </form>
-
-        <div id="response-message"></div>
-
-        <p class="switch-form-link">
-            حساب کاربری دارید؟ <a href="login.html">وارد شوید</a>
-        </p>
     </div>
 
-    <script>
-        const registrationForm = document.getElementById('registration-form');
-        const responseMessage = document.getElementById('response-message');
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
 
-        registrationForm.addEventListener('submit', (e) => {
-            // Prevent the form from actually submitting
+        const firebaseConfig = {
+            apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
+            authDomain: "mafia-9fcbf.firebaseapp.com",
+            projectId: "mafia-9fcbf",
+            storageBucket: "mafia-9fcbf.firebasestorage.app",
+            messagingSenderId: "471627157488",
+            appId: "1:471627157488:web:92f008548a5596619a5735"
+        };
+        
+        const progressBar = document.getElementById('progress-bar');
+        const statusText = document.getElementById('status-text');
+        const statusIcon = document.getElementById('status-icon');
+        const loadingSection = document.getElementById('loading-section');
+        const loginForm = document.getElementById('login-form');
+
+        // --- Loading Logic ---
+        async function initialize() {
+            if (!navigator.onLine) {
+                updateProgress(0, "عدم اتصال به اینترنت!", '❌');
+                return;
+            }
+            updateProgress(25, "برقراری ارتباط...", '<span class="spinner"></span>');
+            try {
+                const app = initializeApp(firebaseConfig);
+                const auth = getAuth(app);
+                await signInAnonymously(auth);
+                updateProgress(100, "سرور در دسترس است.", '✔️');
+                setTimeout(showLoginForm, 1000); // Wait a moment then show form
+            } catch (error) {
+                console.error("Firebase Connection Error:", error);
+                updateProgress(100, "خطا در اتصال به سرور!", '❌');
+            }
+        }
+
+        function showLoginForm() {
+            loadingSection.style.opacity = '0';
+            loadingSection.style.transform = 'scale(0.9)';
+            setTimeout(() => {
+                loadingSection.style.display = 'none';
+                loginForm.style.display = 'block';
+            }, 500); // Match CSS transition
+        }
+
+        function updateProgress(percentage, text, iconHtml = '') {
+            if (progressBar) progressBar.style.width = `${percentage}%`;
+            if (statusText) statusText.textContent = text;
+            if (statusIcon) statusIcon.innerHTML = iconHtml;
+        }
+
+        // --- Form Logic ---
+        loginForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            
-            // Show the "Coming Soon" message
-            responseMessage.textContent = 'این قابلیت به زودی به بازی اضافه خواهد شد...';
-            responseMessage.style.display = 'block';
+            console.log("دکمه ورود کلیک شد. فعلا عملیاتی تعریف نشده است.");
+            // در آینده کد ورود به فایربیس اینجا قرار می گیرد
         });
+        
+        // --- Start the process ---
+        document.addEventListener('DOMContentLoaded', initialize);
     </script>
 </body>
 </html>
