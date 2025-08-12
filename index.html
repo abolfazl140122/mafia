@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بازی شهر مافیا - در حال بارگذاری</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- MAFIA CLASSIC THEME (BROWN & GOLD) --- */
+        :root {
+            --mafia-brown-dark: #3a2e24;      /* Deep, rich brown for background */
+            --mafia-brown-medium: #614f3c;   /* Warmer, wood-like brown for panels */
+            --mafia-brown-light: #8a765a;    /* Lighter brown for highlights */
+            --mafia-gold-accent: #e6c88e;    /* Muted, classic gold/beige */
+            --mafia-gold-dark: #c9a868;      /* Darker shade of the gold accent */
+            --mafia-text-cream: #f2e8d9;     /* Off-white/cream for main text */
+            --mafia-text-dark: #29211b;      /* Very dark brown for text on light surfaces */
+            --mafia-panel-border: #33281e;   /* Dark border for panels */
+            --mafia-panel-border-light: #a38c6d;
+            --clash-green: #59a845;
+            --clash-green-dark: #3a752b;
+            --clash-red: #c74243;
+            --clash-red-dark: #8f2a2b;
+        }
+
+        /* --- KEYFRAME ANIMATIONS (Unchanged) --- */
+        @keyframes clash-panel-intro {
+            0% { opacity: 0; transform: scale(0.8) translateY(-30px); }
+            70% { opacity: 1; transform: scale(1.05) translateY(0); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); box-shadow: 0 6px 0 #8c7854; }
+            50% { transform: scale(1.04); box-shadow: 0 8px 12px rgba(0,0,0,0.3), 0 8px 0 #8c7854; }
+        }
+        @keyframes subtle-pan {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 200% 200%; }
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes fadeInScaleUp {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes pulseGlow {
+            0%, 100% { filter: drop-shadow(0 0 8px rgba(230, 200, 142, 0.4)); }
+            50% { filter: drop-shadow(0 0 16px rgba(230, 200, 142, 0.8)); }
+        }
+        @keyframes tipFadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- GENERAL STYLES --- */
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            color: var(--mafia-text-cream);
+            background-color: var(--mafia-brown-dark); /* Dark brown background */
+            background-image: url('https://www.transparenttextures.com/patterns/dark-wood.png'); /* Wood texture */
+            overflow: hidden;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            position: relative;
+            user-select: none;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 200%; height: 200%;
+            background-image: url('https://www.transparenttextures.com/patterns/dust.png');
+            opacity: 0.2;
+            z-index: 0;
+            animation: subtle-pan 120s linear infinite;
+        }
+
+        .clash-font {
+            font-family: 'Lilita One', cursive;
+            letter-spacing: 1px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        /* --- PANEL STYLES (Adapted to Mafia Theme) --- */
+        .panel-clash {
+            background-color: var(--mafia-brown-medium);
+            border: 4px solid var(--mafia-panel-border);
+            border-top-color: var(--mafia-brown-light);
+            border-left-color: var(--mafia-brown-light);
+            border-radius: 16px;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.4), inset 0 2px 4px rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+        .panel-clash::before, .panel-clash::after {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: var(--mafia-gold-accent);
+            border-radius: 50%;
+            border: 2px solid var(--mafia-panel-border);
+            box-shadow: 0 0 3px #000;
+        }
+        .panel-clash::before { top: 10px; left: 10px; }
+        .panel-clash::after { top: 10px; right: 10px; }
+
+        .panel-hidden {
+            opacity: 0;
+            transform: scale(0.9) translateY(-20px);
+            pointer-events: none;
+            visibility: hidden;
+        }
+        .panel-visible {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            visibility: visible;
+            animation: clash-panel-intro 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* --- BUTTON STYLES (Adapted to Mafia Theme) --- */
+        .btn-clash {
+            border-radius: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: all 0.1s ease-out;
+            cursor: pointer;
+            position: relative;
+            white-space: nowrap;
+        }
+        .btn-clash-primary {
+            background: linear-gradient(to bottom, #d4b98c, var(--mafia-gold-accent));
+            border: 2px solid var(--mafia-panel-border);
+            box-shadow: 0 6px 0 #8c7854;
+            padding: 12px 30px;
+            font-size: 1.25rem;
+            color: var(--mafia-text-dark);
+            text-shadow: 1px 1px 1px rgba(255,255,255,0.3);
+        }
+        .btn-clash-primary:hover {
+            background: linear-gradient(to bottom, #e8d0a9, #d4b98c);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 0 #8c7854;
+        }
+        .btn-clash-primary:active {
+            transform: translateY(4px) !important;
+            box-shadow: 0 2px 0 #8c7854 !important;
+        }
+        #start-game-btn.breathing {
+            animation: breathe 2.5s ease-in-out infinite;
+        }
+        
+        .btn-clash-secondary {
+            background: linear-gradient(to bottom, #8a765a, #73624c);
+            border: 2px solid var(--mafia-panel-border);
+            box-shadow: 0 5px 0 #4a3f33;
+            padding: 10px 22px;
+            font-size: 1rem;
+            color: var(--mafia-text-cream);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+        }
+         .btn-clash-secondary:hover {
+            background: linear-gradient(to bottom, #a18e74, #8a765a);
+            transform: translateY(-2px);
+            box-shadow: 0 7px 0 #4a3f33;
+        }
+        .btn-clash-secondary:active {
+            transform: translateY(3px) !important;
+            box-shadow: 0 2px 0 #4a3f33 !important;
+        }
+
+        /* --- INPUT STYLES (Adapted to Mafia Theme) --- */
+        .input-clash {
+            background-color: var(--mafia-panel-border);
+            border: 2px solid #33281e;
+            color: var(--mafia-text-cream);
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 1rem;
+            box-shadow: inset 0 3px 6px rgba(0,0,0,0.4);
+        }
+        .input-clash:focus {
+            outline: none;
+            border-color: var(--mafia-gold-accent);
+            box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 0 10px var(--mafia-gold-accent);
+        }
+
+        /* --- SCREEN & LOADING STYLES --- */
+        .screen {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100vh;
+            padding: 10px;
+            box-sizing: border-box;
+            opacity: 0; visibility: hidden;
+            transition: opacity 0.5s ease-in-out, visibility 0.5s;
+            display: flex; flex-direction: column; align-items: center;
+            z-index: 1;
+        }
+        .screen.active { opacity: 1; visibility: visible; position: relative; }
+
+        #loading-screen { 
+            justify-content: center; 
+            background: radial-gradient(circle, rgba(74, 58, 42, 0.7) 0%, rgba(41, 33, 27, 0.9) 80%);
+        }
+        
+        #loading-content-box {
+            display: flex; flex-direction: column; align-items: center;
+            text-align: center; width: 100%; max-width: 450px;
+        }
+        #loading-logo {
+            max-width: 280px; width: 70%; margin-bottom: 1.5rem;
+            animation: fadeInScaleUp 1s ease-out, pulseGlow 3s infinite 1s;
+        }
+        #loading-progress-bar-container {
+            width: 100%; background-color: var(--mafia-panel-border);
+            border: 3px solid #33281e; border-radius: 12px;
+            padding: 4px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+            margin-top: 1.5rem; margin-bottom: 0.75rem;
+        }
+        #loading-progress-bar-fill {
+            height: 18px; width: 0%;
+            background: linear-gradient(to right, var(--mafia-gold-dark), var(--mafia-gold-accent));
+            border-radius: 8px;
+            transition: width 0.5s ease-out;
+            box-shadow: 0 0 10px var(--mafia-gold-accent);
+        }
+        #loading-message {
+            font-size: 1.1rem; font-weight: bold;
+            color: var(--mafia-text-cream);
+            text-shadow: 1px 1px 2px #000;
+            min-height: 28px;
+        }
+        #loading-tip {
+            margin-top: 2rem; font-size: 0.9rem; color: #e0d0b8;
+            font-style: italic; background-color: rgba(0,0,0,0.25);
+            padding: 8px 12px; border-radius: 8px;
+            min-height: 50px;
+            display: flex; align-items: center; justify-content: center;
+            animation: tipFadeIn 0.8s ease-out;
+        }
+        
+        /* Placeholder for main screen content after loading */
+        #main-screen {
+             justify-content: center;
+        }
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Loading Screen (Starts as Active) -->
+    <div id="loading-screen" class="screen active">
+        <div id="loading-content-box">
+            <!-- Logo: The URL is from your original file -->
+            <img id="loading-logo" src="https://up.20script.ir/file/7e7a-Copilot-20250812-110015-removebg-preview.png" alt="لوگوی بازی شهر مافیا">
+            
+            <!-- Game Title with Mafia Theme Colors -->
+            <h1 class="text-4xl sm:text-5xl font-bold clash-font text-[var(--mafia-gold-accent)]" style="text-shadow: 3px 3px 0px var(--mafia-text-dark), 5px 5px 8px rgba(0,0,0,0.7);">شهر مافیا</h1>
+            
+            <!-- Progress Bar -->
+            <div id="loading-progress-bar-container">
+                <div id="loading-progress-bar-fill"></div>
+            </div>
+            
+            <!-- Loading Status Message -->
+            <p id="loading-message" class="text-lg">در حال آماده سازی...</p>
+            
+            <!-- Loading Tip -->
+            <p id="loading-tip">✨ در حال جستجو در آرشیوهای مخفی... ✨</p>
+        </div>
+    </div>
+
+    <!-- Main Screen (Hidden by default, becomes active after loading) -->
+    <div id="main-screen" class="screen">
+        <div class="panel-clash p-8 text-center">
+            <h1 class="text-4xl clash-font text-[var(--mafia-gold-accent)]" style="text-shadow: 2px 2px 2px #000;">به شهر مافیا خوش آمدید</h1>
+            <p class="mt-4 text-lg">اتصال به سرور با موفقیت انجام شد.</p>
+            <button id="start-game-btn" class="btn-clash btn-clash-primary clash-font mt-8">شروع بازی</button>
+        </div>
+    </div>
+
+    <script type="module">
+        // --- JAVASCRIPT LOGIC ---
+        
+        // Import Firebase functions from the official CDN
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.12.2/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.12.2/firebase-auth.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.12.2/firebase-analytics.js";
+
+        // Your NEW web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
+            authDomain: "mafia-9fcbf.firebaseapp.com",
+            projectId: "mafia-9fcbf",
+            storageBucket: "mafia-9fcbf.appspot.com", // Corrected storage bucket domain
+            messagingSenderId: "471627157488",
+            appId: "1:471627157488:web:92f008548a5596619a5735",
+            measurementId: "G-0PDHDWC6NV"
+        };
+        
+        // --- Global Variables ---
+        let app;
+        let auth;
+        let analytics;
+
+        // --- DOM Elements ---
+        const loadingScreen = document.getElementById('loading-screen');
+        const loadingProgressBarFill = document.getElementById('loading-progress-bar-fill');
+        const loadingMessage = document.getElementById('loading-message');
+        const loadingTip = document.getElementById('loading-tip');
+        const mainScreen = document.getElementById('main-screen');
+        let tipInterval;
+
+        /**
+         * Shows a specific screen and hides others.
+         * @param {HTMLElement} screenElement The screen to make active.
+         */
+        function showScreen(screenElement) {
+            if (!screenElement) return;
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            screenElement.classList.add('active');
+        }
+
+        /**
+         * Simulates the loading process with dynamic messages and tips.
+         */
+        function simulateLoading() {
+            const tips = [
+                "✨ آیا می‌دانستید نقش «گادفادر» یا «پدرخوانده» قدرتمندترین شهروند بازی است؟",
+                "✨ در سناریوی «شب‌های مافیا»، نقش «دکتر لکتر» می‌تواند خودش را فقط یک بار نجات دهد.",
+                "✨ «آل کاپون»، یکی از معروف‌ترین گنگسترهای تاریخ، سرانجام به خاطر فرار مالیاتی دستگیر شد.",
+                "✨ فیلم «رفقای خوب» (Goodfellas) بر اساس داستان واقعی «هنری هیل»، گنگستر سابق، ساخته شده است.",
+                "✨ اصطلاح «Omertà» به قانون سکوت در بین اعضای مافیا اشاره دارد."
+            ];
+            let currentTipIndex = Math.floor(Math.random() * tips.length);
+            
+            if (loadingTip) loadingTip.innerHTML = tips[currentTipIndex];
+
+            // Change tip every 4 seconds
+            tipInterval = setInterval(() => {
+                currentTipIndex = (currentTipIndex + 1) % tips.length;
+                if (loadingTip) {
+                    loadingTip.style.animation = 'none';
+                    loadingTip.offsetHeight; // Trigger reflow to restart animation
+                    loadingTip.style.animation = 'tipFadeIn 0.8s ease-out';
+                    loadingTip.innerHTML = tips[currentTipIndex];
+                }
+            }, 4000);
+
+            // Stage 1: Initial connection
+            setTimeout(() => {
+                if (loadingProgressBarFill) loadingProgressBarFill.style.width = '30%';
+                if (loadingMessage) loadingMessage.textContent = 'در حال برقراری ارتباط با سرور...';
+            }, 500);
+
+            // Stage 2: Preparing UI
+            setTimeout(() => {
+                if (loadingProgressBarFill) loadingProgressBarFill.style.width = '65%';
+                if (loadingMessage) loadingMessage.textContent = 'آماده‌سازی رابط کاربری...';
+            }, 1500);
+        }
+
+        /**
+         * Initializes Firebase app, auth, and sets up the auth state listener.
+         */
+        async function initFirebase() {
+            try {
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                analytics = getAnalytics(app); // Initialize Analytics
+                console.log("Firebase initialized successfully.");
+
+                // Listen for authentication state changes
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        // User is signed in anonymously.
+                        console.log("User is signed in:", user.uid);
+                    } else {
+                        // User is signed out, or no user exists. Sign in anonymously.
+                        console.log("No user found. Attempting to sign in anonymously.");
+                        signInAnonymously(auth).catch((error) => {
+                            console.error("Anonymous sign-in failed:", error);
+                            if (loadingMessage) loadingMessage.textContent = "خطا در احراز هویت.";
+                        });
+                    }
+
+                    // Once auth state is confirmed (either signed in or initiated sign-in)
+                    // we complete the loading sequence.
+                    if (loadingScreen.classList.contains('active')) {
+                        clearInterval(tipInterval); // Stop changing tips
+                        if (loadingProgressBarFill) loadingProgressBarFill.style.width = '100%';
+                        if (loadingMessage) loadingMessage.textContent = "خوش آمدید!";
+                        
+                        // Wait a moment, then transition to the main screen
+                        setTimeout(() => {
+                            if (mainScreen) showScreen(mainScreen);
+                        }, 800);
+                    }
+                });
+
+            } catch (error) {
+                console.error("Firebase initialization error:", error);
+                if (loadingMessage) loadingMessage.textContent = "خطا در اتصال به سرور بازی.";
+                if (loadingProgressBarFill) {
+                    loadingProgressBarFill.style.background = "var(--clash-red)";
+                }
+            }
+        }
+
+        /**
+         * Main function to start the game initialization process.
+         */
+        function initializeGame() {
+            simulateLoading(); // Start the visual loading simulation
+            initFirebase();    // Start the real connection to the server
+        }
+
+        // Run the game initializer when the DOM is fully loaded.
+        document.addEventListener('DOMContentLoaded', initializeGame);
+
+    </script>
+</body>
+</html>
