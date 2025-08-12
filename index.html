@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>شهر مافیا | در حال بارگذاری...</title>
+    
+    <!-- فونت‌های مورد نیاز از گوگل -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- RESET & BASIC SETUP --- */
+        :root {
+            --paper-bg: #f3e9d2;
+            --text-color: #3d352e;
+            --primary-gold: #c6a76c;
+            --dark-brown: #3a2e28;
+            --dark-red-accent: #8c3a3a;
+            --shadow-color: rgba(0, 0, 0, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: #1a1a1a;
+            /* بافت چوب تیره برای پس‌زمینه */
+            background-image: url('https://www.transparenttextures.com/patterns/dark-wood.png');
+            color: var(--text-color);
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* --- ANIMATIONS --- */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes pulseGlow {
+            0%, 100% {
+                filter: drop-shadow(0 0 5px rgba(255, 223, 150, 0.2));
+            }
+            50% {
+                filter: drop-shadow(0 0 15px rgba(255, 223, 150, 0.5));
+            }
+        }
+
+        @keyframes smokeDrift {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.15;
+            }
+            50% {
+                transform: translate(-20px, -40px) scale(1.2);
+            }
+            90% {
+                opacity: 0.05;
+            }
+            100% {
+                transform: translate(10px, -80px) scale(1.4);
+                opacity: 0;
+            }
+        }
+        
+        /* --- LAYOUT & THEME --- */
+
+        /* لایه دود متحرک در پس‌زمینه */
+        .smoke-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://www.transparenttextures.com/patterns/fog.png');
+            pointer-events: none;
+            animation: smokeDrift 25s linear infinite alternate;
+        }
+
+        /* محفظه اصلی که شبیه یک پرونده محرمانه است */
+        .dossier-container {
+            width: 90%;
+            max-width: 480px;
+            background-color: var(--paper-bg);
+            /* بافت کاغذ برای پرونده */
+            background-image: url('https://www.transparenttextures.com/patterns/paper.png');
+            border-radius: 8px;
+            border: 1px solid #c8bca6;
+            padding: 30px 25px;
+            box-shadow: 0 15px 40px var(--shadow-color), inset 0 0 15px rgba(0,0,0,0.1);
+            text-align: center;
+            position: relative;
+            z-index: 10;
+            animation: fadeIn 1.5s ease-out;
+        }
+        
+        /* مهر محرمانه در گوشه پرونده */
+        .dossier-container::before {
+            content: 'TOP SECRET';
+            position: absolute;
+            top: 25px;
+            left: -20px;
+            background-color: var(--dark-red-accent);
+            color: #f3e9d2;
+            padding: 5px 15px;
+            font-family: 'Playfair Display', serif;
+            font-size: 1rem;
+            font-weight: bold;
+            transform: rotate(-45deg);
+            border: 2px solid var(--dark-brown);
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+        }
+
+        /* لوگوی بازی */
+        .game-logo {
+            max-width: 250px;
+            width: 70%;
+            margin: 0 auto 10px auto;
+            animation: pulseGlow 4s ease-in-out infinite 1s;
+        }
+
+        /* عنوان اصلی بازی */
+        .game-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.8rem;
+            color: var(--dark-brown);
+            text-shadow: 1px 1px 0px #fff;
+            margin-bottom: 25px;
+            animation: fadeInUp 1s ease-out 0.5s backwards;
+        }
+
+        /* استایل نوار پیشرفت */
+        .progress-bar-container {
+            width: 100%;
+            height: 12px;
+            background-color: #dcd0b8;
+            border-radius: 6px;
+            border: 1px solid #b4a890;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+            margin: 25px 0 15px 0;
+            overflow: hidden;
+            animation: fadeInUp 1s ease-out 0.8s backwards;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%; /* با جاوااسکریپت کنترل می‌شود */
+            background: linear-gradient(90deg, var(--dark-red-accent), #a85858);
+            border-radius: 6px;
+            transition: width 0.5s ease-out;
+            box-shadow: 0 0 10px var(--dark-red-accent);
+        }
+
+        /* متن پیام لودینگ */
+        .loading-message {
+            font-size: 1.1rem;
+            font-weight: 700;
+            min-height: 28px; /* جلوگیری از پرش صفحه */
+            transition: opacity 0.3s ease;
+            animation: fadeInUp 1s ease-out 1s backwards;
+        }
+
+        /* نکات و دانستنی‌های مافیایی */
+        .loading-tip {
+            font-size: 0.9rem;
+            font-style: italic;
+            color: #6d6158;
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px dashed #c8bca6;
+            min-height: 45px; /* جلوگیری از پرش صفحه */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease;
+            animation: fadeInUp 1s ease-out 1.2s backwards;
+        }
+        
+        /* استایل ریسپانسیو برای موبایل */
+        @media (max-width: 480px) {
+            .game-title {
+                font-size: 2.2rem;
+            }
+            .dossier-container {
+                padding: 25px 20px;
+            }
+            .dossier-container::before {
+                font-size: 0.8rem;
+                left: -15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- لایه افکت دود برای ایجاد اتمسفر -->
+    <div class="smoke-overlay"></div>
+
+    <!-- کانتینر اصلی صفحه لودینگ با تم پرونده محرمانه -->
+    <div class="dossier-container">
+        
+        <!-- لوگوی جدید بازی -->
+        <img src="https://up.20script.ir/file/adde-Copilot-20250812-110015-removebg-preview.png" alt="لوگوی شهر مافیا" class="game-logo">
+        
+        <!-- عنوان اصلی بازی -->
+        <h1 class="game-title">شهر مافیا</h1>
+        
+        <!-- نوار پیشرفت (Progress Bar) -->
+        <div class="progress-bar-container">
+            <div id="progress-fill" class="progress-bar-fill"></div>
+        </div>
+        
+        <!-- پیام وضعیت لودینگ -->
+        <p id="loading-message" class="loading-message">در حال برقراری ارتباط...</p>
+        
+        <!-- نکات و دانستنی‌های مافیایی -->
+        <p id="loading-tip" class="loading-tip">"سکوت، طلاست." - قانون Omertà</p>
+
+    </div>
+
+    <script>
+        // --- LOGIC SCRIPT ---
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const progressBarFill = document.getElementById('progress-fill');
+            const loadingMessage = document.getElementById('loading-message');
+            const loadingTip = document.getElementById('loading-tip');
+
+            // آرایه‌ای از نکات و دیالوگ‌های معروف مافیایی
+            const mafiaTips = [
+                "«آل کاپون» در نهایت به خاطر فرار مالیاتی دستگیر شد، نه جنایاتش.",
+                "در دنیای مافیا، به قانون سکوت «Omertà» می‌گویند.",
+                "«پدرخوانده» تنها یک شخصیت نیست، او رئیس یک خانواده است.",
+                "«پیکی بلایندرز» کلاههایی با تیغ در لبه‌هایشان داشتند.",
+                "یک پیشنهاد که نمی‌تونی ردش کنی...",
+                "هرگز علیه خانواده نرو...",
+                "ماهی‌ها را برای خوابیدن بفرست.",
+                "دوستانت را نزدیک و دشمنانت را نزدیک‌تر نگه دار."
+            ];
+
+            // مراحل شبیه‌سازی شده فرآیند لودینگ
+            const loadingStages = [
+                { percent: 0, message: "در حال برقراری ارتباط با سرورهای مخفی..." },
+                { percent: 25, message: "رمزگشایی پروتکل‌های امنیتی..." },
+                { percent: 55, message: "آماده‌سازی نقشه شهر..." },
+                { percent: 80, message: "شناسایی بازیکنان..." },
+                { percent: 100, message: "خوش آمدید! شهر منتظر شماست..." }
+            ];
+
+            let currentStage = 0;
+
+            // تابعی برای به‌روزرسانی نکات به صورت دوره‌ای
+            const updateTip = () => {
+                const randomIndex = Math.floor(Math.random() * mafiaTips.length);
+                loadingTip.style.opacity = '0';
+                setTimeout(() => {
+                    loadingTip.textContent = `💡 ${mafiaTips[randomIndex]}`;
+                    loadingTip.style.opacity = '1';
+                }, 500);
+            };
+            
+            // شروع تعویض نکات هر ۴ ثانیه
+            let tipInterval = setInterval(updateTip, 4000);
+
+            // تابع اصلی برای اجرای دنباله‌ای لودینگ
+            const runLoadingSequence = () => {
+                if (currentStage >= loadingStages.length) {
+                    clearInterval(tipInterval); // توقف تعویض نکات در پایان
+                    return;
+                }
+
+                const stage = loadingStages[currentStage];
+
+                // به‌روزرسانی نوار پیشرفت و پیام
+                progressBarFill.style.width = stage.percent + '%';
+                
+                // افکت محو شدن و ظاهر شدن برای متن
+                loadingMessage.style.opacity = '0';
+                setTimeout(() => {
+                    loadingMessage.textContent = stage.message;
+                    loadingMessage.style.opacity = '1';
+                }, 300);
+
+                currentStage++;
+
+                // زمان‌بندی برای رفتن به مرحله بعد
+                const delay = stage.percent === 100 ? 2500 : 1500;
+                setTimeout(runLoadingSequence, delay);
+            };
+
+            // شروع فرآیند لودینگ با یک تأخیر اولیه
+            setTimeout(() => {
+                updateTip(); // نمایش اولین نکته
+                runLoadingSequence();
+            }, 1000);
+        });
+
+    </script>
+
+</body>
+</html>
