@@ -1,1 +1,241 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ثبت نام / ورود - اسکورت گیم</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 
+    <style>
+        :root {
+            --dark-bg: #0d1117;
+            --panel-bg: #161b22;
+            --border-color: #30363d;
+            --text-primary: #e6edf3;
+            --text-secondary: #7d8590;
+            --glow-red: #ff3355;
+            --glow-blue: #00aaff;
+            --success-color: #238636;
+            --error-color: #f85149;
+            --input-bg: #0d1117;
+        }
+
+        @keyframes content-fade-in {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes subtle-pan {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 100%; }
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+            text-align: center;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background-image: url('https://www.transparenttextures.com/patterns/dark-denim-3.png');
+            opacity: 0.05;
+            z-index: 0;
+            animation: subtle-pan 180s linear infinite;
+        }
+
+        .auth-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 400px;
+            padding: 2.5rem 2rem;
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            animation: content-fade-in 1s ease-out;
+        }
+
+        .auth-title {
+            font-size: 2rem;
+            font-weight: 900;
+            margin-bottom: 2rem;
+            text-shadow: 0 0 5px var(--glow-blue), 0 0 10px var(--glow-red);
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'Vazirmatn', sans-serif;
+            font-size: 1rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .input-field::placeholder {
+            color: var(--text-secondary);
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: var(--glow-blue);
+            box-shadow: 0 0 8px rgba(0, 170, 255, 0.5);
+        }
+
+        .btn {
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            font-family: 'Vazirmatn', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--glow-red), var(--glow-blue));
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+        .btn-secondary:hover {
+            background-color: var(--border-color);
+            color: var(--text-primary);
+        }
+        
+        .separator {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: var(--text-secondary);
+            margin: 1.5rem 0;
+        }
+        .separator::before, .separator::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .separator:not(:empty)::before { margin-left: .5em; }
+        .separator:not(:empty)::after { margin-right: .5em; }
+
+        #auth-message {
+            min-height: 24px;
+            margin-top: 1.5rem;
+            font-weight: 700;
+            transition: color 0.3s ease;
+        }
+        #auth-message.success { color: var(--success-color); }
+        #auth-message.error { color: var(--error-color); }
+        #auth-message.info { color: var(--glow-blue); }
+
+    </style>
+</head>
+<body>
+
+    <div class="auth-container">
+        <h1 class="auth-title">ورود / ثبت نام</h1>
+        
+        <form id="email-form" class="auth-form">
+            <input type="email" id="email" class="input-field" placeholder="ایمیل" required>
+            <input type="password" id="password" class="input-field" placeholder="رمز عبور" required>
+            <button type="submit" class="btn btn-primary">تایید و ادامه</button>
+        </form>
+
+        <div class="separator">یا</div>
+
+        <button id="guest-login-btn" class="btn btn-secondary">ورود به عنوان مهمان</button>
+
+        <p id="auth-message"></p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Firebase Configuration
+            const firebaseConfig = {
+              apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
+              authDomain: "mafia-9fcbf.firebaseapp.com",
+              projectId: "mafia-9fcbf",
+              storageBucket: "mafia-9fcbf.appspot.com",
+              messagingSenderId: "471627157488",
+              appId: "1:471627157488:web:92f008548a5596619a5735"
+            };
+
+            // Initialize Firebase
+            firebase.initializeApp(firebaseConfig);
+            const auth = firebase.auth();
+
+            // DOM Elements
+            const emailForm = document.getElementById('email-form');
+            const guestLoginBtn = document.getElementById('guest-login-btn');
+            const authMessage = document.getElementById('auth-message');
+
+            // --- Email Form Handler (Placeholder as requested) ---
+            emailForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                authMessage.textContent = 'این بخش به زودی تکمیل خواهد شد...';
+                authMessage.className = 'info';
+            });
+
+            // --- Anonymous/Guest Login Handler ---
+            guestLoginBtn.addEventListener('click', async () => {
+                authMessage.textContent = 'در حال ورود به عنوان مهمان...';
+                authMessage.className = '';
+
+                try {
+                    const userCredential = await auth.signInAnonymously();
+                    console.log('Signed in anonymously:', userCredential.user);
+                    
+                    authMessage.textContent = 'با موفقیت وارد شدید! در حال انتقال به بازی...';
+                    authMessage.className = 'success';
+
+                    // (اختیاری) در اینجا به صفحه بازی هدایت کنید
+                    // setTimeout(() => {
+                    //     window.location.href = '/game.html'; 
+                    // }, 2000);
+
+                } catch (error) {
+                    console.error('Anonymous sign-in failed:', error);
+                    authMessage.textContent = `خطا: ${error.message}`;
+                    authMessage.className = 'error';
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
