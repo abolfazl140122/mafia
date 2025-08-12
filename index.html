@@ -3,156 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>شهر مافیا - ورود به شهر...</title>
+    <title>شهر مافیا - در حال بارگذاری...</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
-    <style>
-        /* --- General Setup & Variables --- */
-        :root {
-            --wood-dark: #3a2e29;
-            --wood-medium: #6f4e37;
-            --accent-gold: #e0cda9;
-            --text-light: #f5f5dc; /* Beige */
-            --glow-color: rgba(255, 200, 100, 0.7);
-            --error-color: #c06c5c;
-            --success-color: #8fbc8f;
-        }
-
-        /* --- Animations --- */
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes fadeInScaleUp { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
-        @keyframes pulseGlow {
-            0%, 100% { filter: drop-shadow(0 0 8px rgba(224, 205, 169, 0.3)); }
-            50% { filter: drop-shadow(0 0 16px var(--glow-color)); }
-        }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
-        /* --- Body & Background --- */
-        html, body { height: 100%; margin: 0; overflow: hidden; }
-        body {
-            font-family: 'Vazirmatn', sans-serif;
-            background-color: var(--wood-dark);
-            background-image: url('https://www.transparenttextures.com/patterns/wood-pattern.png');
-            color: var(--text-light);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            user-select: none;
-        }
-
-        /* --- Main Container --- */
-        #main-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            max-width: 400px;
-            padding: 2rem;
-            box-sizing: border-box;
-            background-color: rgba(0, 0, 0, 0.2);
-            animation: fadeIn 1.5s ease-out;
-        }
-
-        /* --- Logo & Title --- */
-        #loading-logo {
-            width: 80%;
-            max-width: 280px;
-            margin-bottom: 1.5rem;
-            animation: fadeInScaleUp 1s ease-out, pulseGlow 3s infinite 1s;
-        }
-        h1 {
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: var(--accent-gold);
-            text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.7);
-            margin: 0 0 2rem 0;
-        }
-
-        /* --- Loading Elements --- */
-        #loading-section { width: 100%; transition: opacity 0.5s ease, transform 0.5s ease; }
-        #progress-container {
-            width: 100%; background-color: var(--wood-dark);
-            border: 3px solid #2b1f1a; border-radius: 50px; padding: 5px;
-            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6); margin-bottom: 1rem;
-        }
-        #progress-bar {
-            height: 15px; width: 0%;
-            background: linear-gradient(to right, #b4886c, var(--accent-gold));
-            border-radius: 50px; transition: width 0.5s ease-out;
-            box-shadow: 0 0 10px var(--glow-color);
-        }
-        #status-message {
-            font-size: 1.1rem; min-height: 28px; font-weight: 700;
-            text-shadow: 1px 1px 2px #000; transition: color 0.5s ease;
-        }
-        #status-message.error { color: var(--error-color); }
-        #status-message.success { color: var(--success-color); }
-        .spinner {
-            display: inline-block; width: 1em; height: 1em;
-            border: 2px solid rgba(245, 245, 220, 0.5); border-top-color: var(--text-light);
-            border-radius: 50%; animation: spin 1s linear infinite; margin-left: 8px; vertical-align: middle;
-        }
-
-        /* --- Auth Choices Buttons --- */
-        #auth-choices {
-            display: none; /* Hidden by default */
-            flex-direction: column;
-            width: 100%;
-            gap: 1rem; /* Space between buttons */
-            margin-top: 2rem;
-            animation: fadeIn 1s ease;
-        }
-        .auth-button {
-            padding: 12px 25px; font-family: 'Vazirmatn', sans-serif;
-            font-size: 1.1rem; font-weight: 700; color: var(--wood-dark);
-            background-color: var(--accent-gold); border: 2px solid #b4886c;
-            border-radius: 8px; cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: all 0.2s ease;
-            text-decoration: none;
-        }
-        .auth-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 8px rgba(0,0,0,0.4);
-            background-color: #f3e5ca;
-        }
-        
-        /* --- Retry Button --- */
-        #retry-button {
-            display: none; margin-top: 1.5rem;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div id="main-container">
-        <img id="loading-logo" src="https://up.20script.ir/file/28e7-Copilot-20250812-110015-removebg-preview.png" alt="لوگوی بازی مافیا">
+    <div class="auth-container" id="loading-screen">
+        <img class="logo pulsing" src="https://up.20script.ir/file/28e7-Copilot-20250812-110015-removebg-preview.png" alt="لوگوی بازی مافیا">
         <h1>شهر مافیا</h1>
         
-        <div id="loading-section">
-            <div id="progress-container">
-                <div id="progress-bar"></div>
-            </div>
-            <p id="status-message">
-                <span id="status-text">در حال آماده‌سازی...</span>
-                <span id="status-icon"></span>
-            </p>
+        <div id="progress-container">
+            <div id="progress-bar"></div>
         </div>
+        
+        <p id="status-message">
+            <span id="status-text">در حال آماده‌سازی...</span>
+            <span id="status-icon"></span>
+        </p>
 
-        <div id="auth-choices">
-            <a href="login.html" class="auth-button">ورود به حساب</a>
-            <a href="Registration.html" class="auth-button">ایجاد حساب جدید</a>
+        <!-- Options shown after successful connection -->
+        <div id="auth-options">
+            <a href="login.html" class="btn">ورود به حساب</a>
+            <a href="registration.html" class="btn">ایجاد حساب جدید</a>
         </div>
-
-        <button id="retry-button" class="auth-button">تلاش مجدد</button>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
 
+        // Your web app's Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
             authDomain: "mafia-9fcbf.firebaseapp.com",
@@ -163,28 +46,18 @@
             measurementId: "G-0PDHDWC6NV"
         };
         
-        // --- DOM Elements ---
         const progressBar = document.getElementById('progress-bar');
         const statusText = document.getElementById('status-text');
         const statusIcon = document.getElementById('status-icon');
         const statusMessage = document.getElementById('status-message');
-        const retryButton = document.getElementById('retry-button');
-        const loadingSection = document.getElementById('loading-section');
-        const authChoices = document.getElementById('auth-choices');
+        const progressContainer = document.getElementById('progress-container');
+        const authOptions = document.getElementById('auth-options');
 
-        // --- Main Application Logic ---
-        async function initializeGame() {
-            retryButton.style.display = 'none';
-            authChoices.style.display = 'none';
-            loadingSection.style.opacity = '1';
-            loadingSection.style.transform = 'scale(1)';
-            statusMessage.classList.remove('error', 'success');
-            
+        async function initializeAppFlow() {
             if (!navigator.onLine) {
-                showError("عدم اتصال به اینترنت!", true);
+                showError("عدم اتصال به اینترنت!");
                 return;
             }
-
             updateProgress(25, "در حال آماده‌سازی...", '<span class="spinner"></span>');
             setTimeout(connectToFirebase, 1000);
         }
@@ -198,7 +71,7 @@
                 handleSuccess();
             } catch (error) {
                 console.error("Firebase Connection Error:", error);
-                showError("خطا در اتصال به سرور!", true);
+                showError("خطا در اتصال به سرور!");
             }
         }
 
@@ -207,25 +80,16 @@
             statusMessage.classList.add('success');
             
             setTimeout(() => {
-                // Fade out loading section
-                loadingSection.style.opacity = '0';
-                loadingSection.style.transform = 'scale(0.9)';
-                
-                // After fade out, show auth choices
-                setTimeout(() => {
-                    loadingSection.style.display = 'none';
-                    authChoices.style.display = 'flex';
-                }, 500); // Match this with CSS transition duration
-                
-            }, 1000);
+                progressContainer.style.display = 'none';
+                statusMessage.style.display = 'none';
+                authOptions.style.display = 'flex'; // Show login/register buttons
+            }, 1200);
         }
 
-        function showError(message, showRetry = false) {
+        function showError(message) {
             updateProgress(progressBar.style.width.replace('%',''), message, '❌');
             statusMessage.classList.add('error');
-            if (showRetry) {
-                retryButton.style.display = 'block';
-            }
+            // In a real app, a retry button could be shown here.
         }
 
         function updateProgress(percentage, text, iconHtml = '') {
@@ -234,8 +98,7 @@
             if (statusIcon) statusIcon.innerHTML = iconHtml;
         }
         
-        retryButton.addEventListener('click', initializeGame);
-        document.addEventListener('DOMContentLoaded', initializeGame);
+        document.addEventListener('DOMContentLoaded', initializeAppFlow);
     </script>
 </body>
 </html>
