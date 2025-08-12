@@ -3,334 +3,335 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>شهر مافیا - در حال بارگذاری...</title>
-    
-    <!-- فونت‌های مورد نیاز -->
+    <title>در حال ورود به بازی...</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
-
     <style>
-        /* --- متغیرهای تم استراتژیک --- */
+        /* --- ROOT VARIABLES & THEME --- */
         :root {
-            --color-background: #12151a;
-            --color-text: #e0e5f0;
-            --color-text-muted: #8a93a2;
-            --color-primary-blue: #58a6ff; /* آبی روشن‌تر */
-            --color-primary-red: #ff7b72;  /* قرمز روشن‌تر */
-            --color-gold: #e5a500;
-            --color-success: #4ade80;
-            --color-error: #f87171;
-            --font-main: 'Vazirmatn', sans-serif;
+            --dark-bg: #0d1117; /* پس‌زمینه اصلی بسیار تیره */
+            --panel-bg: #161b22; /* پس‌زمینه پنل کمی روشن‌تر */
+            --border-color: #30363d; /* رنگ حاشیه‌ها */
+            --text-primary: #e6edf3; /* رنگ متن اصلی */
+            --text-secondary: #7d8590; /* رنگ متن ثانویه */
+            
+            /* --- GLOW COLORS (BRIGHTER & VIBRANT) --- */
+            --glow-red: #ff3355; /* قرمز روشن و پرانرژی */
+            --glow-blue: #00aaff; /* آبی روشن و الکتریکی */
+            --glow-error: #ff4136; /* قرمز برای خطا */
+
+            --loader-color: #bb86fc; /* رنگ برای نوار لودینگ */
         }
 
-        /* --- انیمیشن‌ها (Keyframes) --- */
+        /* --- KEYFRAME ANIMATIONS --- */
 
-        /* انیمیشن برای ورود المان‌ها */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes fadeInScaleUp {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        
-        /* انیمیشن اصلی برای هاله‌های نوری */
-        @keyframes glow-breathe-blue {
-            0%, 100% {
-                transform: translate(-45%, 5%) scale(1);
-                opacity: 0.6;
+        /* انیمیشن جدید برای حرکت و درخشش نورها */
+        @keyframes swirl-glow {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 0.7;
+            }
+            25% {
+                transform: translate(15px, 10px) scale(1.1);
+                opacity: 0.9;
             }
             50% {
-                transform: translate(-55%, -5%) scale(1.1);
+                transform: translate(0, -15px) scale(0.95);
                 opacity: 0.8;
+            }
+            75% {
+                transform: translate(-15px, 10px) scale(1.05);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(0, 0) scale(1);
+                opacity: 0.7;
             }
         }
         
-        @keyframes glow-breathe-red {
-            0%, 100% {
-                transform: translate(45%, -5%) scale(1);
-                opacity: 0.6;
+        /* انیمیشن برای محو شدن و ظاهر شدن محتوای لودینگ */
+        @keyframes content-fade-in {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
             }
-            50% {
-                transform: translate(55%, 5%) scale(1.1);
-                opacity: 0.8;
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
         }
         
-        /* انیمیشن برای پس‌زمینه */
+        /* انیمیشن برای پس‌زمینه متحرک */
         @keyframes subtle-pan {
-            from { background-position: 0% 0%; }
-            to { background-position: 100% 100%; }
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 100%; }
         }
 
-
-        /* --- استایل‌های اصلی --- */
-        *, *::before, *::after {
+        /* --- BASE & BODY STYLES --- */
+        * {
             box-sizing: border-box;
-        }
-        
-        html, body {
-            height: 100%;
             margin: 0;
-            overflow: hidden; /* جلوگیری از اسکرول */
+            padding: 0;
         }
 
         body {
-            font-family: var(--font-main);
-            color: var(--color-text);
-            background-color: var(--color-background);
-            background-image: url('https://www.transparenttextures.com/patterns/dark-stone-wall.png');
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-primary);
             display: flex;
             align-items: center;
             justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+            text-align: center;
         }
-        
-        /* لایه متحرک گرد و غبار برای عمق بیشتر */
+
+        /* لایه پس‌زمینه با بافت و انیمیشن */
         body::before {
             content: '';
             position: fixed;
-            top: -50%; left: -50%;
-            width: 200%; height: 200%;
-            background-image: url('https://www.transparenttextures.com/patterns/dust.png');
-            opacity: 0.1;
+            top: -50%; 
+            left: -50%;
+            width: 200%; 
+            height: 200%;
+            background-image: url('https://www.transparenttextures.com/patterns/dark-denim-3.png');
+            opacity: 0.05;
             z-index: 0;
             animation: subtle-pan 180s linear infinite;
         }
 
-        /* --- کانتینر اصلی صفحه لودینگ --- */
-        #loading-screen {
+        /* --- LOADING SCREEN CONTAINER --- */
+        .loading-screen {
+            position: relative;
+            z-index: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             width: 100%;
-            max-width: 500px;
+            max-width: 450px;
             padding: 2rem;
-            position: relative;
-            z-index: 1;
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            animation: content-fade-in 1s ease-out;
         }
 
-        /* --- بخش لوگو و افکت نوری --- */
-        #logo-container {
+        /* --- LOGO CONTAINER & GLOW EFFECT --- */
+        .logo-container {
             position: relative;
             margin-bottom: 2rem;
             display: flex;
             justify-content: center;
             align-items: center;
-            animation: fadeInScaleUp 1.2s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-
-        /* استایل هاله‌های نوری (Glow) */
-        #logo-container::before,
-        #logo-container::after {
-            content: '';
-            position: absolute;
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            z-index: 1;
-            /* فیلتر بلور برای ایجاد افکت نرم و نورانی */
-            filter: blur(80px); 
-        }
-
-        /* هاله نوری آبی (چپ) */
-        #logo-container::before {
-            background: var(--color-primary-blue);
-            left: 50%;
-            top: 50%;
-            /* انیمیشن با تاخیر برای حرکت نامتقارن */
-            animation: glow-breathe-blue 8s infinite ease-in-out;
-        }
-
-        /* هاله نوری قرمز (راست) */
-        #logo-container::after {
-            background: var(--color-primary-red);
-            right: 50%;
-            top: 50%;
-            /* انیمیشن با مدت زمان و تاخیر متفاوت */
-            animation: glow-breathe-red 7s infinite ease-in-out 0.5s;
-        }
-
-        #loading-logo {
-            width: 100%;
-            max-width: 280px;
-            position: relative;
-            z-index: 2; /* لوگو باید روی هاله‌های نوری باشد */
-            /* سایه برای برجسته کردن لوگو */
-            filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.5));
         }
         
-        /* --- بخش متن و نوار پیشرفت --- */
-        #game-title {
+        .logo-container img {
+            max-width: 200px;
+            width: 100%;
+            position: relative; /* برای قرار گرفتن روی نورها */
+            z-index: 2;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2));
+        }
+
+        /* افکت نورانی در پشت لوگو (عنصر اصلی) */
+        .logo-container::before,
+        .logo-container::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            z-index: 1; /* پشت لوگو */
+            filter: blur(60px); /* ایجاد حالت نرم و پخش برای نور */
+        }
+        
+        /* نور آبی در سمت چپ با انیمیشن حرکتی */
+        .logo-container::before {
+            background-color: var(--glow-blue);
+            left: 0;
+            transform-origin: center left;
+            animation: swirl-glow 8s ease-in-out infinite;
+        }
+
+        /* نور قرمز در سمت راست با انیمیشن حرکتی معکوس */
+        .logo-container::after {
+            background-color: var(--glow-red);
+            right: 0;
+            transform-origin: center right;
+            animation: swirl-glow 8s ease-in-out infinite reverse;
+        }
+
+        /* --- TITLE & TEXT STYLES --- */
+        .game-title {
             font-size: 2.5rem;
             font-weight: 900;
-            margin: 0 0 1rem 0;
-            text-shadow: 
-                0 0 10px rgba(0,0,0,0.5),
-                0 0 20px var(--color-gold),
-                3px 3px 2px rgba(0,0,0,0.8);
-            color: #fff;
+            color: var(--text-primary);
+            text-shadow: 0 0 5px var(--glow-blue), 0 0 15px var(--glow-red), 0 0 25px rgba(0,0,0,0.8);
+            margin-bottom: 2rem;
             letter-spacing: 1px;
-            animation: fadeIn 1.5s ease-out;
         }
 
-        #loading-progress-bar-container {
+        /* --- PROGRESS BAR --- */
+        .progress-bar-container {
             width: 100%;
-            background-color: rgba(0, 0, 0, 0.4);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 5px;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
-            margin-top: 1rem;
-            margin-bottom: 0.75rem;
-            animation: fadeIn 1.8s ease-out;
-        }
-
-        #loading-progress-bar-fill {
             height: 12px;
+            background-color: #0d1117;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+        }
+        
+        .progress-bar-fill {
             width: 0%; /* با جاوااسکریپت کنترل می‌شود */
-            background: linear-gradient(90deg, var(--color-primary-blue), var(--color-gold));
+            height: 100%;
+            background: linear-gradient(90deg, var(--glow-red), var(--glow-blue));
             border-radius: 5px;
             transition: width 0.5s ease-out, background 0.5s ease;
-            box-shadow: 0 0 10px rgba(88, 166, 255, 0.5);
+            box-shadow: 0 0 10px var(--glow-blue), 0 0 5px var(--glow-red);
+        }
+        
+        /* حالت خطا برای نوار پیشرفت */
+        .progress-bar-fill.error {
+            background: var(--glow-error);
+            box-shadow: 0 0 10px var(--glow-error);
         }
 
+        /* --- LOADING MESSAGE --- */
         #loading-message {
+            color: var(--text-secondary);
             font-size: 1rem;
             font-weight: 700;
-            color: var(--color-text-muted);
-            min-height: 24px; /* جلوگیری از پرش صفحه هنگام تغییر متن */
-            transition: color 0.5s ease;
-            animation: fadeIn 2s ease-out;
+            min-height: 24px; /* برای جلوگیری از پرش صفحه هنگام تغییر متن */
+            transition: color 0.3s ease, opacity 0.3s ease;
+            opacity: 1;
+        }
+
+        #loading-message.error {
+            color: var(--glow-error);
+            font-weight: 900;
         }
     </style>
 </head>
 <body>
 
-    <div id="loading-screen">
-        
-        <!-- کانتینر برای لوگو و افکت‌های نوری -->
-        <div id="logo-container">
-            <img id="loading-logo" src="https://up.20script.ir/file/adde-Copilot-20250812-110015-removebg-preview.png" alt="لوگوی بازی شهر مافیا">
-        </div>
-
-        <h1 id="game-title">شهر مافیا</h1>
-        
-        <!-- نوار پیشرفت -->
-        <div id="loading-progress-bar-container">
-            <div id="loading-progress-bar-fill"></div>
+    <div class="loading-screen">
+        <div class="logo-container">
+            <img src="https://up.20script.ir/file/adde-Copilot-20250812-110015-removebg-preview.png" alt="لوگوی بازی اسکورت گیم">
         </div>
         
-        <!-- پیام وضعیت -->
+        <h1 class="game-title">اسکورت گیم</h1>
+        
+        <div class="progress-bar-container">
+            <div id="progress-bar-fill" class="progress-bar-fill"></div>
+        </div>
+        
         <p id="loading-message">در حال آماده سازی...</p>
-
     </div>
 
-    <!-- کتابخانه‌های Firebase -->
+    <!-- Firebase SDKs -->
     <script type="module">
         // Import the functions you need from the SDKs you need
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.12.2/firebase-app.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.12.2/firebase-auth.js";
-        
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
         // Your web app's Firebase configuration
         const firebaseConfig = {
-          apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
-          authDomain: "mafia-9fcbf.firebaseapp.com",
-          projectId: "mafia-9fcbf",
-          storageBucket: "mafia-9fcbf.appspot.com", // Corrected storageBucket name
-          messagingSenderId: "471627157488",
-          appId: "1:471627157488:web:92f008548a5596619a5735",
-          measurementId: "G-0PDHDWC6NV"
+            apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
+            authDomain: "mafia-9fcbf.firebaseapp.com",
+            projectId: "mafia-9fcbf",
+            storageBucket: "mafia-9fcbf.firebasestorage.app",
+            messagingSenderId: "471627157488",
+            appId: "1:471627157488:web:92f008548a5596619a5735",
+            measurementId: "G-0PDHDWC6NV"
         };
-        
-        // --- DOM Element References ---
-        const progressBarFill = document.getElementById('loading-progress-bar-fill');
+
+        // DOM Elements
+        const progressBar = document.getElementById('progress-bar-fill');
         const loadingMessage = document.getElementById('loading-message');
 
         /**
-         * تابع برای به‌روزرسانی نوار پیشرفت و پیام
-         * @param {number} percentage - درصد پیشرفت (0-100)
-         * @param {string} message - پیام برای نمایش
-         * @param {string} status - وضعیت ('processing', 'success', 'error')
+         * تابعی برای بروزرسانی وضعیت لودینگ در UI
+         * @param {number} percent - درصد پیشرفت (0-100)
+         * @param {string} message - پیامی که نمایش داده می‌شود
+         * @param {boolean} isError - آیا وضعیت خطا است یا خیر
          */
-        function updateLoadingState(percentage, message, status = 'processing') {
-            if (progressBarFill) {
-                progressBarFill.style.width = `${percentage}%`;
-                
-                // تغییر رنگ نوار بر اساس وضعیت
-                if (status === 'success') {
-                    progressBarFill.style.background = `linear-gradient(90deg, #4ade80, #86efac)`;
-                    progressBarFill.style.boxShadow = `0 0 12px var(--color-success)`;
-                } else if (status === 'error') {
-                    progressBarFill.style.background = `linear-gradient(90deg, #f87171, #fca5a5)`;
-                    progressBarFill.style.boxShadow = `0 0 12px var(--color-error)`;
-                } else {
-                    progressBarFill.style.background = `linear-gradient(90deg, var(--color-primary-blue), var(--color-gold))`;
-                    progressBarFill.style.boxShadow = `0 0 10px rgba(88, 166, 255, 0.5)`;
-                }
-            }
-            if (loadingMessage) {
+        function updateStatus(percent, message, isError = false) {
+            // انیمیشن محو شدن برای تغییر نرم متن
+            loadingMessage.style.opacity = '0';
+            
+            setTimeout(() => {
+                progressBar.style.width = percent + '%';
                 loadingMessage.textContent = message;
-                loadingMessage.style.color = (status === 'error') ? 'var(--color-error)' : 'var(--color-text-muted)';
-            }
+                loadingMessage.style.opacity = '1';
+
+                if (isError) {
+                    progressBar.classList.add('error');
+                    loadingMessage.classList.add('error');
+                } else {
+                    progressBar.classList.remove('error');
+                    loadingMessage.classList.remove('error');
+                }
+            }, 300); // همگام با transition در CSS
         }
 
         /**
-         * تابع اصلی برای شروع فرآیند بارگذاری و اتصال
+         * فرآیند اصلی لودینگ و اتصال به Firebase
          */
-        async function initializeLoadingProcess() {
-            // مرحله 1: شروع اولیه
-            updateLoadingState(10, 'در حال بررسی سیستم...');
-            await new Promise(resolve => setTimeout(resolve, 500));
-
-            // مرحله 2: بررسی اتصال اینترنت
-            if (!navigator.onLine) {
-                updateLoadingState(20, 'خطا: عدم اتصال به اینترنت!', 'error');
-                console.error("Internet connection not available.");
-                return; // فرآیند متوقف می‌شود
-            }
-            
-            updateLoadingState(30, 'اتصال اینترنت برقرار است.');
-            await new Promise(resolve => setTimeout(resolve, 700));
-            
-            // مرحله 3: اتصال به سرور فایربیس
-            updateLoadingState(50, 'در حال اتصال به سرور...');
-            
+        async function startLoadingProcess() {
             try {
+                // مرحله 1: بررسی اتصال به اینترنت
+                await new Promise(resolve => setTimeout(resolve, 500)); // تاخیر اولیه برای نمایش
+                updateStatus(15, 'بررسی اتصال اینترنت...');
+                
+                if (!navigator.onLine) {
+                    throw new Error('اتصال به اینترنت برقرار نیست. لطفا شبکه خود را بررسی کنید.');
+                }
+                
+                // مرحله 2: اتصال به سرورهای Firebase
+                await new Promise(resolve => setTimeout(resolve, 800));
+                updateStatus(40, 'برقراری ارتباط با سرورهای بازی...');
+                
                 const app = initializeApp(firebaseConfig);
                 const auth = getAuth(app);
                 
-                console.log("Firebase initialized successfully.");
-                updateLoadingState(70, 'در حال احراز هویت...');
+                // مرحله 3: احراز هویت ناشناس برای تایید نهایی اتصال
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                updateStatus(75, 'احراز هویت بازیکن...');
                 
-                // مرحله 4: احراز هویت ناشناس
-                const userCredential = await signInAnonymously(auth);
-                const user = userCredential.user;
+                await signInAnonymously(auth);
                 
-                console.log("Signed in anonymously with UID:", user.uid);
-                updateLoadingState(100, 'اتصال با موفقیت برقرار شد!', 'success');
-                
-                // پس از موفقیت، می‌توان کاربر را به صفحه اصلی بازی هدایت کرد
+                // مرحله 4: موفقیت
+                await new Promise(resolve => setTimeout(resolve, 1200));
+                updateStatus(100, 'اتصال موفقیت آمیز بود! خوش آمدید...');
+
+                // (اختیاری) پس از تکمیل، می‌توانید به صفحه بازی هدایت شوید
                 setTimeout(() => {
-                    console.log("Redirecting to the main game page...");
-                    // در اینجا آدرس صفحه اصلی بازی خود را قرار دهید
-                    // window.location.href = 'game.html'; 
-                    loadingMessage.textContent = 'در حال ورود به شهر...';
+                    // window.location.href = '/game.html';
+                    console.log('Loading complete! Redirecting to game...');
                 }, 2000);
 
             } catch (error) {
-                console.error("Firebase connection or authentication error:", error);
-                updateLoadingState(60, 'خطا در اتصال به سرور!', 'error');
+                console.error("Firebase Connection Error:", error);
+                let errorMessage = 'خطا در اتصال به سرور. لطفا مجددا تلاش کنید.';
+                if (error.message.includes('اینترنت')) {
+                    errorMessage = error.message;
+                }
+                
+                // نمایش وضعیت خطا در UI
+                updateStatus(progressBar.style.width.replace('%',''), errorMessage, true);
             }
         }
 
-        // شروع فرآیند پس از بارگذاری کامل DOM
-        document.addEventListener('DOMContentLoaded', initializeLoadingProcess);
+        // شروع فرآیند پس از بارگذاری کامل صفحه
+        document.addEventListener('DOMContentLoaded', startLoadingProcess);
 
     </script>
+
 </body>
 </html>
