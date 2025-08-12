@@ -1,1 +1,158 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ورود به اسکورت گیم</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- استایل‌ها دقیقا مشابه صفحه ثبت‌نام کپی شده‌اند -->
+    <style>
+        :root {
+            --dark-bg: #0d1117;
+            --panel-bg: #161b22;
+            --border-color: #30363d;
+            --text-primary: #e6edf3;
+            --text-secondary: #7d8590;
+            --glow-red: #ff3355;
+            --glow-blue: #00aaff;
+            --input-bg: #0d1117;
+        }
 
+        @keyframes content-fade-in {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .auth-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 450px;
+            padding: 2.5rem;
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 40px var(--glow-blue), 0 0 40px var(--glow-red);
+            animation: content-fade-in 0.8s ease-out;
+        }
+
+        .auth-title {
+            font-size: 2rem;
+            font-weight: 900;
+            margin-bottom: 2rem;
+            text-shadow: 0 0 5px var(--glow-blue), 0 0 10px var(--glow-red);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: right;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'Vazirmatn', sans-serif;
+            font-size: 1rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--glow-blue);
+            box-shadow: 0 0 10px rgba(0, 170, 255, 0.5);
+        }
+
+        .cta-button {
+            width: 100%;
+            padding: 14px;
+            font-family: 'Vazirmatn', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            background: linear-gradient(90deg, var(--glow-red), var(--glow-blue));
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.3s;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 170, 255, 0.3), 0 5px 15px rgba(255, 51, 85, 0.3);
+        }
+
+        #message-area {
+            min-height: 24px;
+            margin-top: 1.5rem;
+            font-weight: 700;
+            color: var(--glow-blue);
+        }
+
+        .bottom-link {
+            margin-top: 1.5rem;
+            color: var(--text-secondary);
+        }
+        .bottom-link a {
+            color: var(--glow-blue);
+            text-decoration: none;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="auth-container">
+        <h1 class="auth-title">ورود به حساب کاربری</h1>
+        
+        <form id="login-form">
+            <div class="form-group">
+                <input type="email" id="email" class="form-input" placeholder="ایمیل" required>
+            </div>
+            <div class="form-group">
+                <input type="password" id="password" class="form-input" placeholder="رمز عبور" required>
+            </div>
+            <button type="submit" class="cta-button">ورود</button>
+        </form>
+        
+        <p id="message-area"></p>
+        
+        <div class="bottom-link">
+            حساب کاربری ندارید؟ <a href="Registration.html">یکی بسازید</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const loginForm = document.getElementById('login-form');
+            const messageArea = document.getElementById('message-area');
+
+            loginForm.addEventListener('submit', (event) => {
+                event.preventDefault(); 
+                messageArea.textContent = 'این قابلیت به زودی به بازی اضافه خواهد شد!';
+                messageArea.style.color = 'var(--glow-blue)';
+            });
+        });
+    </script>
+
+</body>
+</html>
