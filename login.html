@@ -3,158 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>شهر مافیا - ورود به حساب</title>
+    <title>شهر مافیا - ورود</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --wood-dark: #3a2e29; --wood-medium: #6f4e37; --accent-gold: #e0cda9;
-            --text-light: #f5f5dc; --glow-color: rgba(255, 200, 100, 0.7);
-            --error-color: #c06c5c; --success-color: #8fbc8f;
-        }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes fadeInScaleUp { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        
-        html, body { height: 100%; margin: 0; overflow: hidden; }
-        body {
-            font-family: 'Vazirmatn', sans-serif; background-color: var(--wood-dark);
-            background-image: url('https://www.transparenttextures.com/patterns/wood-pattern.png');
-            color: var(--text-light); display: flex; align-items: center; justify-content: center;
-            text-align: center; user-select: none;
-        }
-
-        #main-container {
-            display: flex; flex-direction: column; align-items: center;
-            width: 100%; max-width: 420px; padding: 2rem; box-sizing: border-box;
-            background: rgba(0,0,0,0.3) url('https://www.transparenttextures.com/patterns/worn-dots.png');
-            border: 4px solid #2b1f1a; border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 15px rgba(0,0,0,0.4);
-            animation: fadeInScaleUp 1s ease-out;
-        }
-
-        #auth-logo {
-            width: 50%; max-width: 180px; margin-bottom: 1rem;
-            filter: drop-shadow(0 0 10px var(--glow-color));
-        }
-        
-        h1 {
-            font-size: 2rem; font-weight: 700; color: var(--accent-gold);
-            text-shadow: 2px 2px 4px #000; margin: 0 0 1.5rem 0;
-        }
-        
-        /* --- Loading Styles (Same as index.html but simplified) --- */
-        #loading-section { width: 100%; transition: opacity 0.5s ease, transform 0.5s ease; }
-        #progress-container { width: 100%; background-color: var(--wood-dark); border: 3px solid #2b1f1a; border-radius: 50px; padding: 5px; box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6); margin-bottom: 1rem; }
-        #progress-bar { height: 15px; width: 0%; background: linear-gradient(to right, #b4886c, var(--accent-gold)); border-radius: 50px; transition: width 0.5s ease-out; box-shadow: 0 0 10px var(--glow-color); }
-        #status-message { font-size: 1.1rem; min-height: 28px; font-weight: 700; text-shadow: 1px 1px 2px #000; transition: color 0.5s ease; }
-        #status-message.error { color: var(--error-color); }
-        .spinner { display: inline-block; width: 1em; height: 1em; border: 2px solid rgba(245, 245, 220, 0.5); border-top-color: var(--text-light); border-radius: 50%; animation: spin 1s linear infinite; margin-left: 8px; vertical-align: middle; }
-
-        /* --- Form Styles --- */
-        #login-form { display: none; /* Initially hidden */ width: 100%; animation: fadeIn 1s ease; }
-        .form-group { width: 100%; margin-bottom: 1rem; position: relative; }
-        .auth-input { width: 100%; padding: 12px 15px; font-family: 'Vazirmatn', sans-serif; font-size: 1rem; color: var(--text-light); background-color: var(--wood-dark); border: 2px solid var(--wood-medium); border-radius: 8px; box-sizing: border-box; transition: all 0.3s ease; box-shadow: inset 0 2px 5px rgba(0,0,0,0.5); }
-        .auth-input::placeholder { color: #a9a9a9; }
-        .auth-input:focus { outline: none; border-color: var(--accent-gold); box-shadow: inset 0 2px 5px rgba(0,0,0,0.5), 0 0 10px var(--glow-color); }
-        #submit-button { width: 100%; padding: 12px 25px; font-size: 1.1rem; font-weight: 700; color: var(--wood-dark); background-color: var(--accent-gold); border: 2px solid #b4886c; border-radius: 8px; cursor: pointer; margin-top: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: all 0.2s ease; }
-        #submit-button:hover { transform: translateY(-2px); box-shadow: 0 6px 8px rgba(0,0,0,0.4); background-color: #f3e5ca; }
-        .form-link { margin-top: 1.5rem; color: var(--accent-gold); text-decoration: none; font-weight: 400; transition: color 0.2s; display: block; }
-        .form-link:hover { color: var(--text-light); }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div id="main-container">
-        <img id="auth-logo" src="https://up.20script.ir/file/28e7-Copilot-20250812-110015-removebg-preview.png" alt="لوگوی بازی مافیا">
-        <h1>ورود به حساب کاربری</h1>
-
-        <!-- Loading Section -->
-        <div id="loading-section">
-            <div id="progress-container"><div id="progress-bar"></div></div>
-            <p id="status-message">
-                <span id="status-text">در حال آماده‌سازی...</span>
-                <span id="status-icon"></span>
-            </p>
-        </div>
-
-        <!-- Login Form Section -->
-        <form id="login-form" novalidate>
+    <div class="auth-container">
+        <img class="logo" src="https://up.20script.ir/file/28e7-Copilot-20250812-110015-removebg-preview.png" alt="لوگوی بازی مافیا">
+        <h1>ورود به حساب</h1>
+        
+        <form id="login-form" class="auth-form">
             <div class="form-group">
-                <input type="email" id="email" class="auth-input" placeholder="ایمیل" required>
+                <label for="email">ایمیل</label>
+                <input type="email" id="email" name="email" required>
             </div>
             <div class="form-group">
-                <input type="password" id="password" class="auth-input" placeholder="رمز عبور" required>
+                <label for="password">رمز عبور</label>
+                <input type="password" id="password" name="password" required>
             </div>
-            <button type="submit" id="submit-button">ورود</button>
-            <a href="Registration.html" class="form-link">حساب جدید می‌سازید؟</a>
+            
+            <button type="submit" id="login-button" class="btn">ورود</button>
+
+            <div id="alert-message" class="alert-message" style="display: none;"></div>
         </form>
+
+        <a href="registration.html" class="btn-secondary">حساب کاربری ندارید؟ ثبت نام کنید</a>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
-            authDomain: "mafia-9fcbf.firebaseapp.com",
-            projectId: "mafia-9fcbf",
-            storageBucket: "mafia-9fcbf.firebasestorage.app",
-            messagingSenderId: "471627157488",
-            appId: "1:471627157488:web:92f008548a5596619a5735"
-        };
-        
-        const progressBar = document.getElementById('progress-bar');
-        const statusText = document.getElementById('status-text');
-        const statusIcon = document.getElementById('status-icon');
-        const loadingSection = document.getElementById('loading-section');
+    <script>
         const loginForm = document.getElementById('login-form');
+        const loginButton = document.getElementById('login-button');
+        const alertMessage = document.getElementById('alert-message');
 
-        // --- Loading Logic ---
-        async function initialize() {
-            if (!navigator.onLine) {
-                updateProgress(0, "عدم اتصال به اینترنت!", '❌');
-                return;
-            }
-            updateProgress(25, "برقراری ارتباط...", '<span class="spinner"></span>');
-            try {
-                const app = initializeApp(firebaseConfig);
-                const auth = getAuth(app);
-                await signInAnonymously(auth);
-                updateProgress(100, "سرور در دسترس است.", '✔️');
-                setTimeout(showLoginForm, 1000); // Wait a moment then show form
-            } catch (error) {
-                console.error("Firebase Connection Error:", error);
-                updateProgress(100, "خطا در اتصال به سرور!", '❌');
-            }
-        }
-
-        function showLoginForm() {
-            loadingSection.style.opacity = '0';
-            loadingSection.style.transform = 'scale(0.9)';
-            setTimeout(() => {
-                loadingSection.style.display = 'none';
-                loginForm.style.display = 'block';
-            }, 500); // Match CSS transition
-        }
-
-        function updateProgress(percentage, text, iconHtml = '') {
-            if (progressBar) progressBar.style.width = `${percentage}%`;
-            if (statusText) statusText.textContent = text;
-            if (statusIcon) statusIcon.innerHTML = iconHtml;
-        }
-
-        // --- Form Logic ---
         loginForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            console.log("دکمه ورود کلیک شد. فعلا عملیاتی تعریف نشده است.");
-            // در آینده کد ورود به فایربیس اینجا قرار می گیرد
+            e.preventDefault(); 
+            
+            // Hide previous alerts
+            alertMessage.style.display = 'none';
+
+            // Disable button and show spinner
+            loginButton.disabled = true;
+            loginButton.innerHTML = 'در حال بررسی... <span class="spinner"></span>';
+
+            // Simulate server check
+            setTimeout(() => {
+                // Restore button
+                loginButton.disabled = false;
+                loginButton.innerHTML = 'ورود';
+                
+                // Show message
+                alertMessage.textContent = 'ورود در حال حاضر امکان‌پذیر نیست. لطفاً بعداً تلاش کنید.';
+                alertMessage.style.display = 'block';
+            }, 2000); // 2-second delay
         });
-        
-        // --- Start the process ---
-        document.addEventListener('DOMContentLoaded', initialize);
     </script>
 </body>
 </html>
