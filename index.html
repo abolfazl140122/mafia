@@ -3,24 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>شهر مافیا | در حال بارگذاری...</title>
-    
-    <!-- فونت‌های مورد نیاز از گوگل -->
+    <title>Squid Game - در حال بارگذاری</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Aldrich&family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        /* --- RESET & BASIC SETUP --- */
+        /* 
+        ==============================================
+        --- SQUID GAME THEME & DUAL-COLOR GLOW EFFECT ---
+        ==============================================
+        */
+
         :root {
-            --paper-bg: #f3e9d2;
-            --text-color: #3d352e;
-            --primary-gold: #c6a76c;
-            --dark-brown: #3a2e28;
-            --dark-red-accent: #8c3a3a;
-            --shadow-color: rgba(0, 0, 0, 0.5);
+            --squid-pink: #e81e63; /* #FF4081; */
+            --squid-teal: #004d40;
+            --squid-background: #0a0a0a;
+            --squid-text-light: #f0f0f0;
+            --squid-text-dark: #1a1a1a;
+            
+            /* --- NEW: Dual-Color Glow --- */
+            --squid-glow-red: #FF1B58;
+            --squid-glow-blue: #00A3FF;
         }
 
+        /* --- KEYFRAME ANIMATIONS --- */
+        @keyframes fadeInScaleUp {
+            from { opacity: 0; transform: scale(0.9) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        /* --- NEW: Breathing animation for the dual-color glow --- */
+        @keyframes pulseGlow {
+            0%, 100% { 
+                transform: scale(1);
+                opacity: 0.7;
+                filter: blur(80px);
+            }
+            50% { 
+                transform: scale(1.1);
+                opacity: 0.9;
+                filter: blur(70px);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes subtle-noise-pan {
+            0% { transform: translate(0, 0); }
+            10% { transform: translate(-5%, -10%); }
+            20% { transform: translate(-15%, 5%); }
+            30% { transform: translate(7%, -25%); }
+            40% { transform: translate(-5%, 25%); }
+            50% { transform: translate(-15%, 10%); }
+            60% { transform: translate(15%, 0%); }
+            70% { transform: translate(0%, 15%); }
+            80% { transform: translate(3%, 35%); }
+            90% { transform: translate(-10%, 10%); }
+            100% { transform: translate(0, 0); }
+        }
+
+        /* --- GENERAL STYLES --- */
         * {
             margin: 0;
             padding: 0;
@@ -29,296 +74,255 @@
 
         body {
             font-family: 'Vazirmatn', sans-serif;
-            background-color: #1a1a1a;
-            /* بافت چوب تیره برای پس‌زمینه */
-            background-image: url('https://www.transparenttextures.com/patterns/dark-wood.png');
-            color: var(--text-color);
+            background-color: var(--squid-background);
+            color: var(--squid-text-light);
             overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+            position: relative;
+        }
+
+        /* Textured noise overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background-image: url('https://www.transparenttextures.com/patterns/noisy-grid.png');
+            opacity: 0.05;
+            z-index: 0;
+            animation: subtle-noise-pan 70s linear infinite;
+        }
+        
+        .squid-font {
+            font-family: 'Aldrich', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        /* --- LOADING SCREEN CONTAINER --- */
+        #loading-screen {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
             height: 100vh;
-            position: relative;
-        }
-
-        /* --- ANIMATIONS --- */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        @keyframes pulseGlow {
-            0%, 100% {
-                filter: drop-shadow(0 0 5px rgba(255, 223, 150, 0.2));
-            }
-            50% {
-                filter: drop-shadow(0 0 15px rgba(255, 223, 150, 0.5));
-            }
-        }
-
-        @keyframes smokeDrift {
-            0% {
-                transform: translate(0, 0) scale(1);
-                opacity: 0;
-            }
-            10% {
-                opacity: 0.15;
-            }
-            50% {
-                transform: translate(-20px, -40px) scale(1.2);
-            }
-            90% {
-                opacity: 0.05;
-            }
-            100% {
-                transform: translate(10px, -80px) scale(1.4);
-                opacity: 0;
-            }
-        }
-        
-        /* --- LAYOUT & THEME --- */
-
-        /* لایه دود متحرک در پس‌زمینه */
-        .smoke-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url('https://www.transparenttextures.com/patterns/fog.png');
-            pointer-events: none;
-            animation: smokeDrift 25s linear infinite alternate;
-        }
-
-        /* محفظه اصلی که شبیه یک پرونده محرمانه است */
-        .dossier-container {
-            width: 90%;
-            max-width: 480px;
-            background-color: var(--paper-bg);
-            /* بافت کاغذ برای پرونده */
-            background-image: url('https://www.transparenttextures.com/patterns/paper.png');
-            border-radius: 8px;
-            border: 1px solid #c8bca6;
-            padding: 30px 25px;
-            box-shadow: 0 15px 40px var(--shadow-color), inset 0 0 15px rgba(0,0,0,0.1);
-            text-align: center;
-            position: relative;
-            z-index: 10;
-            animation: fadeIn 1.5s ease-out;
-        }
-        
-        /* مهر محرمانه در گوشه پرونده */
-        .dossier-container::before {
-            content: 'TOP SECRET';
-            position: absolute;
-            top: 25px;
-            left: -20px;
-            background-color: var(--dark-red-accent);
-            color: #f3e9d2;
-            padding: 5px 15px;
-            font-family: 'Playfair Display', serif;
-            font-size: 1rem;
-            font-weight: bold;
-            transform: rotate(-45deg);
-            border: 2px solid var(--dark-brown);
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
-        }
-
-        /* لوگوی بازی */
-        .game-logo {
-            max-width: 250px;
-            width: 70%;
-            margin: 0 auto 10px auto;
-            animation: pulseGlow 4s ease-in-out infinite 1s;
-        }
-
-        /* عنوان اصلی بازی */
-        .game-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 2.8rem;
-            color: var(--dark-brown);
-            text-shadow: 1px 1px 0px #fff;
-            margin-bottom: 25px;
-            animation: fadeInUp 1s ease-out 0.5s backwards;
-        }
-
-        /* استایل نوار پیشرفت */
-        .progress-bar-container {
-            width: 100%;
-            height: 12px;
-            background-color: #dcd0b8;
-            border-radius: 6px;
-            border: 1px solid #b4a890;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
-            margin: 25px 0 15px 0;
-            overflow: hidden;
-            animation: fadeInUp 1s ease-out 0.8s backwards;
-        }
-
-        .progress-bar-fill {
-            height: 100%;
-            width: 0%; /* با جاوااسکریپت کنترل می‌شود */
-            background: linear-gradient(90deg, var(--dark-red-accent), #a85858);
-            border-radius: 6px;
-            transition: width 0.5s ease-out;
-            box-shadow: 0 0 10px var(--dark-red-accent);
-        }
-
-        /* متن پیام لودینگ */
-        .loading-message {
-            font-size: 1.1rem;
-            font-weight: 700;
-            min-height: 28px; /* جلوگیری از پرش صفحه */
-            transition: opacity 0.3s ease;
-            animation: fadeInUp 1s ease-out 1s backwards;
-        }
-
-        /* نکات و دانستنی‌های مافیایی */
-        .loading-tip {
-            font-size: 0.9rem;
-            font-style: italic;
-            color: #6d6158;
-            margin-top: 30px;
-            padding-top: 15px;
-            border-top: 1px dashed #c8bca6;
-            min-height: 45px; /* جلوگیری از پرش صفحه */
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: opacity 0.5s ease;
-            animation: fadeInUp 1s ease-out 1.2s backwards;
+            padding: 20px;
+            z-index: 10;
+        }
+
+        #loading-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
+            animation: fadeIn 1s ease-out;
+        }
+
+        /* --- LOGO AND DUAL-GLOW EFFECT --- */
+        #logo-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 2rem;
+            animation: fadeInScaleUp 1.5s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        #loading-logo {
+            max-width: 300px;
+            width: 80%;
+            position: relative; /* Must be relative to be on top of the glow */
+            z-index: 2; /* Ensures logo is above the glow */
+            filter: drop-shadow(0 0 15px rgba(0, 0, 0, 0.5));
+        }
+
+        /* --- THIS IS THE DUAL-COLOR GLOW EFFECT --- */
+        #logo-glow-effect {
+            position: absolute;
+            width: 110%;
+            height: 110%;
+            z-index: 1; /* Sits right behind the logo */
+            
+            /* The gradient from blue on the left to red on the right */
+            background: linear-gradient(90deg, var(--squid-glow-blue), var(--squid-glow-red));
+
+            /* The breathing/pulsing animation */
+            animation: pulseGlow 5s ease-in-out infinite;
+        }
+
+        /* --- TITLE --- */
+        #loading-title {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--squid-text-light);
+            margin-bottom: 2rem;
+            text-shadow: 0 0 5px var(--squid-pink), 0 0 10px var(--squid-pink);
         }
         
-        /* استایل ریسپانسیو برای موبایل */
-        @media (max-width: 480px) {
-            .game-title {
-                font-size: 2.2rem;
+        @media (min-width: 640px) {
+            #loading-title {
+                font-size: 3.5rem;
             }
-            .dossier-container {
-                padding: 25px 20px;
-            }
-            .dossier-container::before {
-                font-size: 0.8rem;
-                left: -15px;
-            }
+        }
+
+        /* --- PROGRESS BAR --- */
+        #loading-progress-container {
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            padding: 5px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        #loading-progress-fill {
+            height: 16px;
+            width: 0%; /* Starts at 0, controlled by JS */
+            background: linear-gradient(90deg, #f06292, var(--squid-pink));
+            border-radius: 50px;
+            transition: width 0.5s ease-out;
+            box-shadow: 0 0 10px var(--squid-pink), 0 0 5px var(--squid-pink);
+        }
+
+        /* --- MESSAGES & TIPS --- */
+        #loading-message {
+            font-size: 1.1rem;
+            font-weight: bold;
+            min-height: 28px; /* Prevents layout shift */
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        #loading-tip {
+            margin-top: 2rem;
+            font-size: 0.9rem;
+            color: #ccc;
+            font-style: italic;
+            background-color: rgba(0,0,0,0.3);
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            min-height: 50px; /* Prevents layout shift */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            max-width: 90%;
+            transition: opacity 0.5s ease-in-out;
         }
     </style>
 </head>
 <body>
 
-    <!-- لایه افکت دود برای ایجاد اتمسفر -->
-    <div class="smoke-overlay"></div>
+    <div id="loading-screen">
+        <div id="loading-content">
+            
+            <!-- Logo with its container for the glow effect -->
+            <div id="logo-container">
+                <img id="loading-logo" src="https://up.20script.ir/file/d598-squid-game-logo-C393B604B4-seeklogo.com.png" alt="لوگوی بازی مرکب">
+                <!-- This element creates the beautiful blue and red glow behind the logo -->
+                <div id="logo-glow-effect"></div>
+            </div>
 
-    <!-- کانتینر اصلی صفحه لودینگ با تم پرونده محرمانه -->
-    <div class="dossier-container">
-        
-        <!-- لوگوی جدید بازی -->
-        <img src="https://up.20script.ir/file/adde-Copilot-20250812-110015-removebg-preview.png" alt="لوگوی شهر مافیا" class="game-logo">
-        
-        <!-- عنوان اصلی بازی -->
-        <h1 class="game-title">شهر مافیا</h1>
-        
-        <!-- نوار پیشرفت (Progress Bar) -->
-        <div class="progress-bar-container">
-            <div id="progress-fill" class="progress-bar-fill"></div>
+            <h1 id="loading-title" class="squid-font">SQUID GAME</h1>
+            
+            <div id="loading-progress-container">
+                <div id="loading-progress-fill"></div>
+            </div>
+            
+            <p id="loading-message">در حال برقراری ارتباط با سرور...</p>
+            
+            <p id="loading-tip">○ △ □</p>
         </div>
-        
-        <!-- پیام وضعیت لودینگ -->
-        <p id="loading-message" class="loading-message">در حال برقراری ارتباط...</p>
-        
-        <!-- نکات و دانستنی‌های مافیایی -->
-        <p id="loading-tip" class="loading-tip">"سکوت، طلاست." - قانون Omertà</p>
-
     </div>
 
     <script>
-        // --- LOGIC SCRIPT ---
-
         document.addEventListener('DOMContentLoaded', () => {
-            const progressBarFill = document.getElementById('progress-fill');
+
+            // --- Get references to DOM elements ---
+            const progressBarFill = document.getElementById('loading-progress-fill');
             const loadingMessage = document.getElementById('loading-message');
             const loadingTip = document.getElementById('loading-tip');
 
-            // آرایه‌ای از نکات و دیالوگ‌های معروف مافیایی
-            const mafiaTips = [
-                "«آل کاپون» در نهایت به خاطر فرار مالیاتی دستگیر شد، نه جنایاتش.",
-                "در دنیای مافیا، به قانون سکوت «Omertà» می‌گویند.",
-                "«پدرخوانده» تنها یک شخصیت نیست، او رئیس یک خانواده است.",
-                "«پیکی بلایندرز» کلاههایی با تیغ در لبه‌هایشان داشتند.",
-                "یک پیشنهاد که نمی‌تونی ردش کنی...",
-                "هرگز علیه خانواده نرو...",
-                "ماهی‌ها را برای خوابیدن بفرست.",
-                "دوستانت را نزدیک و دشمنانت را نزدیک‌تر نگه دار."
-            ];
+            let tipInterval;
 
-            // مراحل شبیه‌سازی شده فرآیند لودینگ
-            const loadingStages = [
-                { percent: 0, message: "در حال برقراری ارتباط با سرورهای مخفی..." },
-                { percent: 25, message: "رمزگشایی پروتکل‌های امنیتی..." },
-                { percent: 55, message: "آماده‌سازی نقشه شهر..." },
-                { percent: 80, message: "شناسایی بازیکنان..." },
-                { percent: 100, message: "خوش آمدید! شهر منتظر شماست..." }
-            ];
+            // --- Function to simulate the loading process ---
+            function simulateLoading() {
+                const tips = [
+                    "قانون شماره ۱: بازیکن مجاز به توقف بازی نیست.",
+                    "۴۵.۶ میلیارد وون، جایزه نهایی.",
+                    "در بازی «چراغ سبز، چراغ قرمز»، باید قبل از چرخیدن سر عروسک، بایستید.",
+                    "دالگونا، یک آب‌نبات سنتی کره‌ای است که باید شکل روی آن را سالم دربیاورید.",
+                    "چهره‌ی پیشرو (Front Man) از ماسک دارت ویدر الهام گرفته شده است.",
+                    "○ △ □"
+                ];
+                let currentTipIndex = 0;
 
-            let currentStage = 0;
+                // Function to update the tip text with a fade effect
+                const updateTip = () => {
+                    currentTipIndex = (currentTipIndex + 1) % tips.length;
+                    if (loadingTip) {
+                        loadingTip.style.opacity = '0';
+                        setTimeout(() => {
+                            loadingTip.innerHTML = tips[currentTipIndex];
+                            loadingTip.style.opacity = '1';
+                        }, 500); // 500ms for fade out
+                    }
+                };
 
-            // تابعی برای به‌روزرسانی نکات به صورت دوره‌ای
-            const updateTip = () => {
-                const randomIndex = Math.floor(Math.random() * mafiaTips.length);
-                loadingTip.style.opacity = '0';
-                setTimeout(() => {
-                    loadingTip.textContent = `💡 ${mafiaTips[randomIndex]}`;
-                    loadingTip.style.opacity = '1';
-                }, 500);
-            };
-            
-            // شروع تعویض نکات هر ۴ ثانیه
-            let tipInterval = setInterval(updateTip, 4000);
+                // Start cycling through tips
+                updateTip(); // Show the first tip immediately
+                tipInterval = setInterval(updateTip, 4000); // Change tip every 4 seconds
 
-            // تابع اصلی برای اجرای دنباله‌ای لودینگ
-            const runLoadingSequence = () => {
-                if (currentStage >= loadingStages.length) {
-                    clearInterval(tipInterval); // توقف تعویض نکات در پایان
-                    return;
-                }
-
-                const stage = loadingStages[currentStage];
-
-                // به‌روزرسانی نوار پیشرفت و پیام
-                progressBarFill.style.width = stage.percent + '%';
+                // --- Staged Loading Simulation ---
                 
-                // افکت محو شدن و ظاهر شدن برای متن
-                loadingMessage.style.opacity = '0';
+                // Stage 1: Connecting (after 0.5s)
                 setTimeout(() => {
-                    loadingMessage.textContent = stage.message;
-                    loadingMessage.style.opacity = '1';
-                }, 300);
+                    if (progressBarFill) progressBarFill.style.width = '25%';
+                    if (loadingMessage) loadingMessage.textContent = 'در حال بررسی وضعیت بازیکنان...';
+                }, 500);
 
-                currentStage++;
+                // Stage 2: Preparing UI (after 1.5s)
+                setTimeout(() => {
+                    if (progressBarFill) progressBarFill.style.width = '60%';
+                    if (loadingMessage) loadingMessage.textContent = 'آماده‌سازی زمین بازی...';
+                }, 1500);
 
-                // زمان‌بندی برای رفتن به مرحله بعد
-                const delay = stage.percent === 100 ? 2500 : 1500;
-                setTimeout(runLoadingSequence, delay);
-            };
+                // Stage 3: Finalizing (after 2.8s)
+                setTimeout(() => {
+                    if (progressBarFill) progressBarFill.style.width = '90%';
+                    if (loadingMessage) loadingMessage.textContent = 'قوانین در حال نهایی شدن است...';
+                }, 2800);
 
-            // شروع فرآیند لودینگ با یک تأخیر اولیه
-            setTimeout(() => {
-                updateTip(); // نمایش اولین نکته
-                runLoadingSequence();
-            }, 1000);
+                // Stage 4: Complete (after 4s)
+                setTimeout(() => {
+                    if (progressBarFill) progressBarFill.style.width = '100%';
+                    if (loadingMessage) loadingMessage.textContent = 'بازی در شرف آغاز است!';
+                    clearInterval(tipInterval); // Stop changing tips
+                }, 4000);
+
+                // Stage 5: Redirect to the main game page (after 5.5s)
+                setTimeout(() => {
+                    // When your main game page is ready, uncomment the line below:
+                    // window.location.href = 'serchplayers.html'; 
+                    
+                    // For this demo, we'll just show an alert.
+                    console.log("آماده برای انتقال به صفحه اصلی بازی.");
+                    // You can add a fade-out effect here before redirecting
+                    document.body.style.transition = 'opacity 0.5s ease-out';
+                    document.body.style.opacity = '0';
+
+                }, 5500);
+            }
+
+            // --- Start the loading simulation ---
+            simulateLoading();
         });
-
     </script>
 
 </body>
