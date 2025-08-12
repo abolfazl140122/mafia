@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>شهر مافیا - ورود به شهر</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* --- General Setup (Consistent with index.html) --- */
+        :root {
+            --wood-dark: #3a2e29;
+            --wood-medium: #6f4e37;
+            --wood-panel: #5a3d2b;
+            --accent-gold: #e0cda9;
+            --text-light: #f5f5dc; /* Beige */
+            --glow-color: rgba(255, 200, 100, 0.7);
+            --modal-backdrop: rgba(0, 0, 0, 0.7);
+        }
+
+        /* --- Animations --- */
+        @keyframes fadeInScaleUp {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* --- Body & Background --- */
+        html, body {
+            height: 100%;
+            margin: 0;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: var(--wood-dark);
+            background-image: url('https://www.transparenttextures.com/patterns/wood-pattern.png');
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 0; /* Add padding for smaller screens */
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        /* --- Authentication Container --- */
+        #auth-container {
+            width: 90%;
+            max-width: 420px;
+            padding: 2.5rem;
+            box-sizing: border-box;
+            background-color: var(--wood-panel);
+            border: 4px solid #2b1f1a;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(0,0,0,0.4);
+            text-align: center;
+            animation: fadeInScaleUp 1s ease-out;
+        }
+        
+        #logo {
+            width: 150px;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--accent-gold);
+            text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.7);
+            margin: 0 0 2rem 0;
+        }
+
+        /* --- Form Styling --- */
+        #registration-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        .input-group {
+            position: relative;
+            text-align: right;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            font-size: 1rem;
+            text-shadow: 1px 1px 2px #000;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            font-family: 'Vazirmatn', sans-serif;
+            font-size: 1rem;
+            background-color: var(--wood-dark);
+            border: 2px solid #2b1f1a;
+            border-radius: 8px;
+            color: var(--text-light);
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6);
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .input-group input::placeholder {
+            color: rgba(245, 245, 220, 0.4);
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--accent-gold);
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6), 0 0 15px var(--glow-color);
+        }
+        
+        /* --- Buttons --- */
+        #register-button {
+            margin-top: 1rem;
+            padding: 15px 25px;
+            font-family: 'Vazirmatn', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 900;
+            color: var(--wood-dark);
+            background: linear-gradient(145deg, #f3e5ca, var(--accent-gold));
+            border: 2px solid #b4886c;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+            transition: all 0.2s ease;
+            text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.2);
+        }
+        
+        #register-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.4);
+        }
+
+        /* --- Separator & Anonymous Login --- */
+        .separator {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: rgba(224, 205, 169, 0.6);
+            margin: 1.5rem 0;
+            font-weight: 700;
+        }
+        .separator::before,
+        .separator::after {
+            content: '';
+            flex: 1;
+            border-bottom: 2px dashed rgba(224, 205, 169, 0.3);
+        }
+        .separator:not(:empty)::before {
+            margin-left: .5em;
+        }
+        .separator:not(:empty)::after {
+            margin-right: .5em;
+        }
+
+        #anonymous-login-link {
+            display: inline-block;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-light);
+            text-decoration: none;
+            padding: 10px 20px;
+            border: 2px solid rgba(224, 205, 169, 0.5);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        #anonymous-login-link:hover {
+            background-color: rgba(224, 205, 169, 0.1);
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+        }
+        
+        /* --- "Coming Soon" Modal --- */
+        #modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--modal-backdrop);
+            display: none; /* Initially hidden */
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.5s;
+        }
+        
+        #modal-content {
+            background-color: var(--wood-panel);
+            padding: 2.5rem;
+            border-radius: 15px;
+            border: 4px solid #2b1f1a;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            max-width: 350px;
+            animation: fadeInScaleUp 0.5s ease-out;
+            position: relative;
+        }
+
+        #modal-content h2 {
+            color: var(--accent-gold);
+            font-size: 1.8rem;
+            margin-top: 0;
+            margin-bottom: 1rem;
+        }
+
+        #modal-content p {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        
+        #modal-close-btn {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: none;
+            border: none;
+            color: var(--accent-gold);
+            font-size: 2rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        #modal-close-btn:hover {
+            transform: scale(1.2);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="auth-container">
+        <img id="logo" src="https://up.20script.ir/file/28e7-Copilot-20250812-110015-removebg-preview.png" alt="لوگوی بازی مافیا">
+        <h1>ورود به شهر</h1>
+        
+        <form id="registration-form" novalidate>
+            <div class="input-group">
+                <label for="username">نام کاربری</label>
+                <input type="text" id="username" name="username" placeholder="نام شما در بازی..." required>
+            </div>
+            <div class="input-group">
+                <label for="email">ایمیل</label>
+                <input type="email" id="email" name="email" placeholder="mafia@example.com" required>
+            </div>
+            <div class="input-group">
+                <label for="password">رمز عبور</label>
+                <input type="password" id="password" name="password" placeholder="یک رمز عبور قوی انتخاب کنید" required>
+            </div>
+            <button type="submit" id="register-button">ثبت نام</button>
+        </form>
+
+        <div class="separator">یا</div>
+        
+        <a href="#" id="anonymous-login-link">به صورت ناشناس وارد شوید</a>
+    </div>
+
+    <!-- "Coming Soon" Modal -->
+    <div id="modal-overlay">
+        <div id="modal-content">
+            <button id="modal-close-btn">&times;</button>
+            <h2>به زودی...</h2>
+            <p>بخش ثبت‌نام با ایمیل در حال حاضر در دست ساخت است. به زودی می‌توانید با حساب کاربری خود وارد شهر مافیا شوید!</p>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const registrationForm = document.getElementById('registration-form');
+            const modalOverlay = document.getElementById('modal-overlay');
+            const modalCloseBtn = document.getElementById('modal-close-btn');
+            const anonymousLoginLink = document.getElementById('anonymous-login-link');
+
+            // --- Show the "Coming Soon" modal on form submission ---
+            registrationForm.addEventListener('submit', (event) => {
+                event.preventDefault(); // Prevents the form from actually submitting
+                modalOverlay.style.display = 'flex';
+            });
+
+            // --- Close the modal ---
+            const closeModal = () => {
+                modalOverlay.style.display = 'none';
+            };
+
+            modalCloseBtn.addEventListener('click', closeModal);
+            // Also close modal if user clicks on the dark background
+            modalOverlay.addEventListener('click', (event) => {
+                if (event.target === modalOverlay) {
+                    closeModal();
+                }
+            });
+
+            // --- Handle Anonymous Login Click ---
+            anonymousLoginLink.addEventListener('click', (event) => {
+                event.preventDefault();
+                // In a real app, you would initiate Firebase anonymous login here.
+                // For now, we just show an alert or redirect.
+                alert('در حال حاضر این بخش فعال نیست، اما به زودی می‌توانید به صورت ناشناس وارد شوید!');
+                // Example of future implementation:
+                // signInAnonymously(auth).then(() => { window.location.href = 'game.html'; });
+            });
+        });
+    </script>
+</body>
+</html>
