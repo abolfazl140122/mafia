@@ -3,28 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Escort Game - در حال بارگذاری...</title>
-    
-    <!-- ایمپورت فونت‌های حرفه‌ای برای تم جدید -->
+    <title>در حال ورود به بازی...</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        /* --- THEME: STRATEGIC & MODERN --- */
+        /* --- ROOT VARIABLES & THEME --- */
         :root {
-            --dark-bg: #0a0e1a; /* پس‌زمینه اصلی: آبی بسیار تیره/مشکی */
-            --primary-blue: #00bfff; /* آبی درخشان برای نور سمت چپ */
-            --primary-red: #ff1a4f; /* قرمز/صورتی درخشان برای نور سمت راست */
-            --text-color: #e0e0e0; /* رنگ متن اصلی */
-            --text-color-darker: #a0a0b0; /* رنگ متن ثانویه */
-            --progress-bar-bg: rgba(255, 255, 255, 0.08); /* پس‌زمینه نوار پیشرفت */
+            --dark-bg: #0d1117; /* پس‌زمینه اصلی بسیار تیره */
+            --panel-bg: #161b22; /* پس‌زمینه پنل کمی روشن‌تر */
+            --border-color: #30363d; /* رنگ حاشیه‌ها */
+            --text-primary: #e6edf3; /* رنگ متن اصلی */
+            --text-secondary: #7d8590; /* رنگ متن ثانویه */
+            
+            /* --- GLOW COLORS (BRIGHTER & VIBRANT) --- */
+            --glow-red: #ff3355; /* قرمز روشن و پرانرژی */
+            --glow-blue: #00aaff; /* آبی روشن و الکتریکی */
+
+            --loader-color: #bb86fc; /* رنگ برای نوار لودینگ */
         }
 
         /* --- KEYFRAME ANIMATIONS --- */
 
-        /* انیمیشن برای ورود و نمایش محتوا */
-        @keyframes fadeIn {
+        /* انیمیشن برای حرکت و درخشش نورها */
+        @keyframes swirl-glow {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 0.7;
+            }
+            25% {
+                transform: translate(15px, 10px) scale(1.1);
+                opacity: 0.9;
+            }
+            50% {
+                transform: translate(0, -15px) scale(0.95);
+                opacity: 0.8;
+            }
+            75% {
+                transform: translate(-15px, 10px) scale(1.05);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(0, 0) scale(1);
+                opacity: 0.7;
+            }
+        }
+        
+        /* انیمیشن برای محو شدن و ظاهر شدن محتوای لودینگ */
+        @keyframes content-fade-in {
             from {
                 opacity: 0;
                 transform: translateY(20px);
@@ -34,254 +60,206 @@
                 transform: translateY(0);
             }
         }
-
-        /* انیمیشن برای شناور بودن لوگو */
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0px);
-            }
-            50% {
-                transform: translateY(-15px);
-            }
+        
+        /* انیمیشن برای پس‌زمینه متحرک */
+        @keyframes subtle-pan {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 100%; }
         }
 
-        /* انیمیشن اصلی برای نورپردازی پشت لوگو (آبی) */
-        @keyframes pulseGlowBlue {
-            0%, 100% {
-                transform: translate(-75%, -50%) scale(0.95);
-                opacity: 0.7;
-            }
-            50% {
-                transform: translate(-70%, -50%) scale(1.05);
-                opacity: 1;
-            }
+        /* --- BASE & BODY STYLES --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
-        /* انیمیشن اصلی برای نورپردازی پشت لوگو (قرمز) */
-        @keyframes pulseGlowRed {
-            0%, 100% {
-                transform: translate(-25%, -50%) scale(0.95);
-                opacity: 0.7;
-            }
-            50% {
-                transform: translate(-30%, -50%) scale(1.05);
-                opacity: 1;
-            }
-        }
-
-        /* --- BASE STYLES --- */
         body {
             font-family: 'Vazirmatn', sans-serif;
             background-color: var(--dark-bg);
-            /* افکت گرادینت برای تمرکز نور در مرکز و بافت نویزی برای حس استراتژیک */
-            background-image: 
-                radial-gradient(circle at center, rgba(15, 22, 40, 0.8) 0%, transparent 70%),
-                url('https://www.transparenttextures.com/patterns/dark-circles.png');
-            color: var(--text-color);
-            margin: 0;
-            padding: 20px;
+            color: var(--text-primary);
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
             overflow: hidden;
             text-align: center;
-            box-sizing: border-box;
+        }
+
+        /* لایه پس‌زمینه با بافت و انیمیشن */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%; 
+            left: -50%;
+            width: 200%; 
+            height: 200%;
+            background-image: url('https://www.transparenttextures.com/patterns/dark-denim-3.png');
+            opacity: 0.05;
+            z-index: 0;
+            animation: subtle-pan 180s linear infinite;
         }
 
         /* --- LOADING SCREEN CONTAINER --- */
-        #loading-screen {
+        .loading-screen {
+            position: relative;
+            z-index: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            max-width: 500px;
             width: 100%;
-            animation: fadeIn 1.5s ease-out;
+            max-width: 450px;
+            padding: 2rem;
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            animation: content-fade-in 1s ease-out;
         }
 
-        /* --- LOGO & GLOW EFFECT CONTAINER --- */
-        #logo-container {
-            position: relative; /* ضروری برای قرارگیری نورها در پشت */
-            margin-bottom: 2rem;
-            animation: float 6s ease-in-out infinite;
-        }
-
-        #game-logo {
-            max-width: 280px; /* اندازه لوگو */
-            width: 70%;
-            height: auto;
+        /* --- LOGO CONTAINER & GLOW EFFECT --- */
+        .logo-container {
             position: relative;
-            z-index: 2; /* لوگو باید روی نورها باشد */
-            filter: drop-shadow(0 0 15px rgba(0, 0, 0, 0.5)); /* سایه ملایم برای برجستگی */
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .logo-container img {
+            max-width: 200px;
+            width: 100%;
+            position: relative; /* برای قرار گرفتن روی نورها */
+            z-index: 2;
+            /* فیلتر برای درخشش لبه‌های لوگو */
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2));
         }
 
-        /* --- THE DUAL-COLOR GLOW EFFECT --- */
-        /* این بخش کلیدی‌ترین قسمت طراحی است */
-        #logo-container::before,
-        #logo-container::after {
+        /* افکت نورانی در پشت لوگو (عنصر اصلی) */
+        .logo-container::before,
+        .logo-container::after {
             content: '';
             position: absolute;
             top: 50%;
-            left: 50%;
-            width: 200px; /* اندازه منبع نور */
-            height: 200px;
+            width: 150px;
+            height: 150px;
             border-radius: 50%;
-            filter: blur(80px); /* افکت محو شدگی برای ایجاد حالت نورانی */
-            z-index: 1; /* نورها باید پشت لوگو باشند */
+            z-index: 1; /* پشت لوگو */
+            filter: blur(60px); /* ایجاد حالت نرم و پخش برای نور */
         }
-
+        
         /* نور آبی در سمت چپ */
-        #logo-container::before {
-            background: var(--primary-blue);
-            transform: translate(-75%, -50%); /* جابجایی به سمت چپ مرکز */
-            animation: pulseGlowBlue 7s ease-in-out infinite;
+        .logo-container::before {
+            background-color: var(--glow-blue);
+            left: 0;
+            transform-origin: center left;
+            animation: swirl-glow 8s ease-in-out infinite;
         }
 
         /* نور قرمز در سمت راست */
-        #logo-container::after {
-            background: var(--primary-red);
-            transform: translate(-25%, -50%); /* جابجایی به سمت راست مرکز */
-            animation: pulseGlowRed 7s ease-in-out infinite 0.5s; /* با کمی تاخیر برای عدم تقارن */
+        .logo-container::after {
+            background-color: var(--glow-red);
+            right: 0;
+            transform-origin: center right;
+            animation: swirl-glow 8s ease-in-out infinite reverse; /* حرکت معکوس برای عدم تقارن */
         }
-        
-        /* --- GAME TITLE --- */
-        #game-title {
-            font-family: 'Russo One', sans-serif; /* فونت خاص و استراتژیک برای عنوان */
-            font-size: 3rem;
-            color: #fff;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            margin: 0 0 1.5rem 0;
-            /* افکت نئونی برای متن با استفاده از رنگ‌های تم */
-            text-shadow: 
-                0 0 5px #fff,
-                0 0 10px var(--primary-blue),
-                0 0 20px var(--primary-red),
-                0 0 30px var(--primary-blue),
-                0 0 40px var(--primary-red);
+
+        /* --- TITLE & TEXT STYLES --- */
+        .game-title {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--text-primary);
+            text-shadow: 0 0 5px var(--glow-blue), 0 0 15px var(--glow-red), 0 0 25px rgba(0,0,0,0.8);
+            margin-bottom: 2rem;
+            letter-spacing: 1px;
         }
 
         /* --- PROGRESS BAR --- */
-        #progress-bar-container {
+        .progress-bar-container {
             width: 100%;
-            background-color: var(--progress-bar-bg);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 10px;
-            padding: 4px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3), inset 0 1px 3px rgba(0,0,0,0.5);
-            margin-bottom: 1rem;
-        }
-
-        #progress-bar-fill {
             height: 12px;
+            background-color: #0d1117;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+        }
+        
+        .progress-bar-fill {
             width: 0%; /* با جاوااسکریپت کنترل می‌شود */
-            border-radius: 7px;
-            /* گرادینت زیبا که از رنگ‌های تم استفاده می‌کند */
-            background: linear-gradient(90deg, var(--primary-blue) 0%, var(--primary-red) 100%);
-            box-shadow: 0 0 10px var(--primary-blue), 0 0 15px var(--primary-red);
-            transition: width 0.4s ease-out; /* انیمیشن نرم برای پر شدن */
+            height: 100%;
+            background: linear-gradient(90deg, var(--glow-red), var(--glow-blue));
+            border-radius: 5px;
+            transition: width 0.4s ease-out;
+            box-shadow: 0 0 10px var(--glow-blue), 0 0 5px var(--glow-red);
         }
 
-        /* --- LOADING STATUS TEXT --- */
-        #loading-status {
+        /* --- LOADING MESSAGE --- */
+        #loading-message {
+            color: var(--text-secondary);
             font-size: 1rem;
-            color: var(--text-color-darker);
-            letter-spacing: 1px;
-            min-height: 24px; /* جلوگیری از پرش صفحه هنگام تغییر متن */
+            font-weight: 700;
+            min-height: 24px; /* برای جلوگیری از پرش صفحه هنگام تغییر متن */
             transition: color 0.3s ease;
-        }
-
-        /* --- RESPONSIVENESS --- */
-        @media (max-width: 600px) {
-            #game-title {
-                font-size: 2.2rem;
-            }
-            #game-logo {
-                max-width: 220px;
-            }
-            #logo-container::before,
-            #logo-container::after {
-                width: 150px;
-                height: 150px;
-                filter: blur(60px);
-            }
         }
     </style>
 </head>
 <body>
 
-    <div id="loading-screen">
+    <div class="loading-screen">
+        <div class="logo-container">
+            <img src="https://up.20script.ir/file/adde-Copilot-20250812-110015-removebg-preview.png" alt="لوگوی بازی اسکورت گیم">
+        </div>
         
-        <div id="logo-container">
-            <img id="game-logo" src="https://up.20script.ir/file/adde-Copilot-20250812-110015-removebg-preview.png" alt="لوگوی بازی اسکورت گیم">
+        <h1 class="game-title">اسکورت گیم</h1>
+        
+        <div class="progress-bar-container">
+            <div id="progress-bar-fill" class="progress-bar-fill"></div>
         </div>
-
-        <h1 id="game-title">Escort Game</h1>
-
-        <div id="progress-bar-container">
-            <div id="progress-bar-fill"></div>
-        </div>
-
-        <p id="loading-status">در حال آماده‌سازی سیستم...</p>
-
+        
+        <p id="loading-message">در حال آماده سازی...</p>
     </div>
 
     <script>
-        // --- JAVASCRIPT LOGIC FOR LOADING SIMULATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const progressBar = document.getElementById('progress-bar-fill');
+            const loadingMessage = document.getElementById('loading-message');
 
-        // انتخاب عناصر از DOM
-        const progressBarFill = document.getElementById('progress-bar-fill');
-        const loadingStatus = document.getElementById('loading-status');
+            const loadingSteps = [
+                { percent: 15, message: 'برقراری ارتباط با سرور...' },
+                { percent: 30, message: 'احراز هویت بازیکن...' },
+                { percent: 55, message: 'بارگذاری منابع بازی...' },
+                { percent: 75, message: 'ساخت دنیای بازی...' },
+                { percent: 90, message: 'آماده سازی نهایی...' },
+                { percent: 100, message: 'خوش آمدید! ورود به بازی...' }
+            ];
 
-        // لیست پیام‌های لودینگ برای نمایش به کاربر
-        const loadingMessages = [
-            "برقراری ارتباط با سرورهای مرکزی...",
-            "احراز هویت بازیکن...",
-            "بارگذاری منابع بازی...",
-            "آماده‌سازی رابط کاربری...",
-            "آخرین بررسی‌های امنیتی...",
-            "خوش آمدید!"
-        ];
+            let currentStep = 0;
 
-        // متغیر برای نگهداری مرحله فعلی لودینگ
-        let currentStep = 0;
-        let progress = 0;
-
-        // تابعی برای شبیه‌سازی فرآیند لودینگ
-        function simulateLoading() {
-            // تنظیم یک بازه زمانی برای به‌روزرسانی نوار پیشرفت و پیام‌ها
-            const interval = setInterval(() => {
-                // افزایش میزان پیشرفت
-                progress += Math.random() * 15 + 5; // افزایش تصادفی برای حس واقعی‌تر بودن
-                if (progress >= 100) {
-                    progress = 100;
-                }
-                
-                // به‌روزرسانی عرض نوار پیشرفت
-                progressBarFill.style.width = progress + '%';
-
-                // اگر یک پیام جدید برای نمایش وجود دارد و پیشرفت به حد کافی رسیده، آن را نمایش بده
-                if (currentStep < loadingMessages.length && progress > (currentStep * 17)) {
-                    loadingStatus.textContent = loadingMessages[currentStep];
+            function updateProgress() {
+                if (currentStep < loadingSteps.length) {
+                    const step = loadingSteps[currentStep];
+                    progressBar.style.width = step.percent + '%';
+                    loadingMessage.textContent = step.message;
                     currentStep++;
-                }
-
-                // وقتی لودینگ کامل شد، اینتروال را متوقف کن
-                if (progress >= 100) {
-                    clearInterval(interval);
-                    // می‌توانید در اینجا کاری انجام دهید، مثلاً کاربر را به صفحه اصلی بازی منتقل کنید
+                    
+                    // اگر به مرحله آخر رسیدیم، کمی بیشتر صبر می‌کنیم
+                    const delay = (step.percent === 100) ? 1500 : 800 + Math.random() * 500;
+                    
+                    setTimeout(updateProgress, delay);
+                } else {
+                    // (اختیاری) در اینجا می‌توانید به صفحه اصلی بازی هدایت شوید
                     // window.location.href = '/game.html';
                     console.log('Loading complete!');
                 }
-            }, 600); // هر 600 میلی‌ثانیه به‌روز می‌شود
-        }
+            }
 
-        // اجرای شبیه‌سازی لودینگ بعد از بارگذاری کامل صفحه
-        window.addEventListener('load', () => {
-            simulateLoading();
+            // شروع فرآیند لودینگ با یک تأخیر اولیه
+            setTimeout(updateProgress, 500);
         });
-
     </script>
+
 </body>
 </html>
