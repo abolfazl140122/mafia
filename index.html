@@ -3,116 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Squid Game - در حال بارگذاری</title>
+    <title>اسکورت گیم - در حال بارگذاری</title>
+    
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Aldrich&family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet">
+    
     <style>
-        /* 
-        ==============================================
-        --- SQUID GAME THEME & DUAL-COLOR GLOW EFFECT ---
-        ==============================================
-        */
-
+        /* --- General Setup & Theme --- */
         :root {
-            --squid-pink: #e81e63; /* #FF4081; */
-            --squid-teal: #004d40;
-            --squid-background: #0a0a0a;
-            --squid-text-light: #f0f0f0;
-            --squid-text-dark: #1a1a1a;
-            
-            /* --- NEW: Dual-Color Glow --- */
-            --squid-glow-red: #FF1B58;
-            --squid-glow-blue: #00A3FF;
+            --dark-blue-bg: #0d1117;
+            --dark-blue-secondary: #161b22;
+            --accent-red: #ff1432;
+            --accent-blue: #007bff;
+            --text-light: #e6edf3;
+            --text-muted: #8b949e;
+            --border-color: #30363d;
         }
 
-        /* --- KEYFRAME ANIMATIONS --- */
-        @keyframes fadeInScaleUp {
-            from { opacity: 0; transform: scale(0.9) translateY(20px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
-        }
-
-        /* --- NEW: Breathing animation for the dual-color glow --- */
-        @keyframes pulseGlow {
-            0%, 100% { 
-                transform: scale(1);
-                opacity: 0.7;
-                filter: blur(80px);
-            }
-            50% { 
-                transform: scale(1.1);
-                opacity: 0.9;
-                filter: blur(70px);
-            }
-        }
-
+        /* --- Keyframe Animations --- */
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
         }
 
-        @keyframes subtle-noise-pan {
-            0% { transform: translate(0, 0); }
-            10% { transform: translate(-5%, -10%); }
-            20% { transform: translate(-15%, 5%); }
-            30% { transform: translate(7%, -25%); }
-            40% { transform: translate(-5%, 25%); }
-            50% { transform: translate(-15%, 10%); }
-            60% { transform: translate(15%, 0%); }
-            70% { transform: translate(0%, 15%); }
-            80% { transform: translate(3%, 35%); }
-            90% { transform: translate(-10%, 10%); }
-            100% { transform: translate(0, 0); }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        /* --- GENERAL STYLES --- */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
         }
 
-        body {
-            font-family: 'Vazirmatn', sans-serif;
-            background-color: var(--squid-background);
-            color: var(--squid-text-light);
-            overflow: hidden;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
-            position: relative;
-        }
-
-        /* Textured noise overlay */
-        body::before {
-            content: '';
-            position: fixed;
-            top: -50%; left: -50%;
-            width: 200%; height: 200%;
-            background-image: url('https://www.transparenttextures.com/patterns/noisy-grid.png');
-            opacity: 0.05;
-            z-index: 0;
-            animation: subtle-noise-pan 70s linear infinite;
+        @keyframes noise {
+            0%, 100% { background-position: 0 0; }
+            10% { background-position: -5% -10%; }
+            20% { background-position: -15% 5%; }
+            30% { background-position: 7% -25%; }
+            40% { background-position: 20% 25%; }
+            50% { background-position: -25% 10%; }
+            60% { background-position: 15% 5%; }
+            70% { background-position: 0% 15%; }
+            80% { background-position: 25% 35%; }
+            90% { background-position: -10% 10%; }
         }
         
-        .squid-font {
-            font-family: 'Aldrich', sans-serif;
-            text-transform: uppercase;
-            letter-spacing: 3px;
+        /* The dual-color glow animation */
+        @keyframes pulseBlue {
+            0%, 100% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.1); opacity: 0.9; }
         }
 
-        /* --- LOADING SCREEN CONTAINER --- */
-        #loading-screen {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%;
-            height: 100vh;
+        @keyframes pulseRed {
+            0%, 100% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.1); opacity: 0.9; }
+        }
+
+
+        /* --- Body & Background --- */
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: var(--dark-blue-bg);
+            color: var(--text-light);
+            margin: 0;
+            overflow: hidden;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
-            z-index: 10;
+            height: 100vh;
         }
 
-        #loading-content {
+        /* Cinematic noise overlay */
+        body::after {
+            content: "";
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background-image: url('https://www.transparenttextures.com/patterns/black-felt.png');
+            opacity: 0.04;
+            animation: noise 8s steps(10) infinite;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* --- Title Font --- */
+        .title-font {
+            font-family: 'Anton', 'Vazirmatn', sans-serif;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* --- Loading Screen Layout --- */
+        #loading-screen {
+            position: relative;
+            z-index: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -120,207 +113,212 @@
             text-align: center;
             width: 100%;
             max-width: 500px;
+            padding: 20px;
             animation: fadeIn 1s ease-out;
         }
 
-        /* --- LOGO AND DUAL-GLOW EFFECT --- */
+        /* --- Logo Container & The Magical Glow Effect --- */
         #logo-container {
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 2rem;
-            animation: fadeInScaleUp 1.5s cubic-bezier(0.19, 1, 0.22, 1);
+            position: relative; /* Crucial for positioning the glow pseudo-elements */
+            margin-bottom: 1.5rem;
+            animation: scaleIn 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        #loading-logo {
-            max-width: 300px;
-            width: 80%;
-            position: relative; /* Must be relative to be on top of the glow */
-            z-index: 2; /* Ensures logo is above the glow */
-            filter: drop-shadow(0 0 15px rgba(0, 0, 0, 0.5));
-        }
-
-        /* --- THIS IS THE DUAL-COLOR GLOW EFFECT --- */
-        #logo-glow-effect {
+        /* This is the glow effect implementation */
+        #logo-container::before,
+        #logo-container::after {
+            content: '';
             position: absolute;
-            width: 110%;
-            height: 110%;
-            z-index: 1; /* Sits right behind the logo */
-            
-            /* The gradient from blue on the left to red on the right */
-            background: linear-gradient(90deg, var(--squid-glow-blue), var(--squid-glow-red));
-
-            /* The breathing/pulsing animation */
-            animation: pulseGlow 5s ease-in-out infinite;
+            top: 50%;
+            width: 180%; /* Wider than the logo to create a soft side glow */
+            height: 180%; /* Taller as well */
+            transform: translateY(-50%);
+            z-index: -1; /* Place it BEHIND the logo's img tag */
+            filter: blur(55px); /* This makes the glow soft and light-like */
         }
 
-        /* --- TITLE --- */
-        #loading-title {
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: var(--squid-text-light);
-            margin-bottom: 2rem;
-            text-shadow: 0 0 5px var(--squid-pink), 0 0 10px var(--squid-pink);
+        /* The BLUE glow on the LEFT */
+        #logo-container::before {
+            left: -40%; /* Position it to the left */
+            background: radial-gradient(circle, var(--accent-blue) 0%, rgba(0, 123, 255, 0) 65%);
+            animation: pulseBlue 5s infinite ease-in-out;
+        }
+
+        /* The RED glow on the RIGHT */
+        #logo-container::after {
+            right: -40%; /* Position it to the right */
+            background: radial-gradient(circle, var(--accent-red) 0%, rgba(255, 20, 50, 0) 65%);
+            animation: pulseRed 5s infinite ease-in-out;
+            animation-delay: -2.5s; /* This makes the red and blue pulse at different times */
         }
         
-        @media (min-width: 640px) {
-            #loading-title {
-                font-size: 3.5rem;
+        #loading-logo {
+            max-width: 280px;
+            width: 70%;
+            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.4));
+        }
+
+        /* --- Game Title --- */
+        #game-title {
+            font-size: 4rem;
+            color: var(--text-light);
+            margin: 0;
+            line-height: 1.1;
+            text-shadow: 
+                0 0 10px rgba(0, 123, 255, 0.3),
+                0 0 20px rgba(255, 20, 50, 0.3),
+                0 2px 4px rgba(0, 0, 0, 0.5);
+            animation: fadeInUp 1.5s ease-out;
+            animation-delay: 0.2s;
+            opacity: 0;
+            animation-fill-mode: forwards;
+        }
+        @media (max-width: 600px) {
+            #game-title {
+                font-size: 3rem;
             }
         }
 
-        /* --- PROGRESS BAR --- */
-        #loading-progress-container {
+        /* --- Progress Bar --- */
+        #loading-progress-bar-container {
             width: 100%;
-            background-color: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.2);
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
             border-radius: 50px;
-            padding: 5px;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
-            margin-top: 1.5rem;
-            margin-bottom: 1rem;
+            padding: 4px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.4);
+            margin-top: 2rem;
+            animation: fadeInUp 1.5s ease-out;
+            animation-delay: 0.4s;
+            opacity: 0;
+            animation-fill-mode: forwards;
         }
-
-        #loading-progress-fill {
-            height: 16px;
+        
+        #loading-progress-bar-fill {
+            height: 14px;
             width: 0%; /* Starts at 0, controlled by JS */
-            background: linear-gradient(90deg, #f06292, var(--squid-pink));
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-red));
             border-radius: 50px;
             transition: width 0.5s ease-out;
-            box-shadow: 0 0 10px var(--squid-pink), 0 0 5px var(--squid-pink);
+            box-shadow: 0 0 10px var(--accent-red), 0 0 5px var(--accent-blue);
         }
 
-        /* --- MESSAGES & TIPS --- */
+        /* --- Loading Messages --- */
         #loading-message {
+            margin-top: 1rem;
             font-size: 1.1rem;
             font-weight: bold;
-            min-height: 28px; /* Prevents layout shift */
-            transition: opacity 0.5s ease-in-out;
+            color: var(--text-light);
+            min-height: 28px; /* Prevent layout shift */
+            animation: fadeInUp 1.5s ease-out;
+            animation-delay: 0.6s;
+            opacity: 0;
+            animation-fill-mode: forwards;
         }
 
         #loading-tip {
             margin-top: 2rem;
             font-size: 0.9rem;
-            color: #ccc;
-            font-style: italic;
-            background-color: rgba(0,0,0,0.3);
-            padding: 10px 15px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            min-height: 50px; /* Prevents layout shift */
+            color: var(--text-muted);
+            min-height: 40px; /* Prevent layout shift */
             display: flex;
             align-items: center;
             justify-content: center;
-            max-width: 90%;
-            transition: opacity 0.5s ease-in-out;
+            animation: fadeInUp 1.5s ease-out;
+            animation-delay: 0.8s;
+            opacity: 0;
+            animation-fill-mode: forwards;
+            transition: opacity 0.5s ease;
         }
     </style>
 </head>
 <body>
 
     <div id="loading-screen">
-        <div id="loading-content">
-            
-            <!-- Logo with its container for the glow effect -->
-            <div id="logo-container">
-                <img id="loading-logo" src="https://up.20script.ir/file/d598-squid-game-logo-C393B604B4-seeklogo.com.png" alt="لوگوی بازی مرکب">
-                <!-- This element creates the beautiful blue and red glow behind the logo -->
-                <div id="logo-glow-effect"></div>
-            </div>
-
-            <h1 id="loading-title" class="squid-font">SQUID GAME</h1>
-            
-            <div id="loading-progress-container">
-                <div id="loading-progress-fill"></div>
-            </div>
-            
-            <p id="loading-message">در حال برقراری ارتباط با سرور...</p>
-            
-            <p id="loading-tip">○ △ □</p>
+        <div id="logo-container">
+            <img id="loading-logo" src="https://up.20script.ir/file/adde-Copilot-20250812-110015-removebg-preview.png" alt="لوگوی اسکورت گیم">
         </div>
+        
+        <h1 id="game-title" class="title-font">Escort Game</h1>
+        
+        <div id="loading-progress-bar-container">
+            <div id="loading-progress-bar-fill"></div>
+        </div>
+        
+        <p id="loading-message">در حال آماده سازی پایگاه...</p>
+        
+        <p id="loading-tip">نکته: همیشه یک نقشه جایگزین داشته باش.</p>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-
-            // --- Get references to DOM elements ---
-            const progressBarFill = document.getElementById('loading-progress-fill');
+            const progressBar = document.getElementById('loading-progress-bar-fill');
             const loadingMessage = document.getElementById('loading-message');
             const loadingTip = document.getElementById('loading-tip');
 
+            const tips = [
+                "نکته: همیشه یک نقشه جایگزین داشته باش.",
+                "اطلاعات، قدرتمندترین اسلحه است.",
+                "در سایه‌ها حرکت کن، در روشنایی ضربه بزن.",
+                "اعتماد هزینه‌بر است، خیانت کشنده.",
+                "هر عملیاتی نیاز به یک استراتژی دقیق دارد.",
+                "سکوت گاهی اوقات بلندترین فریاد است."
+            ];
+            let currentTipIndex = 0;
             let tipInterval;
 
-            // --- Function to simulate the loading process ---
-            function simulateLoading() {
-                const tips = [
-                    "قانون شماره ۱: بازیکن مجاز به توقف بازی نیست.",
-                    "۴۵.۶ میلیارد وون، جایزه نهایی.",
-                    "در بازی «چراغ سبز، چراغ قرمز»، باید قبل از چرخیدن سر عروسک، بایستید.",
-                    "دالگونا، یک آب‌نبات سنتی کره‌ای است که باید شکل روی آن را سالم دربیاورید.",
-                    "چهره‌ی پیشرو (Front Man) از ماسک دارت ویدر الهام گرفته شده است.",
-                    "○ △ □"
-                ];
-                let currentTipIndex = 0;
-
-                // Function to update the tip text with a fade effect
-                const updateTip = () => {
-                    currentTipIndex = (currentTipIndex + 1) % tips.length;
-                    if (loadingTip) {
-                        loadingTip.style.opacity = '0';
-                        setTimeout(() => {
-                            loadingTip.innerHTML = tips[currentTipIndex];
-                            loadingTip.style.opacity = '1';
-                        }, 500); // 500ms for fade out
-                    }
-                };
-
-                // Start cycling through tips
-                updateTip(); // Show the first tip immediately
-                tipInterval = setInterval(updateTip, 4000); // Change tip every 4 seconds
-
-                // --- Staged Loading Simulation ---
-                
-                // Stage 1: Connecting (after 0.5s)
+            function updateTip() {
+                currentTipIndex = (currentTipIndex + 1) % tips.length;
+                loadingTip.style.opacity = '0';
                 setTimeout(() => {
-                    if (progressBarFill) progressBarFill.style.width = '25%';
-                    if (loadingMessage) loadingMessage.textContent = 'در حال بررسی وضعیت بازیکنان...';
+                    loadingTip.textContent = tips[currentTipIndex];
+                    loadingTip.style.opacity = '1';
                 }, 500);
-
-                // Stage 2: Preparing UI (after 1.5s)
-                setTimeout(() => {
-                    if (progressBarFill) progressBarFill.style.width = '60%';
-                    if (loadingMessage) loadingMessage.textContent = 'آماده‌سازی زمین بازی...';
-                }, 1500);
-
-                // Stage 3: Finalizing (after 2.8s)
-                setTimeout(() => {
-                    if (progressBarFill) progressBarFill.style.width = '90%';
-                    if (loadingMessage) loadingMessage.textContent = 'قوانین در حال نهایی شدن است...';
-                }, 2800);
-
-                // Stage 4: Complete (after 4s)
-                setTimeout(() => {
-                    if (progressBarFill) progressBarFill.style.width = '100%';
-                    if (loadingMessage) loadingMessage.textContent = 'بازی در شرف آغاز است!';
-                    clearInterval(tipInterval); // Stop changing tips
-                }, 4000);
-
-                // Stage 5: Redirect to the main game page (after 5.5s)
-                setTimeout(() => {
-                    // When your main game page is ready, uncomment the line below:
-                    // window.location.href = 'serchplayers.html'; 
-                    
-                    // For this demo, we'll just show an alert.
-                    console.log("آماده برای انتقال به صفحه اصلی بازی.");
-                    // You can add a fade-out effect here before redirecting
-                    document.body.style.transition = 'opacity 0.5s ease-out';
-                    document.body.style.opacity = '0';
-
-                }, 5500);
             }
 
-            // --- Start the loading simulation ---
+            function simulateLoading() {
+                // Start cycling through tips
+                tipInterval = setInterval(updateTip, 4000);
+
+                // Stage 1: Connecting
+                setTimeout(() => {
+                    progressBar.style.width = '25%';
+                    loadingMessage.textContent = 'در حال برقراری ارتباط با سرورهای امن...';
+                }, 500);
+
+                // Stage 2: Authenticating
+                setTimeout(() => {
+                    progressBar.style.width = '50%';
+                    loadingMessage.textContent = 'احراز هویت...';
+                }, 2000);
+
+                // Stage 3: Loading Assets
+                setTimeout(() => {
+                    progressBar.style.width = '75%';
+                    loadingMessage.textContent = 'بارگذاری منابع بازی...';
+                }, 3500);
+                
+                // Stage 4: Finalizing
+                setTimeout(() => {
+                    progressBar.style.width = '100%';
+                    loadingMessage.textContent = 'خوش آمدید!';
+                }, 5000);
+                
+                // Stage 5: Loading Complete
+                setTimeout(() => {
+                    clearInterval(tipInterval); // Stop tips
+                    // In a real game, you would redirect to the main page or show the main menu
+                    // For example: window.location.href = 'main.html';
+                    console.log("Loading complete! Ready to start the game.");
+                    
+                    // Fade out effect before redirecting
+                    document.getElementById('loading-screen').style.transition = 'opacity 0.5s ease-out';
+                    document.getElementById('loading-screen').style.opacity = '0';
+
+                }, 5800);
+            }
+
+            // Start the loading simulation
             simulateLoading();
         });
     </script>
