@@ -10,71 +10,38 @@
     <style>
         /* --- ROOT VARIABLES & THEME --- */
         :root {
-            --dark-bg: #0d1117; /* پس‌زمینه اصلی بسیار تیره */
-            --panel-bg: #161b22; /* پس‌زمینه پنل کمی روشن‌تر */
-            --border-color: #30363d; /* رنگ حاشیه‌ها */
-            --text-primary: #e6edf3; /* رنگ متن اصلی */
-            --text-secondary: #7d8590; /* رنگ متن ثانویه */
-            
-            /* --- GLOW COLORS (BRIGHTER & VIBRANT) --- */
-            --glow-red: #ff3355; /* قرمز روشن و پرانرژی */
-            --glow-blue: #00aaff; /* آبی روشن و الکتریکی */
-            --glow-error: #ff4136; /* قرمز برای خطا */
-
-            --loader-color: #bb86fc; /* رنگ برای نوار لودینگ */
+            --dark-bg: #0d1117;
+            --panel-bg: #161b22;
+            --border-color: #30363d;
+            --text-primary: #e6edf3;
+            --text-secondary: #7d8590;
+            --glow-red: #ff3355;
+            --glow-blue: #00aaff;
+            --success-color: #28a745;
+            --error-color: #dc3545;
         }
 
         /* --- KEYFRAME ANIMATIONS --- */
-
-        /* انیمیشن جدید برای حرکت و درخشش نورها */
         @keyframes swirl-glow {
-            0% {
-                transform: translate(0, 0) scale(1);
-                opacity: 0.7;
-            }
-            25% {
-                transform: translate(15px, 10px) scale(1.1);
-                opacity: 0.9;
-            }
-            50% {
-                transform: translate(0, -15px) scale(0.95);
-                opacity: 0.8;
-            }
-            75% {
-                transform: translate(-15px, 10px) scale(1.05);
-                opacity: 1;
-            }
-            100% {
-                transform: translate(0, 0) scale(1);
-                opacity: 0.7;
-            }
+            0% { transform: translate(0, 0) scale(1); opacity: 0.7; }
+            25% { transform: translate(15px, 10px) scale(1.1); opacity: 0.9; }
+            50% { transform: translate(0, -15px) scale(0.95); opacity: 0.8; }
+            75% { transform: translate(-15px, 10px) scale(1.05); opacity: 1; }
+            100% { transform: translate(0, 0) scale(1); opacity: 0.7; }
         }
         
-        /* انیمیشن برای محو شدن و ظاهر شدن محتوای لودینگ */
         @keyframes content-fade-in {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
-        /* انیمیشن برای پس‌زمینه متحرک */
         @keyframes subtle-pan {
             0% { background-position: 0% 0%; }
             100% { background-position: 100% 100%; }
         }
 
         /* --- BASE & BODY STYLES --- */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'Vazirmatn', sans-serif;
             background-color: var(--dark-bg);
@@ -87,14 +54,11 @@
             text-align: center;
         }
 
-        /* لایه پس‌زمینه با بافت و انیمیشن */
         body::before {
             content: '';
             position: fixed;
-            top: -50%; 
-            left: -50%;
-            width: 200%; 
-            height: 200%;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
             background-image: url('https://www.transparenttextures.com/patterns/dark-denim-3.png');
             opacity: 0.05;
             z-index: 0;
@@ -131,12 +95,11 @@
         .logo-container img {
             max-width: 200px;
             width: 100%;
-            position: relative; /* برای قرار گرفتن روی نورها */
+            position: relative;
             z-index: 2;
             filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2));
         }
 
-        /* افکت نورانی در پشت لوگو (عنصر اصلی) */
         .logo-container::before,
         .logo-container::after {
             content: '';
@@ -145,11 +108,10 @@
             width: 150px;
             height: 150px;
             border-radius: 50%;
-            z-index: 1; /* پشت لوگو */
-            filter: blur(60px); /* ایجاد حالت نرم و پخش برای نور */
+            z-index: 1;
+            filter: blur(60px);
         }
         
-        /* نور آبی در سمت چپ با انیمیشن حرکتی */
         .logo-container::before {
             background-color: var(--glow-blue);
             left: 0;
@@ -157,7 +119,6 @@
             animation: swirl-glow 8s ease-in-out infinite;
         }
 
-        /* نور قرمز در سمت راست با انیمیشن حرکتی معکوس */
         .logo-container::after {
             background-color: var(--glow-red);
             right: 0;
@@ -188,18 +149,12 @@
         }
         
         .progress-bar-fill {
-            width: 0%; /* با جاوااسکریپت کنترل می‌شود */
+            width: 0%;
             height: 100%;
             background: linear-gradient(90deg, var(--glow-red), var(--glow-blue));
             border-radius: 5px;
-            transition: width 0.5s ease-out, background 0.5s ease;
+            transition: width 0.4s ease-out, background 0.4s ease;
             box-shadow: 0 0 10px var(--glow-blue), 0 0 5px var(--glow-red);
-        }
-        
-        /* حالت خطا برای نوار پیشرفت */
-        .progress-bar-fill.error {
-            background: var(--glow-error);
-            box-shadow: 0 0 10px var(--glow-error);
         }
 
         /* --- LOADING MESSAGE --- */
@@ -207,14 +162,8 @@
             color: var(--text-secondary);
             font-size: 1rem;
             font-weight: 700;
-            min-height: 24px; /* برای جلوگیری از پرش صفحه هنگام تغییر متن */
-            transition: color 0.3s ease, opacity 0.3s ease;
-            opacity: 1;
-        }
-
-        #loading-message.error {
-            color: var(--glow-error);
-            font-weight: 900;
+            min-height: 24px;
+            transition: color 0.3s ease;
         }
     </style>
 </head>
@@ -235,102 +184,94 @@
     </div>
 
     <!-- Firebase SDKs -->
-    <script type="module">
-        // Import the functions you need from the SDKs you need
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-analytics-compat.js"></script>
 
-        // Your web app's Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
-            authDomain: "mafia-9fcbf.firebaseapp.com",
-            projectId: "mafia-9fcbf",
-            storageBucket: "mafia-9fcbf.firebasestorage.app",
-            messagingSenderId: "471627157488",
-            appId: "1:471627157488:web:92f008548a5596619a5735",
-            measurementId: "G-0PDHDWC6NV"
-        };
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const progressBar = document.getElementById('progress-bar-fill');
+            const loadingMessage = document.getElementById('loading-message');
 
-        // DOM Elements
-        const progressBar = document.getElementById('progress-bar-fill');
-        const loadingMessage = document.getElementById('loading-message');
-
-        /**
-         * تابعی برای بروزرسانی وضعیت لودینگ در UI
-         * @param {number} percent - درصد پیشرفت (0-100)
-         * @param {string} message - پیامی که نمایش داده می‌شود
-         * @param {boolean} isError - آیا وضعیت خطا است یا خیر
-         */
-        function updateStatus(percent, message, isError = false) {
-            // انیمیشن محو شدن برای تغییر نرم متن
-            loadingMessage.style.opacity = '0';
-            
-            setTimeout(() => {
+            // تابع برای آپدیت کردن نوار و پیام لودینگ
+            function updateStatus(percent, message, isError = false) {
                 progressBar.style.width = percent + '%';
                 loadingMessage.textContent = message;
-                loadingMessage.style.opacity = '1';
-
+                
                 if (isError) {
-                    progressBar.classList.add('error');
-                    loadingMessage.classList.add('error');
+                    loadingMessage.style.color = 'var(--error-color)';
+                    progressBar.style.background = 'var(--error-color)';
                 } else {
-                    progressBar.classList.remove('error');
-                    loadingMessage.classList.remove('error');
+                    loadingMessage.style.color = 'var(--text-secondary)';
                 }
-            }, 300); // همگام با transition در CSS
-        }
-
-        /**
-         * فرآیند اصلی لودینگ و اتصال به Firebase
-         */
-        async function startLoadingProcess() {
-            try {
-                // مرحله 1: بررسی اتصال به اینترنت
-                await new Promise(resolve => setTimeout(resolve, 500)); // تاخیر اولیه برای نمایش
-                updateStatus(15, 'بررسی اتصال اینترنت...');
-                
-                if (!navigator.onLine) {
-                    throw new Error('اتصال به اینترنت برقرار نیست. لطفا شبکه خود را بررسی کنید.');
-                }
-                
-                // مرحله 2: اتصال به سرورهای Firebase
-                await new Promise(resolve => setTimeout(resolve, 800));
-                updateStatus(40, 'برقراری ارتباط با سرورهای بازی...');
-                
-                const app = initializeApp(firebaseConfig);
-                const auth = getAuth(app);
-                
-                // مرحله 3: احراز هویت ناشناس برای تایید نهایی اتصال
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                updateStatus(75, 'احراز هویت بازیکن...');
-                
-                await signInAnonymously(auth);
-                
-                // مرحله 4: موفقیت
-                await new Promise(resolve => setTimeout(resolve, 1200));
-                updateStatus(100, 'اتصال موفقیت آمیز بود! خوش آمدید...');
-
-                // (اختیاری) پس از تکمیل، می‌توانید به صفحه بازی هدایت شوید
-                setTimeout(() => {
-                    // window.location.href = '/game.html';
-                    console.log('Loading complete! Redirecting to game...');
-                }, 2000);
-
-            } catch (error) {
-                console.error("Firebase Connection Error:", error);
-                let errorMessage = 'خطا در اتصال به سرور. لطفا مجددا تلاش کنید.';
-                if (error.message.includes('اینترنت')) {
-                    errorMessage = error.message;
-                }
-                
-                // نمایش وضعیت خطا در UI
-                updateStatus(progressBar.style.width.replace('%',''), errorMessage, true);
             }
-        }
 
-        // شروع فرآیند پس از بارگذاری کامل صفحه
-        document.addEventListener('DOMContentLoaded', startLoadingProcess);
+            // Your web app's Firebase configuration
+            const firebaseConfig = {
+              apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
+              authDomain: "mafia-9fcbf.firebaseapp.com",
+              projectId: "mafia-9fcbf",
+              storageBucket: "mafia-9fcbf.firebasestorage.app",
+              messagingSenderId: "471627157488",
+              appId: "1:471627157488:web:92f008548a5596619a5735",
+              measurementId: "G-0PDHDWC6NV"
+            };
 
+            // شبیه‌سازی مراحل بعدی لودینگ
+            function simulateFinalLoadingSteps() {
+                const steps = [
+                    { percent: 55, message: 'بارگذاری منابع بازی...' },
+                    { percent: 75, message: 'ساخت دنیای بازی...' },
+                    { percent: 90, message: 'آماده سازی نهایی...' },
+                    { percent: 100, message: 'خوش آمدید! ورود به بازی...' }
+                ];
+                let currentStep = 0;
+
+                function nextStep() {
+                    if (currentStep < steps.length) {
+                        const step = steps[currentStep];
+                        updateStatus(step.percent, step.message);
+                        currentStep++;
+                        const delay = (step.percent === 100) ? 2000 : 800 + Math.random() * 400;
+                        setTimeout(nextStep, delay);
+                    } else {
+                        // پس از اتمام لودینگ، به صفحه ثبت‌نام هدایت شو
+                        window.location.href = 'Registration.html';
+                    }
+                }
+                nextStep();
+            }
+
+            // شروع فرآیند لودینگ
+            async function startLoading() {
+                try {
+                    // مرحله ۱: برقراری ارتباط
+                    updateStatus(15, 'برقراری ارتباط با سرور...');
+                    
+                    // تأخیر عمدی برای نمایش بهتر
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+
+                    // مرحله ۲: اتصال به فایربیس
+                    firebase.initializeApp(firebaseConfig);
+                    firebase.analytics();
+
+                    updateStatus(30, 'اتصال به سرور موفق بود!');
+                    loadingMessage.style.color = 'var(--success-color)';
+                    
+                    // تأخیر برای نمایش پیام موفقیت
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+
+                    // مرحله ۳: ادامه مراحل لودینگ
+                    simulateFinalLoadingSteps();
+
+                } catch (error) {
+                    console.error("Firebase initialization failed:", error);
+                    updateStatus(100, 'خطا در اتصال به سرور. لطفا اتصال اینترنت خود را بررسی کنید.', true);
+                }
+            }
+            
+            // شروع کل فرآیند
+            startLoading();
+        });
     </script>
 
 </body>
