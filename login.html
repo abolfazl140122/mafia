@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>شهر مافیا - ایجاد حساب کاربری</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* --- General Setup & Variables (Copied from index.html for consistency) --- */
+        :root {
+            --wood-dark: #3a2e29;
+            --wood-medium: #6f4e37;
+            --wood-panel: #5a3d2b;
+            --accent-gold: #e0cda9;
+            --text-light: #f5f5dc; /* Beige */
+            --glow-color: rgba(255, 200, 100, 0.7);
+            --error-color: #c06c5c;
+            --info-color: #87ceeb; /* Sky blue for info messages */
+        }
+
+        /* --- Animations --- */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Body & Background --- */
+        html, body {
+            height: 100%;
+            margin: 0;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: var(--wood-dark);
+            background-image: url('https://www.transparenttextures.com/patterns/wood-pattern.png');
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem 0;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        /* --- Authentication Form Container --- */
+        .auth-container {
+            width: 90%;
+            max-width: 450px;
+            padding: 2.5rem 2rem;
+            background-color: var(--wood-panel);
+            border: 4px solid #2b1f1a;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(0,0,0,0.4);
+            animation: fadeIn 1s ease-out;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: var(--accent-gold);
+            text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.7);
+            margin: 0 0 2rem 0;
+        }
+
+        /* --- Input Fields Styling --- */
+        .input-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+        
+        .input-group .icon {
+            position: absolute;
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
+            color: var(--accent-gold);
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 45px 12px 15px; /* Padding for icon */
+            font-family: 'Vazirmatn', sans-serif;
+            font-size: 1rem;
+            background-color: var(--wood-dark);
+            border: 2px solid var(--wood-medium);
+            border-radius: 8px;
+            color: var(--text-light);
+            box-sizing: border-box;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .input-field::placeholder {
+            color: rgba(245, 245, 220, 0.5);
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 10px var(--glow-color);
+        }
+        
+        .input-field:focus + .icon {
+            opacity: 1;
+        }
+
+        /* --- Button Styling --- */
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            margin-top: 1rem;
+            font-family: 'Vazirmatn', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--wood-dark);
+            background: linear-gradient(to bottom, #f3e5ca, var(--accent-gold));
+            border: 2px solid #b4886c;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            transition: all 0.2s ease;
+            text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3);
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 10px rgba(0,0,0,0.4);
+        }
+
+        .submit-btn:active:not(:disabled) {
+            transform: translateY(-1px);
+        }
+        
+        /* --- Links and Messages --- */
+        .switch-form-link {
+            margin-top: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .switch-form-link a {
+            color: var(--accent-gold);
+            font-weight: 700;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .switch-form-link a:hover {
+            color: #fff;
+            text-decoration: underline;
+        }
+        
+        #response-message {
+            display: none; /* Hidden by default */
+            margin-top: 1.5rem;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: 700;
+            animation: fadeIn 0.5s;
+            color: var(--info-color);
+            background-color: rgba(0,0,0,0.3);
+            border: 1px solid var(--info-color);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="auth-container">
+        <h1>ایجاد حساب کاربری</h1>
+        
+        <form id="registration-form" novalidate>
+            <div class="input-group">
+                <input type="email" id="email" class="input-field" placeholder="ایمیل خود را وارد کنید" required>
+                <!-- SVG Icon for Email -->
+                <span class="icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M.05 3.555A2 2 0 0 1 2 2h12a2 2 0 0 1 1.95 1.555L8 8.414.05 3.555ZM0 4.697v7.104l5.803-3.558L0 4.697ZM6.761 8.83l-6.57 4.027A2 2 0 0 0 2 14h12a2 2 0 0 0 1.808-1.144l-6.57-4.027L8 9.586l-1.239-.757Zm3.436-.586L16 11.803V4.697l-5.803 3.558Z"/>
+                    </svg>
+                </span>
+            </div>
+
+            <div class="input-group">
+                <input type="password" id="password" class="input-field" placeholder="رمز عبور" required>
+                <!-- SVG Icon for Password -->
+                 <span class="icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+                    </svg>
+                </span>
+            </div>
+
+            <div class="input-group">
+                <input type="password" id="password-confirm" class="input-field" placeholder="تکرار رمز عبور" required>
+                 <span class="icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+                    </svg>
+                </span>
+            </div>
+
+            <button type="submit" class="submit-btn">ثبت نام</button>
+        </form>
+
+        <div id="response-message"></div>
+
+        <p class="switch-form-link">
+            حساب کاربری دارید؟ <a href="login.html">وارد شوید</a>
+        </p>
+    </div>
+
+    <script>
+        const registrationForm = document.getElementById('registration-form');
+        const responseMessage = document.getElementById('response-message');
+
+        registrationForm.addEventListener('submit', (e) => {
+            // Prevent the form from actually submitting
+            e.preventDefault();
+            
+            // Show the "Coming Soon" message
+            responseMessage.textContent = 'این قابلیت به زودی به بازی اضافه خواهد شد...';
+            responseMessage.style.display = 'block';
+        });
+    </script>
+</body>
+</html>
