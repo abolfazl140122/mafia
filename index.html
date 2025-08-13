@@ -4,56 +4,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>در حال اتصال به سرور مافیا...</title>
-    
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
-    
     <style>
-        /* --- CSS Reset & Base Styles --- */
-        *, *::before, *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        /* 
-         ==========================================================================
-           1. ROOT VARIABLES & THEME DEFINITION
-           - تعریف رنگ‌ها و متغیرهای اصلی برای تم قهوه‌ای و طلایی
-           - این بخش به ما اجازه می‌دهد تا به راحتی تم کلی را تغییر دهیم.
-         ========================================================================== 
+        /* --- ROOT VARIABLES & GENERAL SETUP --- */
+        /*
+            In this section, we define the color palette and basic setup
+            for the entire page. Using CSS variables makes it easier to
+            maintain and theme the application.
         */
         :root {
-            --color-background-dark: #1a1510;
-            --color-panel-brown-dark: #3a2d20;
-            --color-panel-brown-light: #5c4a3a;
-            --color-gold-bright: #ffd700;
-            --color-gold-dark: #b8860b;
-            --color-gold-glow: rgba(255, 223, 100, 0.75);
-            --color-text-light: #f5eadd;
-            --color-text-dark: #2c221a;
-            --color-success-glow: rgba(144, 238, 144, 0.8);
-            --color-success-dark: #2e7d32;
-            --color-error-glow: rgba(255, 100, 100, 0.8);
-            --color-error-dark: #c62828;
-            --font-main: 'Vazirmatn', sans-serif;
+            --mafia-brown-dark: #3a2e28;
+            --mafia-brown-panel: #4f3f36;
+            --mafia-brown-panel-border: #6a5348;
+            --mafia-gold: #e6c278;
+            --mafia-gold-dark: #c8a050;
+            --mafia-text-light: #f5eadd;
+            --mafia-progress-bg: #312620;
+            --mafia-progress-fill: #5fba7d;
+            --mafia-progress-fill-shadow: #3a8c54;
+            --mafia-error-fill: #d35d5d;
+            --mafia-error-fill-shadow: #a03c3c;
+            --glow-red: #ff3030;
+            --glow-blue: #4a90e2;
         }
 
-        /* 
-         ==========================================================================
-           2. KEYFRAME ANIMATIONS
-           - تعریف تمام انیمیشن‌های مورد استفاده در صفحه لودینگ
-           - شامل انیمیشن برای ورود پنل، درخشش لوگو، حرکت نور روی پروگرس بار و...
-         ========================================================================== 
+        /* --- KEYFRAME ANIMATIONS --- */
+        /*
+            This section contains all the @keyframes animations used
+            to create a dynamic and engaging loading experience.
         */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
 
-        /* انیمیشن برای ورود سینمایی پنل اصلی */
-        @keyframes panel-intro-animation {
+        @keyframes panelIntro {
             0% {
                 opacity: 0;
-                transform: translateY(50px) scale(0.95);
+                transform: translateY(40px) scale(0.95);
             }
             100% {
                 opacity: 1;
@@ -61,497 +55,493 @@
             }
         }
 
-        /* انیمیشن برای درخشش و تپش نور طلایی پشت لوگو */
-        @keyframes logo-glow-pulse {
-            0%, 100% {
-                filter: drop-shadow(0 0 12px var(--color-gold-glow)) brightness(1.1);
+        @keyframes logoPulseGlow {
+            0% {
+                filter:
+                    drop-shadow(0 0 8px var(--glow-red))
+                    drop-shadow(0 0 16px var(--glow-blue))
+                    brightness(1.1);
+                transform: scale(1);
             }
             50% {
-                filter: drop-shadow(0 0 22px var(--color-gold-glow)) brightness(1.2);
-            }
-        }
-
-        /* انیمیشن برای حرکت نور روی نوار پیشرفت */
-        @keyframes progress-bar-shine {
-            0% {
-                left: -100px;
+                filter:
+                    drop-shadow(0 0 16px var(--glow-red))
+                    drop-shadow(0 0 32px var(--glow-blue))
+                    brightness(1.2);
+                transform: scale(1.03);
             }
             100% {
-                left: 100%;
+                filter:
+                    drop-shadow(0 0 8px var(--glow-red))
+                    drop-shadow(0 0 16px var(--glow-blue))
+                    brightness(1.1);
+                transform: scale(1);
             }
         }
         
-        /* انیمیشن برای ظاهر شدن نرم متن و دکمه‌ها */
-        @keyframes fade-in-subtle {
-            from {
+        @keyframes statusIconPopIn {
+            0% {
                 opacity: 0;
-                transform: translateY(10px);
+                transform: scale(0.5) rotate(-90deg);
             }
-            to {
+            70% {
+                 transform: scale(1.2) rotate(10deg);
+            }
+            100% {
                 opacity: 1;
-                transform: translateY(0);
+                transform: scale(1) rotate(0deg);
             }
         }
 
-        /* انیمیشن برای چرخش آیکون لودینگ */
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
+        @keyframes buttonBreathe {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 6px 0 var(--mafia-gold-dark), 0 10px 20px rgba(0, 0, 0, 0.4);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 8px 0 var(--mafia-gold-dark), 0 15px 30px rgba(0, 0, 0, 0.5);
             }
         }
+        
+        @keyframes backgroundPan {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 100%; }
+        }
 
-        /* 
-         ==========================================================================
-           3. BODY & LAYOUT STYLES
-           - استایل‌های اصلی بدنه، پس‌زمینه و چیدمان کلی
-         ========================================================================== 
-        */
+        /* --- BODY & BACKGROUND STYLING --- */
+        html {
+            height: 100%;
+        }
+
         body {
-            font-family: var(--font-main);
-            color: var(--color-text-light);
-            background-color: var(--color-background-dark);
-            /* استفاده از یک بافت چوب تیره برای پس‌زمینه */
+            font-family: 'Vazirmatn', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-color: var(--mafia-brown-dark);
+            /* A subtle, dark wood texture for the background */
             background-image: url('https://www.transparenttextures.com/patterns/dark-wood.png');
+            animation: backgroundPan 120s linear infinite alternate;
+            color: var(--mafia-text-light);
             display: flex;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
             overflow: hidden;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
-        /* 
-         ==========================================================================
-           4. LOADING CONTAINER & PANEL STYLING
-           - استایل‌های اصلی برای پنل مرکزی لودینگ
-           - شامل گرادینت، حاشیه، سایه داخلی و عناصر تزئینی
-         ========================================================================== 
-        */
-        #loading-container {
-            width: 90%;
-            max-width: 480px;
-            padding: 2.5rem 2rem;
-            background: linear-gradient(145deg, var(--color-panel-brown-light), var(--color-panel-brown-dark));
-            border-radius: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 
-                        inset 0 2px 5px rgba(255, 255, 255, 0.05);
-            text-align: center;
-            position: relative;
-            animation: panel-intro-animation 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        *, *::before, *::after {
+            box-sizing: border-box;
         }
 
-        /* عناصر تزئینی گوشه‌های پنل */
-        #loading-container::before,
-        #loading-container::after {
-            content: '';
-            position: absolute;
-            width: 30px;
-            height: 30px;
-            border-style: solid;
-            border-color: var(--color-gold-dark);
-            opacity: 0.7;
-        }
-
-        #loading-container::before {
-            top: 15px;
-            left: 15px;
-            border-width: 3px 0 0 3px;
-            border-top-left-radius: 15px;
-        }
-
-        #loading-container::after {
-            bottom: 15px;
-            right: 15px;
-            border-width: 0 3px 3px 0;
-            border-bottom-right-radius: 15px;
-        }
-        
-        /* 
-         ==========================================================================
-           5. LOGO STYLING
-           - استایل‌های لوگوی مرکزی با افکت نورانی
-         ========================================================================== 
-        */
-        #loading-logo {
-            width: 100%;
-            max-width: 160px; /* افزایش اندازه لوگو */
-            height: auto;
-            margin: 0 auto 1.5rem;
-            display: block;
-            /* حذف پس زمینه احتمالی عکس و اعمال انیمیشن درخشش */
-            background-color: transparent;
-            animation: logo-glow-pulse 3.5s ease-in-out infinite;
-            /* جلوگیری از انتخاب ناخواسته لوگو */
-            user-select: none;
-            -webkit-user-select: none;
-        }
-
-        /* 
-         ==========================================================================
-           6. TITLE & MESSAGE STYLING
-           - استایل‌های عنوان اصلی و پیام‌های وضعیت
-         ========================================================================== 
-        */
-        #loading-title {
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: var(--color-gold-bright);
-            margin-bottom: 2rem;
-            text-shadow: 0 0 15px var(--color-gold-glow), 
-                         0 2px 2px var(--color-text-dark);
-        }
-
-        #loading-message {
-            font-size: 1.1rem;
-            font-weight: 700;
-            min-height: 50px; /* جلوگیری از پرش صفحه با تغییر متن */
+        /* --- LOADING SCREEN CONTAINER --- */
+        #loading-screen {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            transition: color 0.5s ease;
+            width: 100%;
+            padding: 20px;
+            animation: fadeIn 1s ease-in-out;
         }
-        
-        /* آیکون چرخان برای نمایش وضعیت "در حال انجام" */
-        .spinner-icon {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(245, 234, 221, 0.3);
-            border-top-color: var(--color-text-light);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+
+        /* --- MAIN LOADING PANEL --- */
+        /*
+            This is the central UI element. It's designed to look
+            like a premium, polished panel with depth and texture.
+        */
+        #loading-panel {
+            width: 100%;
+            max-width: 480px;
+            background: linear-gradient(145deg, var(--mafia-brown-panel), #45372f);
+            border-radius: 24px;
+            padding: 30px 40px;
+            border: 3px solid rgba(0, 0, 0, 0.2);
+            border-top-color: rgba(255, 255, 255, 0.1);
+            box-shadow:
+                0 20px 40px rgba(0, 0, 0, 0.5),
+                inset 0 2px 5px rgba(0, 0, 0, 0.3),
+                inset 0 -2px 3px rgba(255, 255, 255, 0.05);
+            text-align: center;
+            animation: panelIntro 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+            position: relative;
+            overflow: hidden;
         }
-        
-        /* آیکون تیک برای نمایش وضعیت "موفق" */
-        .success-icon {
-            color: var(--color-success-glow);
-            font-weight: bold;
-            font-size: 1.5rem;
+
+        /* Decorative corner elements for a more premium feel */
+        #loading-panel::before,
+        #loading-panel::after {
+            content: '';
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border-style: solid;
+            border-color: var(--mafia-gold);
+            opacity: 0.2;
         }
-        
-        /* آیکون خطا */
-        .error-icon {
-             color: var(--color-error-glow);
-             font-weight: bold;
-             font-size: 1.5rem;
+
+        #loading-panel::before {
+            top: 15px;
+            left: 15px;
+            border-width: 2px 0 0 2px;
+            border-top-left-radius: 22px;
+        }
+
+        #loading-panel::after {
+            bottom: 15px;
+            right: 15px;
+            border-width: 0 2px 2px 0;
+            border-bottom-right-radius: 22px;
         }
 
 
-        /* 
-         ==========================================================================
-           7. PROGRESS BAR STYLING
-           - استایل‌های نوار پیشرفت با افکت نور متحرک
-         ========================================================================== 
+        /* --- LOGO STYLING --- */
+        /*
+            This section styles the logo, making it larger and applying
+            the complex red/blue animated glow as requested.
+        */
+        #loading-logo-container {
+            margin-bottom: 20px;
+            /* Prevents the glow from being cut off */
+            padding: 10px;
+        }
+        
+        #loading-logo {
+            width: 180px; /* Increased size */
+            height: auto;
+            max-width: 50%;
+            margin: 0 auto;
+            display: block;
+            /* The key to the complex glow effect */
+            animation: logoPulseGlow 4s ease-in-out infinite;
+        }
+
+        /* --- TITLE STYLING --- */
+        #loading-title {
+            font-size: 3rem;
+            font-weight: 900;
+            margin: 0 0 30px 0;
+            color: var(--mafia-gold);
+            /* Strong text shadow for a 3D, premium look */
+            text-shadow:
+                0px 1px 1px rgba(255,220,150,0.5),
+                0px 2px 2px rgba(0,0,0,0.7),
+                0px 4px 8px rgba(0,0,0,0.5);
+        }
+
+        /* --- PROGRESS BAR STYLING --- */
+        /*
+            A detailed progress bar that supports a success (green)
+            and error (red) state.
         */
         #progress-bar-container {
             width: 100%;
             height: 22px;
-            background-color: rgba(0, 0, 0, 0.3);
-            border-radius: 11px;
-            margin: 1.5rem 0;
-            border: 2px solid rgba(0, 0, 0, 0.2);
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
-            position: relative;
-            overflow: hidden; /* برای مخفی کردن افکت نور در خارج از نوار */
-        }
-        
-        #progress-bar-fill {
-            height: 100%;
-            width: 0%; /* عرض اولیه صفر که با جاوااسکریپت کنترل می‌شود */
-            background: linear-gradient(90deg, var(--color-gold-dark), var(--color-gold-bright));
-            border-radius: 9px;
-            transition: width 0.7s cubic-bezier(0.65, 0, 0.35, 1);
-            position: relative;
-        }
-        
-        /* عنصر برای ایجاد افکت نور متحرک روی نوار پیشرفت */
-        #progress-bar-fill::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100px;
-            height: 100%;
-            background: linear-gradient(90deg, 
-                rgba(255, 255, 255, 0) 0%, 
-                rgba(255, 255, 255, 0.4) 50%, 
-                rgba(255, 255, 255, 0) 100%);
-            transform: skewX(-25deg);
-            animation: progress-bar-shine 2.5s linear infinite;
+            background-color: var(--mafia-progress-bg);
+            border-radius: 50px;
+            margin-bottom: 20px;
+            padding: 4px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(0,0,0,0.4);
         }
 
-        /* 
-         ==========================================================================
-           8. BUTTONS STYLING
-           - استایل دکمه‌های "ورود" و "تلاش مجدد"
-         ========================================================================== 
+        #progress-bar-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(to right, var(--mafia-progress-fill), #8ee0a8);
+            border-radius: 50px;
+            transition: width 0.5s cubic-bezier(0.65, 0, 0.35, 1);
+            box-shadow: 0 0 10px 1px var(--mafia-progress-fill-shadow);
+        }
+
+        #progress-bar-fill.error {
+            background: linear-gradient(to right, var(--mafia-error-fill), #e08a8a);
+            box-shadow: 0 0 10px 1px var(--mafia-error-fill-shadow);
+        }
+
+        /* --- STATUS MESSAGE STYLING --- */
+        /*
+            The message text below the progress bar. It includes
+            a container for an icon (spinner, checkmark, or X).
         */
-        .action-button {
-            display: none; /* در ابتدا مخفی است */
-            padding: 12px 30px;
-            margin-top: 2rem;
-            font-family: var(--font-main);
-            font-size: 1.2rem;
+        #status-message {
+            min-height: 28px;
+            font-size: 1.1rem;
             font-weight: 700;
-            color: var(--color-text-dark);
+            color: var(--mafia-text-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: color 0.3s ease;
+        }
+        
+        #status-icon-container {
+            width: 24px;
+            height: 24px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Spinner for loading states */
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: var(--mafia-gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Checkmark/Error icons */
+        .status-icon {
+            width: 24px;
+            height: 24px;
+            animation: statusIconPopIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .status-icon.success {
+            color: var(--mafia-progress-fill);
+        }
+
+        .status-icon.error {
+            color: var(--mafia-error-fill);
+        }
+
+        /* --- ENTER BUTTON STYLING --- */
+        /*
+            A highly styled button that appears after successful loading.
+            It's initially hidden and has a breathing animation to attract clicks.
+        */
+        #enter-button-container {
+            margin-top: 30px;
+            height: 60px; /* Reserve space to prevent layout shift */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #enter-button {
+            display: inline-block;
+            padding: 12px 40px;
+            font-family: 'Vazirmatn', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--mafia-brown-dark);
+            background: linear-gradient(to bottom, #fde49b, var(--mafia-gold));
             border: none;
             border-radius: 12px;
             cursor: pointer;
-            transition: all 0.2s ease-in-out;
+            text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.4);
+            transition: all 0.15s ease-out;
             position: relative;
-            overflow: hidden;
-            text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.3);
-            animation: fade-in-subtle 0.5s ease-out forwards;
-            animation-delay: 0.3s; /* با تاخیر ظاهر شود */
-            opacity: 0; /* برای شروع انیمیشن */
+            
+            /* 3D effect */
+            box-shadow: 0 6px 0 var(--mafia-gold-dark), 0 10px 20px rgba(0, 0, 0, 0.4);
+            
+            /* Hidden by default */
+            opacity: 0;
+            transform: translateY(20px);
+            pointer-events: none;
         }
-
-        .action-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
-        }
-
-        .action-button:active {
+        
+        #enter-button.visible {
+            opacity: 1;
             transform: translateY(0);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            pointer-events: auto;
+            transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.2, 1, 0.3, 1) 0.1s;
+            animation: buttonBreathe 2.5s ease-in-out infinite 1s;
         }
-        
-        /* دکمه اصلی (ورود) */
-        #enter-button {
-            background: linear-gradient(180deg, var(--color-gold-bright), var(--color-gold-dark));
-            box-shadow: 0 5px 0 #8c6400;
-        }
+
         #enter-button:hover {
-            background: linear-gradient(180deg, #ffeb8d, var(--color-gold-dark));
+            background: linear-gradient(to bottom, #fff0a0, #ffda5a);
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 8px 0 var(--mafia-gold-dark), 0 15px 30px rgba(0, 0, 0, 0.5);
         }
 
-        /* دکمه خطا (تلاش مجدد) */
-        #retry-button {
-            background: linear-gradient(180deg, #ff8a80, var(--color-error-dark));
-            box-shadow: 0 5px 0 #8e1c1c;
-        }
-        #retry-button:hover {
-             background: linear-gradient(180deg, #ffab91, var(--color-error-dark));
+        #enter-button:active {
+            transform: translateY(4px) scale(1.05) !important;
+            box-shadow: 0 2px 0 var(--mafia-gold-dark), 0 5px 10px rgba(0, 0, 0, 0.4) !important;
+            transition-duration: 0.05s;
         }
         
-        /* کلاس برای نمایش دکمه‌ها */
-        .visible {
-            display: inline-block !important;
-        }
+        /* --- MEDIA QUERIES FOR RESPONSIVENESS --- */
+        @media (max-width: 480px) {
+            #loading-panel {
+                padding: 25px 20px;
+            }
 
+            #loading-logo {
+                width: 140px;
+            }
+
+            #loading-title {
+                font-size: 2.2rem;
+                margin-bottom: 25px;
+            }
+
+            #status-message {
+                font-size: 1rem;
+            }
+            
+            #enter-button {
+                font-size: 1.1rem;
+                padding: 10px 30px;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <div id="loading-container">
-        <!-- لوگوی بازی -->
-        <img id="loading-logo" src="https://up.20script.ir/file/40b6-Copilot-20250812-110015-removebg-preview.png" alt="لوگوی شهر مافیا">
-        
-        <!-- عنوان اصلی -->
-        <h1 id="loading-title">شهر مافیا</h1>
-        
-        <!-- نوار پیشرفت -->
-        <div id="progress-bar-container">
-            <div id="progress-bar-fill"></div>
-        </div>
-        
-        <!-- پیام وضعیت -->
-        <p id="loading-message">
-            <span class="spinner-icon"></span>
-            <span>در حال آماده سازی...</span>
-        </p>
-        
-        <!-- دکمه ورود (در ابتدا مخفی) -->
-        <button id="enter-button" class="action-button">ورود به شهر</button>
+    <div id="loading-screen">
+        <div id="loading-panel">
+            <div id="loading-logo-container">
+                <!-- Logo with transparent background -->
+                <img id="loading-logo" src="https://up.20script.ir/file/40b6-Copilot-20250812-110015-removebg-preview.png" alt="لوگوی بازی مافیا">
+            </div>
 
-        <!-- دکمه تلاش مجدد (در ابتدا مخفی) -->
-        <button id="retry-button" class="action-button">تلاش مجدد</button>
+            <h1 id="loading-title">شهر مافیا</h1>
+            
+            <div id="progress-bar-container">
+                <div id="progress-bar-fill"></div>
+            </div>
+
+            <div id="status-message">
+                <div id="status-icon-container">
+                    <!-- This container will hold the dynamic icon -->
+                </div>
+                <span id="status-text">در حال آماده سازی...</span>
+            </div>
+
+            <div id="enter-button-container">
+                <button id="enter-button">ورود به شهر</button>
+            </div>
+        </div>
     </div>
 
+    <!-- Firebase SDKs -->
     <script type="module">
-        /* 
-         ==========================================================================
-           JAVASCRIPT LOGIC
-           - مدیریت کامل فرآیند لودینگ، اتصال به فایربیس و تعامل با کاربر
-         ========================================================================== 
-        */
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js";
+        // Since we are just checking the connection, we don't need other services like Analytics here.
+        // import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-analytics.js";
 
-        // -----------------------------------------------------------------------
-        // 1. FIREBASE IMPORTS & CONFIGURATION
-        // -----------------------------------------------------------------------
-        
-        // این بخش برای اتصال به فایربیس است. مطمئن شوید که SDK ها را به درستی وارد کرده‌اید.
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-        // import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-analytics.js";
-
-        // اطلاعات پیکربندی فایربیس شما
+        // Your web app's Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
             authDomain: "mafia-9fcbf.firebaseapp.com",
             projectId: "mafia-9fcbf",
-            storageBucket: "mafia-9fcbf.appspot.com",
+            storageBucket: "mafia-9fcbf.appspot.com", // Corrected domain
             messagingSenderId: "471627157488",
             appId: "1:471627157488:web:92f008548a5596619a5735",
             measurementId: "G-0PDHDWC6NV"
         };
         
-        // -----------------------------------------------------------------------
-        // 2. DOM ELEMENT SELECTORS
-        // -----------------------------------------------------------------------
-
+        // --- DOM Element Selection ---
+        // Getting references to all the UI elements we need to manipulate.
         const progressBarFill = document.getElementById('progress-bar-fill');
-        const loadingMessage = document.getElementById('loading-message');
+        const statusText = document.getElementById('status-text');
+        const statusIconContainer = document.getElementById('status-icon-container');
         const enterButton = document.getElementById('enter-button');
-        const retryButton = document.getElementById('retry-button');
 
-        // -----------------------------------------------------------------------
-        // 3. HELPER FUNCTIONS
-        // -----------------------------------------------------------------------
+        // --- Icon Templates (as inline SVG for self-containment) ---
+        const icons = {
+            spinner: `<div class="spinner"></div>`,
+            success: `
+                <svg class="status-icon success" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm-1.999 14.413-3.713-3.705L7.7 11.292l2.299 2.295 5.294-5.294 1.414 1.414-6.706 6.706z"></path>
+                </svg>`,
+            error: `
+                <svg class="status-icon error" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm4.207 12.793-1.414 1.414L12 13.414l-2.793 2.793-1.414-1.414L10.586 12 7.793 9.207l1.414-1.414L12 10.586l2.793-2.793 1.414 1.414L13.414 12l2.793 2.793z"></path>
+                </svg>`
+        };
 
         /**
-         * تابع برای به‌روزرسانی نوار پیشرفت و پیام وضعیت
-         * @param {number} percentage - درصد پیشرفت (0 تا 100)
-         * @param {string} messageText - متن پیامی که نمایش داده می‌شود
-         * @param {'loading' | 'success' | 'error'} status - وضعیت برای نمایش آیکون مناسب
+         * Updates the status message and progress bar.
+         * @param {number} progress - The percentage for the progress bar (0-100).
+         * @param {string} text - The message to display.
+         * @param {string} iconName - The name of the icon to show ('spinner', 'success', 'error').
+         * @param {boolean} isError - Optional flag for error state styling.
          */
-        function updateLoadingState(percentage, messageText, status = 'loading') {
-            // به‌روزرسانی عرض نوار پیشرفت
+        function updateStatus(progress, text, iconName, isError = false) {
+            if (progressBarFill) progressBarFill.style.width = `${progress}%`;
+            if (statusText) statusText.textContent = text;
+            if (statusIconContainer && icons[iconName]) {
+                statusIconContainer.innerHTML = icons[iconName];
+            }
             if (progressBarFill) {
-                progressBarFill.style.width = `${percentage}%`;
-            }
-            
-            // به‌روزرسانی پیام و آیکون
-            if (loadingMessage) {
-                let iconHtml = '';
-                if (status === 'loading') {
-                    iconHtml = '<span class="spinner-icon"></span>';
-                } else if (status === 'success') {
-                    iconHtml = '<span class="success-icon">✔</span>';
-                    progressBarFill.style.background = 'linear-gradient(90deg, #2e7d32, #66bb6a)';
-                } else if (status === 'error') {
-                    iconHtml = '<span class="error-icon">✖</span>';
-                    progressBarFill.style.background = 'linear-gradient(90deg, #c62828, #ef5350)';
-                }
-                
-                loadingMessage.innerHTML = `${iconHtml}<span>${messageText}</span>`;
-            }
-        }
-
-        /**
-         * تابع برای شبیه‌سازی تاخیر (برای نمایش بهتر فرآیند)
-         * @param {number} ms - مدت زمان تاخیر به میلی‌ثانیه
-         */
-        function delay(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
-
-        /**
-         * تابع برای نمایش دکمه‌ها
-         * @param {'enter' | 'retry' | 'none'} buttonToShow - کدام دکمه نمایش داده شود
-         */
-        function showActionButton(buttonToShow) {
-            enterButton.classList.remove('visible');
-            retryButton.classList.remove('visible');
-
-            if (buttonToShow === 'enter' && enterButton) {
-                enterButton.classList.add('visible');
-            } else if (buttonToShow === 'retry' && retryButton) {
-                retryButton.classList.add('visible');
+                progressBarFill.classList.toggle('error', isError);
             }
         }
         
-        // -----------------------------------------------------------------------
-        // 4. CORE LOGIC - FIREBASE INITIALIZATION & LOADING SEQUENCE
-        // -----------------------------------------------------------------------
-
         /**
-         * تابع اصلی برای شروع فرآیند لودینگ و اتصال
+         * Simulates the loading process and tries to connect to Firebase.
          */
-        async function startLoadingSequence() {
+        async function startLoadingProcess() {
+            // --- Step 1: Initializing and checking internet connection ---
+            updateStatus(10, 'در حال آماده سازی...', 'spinner');
+            
+            await new Promise(resolve => setTimeout(resolve, 800)); // Aesthetic delay
+
+            if (!navigator.onLine) {
+                updateStatus(100, 'اتصال به اینترنت برقرار نیست!', 'error', true);
+                console.error("No internet connection.");
+                return; // Stop the process
+            }
+
+            updateStatus(30, 'بررسی اتصال به اینترنت...', 'spinner');
+
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Aesthetic delay
+
+            // --- Step 2: Attempting to connect to the server (Firebase) ---
+            updateStatus(65, 'در حال اتصال به سرور مافیا...', 'spinner');
+            
             try {
-                // --- مرحله ۱: شروع و بررسی اتصال اینترنت ---
-                showActionButton('none'); // مخفی کردن همه دکمه‌ها در ابتدا
-                updateLoadingState(10, 'در حال آماده سازی...', 'loading');
-                await delay(500);
-
-                updateLoadingState(25, 'بررسی اتصال به اینترنت...', 'loading');
-                await delay(1000);
-
-                if (!navigator.onLine) {
-                    // اگر اینترنت قطع بود، خطا نمایش بده
-                    throw new Error("اتصال شما به اینترنت برقرار نیست. لطفا شبکه خود را بررسی کنید.");
-                }
-                
-                updateLoadingState(50, 'اتصال به اینترنت برقرار شد.', 'loading');
-                await delay(500);
-
-                // --- مرحله ۲: تلاش برای اتصال به سرور فایربیس ---
-                updateLoadingState(75, 'در حال اتصال به سرور بازی...', 'loading');
-                
-                // شبیه‌سازی اتصال به فایربیس
-                // در یک پروژه واقعی، این بخش شامل منطق اتصال واقعی خواهد بود.
+                // Initialize Firebase
                 const app = initializeApp(firebaseConfig);
-                // const analytics = getAnalytics(app); // در صورت نیاز فعال شود
+                // If the line above doesn't throw an error, initialization is considered successful.
+                console.log("Firebase initialized successfully.", app.name);
                 
-                // اگر کد به اینجا برسد یعنی اتصال موفق بوده است
-                await delay(1500); // تاخیر برای نمایش بهتر پیام
+                // const analytics = getAnalytics(app); // Optional
                 
-                // --- مرحله ۳: اتصال موفق ---
-                updateLoadingState(100, 'اتصال با موفقیت انجام شد!', 'success');
+                await new Promise(resolve => setTimeout(resolve, 1200)); // Simulate server handshake
                 
-                // نمایش دکمه "ورود به شهر"
-                showActionButton('enter');
+                // --- Step 3: Success ---
+                updateStatus(100, 'اتصال با موفقیت انجام شد!', 'success');
+                console.log("Connection successful. Showing enter button.");
+
+                // Show the "Enter" button
+                if (enterButton) {
+                    enterButton.classList.add('visible');
+                }
 
             } catch (error) {
-                // --- مدیریت خطا ---
-                console.error("خطا در فرآیند لودینگ:", error);
-                
-                // نمایش پیام خطا به کاربر
-                updateLoadingState(
-                    progressBarFill.style.width.replace('%', ''), // نوار پیشرفت در همانجا متوقف شود
-                    error.message || "خطایی رخ داد. امکان اتصال به سرور وجود ندارد.",
-                    'error'
-                );
-
-                // نمایش دکمه "تلاش مجدد"
-                showActionButton('retry');
+                // --- Step 3: Failure ---
+                console.error("Firebase initialization failed:", error);
+                updateStatus(100, 'خطا در اتصال به سرور!', 'error', true);
             }
         }
-        
-        // -----------------------------------------------------------------------
-        // 5. EVENT LISTENERS
-        // -----------------------------------------------------------------------
 
-        // رویداد کلیک برای دکمه "ورود به شهر"
+        // --- Event Listener for the Enter Button ---
         if (enterButton) {
             enterButton.addEventListener('click', () => {
-                // در اینجا می‌توانید کاربر را به صفحه اصلی بازی هدایت کنید
-                // window.location.href = '/game.html';
-                alert('در حال هدایت به صفحه اصلی بازی...');
-                
-                // انیمیشن خروج پنل (اختیاری)
-                document.getElementById('loading-container').style.transition = 'opacity 0.5s, transform 0.5s';
-                document.getElementById('loading-container').style.opacity = '0';
-                document.getElementById('loading-container').style.transform = 'scale(0.9)';
+                console.log("Entering the city...");
+                // Here you would redirect to the main game page, for example:
+                // window.location.href = 'main-game.html';
+                alert("خوش آمدید! (در نسخه نهایی به صفحه اصلی بازی منتقل می‌شوید)");
             });
         }
         
-        // رویداد کلیک برای دکمه "تلاش مجدد"
-        if (retryButton) {
-            retryButton.addEventListener('click', () => {
-                // فرآیند لودینگ را از اول شروع کن
-                startLoadingSequence();
-            });
-        }
-
-        // -----------------------------------------------------------------------
-        // 6. INITIALIZATION
-        // -----------------------------------------------------------------------
-
-        // شروع کل فرآیند با بارگذاری کامل صفحه
-        document.addEventListener('DOMContentLoaded', startLoadingSequence);
+        // --- Start the whole process when the page loads ---
+        document.addEventListener('DOMContentLoaded', startLoadingProcess);
 
     </script>
 </body>
