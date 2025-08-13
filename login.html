@@ -3,166 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>شهر مافیا - ورود</title>
-    
+    <title>شهر مافیا - ورود به حساب</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
-    
-    <!-- استایل‌ها کاملاً مشابه صفحه ثبت نام برای یکپارچگی -->
     <style>
         :root {
-            --wood-dark: #1a140f;
-            --wood-texture-url: url('https://www.transparenttextures.com/patterns/dark-wood.png');
-            --panel-bg: #3a2d20;
-            --panel-bg-gradient: linear-gradient(145deg, #4a3a2a, #2c2218);
-            --panel-border: #5c4a3a;
-            --text-gold: #ffc947;
-            --text-gold-dark: #e5a500;
-            --text-light: #e0dacc;
-            --error-color: #ff5252;
+            --bg-color: #f4f1ea;
+            --panel-bg: #ffffff;
+            --primary-color: #4a2c2a;
+            --accent-color: #c5a687;
+            --text-color: #3d3d3d;
+            --error-color: #d9534f;
+            --border-color: #e0dacc;
         }
-        @keyframes panel-intro {
-            from { opacity: 0; transform: translateY(40px) scale(0.98); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { height: 100%; }
         body {
             font-family: 'Vazirmatn', sans-serif;
-            background-color: var(--wood-dark);
-            background-image: var(--wood-texture-url);
-            color: var(--text-light);
+            background-color: var(--bg-color);
+            color: var(--text-color);
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 100%;
+            min-height: 100vh;
             padding: 20px;
         }
-        .container {
+
+        .auth-container {
             width: 100%;
-            max-width: 450px;
-            animation: panel-intro 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+            max-width: 420px;
+            background: var(--panel-bg);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+            text-align: center;
         }
-        .login-panel {
-            background: var(--panel-bg-gradient);
-            border-radius: 20px;
-            border: 2px solid var(--panel-border);
-            padding: 30px 35px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 1px 3px rgba(255,255,255,0.1);
-        }
-        .panel-header { text-align: center; margin-bottom: 25px; }
-        .panel-header img { width: 100px; margin-bottom: 10px; }
-        .panel-header h1 {
+
+        .auth-title {
             font-size: 2.5rem;
             font-weight: 900;
-            color: var(--text-gold);
-            text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+            color: var(--primary-color);
+            margin-bottom: 10px;
         }
-        .panel-header p { font-size: 1rem; color: var(--text-light); opacity: 0.8; }
 
-        .input-group { margin-bottom: 20px; }
+        .auth-subtitle {
+            font-size: 1rem;
+            color: #777;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: right;
+        }
+
         .input-group label {
             display: block;
             margin-bottom: 8px;
             font-weight: 700;
             font-size: 0.9rem;
-            color: var(--text-gold);
         }
-        .input-field {
+
+        .auth-input {
             width: 100%;
             padding: 12px 15px;
-            background-color: #2a1f15;
-            border: 2px solid var(--panel-border);
-            border-radius: 10px;
-            color: var(--text-light);
-            font-family: 'Vazirmatn', sans-serif;
             font-size: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
             transition: border-color 0.3s, box-shadow 0.3s;
+            font-family: 'Vazirmatn', sans-serif;
         }
-        .input-field:focus {
+        .auth-input:focus {
             outline: none;
-            border-color: var(--text-gold);
-            box-shadow: 0 0 10px rgba(255, 201, 71, 0.3);
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(197, 166, 135, 0.3);
         }
-        .password-group { position: relative; }
-        .password-toggle {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
+
+        .auth-button {
+            width: 100%;
+            padding: 14px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+            background-color: var(--primary-color);
+            border: none;
+            border-radius: 8px;
             cursor: pointer;
-            color: #999;
-            font-size: 1.2rem;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+        .auth-button:hover {
+            background-color: #382120;
+        }
+        .auth-button:active {
+            transform: scale(0.98);
+        }
+        .auth-button:disabled {
+            background-color: #9d8a7a;
+            cursor: not-allowed;
         }
 
-        .login-btn {
-            width: 100%; padding: 15px; font-family: 'Vazirmatn', sans-serif;
-            font-size: 1.2rem; font-weight: 700; color: var(--wood-dark);
-            background: linear-gradient(180deg, var(--text-gold), var(--text-gold-dark));
-            border: 2px solid #a07200; border-radius: 12px; cursor: pointer;
-            box-shadow: 0 4px 0 #a07200; transition: all 0.15s ease-out;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
+        .auth-link {
+            margin-top: 25px;
+            font-size: 0.9rem;
         }
-        .login-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 0 #a07200; }
-        .login-btn:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 2px 0 #a07200; }
-        .login-btn:disabled {
-            background: #555; box-shadow: 0 4px 0 #333;
-            cursor: not-allowed; color: #999;
+        .auth-link a {
+            color: var(--primary-color);
+            font-weight: 700;
+            text-decoration: none;
         }
-
-        .loader { width: 18px; height: 18px; border: 2px solid #fff; border-bottom-color: transparent; border-radius: 50%; display: inline-block; animation: spin 1s linear infinite; }
-        .hidden { display: none; }
 
         .error-message {
-            color: var(--error-color); font-size: 0.9rem; margin-top: 5px;
-            min-height: 1.2em; text-align: center; font-weight: bold;
+            color: var(--error-color);
+            background-color: rgba(217, 83, 79, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            display: none; /* Hidden by default */
         }
-        .form-footer { margin-top: 20px; text-align: center; font-size: 0.9rem; }
-        .form-footer a { color: var(--text-gold); text-decoration: none; font-weight: 700; }
-        .form-footer a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="login-panel">
-            <div class="panel-header">
-                <img src="https://up.20script.ir/file/40b6-Copilot-20250812-110015-removebg-preview.png" alt="لوگو">
-                <h1>ورود به شهر</h1>
-                <p>اطلاعات حساب کاربری خود را وارد کنید.</p>
+    <div class="auth-container">
+        <h1 class="auth-title">ورود به شهر</h1>
+        <p class="auth-subtitle">خوش آمدید! لطفاً اطلاعات خود را وارد کنید.</p>
+        
+        <form id="login-form">
+            <div class="input-group">
+                <label for="email">ایمیل</label>
+                <input type="email" id="email" class="auth-input" required>
             </div>
-            <form id="login-form" novalidate>
-                <div class="input-group">
-                    <label for="email">ایمیل</label>
-                    <input type="email" id="email" class="input-field" required>
-                </div>
-                <div class="input-group password-group">
-                    <label for="password">رمز عبور</label>
-                    <input type="password" id="password" class="input-field" required>
-                    <span id="toggle-password" class="password-toggle">👁️</span>
-                </div>
-                
-                <p class="error-message" id="error-message"></p>
+            <div class="input-group">
+                <label for="password">رمز عبور</label>
+                <input type="password" id="password" class="auth-input" required>
+            </div>
+            <button type="submit" id="login-button" class="auth-button">ورود</button>
+        </form>
 
-                <button type="submit" class="login-btn" id="login-btn">
-                    <span id="btn-text">ورود</span>
-                    <div id="btn-loader" class="loader hidden"></div>
-                </button>
-            </form>
-            <div class="form-footer">
-                <p>حساب کاربری ندارید؟ <a href="Registration.html">ثبت نام کنید</a></p>
-            </div>
-        </div>
+        <p id="error-message" class="error-message"></p>
+
+        <p class="auth-link">
+            هنوز عضو نشده‌اید؟ <a href="./Registration.html">ثبت‌نام کنید</a>
+        </p>
     </div>
 
     <script type="module">
-        // ==================== JAVASCRIPT - منطق ورود ====================
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-        // کانفیگ فایربیس (باید با صفحه ثبت نام یکسان باشد)
         const firebaseConfig = {
           apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
           authDomain: "mafia-9fcbf.firebaseapp.com",
@@ -172,64 +162,52 @@
           appId: "1:471627157488:web:92f008548a5596619a5735",
           measurementId: "G-0PDHDWC6NV"
         };
-        
+
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        // انتخاب عناصر DOM
-        const form = document.getElementById('login-form');
+        const loginForm = document.getElementById('login-form');
         const emailInput = document.getElementById('email');
         const passwordInput = document.getElementById('password');
+        const loginButton = document.getElementById('login-button');
         const errorMessage = document.getElementById('error-message');
-        const loginBtn = document.getElementById('login-btn');
-        const btnText = document.getElementById('btn-text');
-        const btnLoader = document.getElementById('btn-loader');
-        const togglePasswordBtn = document.getElementById('toggle-password');
 
-        function showLoader(isLoading) {
-            loginBtn.disabled = isLoading;
-            btnText.classList.toggle('hidden', isLoading);
-            btnLoader.classList.toggle('hidden', !isLoading);
-        }
-
-        togglePasswordBtn.addEventListener('click', () => {
-            const isPassword = passwordInput.type === 'password';
-            passwordInput.type = isPassword ? 'text' : 'password';
-            togglePasswordBtn.textContent = isPassword ? '🙈' : '👁️';
-        });
-
-        form.addEventListener('submit', async (e) => {
+        loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            errorMessage.textContent = '';
             
             const email = emailInput.value.trim();
             const password = passwordInput.value.trim();
 
             if (!email || !password) {
-                errorMessage.textContent = 'لطفاً ایمیل و رمز عبور را وارد کنید.';
+                showError("لطفاً ایمیل و رمز عبور را وارد کنید.");
                 return;
             }
 
-            showLoader(true);
+            loginButton.disabled = true;
+            loginButton.textContent = 'در حال ورود...';
+            errorMessage.style.display = 'none';
 
             try {
                 await signInWithEmailAndPassword(auth, email, password);
-                // اگر ورود موفق باشد، کاربر به صورت خودکار به صفحه اصلی هدایت می‌شود.
-                // (در یک پروژه واقعی، این هدایت در onAuthStateChanged مدیریت می‌شود)
-                alert('ورود موفقیت‌آمیز بود! در حال انتقال به بازی...');
-                window.location.href = 'main.html'; // صفحه اصلی بازی
-
+                // On successful login, redirect to the game page
+                window.location.href = './شهر مافیا رفع باگ.txt'; // <-- آدرس صفحه اصلی بازی
             } catch (error) {
-                console.error("Firebase login error:", error.code);
+                let friendlyMessage = "ایمیل یا رمز عبور اشتباه است.";
                 if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-                    errorMessage.textContent = 'ایمیل یا رمز عبور اشتباه است.';
-                } else {
-                    errorMessage.textContent = 'خطایی در ورود رخ داد. لطفاً دوباره تلاش کنید.';
+                    friendlyMessage = "ایمیل یا رمز عبور وارد شده صحیح نمی‌باشد.";
                 }
+                console.error("Login Error:", error);
+                showError(friendlyMessage);
             } finally {
-                showLoader(false);
+                loginButton.disabled = false;
+                loginButton.textContent = 'ورود';
             }
         });
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+        }
     </script>
 </body>
 </html>
