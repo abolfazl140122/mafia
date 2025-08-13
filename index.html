@@ -3,269 +3,448 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بازی مافیا - در حال بارگذاری</title>
+    <title>در حال اتصال به سرور...</title>
+    
+    <!-- فونت‌های سفارشی برای ظاهر شیک -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
-        /* --- MAFIA VINTAGE THEME --- */
+        /* --- ROOT VARIABLES: Brown & Gold Vintage Theme --- */
         :root {
-            --mafia-brown-dark: #2a1f18; /* پس‌زمینه اصلی */
-            --mafia-brown-panel: #4a3a2f; /* رنگ پنل */
-            --mafia-text-light: #e0d7cf; /* رنگ متن اصلی */
-            --mafia-highlight-amber: #c58940; /* رنگ هایلایت (نوار پیشرفت، آیکون) */
-            --mafia-highlight-amber-dark: #a06c30; /* هاور هایلایت */
-            --mafia-red-error: #b94a48; /* رنگ خطا */
+            --primary-brown-dark: #2a1f14; /* Dark wood background */
+            --primary-brown-medium: #4d3a2a; /* Main panel color */
+            --accent-gold-main: #e8c47f;    /* Gold for borders and highlights */
+            --accent-gold-glow: #ffdf99;    /* Lighter gold for glowing effects */
+            --text-light-parchment: #f5eadd; /* Off-white, parchment-like text color */
+            --text-dark-wood: #3b2e21;       /* Dark text for on-gold elements */
+            --success-green-muted: #77a877; /* Elegant, muted green for success state */
+            --error-red-muted: #c75b5b;       /* Elegant, muted red for error state */
+            --progress-bar-bg: rgba(0, 0, 0, 0.3);
         }
 
         /* --- KEYFRAME ANIMATIONS --- */
-        @keyframes fadeInScaleUp {
-            from { opacity: 0; transform: scale(0.8); }
+
+        /* انیمیشن برای ورود پنل به صفحه */
+        @keyframes panel-intro {
+            0% {
+                opacity: 0;
+                transform: translateY(50px) scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* انیمیشن برای درخشش و تپش آیکون */
+        @keyframes pulse-glow {
+            0%, 100% {
+                transform: scale(1);
+                filter: drop-shadow(0 0 10px var(--accent-gold-glow));
+            }
+            50% {
+                transform: scale(1.05);
+                filter: drop-shadow(0 0 20px var(--accent-gold-glow));
+            }
+        }
+        
+        /* انیمیشن برای نمایش محتوای متنی */
+        @keyframes text-fade-in {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* انیمیشن درخشش روی نوار پیشرفت */
+        @keyframes progress-gleam {
+            0% { transform: translateX(-100%) skewX(-30deg); }
+            100% { transform: translateX(300%) skewX(-30deg); }
+        }
+
+        /* انیمیشن برای مونتاژ شدن آیکون تعجب */
+        @keyframes assemble-exclamation-bar {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes assemble-exclamation-dot {
+            from { opacity: 0; transform: scale(0); }
             to { opacity: 1; transform: scale(1); }
         }
         
-        @keyframes pulseGlow {
-            0%, 100% { filter: drop-shadow(0 0 5px rgba(197, 137, 64, 0.4)); transform: scale(1); }
-            50% { filter: drop-shadow(0 0 12px rgba(197, 137, 64, 0.8)); transform: scale(1.05); }
+        /* انیمیشن برای تبدیل شدن آیکون به تیک یا ضربدر */
+        @keyframes icon-transform-to-check-1 {
+            0% { transform: translateY(0) rotate(0); height: 50%; opacity: 1; }
+            50% { transform: translateY(15px) rotate(0); height: 10px; opacity: 1; }
+            100% { transform: translateY(15px) rotate(45deg); height: 45%; opacity: 1; }
+        }
+        @keyframes icon-transform-to-check-2 {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(0); opacity: 0; }
+            51% { height: 75%; transform: translateY(0px) rotate(0); opacity: 0; }
+            100% { height: 75%; transform: translateY(0px) rotate(-45deg); opacity: 1; }
         }
 
-        @keyframes subtlePan {
-            0% { background-position: 0% 0%; }
-            100% { background-position: 100% 100%; }
+        @keyframes icon-transform-to-cross-1 {
+            from { transform: translateY(0) rotate(0); }
+            to { transform: translateY(10px) rotate(45deg); }
         }
+        @keyframes icon-transform-to-cross-2 {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(0); opacity: 0; }
+            51% { transform: translateY(10px) rotate(45deg); opacity: 0; }
+            100% { transform: translateY(10px) rotate(-45deg); opacity: 1; }
+        }
+
 
         /* --- BASE STYLES --- */
-        body {
-            font-family: 'Vazirmatn', sans-serif;
+        * {
             margin: 0;
-            background-color: var(--mafia-brown-dark);
-            background-image: url('https://www.transparenttextures.com/patterns/old-wall.png');
-            color: var(--mafia-text-light);
-            overflow: hidden;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-            -webkit-user-select: none;
-            user-select: none;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        /* --- LOADING SCREEN STYLES --- */
-        .screen {
-            position: fixed;
-            inset: 0; /* top, right, bottom, left = 0 */
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: var(--primary-brown-dark);
+            background-image: url('https://www.transparenttextures.com/patterns/dark-wood.png');
+            color: var(--text-light-parchment);
             display: flex;
             align-items: center;
             justify-content: center;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        /* --- LOADING SCREEN CONTAINER --- */
+        #loading-screen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
             padding: 20px;
-            box-sizing: border-box;
-            opacity: 1;
-            visibility: visible;
-            transition: opacity 0.7s ease-in-out, visibility 0.7s;
         }
 
-        .screen.hidden {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-        }
-
-        #loading-box {
-            background-color: var(--mafia-brown-panel);
-            border: 3px solid rgba(0,0,0,0.3);
-            border-radius: 16px;
-            padding: 2.5rem 2rem;
+        /* --- MAIN LOADING PANEL --- */
+        .loading-panel {
             width: 100%;
             max-width: 450px;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255, 224, 199, 0.1);
-            animation: fadeInScaleUp 0.8s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
-        }
-
-        #loading-icon {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 1.5rem auto;
-            color: var(--mafia-highlight-amber);
-            animation: pulseGlow 3s ease-in-out infinite;
-        }
-
-        #loading-title {
-            font-size: 2rem;
-            font-weight: 900;
-            margin: 0 0 1rem 0;
-            color: #fff;
-        }
-
-        #progress-bar-container {
-            width: 100%;
-            background-color: var(--mafia-brown-dark);
-            border: 2px solid #201813;
-            border-radius: 12px;
-            padding: 5px;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
-            margin: 2rem 0 1rem 0;
-        }
-
-        #progress-bar-fill {
-            height: 20px;
-            width: 0%; /* Starts at 0, controlled by JS */
-            background: linear-gradient(90deg, var(--mafia-highlight-amber-dark), var(--mafia-highlight-amber));
-            border-radius: 8px;
-            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 0 10px var(--mafia-highlight-amber);
-        }
-
-        #progress-bar-fill.error {
-            background: var(--mafia-red-error);
-            box-shadow: 0 0 10px var(--mafia-red-error);
-        }
-
-        #loading-message {
-            font-size: 1.1rem;
-            font-weight: 700;
-            min-height: 28px; /* Prevents layout shift */
-            transition: color 0.3s ease;
-        }
-        
-        /* --- MAIN CONTENT STYLES --- */
-        #main-content {
+            background: linear-gradient(145deg, #5a4635, var(--primary-brown-medium));
+            border-radius: 20px;
+            padding: 30px 40px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), 
+                        inset 0 2px 5px rgba(255, 255, 255, 0.1);
+            border: 5px solid;
+            border-image-source: linear-gradient(to bottom, var(--accent-gold-glow), #b38e5d);
+            border-image-slice: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            gap: 25px;
+            animation: panel-intro 1s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+            transition: border-color 0.8s ease;
         }
 
-        #main-content h1 {
-            font-size: 3rem;
-            color: var(--mafia-highlight-amber);
-            text-shadow: 2px 2px 4px var(--mafia-brown-dark);
+        /* --- ICON STYLES --- */
+        #icon-container {
+            width: 100px;
+            height: 100px;
+            position: relative;
+            animation: pulse-glow 3s ease-in-out infinite 1s;
+        }
+        
+        /* استایل‌های پایه برای دو جزء آیکون تعجب */
+        .icon-part {
+            position: absolute;
+            background-color: var(--accent-gold-main);
+            box-shadow: 0 0 15px rgba(232, 196, 127, 0.5);
+            transition: all 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
         }
 
-        #main-content p {
-            font-size: 1.2rem;
+        #exclamation-bar {
+            width: 18px;
+            height: 50%;
+            left: 50%;
+            top: 10%;
+            transform: translateX(-50%);
+            border-radius: 9px;
+            animation: assemble-exclamation-bar 0.7s ease-out 0.2s backwards;
+        }
+
+        #exclamation-dot {
+            width: 20px;
+            height: 20px;
+            left: 50%;
+            bottom: 10%;
+            transform: translateX(-50%);
+            border-radius: 50%;
+            animation: assemble-exclamation-dot 0.5s ease-out 0.8s backwards;
+        }
+        
+        /* --- TITLE STYLES --- */
+        .loading-title {
+            font-family: 'Cinzel Decorative', cursive;
+            font-size: 2.5rem;
+            color: var(--accent-gold-main);
+            text-shadow: 0 0 5px var(--accent-gold-glow), 0 0 10px var(--accent-gold-glow), 2px 2px 2px var(--primary-brown-dark);
+            animation: text-fade-in 0.8s ease-out 0.5s backwards;
+        }
+
+        /* --- PROGRESS BAR STYLES --- */
+        .progress-bar-container {
+            width: 100%;
+            height: 22px;
+            background-color: var(--progress-bar-bg);
+            border-radius: 11px;
+            padding: 4px;
+            border: 1px solid rgba(0,0,0,0.4);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            width: 0%; /* JS controls this */
+            height: 100%;
+            background: linear-gradient(90deg, #b38e5d, var(--accent-gold-glow));
+            border-radius: 7px;
+            transition: width 0.5s cubic-bezier(0.65, 0, 0.35, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* انیمیشن درخشش */
+        .progress-bar-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
+            animation: progress-gleam 2s infinite;
+        }
+
+        /* --- LOADING MESSAGE STYLES --- */
+        #loading-message {
+            font-size: 1.1rem;
+            font-weight: 700;
+            min-height: 28px; /* جلوگیری از پرش صفحه */
+            text-align: center;
+            animation: text-fade-in 0.8s ease-out 1s backwards;
+            transition: color 0.8s ease;
+        }
+
+
+        /* 
+        =================================
+        --- STATE-BASED MODIFIERS ---
+        =================================
+        */
+
+        /* --- SUCCESS STATE --- */
+        .loading-panel.success {
+            border-image-source: linear-gradient(to bottom, #a8d8a8, var(--success-green-muted));
+        }
+
+        .loading-panel.success #icon-container {
+            animation: none; /* توقف انیمیشن تپش */
+        }
+
+        .loading-panel.success #exclamation-bar {
+            animation: icon-transform-to-check-1 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+            background-color: var(--success-green-muted);
+            box-shadow: 0 0 15px var(--success-green-muted);
+        }
+        .loading-panel.success #exclamation-dot {
+            animation: icon-transform-to-check-2 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+            background-color: var(--success-green-muted);
+            box-shadow: 0 0 15px var(--success-green-muted);
+        }
+
+        .loading-panel.success .progress-bar-fill {
+            background: linear-gradient(90deg, #6a9b6a, var(--success-green-muted));
+        }
+
+        .loading-panel.success #loading-message {
+            color: var(--success-green-muted);
+            text-shadow: 0 0 5px var(--success-green-muted);
+        }
+
+        /* --- ERROR STATE --- */
+        .loading-panel.error {
+            border-image-source: linear-gradient(to bottom, #e08c8c, var(--error-red-muted));
+        }
+        
+        .loading-panel.error #icon-container {
+            animation: none;
+        }
+
+        .loading-panel.error #exclamation-bar {
+            animation: icon-transform-to-cross-1 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+            background-color: var(--error-red-muted);
+            box-shadow: 0 0 15px var(--error-red-muted);
+        }
+        .loading-panel.error #exclamation-dot {
+            animation: icon-transform-to-cross-2 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+            background-color: var(--error-red-muted);
+            box-shadow: 0 0 15px var(--error-red-muted);
+        }
+        
+        .loading-panel.error .progress-bar-fill {
+            background: linear-gradient(90deg, #b55353, var(--error-red-muted));
+        }
+
+        .loading-panel.error #loading-message {
+            color: var(--error-red-muted);
+            text-shadow: 0 0 5px var(--error-red-muted);
         }
 
     </style>
 </head>
 <body>
 
-    <!-- Loading Screen -->
-    <div id="loading-screen" class="screen">
-        <div id="loading-box">
-            <!-- شما می‌توانید به جای این SVG، لوگوی خود را قرار دهید -->
-            <div id="loading-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-12h2v4h-2zm0 6h2v2h-2z"/>
-                </svg>
+    <div id="loading-screen">
+        <div class="loading-panel" id="loading-panel">
+            <div id="icon-container">
+                <div class="icon-part" id="exclamation-bar"></div>
+                <div class="icon-part" id="exclamation-dot"></div>
             </div>
-            
-            <h1 id="loading-title">شهر مافیا</h1>
-            
-            <div id="progress-bar-container">
-                <div id="progress-bar-fill"></div>
+            <h1 class="loading-title">MAFIA</h1>
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" id="progress-bar-fill"></div>
             </div>
-            
             <p id="loading-message">در حال آماده سازی...</p>
         </div>
     </div>
 
-    <!-- Main Content (Hidden by default) -->
-    <div id="main-content" class="screen hidden">
-        <div>
-            <h1>خوش آمدید!</h1>
-            <p>بازی به زودی آغاز می‌شود...</p>
-        </div>
-    </div>
-
-
     <script type="module">
-        // --- JAVASCRIPT LOGIC ---
+        // --- JAVASCRIPT LOGIC FOR FIREBASE CONNECTION & UI UPDATE ---
 
-        // 1. Import the functions you need from the SDKs you need
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-analytics.js";
-        
-        // 2. Your web app's Firebase configuration
+        // Import the functions you need from the SDKs
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+
+        // Your web app's Firebase configuration
         const firebaseConfig = {
-          apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
-          authDomain: "mafia-9fcbf.firebaseapp.com",
-          projectId: "mafia-9fcbf",
-          storageBucket: "mafia-9fcbf.appspot.com", // 'firebasestorage.app' is incorrect, corrected to 'appspot.com'
-          messagingSenderId: "471627157488",
-          appId: "1:471627157488:web:92f008548a5596619a5735",
-          measurementId: "G-0PDHDWC6NV"
+            apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
+            authDomain: "mafia-9fcbf.firebaseapp.com",
+            projectId: "mafia-9fcbf",
+            storageBucket: "mafia-9fcbf.appspot.com", // Corrected domain
+            messagingSenderId: "471627157488",
+            appId: "1:471627157488:web:92f008548a5596619a5735",
+            measurementId: "G-0PDHDWC6NV"
         };
-
-        // 3. DOM Element References
-        const loadingScreen = document.getElementById('loading-screen');
-        const mainContent = document.getElementById('main-content');
+        
+        // --- DOM Elements ---
+        const loadingPanel = document.getElementById('loading-panel');
         const progressBarFill = document.getElementById('progress-bar-fill');
         const loadingMessage = document.getElementById('loading-message');
 
         /**
-         * A helper function to update the progress bar and message.
-         * @param {number} percentage - The new width percentage for the progress bar.
-         * @param {string} message - The new message to display.
+         * A utility function to create a delay.
+         * @param {number} ms - The number of milliseconds to wait.
+         * @returns {Promise<void>}
          */
-        function updateProgress(percentage, message) {
-            if (progressBarFill) progressBarFill.style.width = `${percentage}%`;
-            if (loadingMessage) loadingMessage.textContent = message;
-        }
+        const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
         /**
-         * A function to handle and display errors during loading.
-         * @param {string} message - The error message to display.
+         * Updates the UI with the current progress and message.
+         * @param {number} percent - The progress percentage (0-100).
+         * @param {string} message - The message to display.
          */
-        function showError(message) {
-            console.error("Loading Error:", message);
-            if(progressBarFill) progressBarFill.classList.add('error');
-            if(loadingMessage) loadingMessage.style.color = 'var(--mafia-red-error)';
-            updateProgress(100, message);
-        }
-
-        /**
-         * The main function to initialize and run the loading sequence.
-         */
-        async function initializeLoadingProcess() {
-            // Step 1: Initial state
-            updateProgress(10, 'در حال شروع...');
-            await new Promise(resolve => setTimeout(resolve, 500));
-
-            // Step 2: Check internet connection
-            updateProgress(30, 'بررسی اتصال اینترنت...');
-            await new Promise(resolve => setTimeout(resolve, 1000));
-
-            if (!navigator.onLine) {
-                showError('خطا: اتصال به اینترنت برقرار نیست!');
-                return; // Stop the process
+        function updateProgress(percent, message) {
+            // Clamp the percentage value between 0 and 100
+            const clampedPercent = Math.max(0, Math.min(100, percent));
+            
+            if (progressBarFill) {
+                progressBarFill.style.width = `${clampedPercent}%`;
             }
+            if (loadingMessage) {
+                loadingMessage.textContent = message;
+            }
+        }
 
-            // Step 3: Connect to Firebase
-            updateProgress(60, 'در حال اتصال به سرور...');
-            await new Promise(resolve => setTimeout(resolve, 1200));
+        /**
+         * Sets the final state of the loading panel (success or error).
+         * @param {'success' | 'error'} state - The final state.
+         * @param {string} finalMessage - The message to display for the final state.
+         */
+        function setFinalState(state, finalMessage) {
+            updateProgress(100, finalMessage);
+            if (loadingPanel) {
+                // Remove any existing state classes first
+                loadingPanel.classList.remove('success', 'error');
+                // Add the new state class
+                loadingPanel.classList.add(state);
+            }
+        }
 
+        /**
+         * The main asynchronous function to initialize the connection process.
+         */
+        async function initializeConnection() {
             try {
-                // Initialize Firebase
-                const app = initializeApp(firebaseConfig);
-                const analytics = getAnalytics(app); // Optional, but good to have
+                // --- Step 1: Initial Animation & Internet Check ---
+                updateProgress(10, 'بررسی اتصال به اینترنت...');
+                await wait(1200);
+
+                if (!navigator.onLine) {
+                    console.error("No internet connection.");
+                    // Throw a specific error to be caught below
+                    throw new Error('NoInternet');
+                }
                 
-                console.log("Firebase initialized successfully.");
+                // --- Step 2: Confirmation & Preparing for Firebase ---
+                updateProgress(40, 'اتصال اینترنت برقرار است. آماده‌سازی...');
+                await wait(1500);
 
-                // Step 4: Success
-                updateProgress(100, 'اتصال موفقیت آمیز بود ✅');
-                await new Promise(resolve => setTimeout(resolve, 1500));
+                // --- Step 3: Attempting to connect to Firebase ---
+                updateProgress(70, 'در حال اتصال به سرور‌های بازی...');
+                
+                // Initialize Firebase
+                // This is the core connection logic
+                const app = initializeApp(firebaseConfig);
+                const analytics = getAnalytics(app); // As requested
+                
+                console.log("Firebase has been initialized successfully.");
 
-                // Step 5: Transition to main content
-                if (loadingScreen) loadingScreen.classList.add('hidden');
-                if (mainContent) mainContent.classList.remove('hidden');
+                // --- Step 4: Success! ---
+                await wait(1000); // A short delay for dramatic effect
+                setFinalState('success', 'اتصال با موفقیت انجام شد!');
+                console.log("Loading sequence complete. Status: SUCCESS");
 
             } catch (error) {
-                console.error("Firebase Initialization Error:", error);
-                showError('خطا در اتصال به سرور بازی!');
+                console.error("An error occurred during the initialization process:", error);
+                
+                // --- Error Handling ---
+                let errorMessage = 'خطا در اتصال به سرور'; // Default error
+                
+                if (error.message === 'NoInternet') {
+                    errorMessage = 'خطا: عدم اتصال به اینترنت';
+                } else if (error.code) {
+                    // Firebase specific errors often have a 'code' property
+                    console.error(`Firebase Error Code: ${error.code}`);
+                    errorMessage = 'خطای سرور: پیکربندی نامعتبر است';
+                }
+                
+                setFinalState('error', errorMessage);
+                console.log("Loading sequence complete. Status: FAILED");
             }
         }
 
-        // Run the loading process when the page is ready.
-        document.addEventListener('DOMContentLoaded', initializeLoadingProcess);
+        // Start the process once the DOM is fully loaded.
+        document.addEventListener('DOMContentLoaded', initializeConnection);
 
     </script>
 </body>
