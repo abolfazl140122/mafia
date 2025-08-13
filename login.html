@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ورود به شهر مافیا</title>
+    <title>شهر مافیا - ورود</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
     
+    <!-- استایل‌ها کاملاً مشابه صفحه ثبت نام برای یکپارچگی -->
     <style>
-        /* ==================== SHARED THEME: DARK WOOD & NEON GOLD ==================== */
         :root {
             --wood-dark: #1a140f;
             --wood-texture-url: url('https://www.transparenttextures.com/patterns/dark-wood.png');
@@ -20,22 +20,16 @@
             --text-gold: #ffc947;
             --text-gold-dark: #e5a500;
             --text-light: #e0dacc;
-            --glow-red: #ff3131;
-            --error-color: #f75d5d;
+            --error-color: #ff5252;
         }
-
         @keyframes panel-intro {
             from { opacity: 0; transform: translateY(40px) scale(0.98); }
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
-
-        @keyframes spinner {
-            to { transform: rotate(360deg); }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { height: 100%; }
-
         body {
             font-family: 'Vazirmatn', sans-serif;
             background-color: var(--wood-dark);
@@ -47,44 +41,39 @@
             min-height: 100%;
             padding: 20px;
         }
-
-        .auth-container {
+        .container {
             width: 100%;
             max-width: 450px;
+            animation: panel-intro 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .login-panel {
             background: var(--panel-bg-gradient);
             border-radius: 20px;
             border: 2px solid var(--panel-border);
-            padding: 30px 40px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            text-align: center;
-            animation: panel-intro 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+            padding: 30px 35px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 1px 3px rgba(255,255,255,0.1);
         }
-
-        .logo-container {
-            margin-bottom: 20px;
-        }
-        .logo {
-            width: 100px;
-            height: auto;
-            filter: drop-shadow(0 0 10px rgba(255, 201, 71, 0.5));
-        }
-
-        .title {
+        .panel-header { text-align: center; margin-bottom: 25px; }
+        .panel-header img { width: 100px; margin-bottom: 10px; }
+        .panel-header h1 {
             font-size: 2.5rem;
             font-weight: 900;
             color: var(--text-gold);
-            margin-bottom: 25px;
-            text-shadow: 0 0 5px rgba(255, 201, 71, 0.4), 2px 2px 4px rgba(0, 0, 0, 0.5);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.4);
         }
+        .panel-header p { font-size: 1rem; color: var(--text-light); opacity: 0.8; }
 
-        .input-group {
-            position: relative;
-            margin-bottom: 20px;
+        .input-group { margin-bottom: 20px; }
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--text-gold);
         }
-
         .input-field {
             width: 100%;
-            padding: 14px 20px 14px 50px;
+            padding: 12px 15px;
             background-color: #2a1f15;
             border: 2px solid var(--panel-border);
             border-radius: 10px;
@@ -96,204 +85,149 @@
         .input-field:focus {
             outline: none;
             border-color: var(--text-gold);
-            box-shadow: 0 0 15px rgba(255, 201, 71, 0.3);
+            box-shadow: 0 0 10px rgba(255, 201, 71, 0.3);
         }
-        .input-field.error {
-            border-color: var(--glow-red);
-        }
-
-        .input-icon {
+        .password-group { position: relative; }
+        .password-toggle {
             position: absolute;
             left: 15px;
             top: 50%;
             transform: translateY(-50%);
-            width: 20px;
-            height: 20px;
-            color: var(--panel-border-light);
-            transition: color 0.3s;
-        }
-        .input-field:focus + .input-icon {
-            color: var(--text-gold);
+            cursor: pointer;
+            color: #999;
+            font-size: 1.2rem;
         }
 
-        .btn-primary {
-            width: 100%;
-            padding: 14px;
-            font-family: 'Vazirmatn', sans-serif;
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--wood-dark);
+        .login-btn {
+            width: 100%; padding: 15px; font-family: 'Vazirmatn', sans-serif;
+            font-size: 1.2rem; font-weight: 700; color: var(--wood-dark);
             background: linear-gradient(180deg, var(--text-gold), var(--text-gold-dark));
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            box-shadow: 0 4px 0 #a07200;
-            transition: all 0.15s ease-out;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+            border: 2px solid #a07200; border-radius: 12px; cursor: pointer;
+            box-shadow: 0 4px 0 #a07200; transition: all 0.15s ease-out;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
         }
-        .btn-primary:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 0 #a07200;
+        .login-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 0 #a07200; }
+        .login-btn:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 2px 0 #a07200; }
+        .login-btn:disabled {
+            background: #555; box-shadow: 0 4px 0 #333;
+            cursor: not-allowed; color: #999;
         }
-        .btn-primary:active:not(:disabled) {
-            transform: translateY(2px);
-            box-shadow: 0 2px 0 #a07200;
-        }
-        .btn-primary:disabled {
-            background: #888;
-            cursor: not-allowed;
-            box-shadow: 0 4px 0 #555;
-        }
-        .spinner {
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spinner 0.6s linear infinite;
-        }
+
+        .loader { width: 18px; height: 18px; border: 2px solid #fff; border-bottom-color: transparent; border-radius: 50%; display: inline-block; animation: spin 1s linear infinite; }
+        .hidden { display: none; }
 
         .error-message {
-            color: var(--error-color);
-            min-height: 20px;
-            margin-bottom: 15px;
-            font-weight: bold;
-            font-size: 0.9rem;
+            color: var(--error-color); font-size: 0.9rem; margin-top: 5px;
+            min-height: 1.2em; text-align: center; font-weight: bold;
         }
-
-        .switch-link {
-            margin-top: 25px;
-            font-size: 0.9rem;
-        }
-        .switch-link a {
-            color: var(--text-gold);
-            font-weight: bold;
-            text-decoration: none;
-        }
-        .switch-link a:hover {
-            text-decoration: underline;
-        }
+        .form-footer { margin-top: 20px; text-align: center; font-size: 0.9rem; }
+        .form-footer a { color: var(--text-gold); text-decoration: none; font-weight: 700; }
+        .form-footer a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
+    <div class="container">
+        <div class="login-panel">
+            <div class="panel-header">
+                <img src="https://up.20script.ir/file/40b6-Copilot-20250812-110015-removebg-preview.png" alt="لوگو">
+                <h1>ورود به شهر</h1>
+                <p>اطلاعات حساب کاربری خود را وارد کنید.</p>
+            </div>
+            <form id="login-form" novalidate>
+                <div class="input-group">
+                    <label for="email">ایمیل</label>
+                    <input type="email" id="email" class="input-field" required>
+                </div>
+                <div class="input-group password-group">
+                    <label for="password">رمز عبور</label>
+                    <input type="password" id="password" class="input-field" required>
+                    <span id="toggle-password" class="password-toggle">👁️</span>
+                </div>
+                
+                <p class="error-message" id="error-message"></p>
 
-    <div class="auth-container">
-        <div class="logo-container">
-            <img src="https://up.20script.ir/file/40b6-Copilot-20250812-110015-removebg-preview.png" alt="لوگو" class="logo">
+                <button type="submit" class="login-btn" id="login-btn">
+                    <span id="btn-text">ورود</span>
+                    <div id="btn-loader" class="loader hidden"></div>
+                </button>
+            </form>
+            <div class="form-footer">
+                <p>حساب کاربری ندارید؟ <a href="Registration.html">ثبت نام کنید</a></p>
+            </div>
         </div>
-        <h1 class="title">ورود به شهر</h1>
-        
-        <form id="login-form" novalidate>
-            <div id="error-message-container" class="error-message"></div>
-
-            <div class="input-group">
-                <input type="email" id="email" class="input-field" placeholder="ایمیل" required>
-                 <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zm-2 0-8 5-8-5h16zm0 12H4V8l8 5 8-5v10z"/></svg>
-            </div>
-            <div class="input-group">
-                <input type="password" id="password" class="input-field" placeholder="رمز عبور" required>
-                <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/></svg>
-            </div>
-            
-            <button type="submit" id="login-button" class="btn-primary">
-                <span id="button-text">ورود</span>
-                <div id="loading-spinner" class="spinner" style="display: none;"></div>
-            </button>
-        </form>
-
-        <p class="switch-link">
-            حساب کاربری ندارید؟ <a href="./Registration.html">یکی بسازید</a>
-        </p>
     </div>
 
     <script type="module">
+        // ==================== JAVASCRIPT - منطق ورود ====================
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        
-        // КОНФИГУРАЦИЯ FIREBASE ВАШЕГО ВЕБ-ПРИЛОЖЕНИЯ
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+        // کانفیگ فایربیس (باید با صفحه ثبت نام یکسان باشد)
         const firebaseConfig = {
-            apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
-            authDomain: "mafia-9fcbf.firebaseapp.com",
-            projectId: "mafia-9fcbf",
-            storageBucket: "mafia-9fcbf.appspot.com",
-            messagingSenderId: "471627157488",
-            appId: "1:471627157488:web:92f008548a5596619a5735",
-            measurementId: "G-0PDHDWC6NV"
+          apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
+          authDomain: "mafia-9fcbf.firebaseapp.com",
+          projectId: "mafia-9fcbf",
+          storageBucket: "mafia-9fcbf.appspot.com",
+          messagingSenderId: "471627157488",
+          appId: "1:471627157488:web:92f008548a5596619a5735",
+          measurementId: "G-0PDHDWC6NV"
         };
         
-        // Инициализация Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        
-        // ВЫБОР ЭЛЕМЕНТОВ DOM
+
+        // انتخاب عناصر DOM
         const form = document.getElementById('login-form');
         const emailInput = document.getElementById('email');
         const passwordInput = document.getElementById('password');
-        const errorMessageContainer = document.getElementById('error-message-container');
-        const loginButton = document.getElementById('login-button');
-        const buttonText = document.getElementById('button-text');
-        const loadingSpinner = document.getElementById('loading-spinner');
+        const errorMessage = document.getElementById('error-message');
+        const loginBtn = document.getElementById('login-btn');
+        const btnText = document.getElementById('btn-text');
+        const btnLoader = document.getElementById('btn-loader');
+        const togglePasswordBtn = document.getElementById('toggle-password');
 
-        // بررسی وضعیت ورود کاربر هنگام بارگذاری صفحه
-        // اگر کاربر قبلا وارد شده باشد، مستقیما به صفحه بازی منتقل می‌شود
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                console.log('User is already logged in, redirecting...');
-                // **مهم:** آدرس صفحه اصلی بازی را اینجا قرار دهید
-                // window.location.href = './main-game.html'; 
-            }
+        function showLoader(isLoading) {
+            loginBtn.disabled = isLoading;
+            btnText.classList.toggle('hidden', isLoading);
+            btnLoader.classList.toggle('hidden', !isLoading);
+        }
+
+        togglePasswordBtn.addEventListener('click', () => {
+            const isPassword = passwordInput.type === 'password';
+            passwordInput.type = isPassword ? 'text' : 'password';
+            togglePasswordBtn.textContent = isPassword ? '🙈' : '👁️';
         });
 
-        // افزودن رویداد به فرم
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-
+            errorMessage.textContent = '';
+            
             const email = emailInput.value.trim();
-            const password = passwordInput.value;
+            const password = passwordInput.value.trim();
 
             if (!email || !password) {
-                errorMessageContainer.textContent = 'لطفاً ایمیل و رمز عبور را وارد کنید.';
+                errorMessage.textContent = 'لطفاً ایمیل و رمز عبور را وارد کنید.';
                 return;
             }
 
-            // نمایش حالت لودینگ
-            errorMessageContainer.textContent = '';
-            loginButton.disabled = true;
-            buttonText.style.display = 'none';
-            loadingSpinner.style.display = 'block';
+            showLoader(true);
 
             try {
-                // تلاش برای ورود کاربر
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                console.log('Login successful:', userCredential.user);
-
-                // ورود موفق
-                errorMessageContainer.textContent = 'ورود موفقیت‌آمیز بود! در حال انتقال...';
-                errorMessageContainer.style.color = '#39ff14'; // رنگ سبز نئونی
-                
-                // **مهم:** اینجا باید آدرس صفحه اصلی بازی را قرار دهید
-                setTimeout(() => {
-                   window.location.href = './'; // انتقال به صفحه اصلی
-                }, 1500);
+                await signInWithEmailAndPassword(auth, email, password);
+                // اگر ورود موفق باشد، کاربر به صورت خودکار به صفحه اصلی هدایت می‌شود.
+                // (در یک پروژه واقعی، این هدایت در onAuthStateChanged مدیریت می‌شود)
+                alert('ورود موفقیت‌آمیز بود! در حال انتقال به بازی...');
+                window.location.href = 'main.html'; // صفحه اصلی بازی
 
             } catch (error) {
-                // مدیریت خطاهای ورود
-                let friendlyMessage = 'ایمیل یا رمز عبور اشتباه است.';
-                // Firebase خطای مشخص برای "کاربر یافت نشد" یا "رمز اشتباه" به دلایل امنیتی نمی‌دهد
-                // و از auth/invalid-credential استفاده می‌کند.
-                if (error.code === 'auth/invalid-credential') {
-                    friendlyMessage = 'اطلاعات ورود نامعتبر است. لطفاً دوباره بررسی کنید.';
+                console.error("Firebase login error:", error.code);
+                if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+                    errorMessage.textContent = 'ایمیل یا رمز عبور اشتباه است.';
+                } else {
+                    errorMessage.textContent = 'خطایی در ورود رخ داد. لطفاً دوباره تلاش کنید.';
                 }
-                
-                errorMessageContainer.textContent = friendlyMessage;
-
-                // بازگرداندن دکمه به حالت اولیه
-                loginButton.disabled = false;
-                buttonText.style.display = 'inline';
-                loadingSpinner.style.display = 'none';
+            } finally {
+                showLoader(false);
             }
         });
     </script>
