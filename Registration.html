@@ -5,37 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ساخت حساب کاربری - شهر مافیا</title>
     
-    <!-- Google Fonts for a premium look -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&family=Lalezar&display=swap" rel="stylesheet">
 
     <style>
-        /*
-        ==============================================
-        --- MAFIA CITY THEME - REGISTRATION PAGE ---
-        ---      Crafted with attention to detail      ---
-        ==============================================
-        */
+        /* --- MAFIA CITY THEME - REGISTRATION PAGE (MATCHING LOGIN PAGE) --- */
 
-        /* --- CSS Variables for Theming --- */
+        /* --- ROOT VARIABLES (Consistent Theming) --- */
         :root {
-            --mafia-dark-wood: #1a1613;
-            --mafia-panel-brown: #362f2a;
-            --mafia-panel-border: #25201c;
-            --mafia-gold-accent: #eec45b;
-            --mafia-gold-glow: rgba(238, 196, 91, 0.7);
-            --mafia-gold-dark: #b8913c;
+            --mafia-dark-wood: #1e1a17;
+            --mafia-panel-brown: #3a322d;
+            --mafia-panel-border: #2c2521;
+            --mafia-gold-accent: #e6b800;
+            --mafia-gold-glow: rgba(230, 184, 0, 0.6);
+            --mafia-gold-dark: #a88700;
             --mafia-text-light: #e8e0d9;
             --mafia-text-dark: #1a1a1a;
-            --mafia-success-green: #5cb85c;
-            --mafia-success-green-glow: rgba(92, 184, 92, 0.7);
-            --mafia-error-red: #d9534f;
-            --mafia-error-red-glow: rgba(217, 83, 79, 0.7);
-            --mafia-input-bg: #28221e;
+            --mafia-success-green: #28a745;
+            --mafia-success-green-glow: rgba(40, 167, 69, 0.7);
+            --mafia-error-red: #dc3545;
+            --mafia-error-red-glow: rgba(220, 53, 69, 0.7);
+            --mafia-input-bg: #2a2420;
+            --glitch-color-1: #ff4848; /* Red */
+            --glitch-color-2: #48ffff; /* Cyan */
         }
 
-        /* --- Keyframe Animations --- */
+        /* --- KEYFRAME ANIMATIONS --- */
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -44,8 +41,8 @@
         @keyframes panelIntro {
             0% { 
                 opacity: 0; 
-                transform: translateY(50px) scale(0.95);
-                filter: blur(8px);
+                transform: translateY(40px) scale(0.95);
+                filter: blur(5px);
             }
             100% { 
                 opacity: 1; 
@@ -53,44 +50,64 @@
                 filter: blur(0);
             }
         }
-        
+
         @keyframes backgroundPan {
             0% { background-position: 0% 0%; }
-            100% { background-position: 150% 150%; }
-        }
-        
-        /* The iconic flickering "IA" animation */
-        @keyframes flicker {
-            0%, 18%, 22%, 25%, 53%, 57%, 100% {
-                text-shadow:
-                    0 0 4px var(--mafia-gold-glow),
-                    0 0 10px var(--mafia-gold-glow),
-                    0 0 18px var(--mafia-gold-glow),
-                    0 0 38px var(--mafia-gold-glow),
-                    0 0 70px #000;
-                color: var(--mafia-gold-accent);
-                opacity: 1;
-            }
-            20%, 24%, 55% {
-                text-shadow: none;
-                color: #555;
-                opacity: 0.6;
-            }
+            100% { background-position: 100% 100%; }
         }
         
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
 
-        /* --- General & Body Styles --- */
+        /* --- GLITCH TEXT ANIMATION (EXACTLY LIKE LOGIN PAGE) --- */
+        @keyframes glitch-anim-1 {
+            0% { clip-path: inset(21% 0 76% 0); }
+            10% { clip-path: inset(92% 0 2% 0); }
+            20% { clip-path: inset(55% 0 7% 0); }
+            30% { clip-path: inset(18% 0 73% 0); }
+            40% { clip-path: inset(93% 0 4% 0); }
+            50% { clip-path: inset(37% 0 52% 0); }
+            60% { clip-path: inset(98% 0 1% 0); }
+            70% { clip-path: inset(69% 0 22% 0); }
+            80% { clip-path: inset(95% 0 5% 0); }
+            90% { clip-path: inset(25% 0 58% 0); }
+            100% { clip-path: inset(1% 0 98% 0); }
+        }
+
+        @keyframes glitch-anim-2 {
+            0% { clip-path: inset(89% 0 3% 0); }
+            10% { clip-path: inset(62% 0 32% 0); }
+            20% { clip-path: inset(10% 0 88% 0); }
+            30% { clip-path: inset(84% 0 2% 0); }
+            40% { clip-path: inset(15% 0 84% 0); }
+            50% { clip-path: inset(79% 0 18% 0); }
+            60% { clip-path: inset(48% 0 50% 0); }
+            70% { clip-path: inset(9% 0 89% 0); }
+            80% { clip-path: inset(73% 0 13% 0); }
+            90% { clip-path: inset(44% 0 45% 0); }
+            100% { clip-path: inset(85% 0 4% 0); }
+        }
+
+        @keyframes glitch-skew {
+            0% { transform: skewX(0deg); }
+            10% { transform: skewX(3deg); }
+            20% { transform: skewX(-4deg); }
+            30% { transform: skewX(1deg); }
+            40% { transform: skewX(0deg); }
+            50% { transform: skewX(-2deg); }
+            60% { transform: skewX(5deg); }
+            70% { transform: skewX(-3deg); }
+            80% { transform: skewX(2deg); }
+            90% { transform: skewX(-1deg); }
+            100% { transform: skewX(0deg); }
+        }
+
+        /* --- GENERAL & BODY STYLES --- */
         *, *::before, *::after {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-        }
-
-        html {
-            scroll-behavior: smooth;
         }
 
         body {
@@ -103,80 +120,129 @@
             justify-content: center;
             min-height: 100vh;
             padding: 20px;
-            overflow-x: hidden;
-            animation: fadeIn 1.2s ease-out;
+            overflow: hidden;
+            animation: fadeIn 1s ease-out;
             position: relative;
         }
 
-        /* A subtle overlay texture for a grittier feel */
         body::before {
             content: '';
             position: fixed;
             top: -50%; left: -50%;
             width: 200%; height: 200%;
-            background-image: url('https://www.transparenttextures.com/patterns/dust-and-scratches.png');
-            opacity: 0.1;
+            background-image: url('https://www.transparenttextures.com/patterns/foggy-birds.png');
+            opacity: 0.05;
             z-index: 0;
-            pointer-events: none;
-            animation: backgroundPan 240s linear infinite;
+            animation: backgroundPan 180s linear infinite;
         }
         
-        /* --- Typography --- */
+        /* --- TYPOGRAPHY & TITLE --- */
         .title-font {
             font-family: 'Lalezar', cursive;
         }
         
         h1, h2, h3 {
-            text-shadow: 2px 2px 5px rgba(0,0,0,0.6);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
 
-        /* --- Main Container & Panel Styling --- */
-        .registration-container {
+        /* Glitch Title Styling */
+        .glitch {
+            position: relative;
+            color: var(--mafia-text-light);
+            font-size: 3rem; /* Adjusted for Registration panel */
+            animation: glitch-skew 2s cubic-bezier(0.25, 0.46, 0.45, 0.94) 1s both infinite;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
+        }
+        
+        @media (min-width: 500px) {
+            .glitch { font-size: 3.5rem; }
+        }
+
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+        }
+
+        .glitch::before {
+            left: 2px;
+            text-shadow: -2px 0 var(--glitch-color-1);
+            animation: glitch-anim-1 3s cubic-bezier(0.25, 0.46, 0.45, 0.94) 1.2s both infinite;
+        }
+
+        .glitch::after {
+            left: -2px;
+            text-shadow: -2px 0 var(--glitch-color-2), 2px 2px var(--glitch-color-1);
+            animation: glitch-anim-2 2.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) 1.1s both infinite;
+        }
+
+        /* --- AUTHENTICATION PANEL & LAYOUT --- */
+        .auth-container {
             width: 100%;
             max-width: 480px;
             position: relative;
             z-index: 1;
         }
         
-        #registration-panel {
+        #auth-panel {
             background: linear-gradient(145deg, var(--mafia-panel-brown), #312a25);
             border: 3px solid var(--mafia-panel-border);
             border-radius: 20px;
             padding: 2rem 1.5rem;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 
-                        inset 0 3px 4px rgba(255, 255, 255, 0.05),
-                        inset 0 -3px 4px rgba(0, 0, 0, 0.2);
-            animation: panelIntro 0.9s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), 
+                        inset 0 2px 3px rgba(255, 255, 255, 0.05),
+                        inset 0 -2px 3px rgba(0, 0, 0, 0.2);
+            animation: panelIntro 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
             position: relative;
             overflow: hidden;
-            backdrop-filter: blur(5px);
-            background-color: rgba(54, 47, 42, 0.85);
         }
         
         @media (min-width: 500px) {
-            #registration-panel {
-                padding: 3rem 2.5rem;
-                border-radius: 24px;
-            }
+            #auth-panel { padding: 2.5rem; }
         }
 
-        /* Decorative metal corner brackets */
-        .panel-corner {
+        /* Panel decorative corners */
+        #auth-panel::before, #auth-panel::after {
+            content: '';
             position: absolute;
-            width: 30px;
-            height: 30px;
+            width: 20px;
+            height: 20px;
             border-style: solid;
             border-color: var(--mafia-gold-accent);
-            opacity: 0.4;
-            transition: all 0.4s ease;
+            opacity: 0.5;
+            transition: all 0.3s ease;
         }
-        .panel-corner.top-left { top: 15px; left: 15px; border-width: 3px 0 0 3px; }
-        .panel-corner.top-right { top: 15px; right: 15px; border-width: 3px 3px 0 0; }
-        .panel-corner.bottom-left { bottom: 15px; left: 15px; border-width: 0 0 3px 3px; }
-        .panel-corner.bottom-right { bottom: 15px; right: 15px; border-width: 0 2px 2px 0; }
-        #registration-panel:hover .panel-corner {
-            opacity: 0.8;
-            transform: scale(1.1);
+        #auth-panel::before {
+            top: 15px; left: 15px;
+            border-width: 2px 0 0 2px;
+        }
+        #auth-panel::after {
+            top: 15px; right: 15px;
+            border-width: 2px 2px 0 0;
+        }
+        .panel-bottom-corners::before, .panel-bottom-corners::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-style: solid;
+            border-color: var(--mafia-gold-accent);
+            opacity: 0.5;
+            transition: all 0.3s ease;
+        }
+        .panel-bottom-corners::before {
+            bottom: 15px; left: 15px;
+            border-width: 0 0 2px 2px;
+        }
+        .panel-bottom-corners::after {
+            bottom: 15px; right: 15px;
+            border-width: 0 2px 2px 0;
         }
 
         #panel-header {
@@ -184,55 +250,100 @@
             margin-bottom: 2rem;
         }
 
-        /* Styling the animated title */
-        #panel-header h1 {
-            font-size: 3rem;
-            color: var(--mafia-text-light);
-            text-shadow: 2px 2px 2px #000;
-        }
-        #panel-header .flicker {
-            animation: flicker 4s linear infinite;
-        }
-        
-        #panel-header p {
+        #panel-header .subtitle {
             font-size: 1rem;
             color: var(--mafia-text-light);
             opacity: 0.8;
-            margin-top: 0.5rem;
+            margin-top: 1rem;
         }
         
-        /* --- Form Elements Styling --- */
-        .form-content {
-            display: block;
+        /* --- TAB NAVIGATION --- */
+        #tab-container {
+            display: flex;
+            margin-bottom: 1.5rem;
+            background-color: var(--mafia-input-bg);
+            border-radius: 10px;
+            padding: 5px;
+            border: 1px solid var(--mafia-panel-border);
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 0.75rem 0.5rem;
+            background-color: transparent;
+            border: none;
+            color: var(--mafia-text-light);
+            opacity: 0.6;
+            font-family: 'Vazirmatn', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .tab-btn.active {
+            background-color: var(--mafia-gold-accent);
+            color: var(--mafia-text-dark);
+            opacity: 1;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            text-shadow: none;
+        }
+        
+        .tab-btn:not(.active):hover {
+            opacity: 1;
+            background-color: rgba(255,255,255,0.05);
         }
 
-        .form-group {
-            margin-bottom: 1.5rem;
+        /* --- FORM ELEMENTS --- */
+        .form-content {
+            display: none; /* Hidden by default */
+        }
+        
+        .form-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .input-group {
+            margin-bottom: 1.25rem;
             position: relative;
         }
 
-        .form-group label {
+        .input-group label {
             display: block;
             font-size: 0.9rem;
             font-weight: 700;
-            margin-bottom: 0.6rem;
+            margin-bottom: 0.5rem;
             opacity: 0.9;
-            transition: all 0.3s ease;
+        }
+        
+        .input-mafia-wrapper {
+            position: relative;
+        }
+
+        .input-mafia-wrapper .icon {
+            position: absolute;
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
+            color: #8a7e74;
+            font-size: 1.2rem;
+            transition: color 0.3s ease;
         }
         
         .input-mafia {
             width: 100%;
-            padding: 1rem;
-            padding-left: 3rem; /* Space for icon */
+            padding: 0.9rem 2.8rem 0.9rem 1rem; /* Adjusted padding for icon */
             background-color: var(--mafia-input-bg);
             border: 2px solid var(--mafia-panel-border);
-            border-radius: 12px;
+            border-radius: 10px;
             color: var(--mafia-text-light);
             font-size: 1rem;
             font-family: 'Vazirmatn', sans-serif;
             transition: all 0.3s ease;
-            box-shadow: inset 0 3px 6px rgba(0,0,0,0.4);
-            position: relative;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.3);
         }
         
         .input-mafia::placeholder {
@@ -243,9 +354,10 @@
         .input-mafia:focus {
             outline: none;
             border-color: var(--mafia-gold-accent);
-            box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 0 12px var(--mafia-gold-glow);
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.3), 0 0 10px var(--mafia-gold-glow);
         }
-        .input-mafia:focus + .input-icon {
+        
+        .input-mafia:focus + .icon {
             color: var(--mafia-gold-accent);
         }
         
@@ -253,37 +365,19 @@
             border-color: var(--mafia-error-red);
         }
         .input-mafia.invalid:focus {
-             box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 0 12px var(--mafia-error-red-glow);
+             box-shadow: inset 0 2px 5px rgba(0,0,0,0.3), 0 0 10px var(--mafia-error-red-glow);
         }
-        .input-mafia.invalid + .input-icon {
+         .input-mafia.invalid + .icon {
             color: var(--mafia-error-red);
         }
         
-        /* Icons inside input fields */
-        .input-icon {
-            position: absolute;
-            top: 50%;
-            left: 1rem;
-            transform: translateY(-50%);
-            color: #8a7e74;
-            transition: color 0.3s ease;
-            pointer-events: none; /* Make icon unclickable */
-            font-size: 1.2rem;
-            opacity: 0.7;
-        }
-        .input-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        /* --- Primary Button Styling --- */
+        /* --- PRIMARY BUTTON --- */
         .btn-mafia-primary {
             width: 100%;
             padding: 1rem;
             font-family: 'Vazirmatn', sans-serif;
             font-weight: 900;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             color: var(--mafia-text-dark);
             background: linear-gradient(to top, var(--mafia-gold-dark), var(--mafia-gold-accent));
             border: 2px solid #816600;
@@ -291,7 +385,7 @@
             cursor: pointer;
             text-transform: uppercase;
             letter-spacing: 1px;
-            box-shadow: 0 6px 0 #816600, 0 10px 20px rgba(0,0,0,0.5);
+            box-shadow: 0 5px 0 #816600, 0 8px 15px rgba(0,0,0,0.4);
             transition: all 0.15s ease-out;
             position: relative;
             overflow: hidden;
@@ -301,73 +395,64 @@
         }
         
         .btn-mafia-primary:hover:not(:disabled) {
-            transform: translateY(-3px);
-            box-shadow: 0 9px 0 #816600, 0 15px 25px rgba(0,0,0,0.5);
-            filter: brightness(1.15);
+            transform: translateY(-2px);
+            box-shadow: 0 7px 0 #816600, 0 12px 20px rgba(0,0,0,0.4);
+            filter: brightness(1.1);
         }
 
         .btn-mafia-primary:active:not(:disabled) {
-            transform: translateY(5px);
-            box-shadow: 0 1px 0 #816600, 0 3px 6px rgba(0,0,0,0.5);
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #816600, 0 2px 5px rgba(0,0,0,0.4);
             transition-duration: 0.05s;
         }
         
         .btn-mafia-primary:disabled {
-            filter: grayscale(80%) brightness(0.7);
+            filter: grayscale(70%) brightness(0.8);
             cursor: not-allowed;
-            box-shadow: 0 6px 0 #554400;
+            box-shadow: 0 5px 0 #554400;
         }
         
         .btn-loader {
-            width: 24px;
-            height: 24px;
-            border: 4px solid rgba(0, 0, 0, 0.3);
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0, 0, 0, 0.3);
             border-top-color: var(--mafia-text-dark);
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
+            margin-left: 10px;
         }
         
-        /* --- Error & Success Message Styling --- */
+        /* --- ERROR & SUCCESS MESSAGES --- */
         #message-container {
             margin-top: 1.5rem;
-            padding: 1rem;
-            border-radius: 10px;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
             font-weight: 700;
             text-align: center;
             display: none; /* Hidden by default */
             border-width: 2px;
             border-style: solid;
-            animation: fadeIn 0.4s;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            font-size: 0.95rem;
+            animation: fadeIn 0.3s;
         }
         
         #message-container.error {
-            background-color: rgba(217, 83, 79, 0.2);
+            background-color: rgba(220, 53, 69, 0.2);
             border-color: var(--mafia-error-red);
             color: #f8d7da;
             display: block;
         }
 
         #message-container.success {
-            background-color: rgba(92, 184, 92, 0.2);
+            background-color: rgba(40, 167, 69, 0.2);
             border-color: var(--mafia-success-green);
             color: #d4edda;
             display: block;
         }
         
-        /* --- Footer Link Styling --- */
+        /* --- FOOTER LINK --- */
         #panel-footer {
             margin-top: 2rem;
             text-align: center;
-            border-top: 1px solid rgba(238, 196, 91, 0.1);
-            padding-top: 1.5rem;
-        }
-        
-        #panel-footer p {
-            font-size: 0.9rem;
-            color: var(--mafia-text-light);
-            opacity: 0.8;
         }
         
         #panel-footer a {
@@ -379,10 +464,10 @@
         
         #panel-footer a:hover {
             color: #fff;
-            text-shadow: 0 0 8px var(--mafia-gold-glow);
+            text-shadow: 0 0 5px var(--mafia-gold-glow);
         }
         
-        /* --- Utility Classes --- */
+        /* --- UTILITY CLASSES --- */
         .hidden {
             display: none !important;
         }
@@ -391,76 +476,91 @@
 </head>
 <body>
 
-    <div class="registration-container">
-        <div id="registration-panel">
-            <!-- Decorative Corners -->
-            <div class="panel-corner top-left"></div>
-            <div class="panel-corner top-right"></div>
-            <div class="panel-corner bottom-left"></div>
-            <div class="panel-corner bottom-right"></div>
-            
-            <!-- Panel Header with Animated Title -->
+    <div class="auth-container">
+        <div id="auth-panel">
             <div id="panel-header">
-                <h1 class="title-font">شهر ماف<span class="flicker">IA</span></h1>
-                <p>برای پیوستن به خانواده، هویت خود را بسازید</p>
+                <h1 class="title-font glitch" data-text="شهر مافیا">شهر مافیا</h1>
+                <p class="subtitle">برای پیوستن به خانواده، هویت خود را بسازید</p>
             </div>
             
-            <!-- Registration Form -->
-            <form id="registration-form" class="form-content" novalidate>
-                <div class="form-group">
-                    <label for="display-name">نام نمایشی (فقط انگلیسی)</label>
-                    <div class="input-wrapper">
-                        <input type="text" id="display-name" class="input-mafia" placeholder="مثال: Godfather123" required autocomplete="username">
-                        <span class="input-icon">👤</span>
+            <div id="tab-container">
+                <button id="email-tab-btn" class="tab-btn active" data-form="email-form">ثبت نام با ایمیل</button>
+                <button id="guest-tab-btn" class="tab-btn" data-form="guest-form">ورود به عنوان مهمان</button>
+            </div>
+
+            <!-- Email Registration Form -->
+            <form id="email-form" class="form-content active" novalidate>
+                <div class="input-group">
+                    <label for="email-display-name">نام نمایشی (فقط انگلیسی)</label>
+                    <div class="input-mafia-wrapper">
+                        <input type="text" id="email-display-name" class="input-mafia" placeholder="مثال: Godfather123" required>
+                        <span class="icon">👤</span>
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="input-group">
                     <label for="email">ایمیل</label>
-                    <div class="input-wrapper">
-                        <input type="email" id="email" class="input-mafia" placeholder="آدرس ایمیل معتبر" required autocomplete="email">
-                        <span class="input-icon">✉️</span>
+                    <div class="input-mafia-wrapper">
+                        <input type="email" id="email" class="input-mafia" placeholder="آدرس ایمیل معتبر" required>
+                        <span class="icon">✉️</span>
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="input-group">
                     <label for="password">رمز عبور</label>
-                    <div class="input-wrapper">
-                        <input type="password" id="password" class="input-mafia" placeholder="حداقل ۶ کاراکتر" required autocomplete="new-password">
-                         <span class="input-icon">🔑</span>
+                    <div class="input-mafia-wrapper">
+                        <input type="password" id="password" class="input-mafia" placeholder="حداقل ۶ کاراکتر" required>
+                        <span class="icon">🔑</span>
                     </div>
                 </div>
-                <div class="form-group">
+                 <div class="input-group">
                     <label for="confirm-password">تکرار رمز عبور</label>
-                    <div class="input-wrapper">
-                        <input type="password" id="confirm-password" class="input-mafia" placeholder="رمز عبور خود را تکرار کنید" required autocomplete="new-password">
-                        <span class="input-icon">🔑</span>
+                     <div class="input-mafia-wrapper">
+                        <input type="password" id="confirm-password" class="input-mafia" placeholder="رمز عبور خود را تکرار کنید" required>
+                        <span class="icon">🔑</span>
                     </div>
                 </div>
-                <button type="submit" id="register-btn" class="btn-mafia-primary">
+                <button type="submit" id="email-register-btn" class="btn-mafia-primary">
                     <span class="btn-text">ایجاد حساب کاربری</span>
                 </button>
             </form>
 
-            <!-- Message container for errors or success -->
+            <!-- Guest Registration Form -->
+            <form id="guest-form" class="form-content" novalidate>
+                <div class="input-group">
+                    <label for="guest-display-name">نام نمایشی (فقط انگلیسی)</label>
+                     <div class="input-mafia-wrapper">
+                        <input type="text" id="guest-display-name" class="input-mafia" placeholder="نام مهمان خود را انتخاب کنید" required>
+                        <span class="icon">👤</span>
+                    </div>
+                </div>
+                 <p style="font-size: 0.8rem; text-align: center; opacity: 0.7; margin: -1rem 0 1.5rem 0;">توجه: در حالت مهمان، پیشرفت شما فقط روی همین مرورگر ذخیره می‌شود.</p>
+                <button type="submit" id="guest-register-btn" class="btn-mafia-primary">
+                    <span class="btn-text">ورود به عنوان مهمان</span>
+                </button>
+            </form>
+
             <div id="message-container"></div>
             
-            <!-- Footer link to login page -->
             <div id="panel-footer">
-                <p>از اعضای خانواده هستید؟ <a href="login.html">وارد شوید</a></p>
+                <p>حساب کاربری دارید؟ <a href="login.html">وارد شوید</a></p>
             </div>
+            
+            <div class="panel-bottom-corners"></div>
         </div>
     </div>
 
     <!-- Firebase SDKs -->
     <script type="module">
-        // Import Firebase functions - these are ready for when you activate the logic
+        // Import Firebase functions
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { 
             getAuth, 
             createUserWithEmailAndPassword, 
+            signInAnonymously,
             updateProfile 
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
         // --- FIREBASE CONFIGURATION ---
+        // Replace with your actual Firebase config
         const firebaseConfig = {
             apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
             authDomain: "mafia-9fcbf.firebaseapp.com",
@@ -476,29 +576,58 @@
         try {
             app = initializeApp(firebaseConfig);
             auth = getAuth(app);
-            console.log("Firebase initialized successfully for Registration page.");
+            console.log("Firebase initialized successfully.");
         } catch (error) {
             console.error("Firebase initialization failed:", error);
-            const panel = document.getElementById('registration-panel');
+            // Display a critical error to the user if Firebase fails to load
+            const panel = document.getElementById('auth-panel');
             if(panel) {
                 panel.innerHTML = `<div style="text-align: center; color: var(--mafia-error-red);">
-                                    <h2 class="title-font">خطای بحرانی</h2>
-                                    <p>امکان برقراری ارتباط با سرورهای بازی وجود ندارد. لطفا اتصال اینترنت خود را بررسی و صفحه را دوباره بارگذاری نمایید.</p>
+                                    <h2>خطای اتصال</h2>
+                                    <p>امکان برقراری ارتباط با سرورهای بازی وجود ندارد. لطفاً اتصال اینترنت خود را بررسی کرده و صفحه را دوباره بارگذاری کنید.</p>
                                    </div>`;
             }
         }
         
+
         // --- DOM ELEMENT SELECTORS ---
-        const registrationForm = document.getElementById('registration-form');
-        const displayNameInput = document.getElementById('display-name');
+        const emailTabBtn = document.getElementById('email-tab-btn');
+        const guestTabBtn = document.getElementById('guest-tab-btn');
+        const emailForm = document.getElementById('email-form');
+        const guestForm = document.getElementById('guest-form');
+        
+        // Email Form Elements
+        const emailDisplayNameInput = document.getElementById('email-display-name');
         const emailInput = document.getElementById('email');
         const passwordInput = document.getElementById('password');
         const confirmPasswordInput = document.getElementById('confirm-password');
-        const registerBtn = document.getElementById('register-btn');
+        const emailRegisterBtn = document.getElementById('email-register-btn');
+
+        // Guest Form Elements
+        const guestDisplayNameInput = document.getElementById('guest-display-name');
+        const guestRegisterBtn = document.getElementById('guest-register-btn');
+        
+        // Message Container
         const messageContainer = document.getElementById('message-container');
 
         // --- UI HELPER FUNCTIONS ---
 
+        /**
+         * Switches between registration forms (Email/Guest).
+         * @param {string} formId The ID of the form to show ('email-form' or 'guest-form').
+         */
+        function switchForm(formId) {
+            const isEmailForm = formId === 'email-form';
+            
+            emailForm.classList.toggle('active', isEmailForm);
+            guestForm.classList.toggle('active', !isEmailForm);
+            
+            emailTabBtn.classList.toggle('active', isEmailForm);
+            guestTabBtn.classList.toggle('active', !isEmailForm);
+
+            clearMessages();
+        }
+        
         /**
          * Displays a message (error or success) to the user.
          * @param {string} message The text to display.
@@ -531,14 +660,14 @@
             let loader = button.querySelector('.btn-loader');
 
             if (isLoading) {
-                if (btnText) btnText.style.display = 'none';
+                if (btnText) btnText.classList.add('hidden');
                 if (!loader) {
                     loader = document.createElement('div');
                     loader.className = 'btn-loader';
                     button.prepend(loader);
                 }
             } else {
-                if (btnText) btnText.style.display = 'inline';
+                if (btnText) btnText.classList.remove('hidden');
                 if (loader) loader.remove();
             }
         }
@@ -546,94 +675,77 @@
         // --- VALIDATION FUNCTIONS ---
 
         /**
-         * Validates the entire registration form and highlights invalid fields.
-         * @returns {boolean} True if the form is valid, false otherwise.
+         * Validates an email address format.
+         * @param {string} email The email to validate.
+         * @returns {boolean} True if valid, false otherwise.
          */
-        function validateForm() {
+        function isValidEmail(email) {
+            const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return regex.test(email);
+        }
+
+        /**
+         * Validates the display name.
+         * @param {string} name The name to validate.
+         * @returns {string|null} An error message if invalid, otherwise null.
+         */
+        function validateDisplayName(name) {
+            if (!name.trim()) return "نام نمایشی نمی‌تواند خالی باشد.";
+            if (name.length < 3) return "نام نمایشی باید حداقل ۳ کاراکتر باشد.";
+            if (name.length > 20) return "نام نمایشی نمی‌تواند بیشتر از ۲۰ کاراکتر باشد.";
+            if (/[^a-zA-Z0-9_]/.test(name)) return "نام نمایشی فقط می‌تواند شامل حروف انگلیسی، اعداد و آندرلاین (_) باشد.";
+            return null;
+        }
+
+        // --- EVENT HANDLERS ---
+        
+        /**
+         * Handles the submission of the email registration form.
+         * @param {Event} event The form submission event.
+         */
+        async function handleEmailRegistration(event) {
+            event.preventDefault();
             clearMessages();
-            let isValid = true;
             
-            const displayName = displayNameInput.value;
+            const displayName = emailDisplayNameInput.value;
             const email = emailInput.value;
             const password = passwordInput.value;
             const confirmPassword = confirmPasswordInput.value;
 
-            // Validate Display Name
-            if (!displayName.trim()) {
-                showMessage("نام نمایشی نمی‌تواند خالی باشد.");
-                displayNameInput.classList.add('invalid');
-                isValid = false;
-            } else if (displayName.length < 3) {
-                showMessage("نام نمایشی باید حداقل ۳ کاراکتر باشد.");
-                displayNameInput.classList.add('invalid');
-                isValid = false;
-            } else if (displayName.length > 20) {
-                showMessage("نام نمایشی نمی‌تواند بیشتر از ۲۰ کاراکتر باشد.");
-                displayNameInput.classList.add('invalid');
-                isValid = false;
-            } else if (/[^a-zA-Z0-9_]/.test(displayName)) {
-                showMessage("نام نمایشی فقط می‌تواند شامل حروف انگلیسی، اعداد و آندرلاین (_) باشد.");
-                displayNameInput.classList.add('invalid');
-                isValid = false;
+            // --- Form Validation ---
+            const displayNameError = validateDisplayName(displayName);
+            if (displayNameError) {
+                showMessage(displayNameError);
+                emailDisplayNameInput.classList.add('invalid');
+                return;
             }
-
-            // Validate Email
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                if(isValid) showMessage("لطفاً یک آدرس ایمیل معتبر وارد کنید.");
+            if (!isValidEmail(email)) {
+                showMessage("لطفاً یک آدرس ایمیل معتبر وارد کنید.");
                 emailInput.classList.add('invalid');
-                isValid = false;
+                return;
             }
-
-            // Validate Password
             if (password.length < 6) {
-                if(isValid) showMessage("رمز عبور باید حداقل ۶ کاراکتر باشد.");
+                showMessage("رمز عبور باید حداقل ۶ کاراکتر باشد.");
                 passwordInput.classList.add('invalid');
-                isValid = false;
+                return;
             }
-            
-            // Validate Confirm Password
             if (password !== confirmPassword) {
-                if(isValid) showMessage("رمزهای عبور با یکدیگر مطابقت ندارند.");
+                showMessage("رمزهای عبور با یکدیگر مطابقت ندارند.");
+                passwordInput.classList.add('invalid');
                 confirmPasswordInput.classList.add('invalid');
-                isValid = false;
-            }
-            
-            return isValid;
-        }
-
-        // --- MAIN EVENT HANDLER ---
-        
-        /**
-         * Handles the submission of the registration form.
-         * @param {Event} event The form submission event.
-         */
-        async function handleRegistration(event) {
-            event.preventDefault(); // Prevent default form submission
-            
-            // If form is not valid, stop execution
-            if (!validateForm()) {
                 return;
             }
             
-            // Set button to loading state
-            setButtonLoadingState(registerBtn, true);
+            setButtonLoadingState(emailRegisterBtn, true);
 
             // --- SIMULATED SERVER INTERACTION (As requested) ---
-            // This part simulates a delay and then shows the "Coming soon" message.
             setTimeout(() => {
                 showMessage("این قابلیت به زودی فعال خواهد شد...", "success");
-                setButtonLoadingState(registerBtn, false);
-            }, 2500); // Simulate a 2.5 second network delay
+                setButtonLoadingState(emailRegisterBtn, false);
+            }, 2000);
 
             /*
-            // --- ACTUAL FIREBASE REGISTRATION LOGIC (For Future Implementation) ---
-            // To activate this, remove the setTimeout block above and uncomment this block.
-            
-            const displayName = displayNameInput.value;
-            const email = emailInput.value;
-            const password = passwordInput.value;
-
+            // --- ACTUAL FIREBASE REGISTRATION LOGIC (Future Implementation) ---
             try {
                 // Step 1: Create user with email and password
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -644,43 +756,96 @@
                 await updateProfile(user, { displayName: displayName });
                 console.log("Profile updated with display name:", displayName);
                 
-                setButtonLoadingState(registerBtn, false);
-                showMessage("ثبت نام با موفقیت انجام شد! در حال انتقال شما...", "success");
+                setButtonLoadingState(emailRegisterBtn, false);
+                showMessage("ثبت نام با موفقیت انجام شد! در حال انتقال...", "success");
                 
                 // Step 3: Redirect to the game or main page after a delay
-                setTimeout(() => { window.location.href = '/dashboard.html'; }, 2000);
+                // setTimeout(() => { window.location.href = '/game.html'; }, 2000);
 
             } catch (error) {
-                setButtonLoadingState(registerBtn, false);
+                setButtonLoadingState(emailRegisterBtn, false);
                 console.error("Email registration error:", error.code, error.message);
                 
-                // Provide user-friendly error messages based on Firebase error codes
+                // Provide user-friendly error messages
                 if (error.code === 'auth/email-already-in-use') {
-                    showMessage("این ایمیل قبلاً در سیستم ثبت شده است.");
-                    emailInput.classList.add('invalid');
+                    showMessage("این ایمیل قبلاً ثبت نام کرده است.");
                 } else if (error.code === 'auth/weak-password') {
                     showMessage("رمز عبور ضعیف است. لطفاً رمز قوی‌تری انتخاب کنید.");
-                    passwordInput.classList.add('invalid');
                 } else {
-                    showMessage("خطایی ناشناخته در هنگام ثبت نام رخ داد. لطفاً دوباره تلاش کنید.");
+                    showMessage("خطایی در هنگام ثبت نام رخ داد. لطفاً دوباره تلاش کنید.");
                 }
             }
             */
         }
+        
+        /**
+         * Handles the submission of the guest registration form.
+         * @param {Event} event The form submission event.
+         */
+        async function handleGuestRegistration(event) {
+            event.preventDefault();
+            clearMessages();
 
-        // --- ATTACH EVENT LISTENERS ONCE DOM IS LOADED ---
-        document.addEventListener('DOMContentLoaded', () => {
-            if (!auth) {
-                console.error("Auth service is not available. Registration form listener not attached.");
+            const displayName = guestDisplayNameInput.value;
+
+            // --- Form Validation ---
+            const displayNameError = validateDisplayName(displayName);
+            if (displayNameError) {
+                showMessage(displayNameError);
+                guestDisplayNameInput.classList.add('invalid');
                 return;
             }
 
-            // Attach the main event handler to the form's submit event
-            if(registrationForm) {
-                registrationForm.addEventListener('submit', handleRegistration);
+            setButtonLoadingState(guestRegisterBtn, true);
+            
+            // --- SIMULATED SERVER INTERACTION (As requested) ---
+            setTimeout(() => {
+                showMessage("این قابلیت به زودی فعال خواهد شد...", "success");
+                setButtonLoadingState(guestRegisterBtn, false);
+            }, 2000);
+            
+            /*
+            // --- ACTUAL FIREBASE GUEST LOGIC (Future Implementation) ---
+            try {
+                // Step 1: Sign in anonymously
+                const userCredential = await signInAnonymously(auth);
+                const user = userCredential.user;
+                console.log("Guest user signed in:", user.uid);
+
+                // Step 2: Update the anonymous user's profile with the display name
+                await updateProfile(user, { displayName: displayName });
+                console.log("Guest profile updated with display name:", displayName);
+                
+                setButtonLoadingState(guestRegisterBtn, false);
+                showMessage("ورود موفقیت آمیز بود! در حال انتقال...", "success");
+
+                // Step 3: Redirect to the game
+                // setTimeout(() => { window.location.href = '/game.html'; }, 2000);
+
+            } catch (error) {
+                setButtonLoadingState(guestRegisterBtn, false);
+                console.error("Guest registration error:", error.code, error.message);
+                showMessage("خطایی در هنگام ورود رخ داد. لطفاً دوباره تلاش کنید.");
             }
+            */
+        }
+
+
+        // --- ATTACH EVENT LISTENERS ---
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!auth) {
+                console.error("Auth service is not available. Event listeners not attached.");
+                return;
+            }
+
+            emailTabBtn.addEventListener('click', () => switchForm('email-form'));
+            guestTabBtn.addEventListener('click', () => switchForm('guest-form'));
+
+            emailForm.addEventListener('submit', handleEmailRegistration);
+            guestForm.addEventListener('submit', handleGuestRegistration);
         });
 
     </script>
+
 </body>
 </html>
