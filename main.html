@@ -2,8 +2,8 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>شهر مافیا - صفحه اصلی</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>شهر مافیا</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,14 +11,13 @@
     <style>
         /*
         ==========================================================================
-         THEME: DARK CINEMATIC & NEON GOLD (Redesigned Layout)
+         THEME: DARK WOOD & NEON GOLD (REFINED LAYOUT V3)
         ==========================================================================
         */
 
         :root {
             --wood-dark: #1a140f;
-            --panel-bg: #2c2218; 
-            --panel-bg-gradient: linear-gradient(145deg, #3a2d20, #1f1811);
+            --panel-bg-gradient: linear-gradient(145deg, #4a3a2a, #2c2218);
             --panel-border: #5c4a3a;
             --text-gold: #ffc947;
             --text-gold-dark: #e5a500;
@@ -26,7 +25,6 @@
             --text-dark: #1a140f;
             --action-red: #d94848;
             --action-red-dark: #a12d2d;
-            --glow-gold: rgba(255, 201, 71, 0.7);
         }
 
         /* --- KEYFRAME ANIMATIONS --- */
@@ -34,80 +32,130 @@
             from { opacity: 0; transform: scale(0.9) translateY(30px); }
             to { opacity: 1; transform: scale(1) translateY(0); }
         }
-
         @keyframes breathe {
-            0%, 100% { transform: scale(1) translateY(0); box-shadow: 0 8px 0 #a07200, 0 10px 30px rgba(0,0,0,0.6); }
-            50% { transform: scale(1.03) translateY(-5px); box-shadow: 0 12px 0 #a07200, 0 15px 40px rgba(255, 201, 71, 0.25); }
+            0%, 100% { transform: scale(1); box-shadow: 0 5px 0 #a07200; }
+            50% { transform: scale(1.05); box-shadow: 0 7px 0 #a07200, 0 0 25px rgba(255, 201, 71, 0.3); }
         }
-        
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes subtle-fade-in {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
         /* --- BASE & BACKGROUND STYLES --- */
         body {
             font-family: 'Vazirmatn', sans-serif;
             color: var(--text-light);
-            /* --- BACKGROUND IMAGE IMPLEMENTATION (No wood texture) --- */
+            /* --- CLEAR BACKGROUND IMAGE IMPLEMENTATION --- */
             background-image: url('https://up.20script.ir/file/a2c6-file-000000001500622f9419de6c322df297.jpg');
             background-color: var(--wood-dark);
             background-size: cover;
-            background-position: center top;
+            background-position: center;
             background-attachment: fixed;
+            height: 100vh;
+            width: 100vw;
             overflow: hidden;
             position: relative;
             user-select: none;
             -webkit-user-select: none;
         }
 
-        /* Dark overlay for readability and atmosphere */
+        /* Dark overlay for readability */
         body::before {
             content: '';
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: radial-gradient(circle, rgba(10, 8, 5, 0.3) 0%, rgba(26, 20, 15, 0.75) 80%);
+            background: linear-gradient(to top, rgba(10, 8, 5, 0.7) 0%, rgba(10, 8, 5, 0.1) 60%, rgba(10, 8, 5, 0.7) 100%);
             z-index: 0;
         }
 
         /* All content must be on a higher z-index */
         .screen {
-            position: absolute; top: 0; left: 0;
-            width: 100%; height: 100vh;
-            padding: 15px; box-sizing: border-box;
-            opacity: 0; visibility: hidden;
-            transition: opacity 0.5s ease-in-out;
-            display: flex; flex-direction: column;
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%; /* Use 100% instead of 100vh for better mobile compatibility */
+            padding: 1rem;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
             align-items: center;
             z-index: 1;
         }
-        .screen.active { opacity: 1; visibility: visible; }
-        #main-screen { justify-content: center; } /* Center the start button */
+        .screen.active {
+             opacity: 1; 
+             visibility: visible; 
+        }
         
         .clash-font {
             font-family: 'Lilita One', 'Vazirmatn', sans-serif;
             font-weight: 900;
         }
 
-        /* --- NEW: USER PROFILE AREA (Top Right) --- */
-        #profile-hub {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 100;
+        /* --- NEW TOP-RIGHT UI AREA --- */
+        #top-ui-container {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            gap: 12px;
-            transition: opacity 0.4s ease, transform 0.4s ease;
+            align-items: flex-end;
+            gap: 0.75rem;
+            animation: subtle-fade-in 0.8s ease-out;
         }
-        #profile-hub.hidden {
-            opacity: 0;
-            transform: translateY(-20px);
-            pointer-events: none;
+
+        #profile-main-area {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        #user-info-box {
+            background-color: rgba(26, 20, 15, 0.8);
+            border: 2px solid var(--panel-border);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border-radius: 12px;
+            padding: 0.5rem 1rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            text-align: right;
+        }
+        
+        #display-name-output-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        #display-name-output {
+            color: var(--text-gold);
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+        #edit-name-btn {
+            cursor: pointer;
+            font-size: 1rem;
+            opacity: 0.7;
+            transition: opacity 0.2s ease;
+        }
+        #edit-name-btn:hover { opacity: 1; }
+
+        #public-user-id-output {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            opacity: 0.8;
+            font-family: monospace;
         }
         
         #avatar-container {
-            width: 65px; /* Smaller avatar */
-            height: 65px;
+            width: 70px; /* Smaller avatar */
+            height: 70px;
             border-radius: 50%;
             border: 3px solid var(--text-gold-dark);
             background-color: var(--wood-dark);
@@ -115,168 +163,196 @@
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(0,0,0,0.6);
             transition: transform 0.3s ease;
+            flex-shrink: 0;
         }
-        #avatar-container:hover { transform: scale(1.08); }
+        #avatar-container:hover { transform: scale(1.05); }
         #avatar-image { width: 100%; height: 100%; object-fit: cover; }
 
-        #user-info-box {
-            background-color: rgba(26, 20, 15, 0.85);
-            border: 2px solid var(--panel-border);
-            backdrop-filter: blur(5px);
-            border-radius: 12px;
-            padding: 8px 15px;
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
-            text-align: center;
-        }
-        #display-name-output { font-size: 1.1rem; color: var(--text-gold); }
-        #public-user-id-output { font-size: 0.8rem; color: var(--text-light); opacity: 0.7; }
-
-        #profile-actions {
+        /* --- TOP-RIGHT SECONDARY BUTTONS --- */
+        #secondary-buttons-container {
             display: flex;
-            gap: 10px;
+            flex-direction: column;
+            gap: 0.5rem;
+            align-items: flex-end;
+            margin-right: 0.5rem; /* Align slightly with the profile box */
         }
-        .profile-action-btn {
-            background: var(--panel-bg-gradient);
-            color: var(--text-gold);
-            border: 1px solid var(--panel-border);
-            border-radius: 8px;
-            padding: 6px 12px;
-            font-size: 0.8rem;
+        
+        .btn-clash {
+            border-radius: 10px;
             font-weight: 700;
+            transition: all 0.15s ease-out;
             cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 3px 5px rgba(0,0,0,0.4);
-        }
-        .profile-action-btn:hover {
-            background: var(--text-gold);
-            color: var(--text-dark);
-            border-color: var(--text-gold-dark);
-            transform: translateY(-2px);
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
         }
 
-        /* --- Main Title & Start Button --- */
-        #main-content {
+        /* Primary Button (Gold) */
+        .btn-clash-primary {
+            background: linear-gradient(to bottom, var(--text-gold), var(--text-gold-dark));
+            border: 2px solid #a07200;
+            box-shadow: 0 5px 0 #a07200;
+            color: var(--text-dark);
+            padding: 10px 28px; /* Adjusted padding */
+            font-size: 1.1rem; /* Adjusted font size */
+        }
+        .btn-clash-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 0 #a07200;
+        }
+        .btn-clash-primary:active {
+            transform: translateY(3px) !important;
+            box-shadow: 0 2px 0 #a07200 !important;
+        }
+        
+        /* Secondary Button (Dark Wood) */
+        .btn-clash-secondary {
+            background: rgba(26, 20, 15, 0.7);
+            border: 1px solid var(--panel-border);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            box-shadow: 0 3px 0 rgba(0,0,0,0.4);
+            color: var(--text-gold);
+            padding: 6px 14px;
+            font-size: 0.85rem;
+        }
+        .btn-clash-secondary:hover {
+            background: rgba(46, 38, 29, 0.8);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 0 rgba(0,0,0,0.4);
+        }
+        .btn-clash-secondary:active {
+            transform: translateY(2px) !important;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.4) !important;
+        }
+
+        /* --- BOTTOM "START GAME" BUTTON AREA --- */
+        #bottom-action-area {
+            margin-top: auto; /* Pushes to the bottom */
+            padding-bottom: 2rem;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            animation: subtle-fade-in 0.8s 0.2s ease-out backwards;
+        }
+
+        #start-game-btn.breathing {
+            animation: breathe 2.5s ease-in-out infinite;
+        }
+        
+        /* --- LOADER & MODALS --- */
+        .loader-container {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            text-align: center;
-            flex-grow: 1;
-            padding-bottom: 10vh; /* Push content up slightly */
+            height: 100%;
+            width: 100%;
         }
-        
-        #main-title {
-            font-size: 6rem;
-            color: var(--text-gold);
-            text-shadow: 
-                0 0 10px var(--glow-gold),
-                0 0 25px rgba(255, 165, 0, 0.5),
-                4px 4px 8px rgba(0,0,0,0.8);
-            margin-bottom: 3rem;
+        .loader {
+            border: 8px solid var(--panel-border);
+            border-top: 8px solid var(--text-gold);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
         }
-        @media (max-width: 640px) { #main-title { font-size: 4rem; } }
 
-        #start-game-btn {
-            font-size: 1.8rem; /* Larger font size */
-            padding: 18px 50px; /* More padding */
-            border-radius: 15px;
-            background: linear-gradient(to bottom, var(--text-gold), var(--text-gold-dark));
-            border: 2px solid #a07200;
-            color: var(--text-dark);
-            animation: breathe 3s ease-in-out infinite;
-            cursor: pointer;
-            transition: all 0.15s ease-out;
+        .panel-hidden {
+            opacity: 0;
+            pointer-events: none;
+            visibility: hidden;
         }
-        #start-game-btn:active {
-            transform: scale(0.98) translateY(4px) !important;
-            animation: none;
-            box-shadow: 0 2px 0 #a07200 !important;
+        #modal-container, #game-mode-panel-container {
+             background-color: rgba(10, 8, 5, 0.8);
+             backdrop-filter: blur(8px);
+             -webkit-backdrop-filter: blur(8px);
+             position: fixed; inset: 0;
+             display: flex; align-items: center; justify-content: center;
+             z-index: 50;
+             transition: opacity 0.3s ease;
         }
-        
-        /* --- Registration Screen --- */
         .panel-clash {
             background: var(--panel-bg-gradient);
             border: 3px solid var(--panel-border);
             border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6), inset 0 2px 4px rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            animation: panel-intro 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
         }
-        .btn-clash-primary {
-            background: linear-gradient(to bottom, var(--text-gold), var(--text-gold-dark));
-            border: 2px solid #a07200; box-shadow: 0 6px 0 #a07200;
-            color: var(--text-dark);
+        #close-game-mode-panel-btn {
+            position: absolute; top: 15px; right: 15px; width: 40px; height: 40px;
+            background: linear-gradient(to bottom, var(--action-red), var(--action-red-dark));
+            border: 2px solid #6b1d1d; box-shadow: 0 4px 0 #6b1d1d;
+            color: white; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; cursor: pointer; transition: all 0.2s ease;
         }
-        .btn-clash-secondary {
-            background: linear-gradient(to bottom, #4a3a2a, var(--panel-bg));
-            border: 2px solid var(--panel-border); box-shadow: 0 5px 0 #1a140f;
-            color: var(--text-gold);
-        }
-        .input-clash {
-            background-color: #2a1f15; border: 2px solid var(--panel-border);
-            color: var(--text-light); border-radius: 10px;
-            box-shadow: inset 0 3px 6px rgba(0,0,0,0.5);
-        }
-        .input-clash:focus { border-color: var(--text-gold); box-shadow: inset 0 3px 6px rgba(0,0,0,0.5), 0 0 12px var(--glow-gold); }
-        .hidden { display: none !important; }
+        #close-game-mode-panel-btn:hover { transform: scale(1.1) rotate(90deg); }
 
     </style>
 </head>
 <body>
-
-    <!-- ======================= MAIN SCREEN ======================= -->
+    
+    <!-- This screen will only be visible while checking user auth status -->
     <div id="main-screen" class="screen active">
 
-        <!-- User Profile Hub (Top Right) -->
-        <div id="profile-hub" class="hidden">
-            <div id="avatar-container" title="تغییر آواتار">
-                <img id="avatar-image" src="https://placehold.co/80x80/1a140f/e0dacc?text=?" alt="آواتار کاربر">
-            </div>
-            <div id="user-info-box">
-                <div id="display-name-output" class="clash-font">...</div>
-                <div id="public-user-id-output">#...</div>
-            </div>
-            <div id="profile-actions">
-                <button id="leaderboard-btn" class="profile-action-btn">🏆 رتبه‌بندی</button>
-                <button id="developers-btn" class="profile-action-btn">👥 سازندگان</button>
-            </div>
+        <!-- This container is shown while we check for user data -->
+        <div id="loading-indicator" class="loader-container">
+            <div class="loader"></div>
+            <p class="mt-4 text-lg font-bold">در حال اتصال به شهر...</p>
         </div>
 
-        <!-- Main Content (Centered) -->
-        <div id="main-content">
-            <h1 id="main-title" class="clash-font">شهر مافیا</h1>
-            <button id="start-game-btn" class="clash-font">شروع بازی</button>
-        </div>
-    </div>
-
-    <!-- ======================= REGISTRATION SCREEN (Initially hidden) ======================= -->
-    <div id="registration-screen" class="screen justify-center">
-         <div class="panel-clash p-6 sm:p-8 rounded-lg max-w-md mx-auto">
-            <h2 class="text-2xl font-bold mb-4 text-center clash-font text-gold">ورود به شهر</h2>
-            <p class="text-center text-gray-300 mb-6">برای شروع، یک نام برای خود انتخاب کنید.</p>
-            <label for="display-name-input" class="block mb-2 text-sm font-medium">نام نمایشی (فقط انگلیسی):</label>
-            <input type="text" id="display-name-input" placeholder="مثال: Godfather123" class="input-clash w-full p-3 text-lg" maxlength="20">
-            <p id="input-error-message" class="hidden text-red-400 text-sm mt-1"></p>
-
-            <div class="mt-4 mb-3">
-                <label for="user-id-display" class="block text-sm font-medium mb-2">شناسه کاربری شما (برای بازیابی):</label>
-                <div class="flex items-center gap-2">
-                    <input type="text" id="user-id-display" class="input-clash w-full p-3 text-lg text-center" readonly placeholder="در حال ساخت...">
-                    <button id="generate-user-id-btn" class="btn-clash-secondary px-4 py-3 font-bold">ساختن</button>
+        <!-- This container is hidden by default and shown only if the user has a profile -->
+        <div id="game-ui" class="hidden h-full w-full">
+            
+            <!-- NEW: Top Right UI Area -->
+            <div id="top-ui-container">
+                <div id="profile-main-area">
+                    <div id="user-info-box">
+                        <div id="display-name-output-container">
+                            <span id="edit-name-btn" title="تغییر نام">✏️</span>
+                            <span id="display-name-output" class="clash-font">...</span>
+                        </div>
+                        <div id="public-user-id-output">#...</div>
+                    </div>
+                    <div id="avatar-container" title="تغییر آواتار">
+                        <img id="avatar-image" src="https://placehold.co/80x80/1a140f/e0dacc?text=?" alt="آواتار کاربر">
+                    </div>
+                </div>
+                <div id="secondary-buttons-container">
+                    <button id="leaderboard-btn" class="btn-clash btn-clash-secondary">🏆 رتبه‌بندی</button>
+                    <button id="developers-btn" class="btn-clash btn-clash-secondary">👥 سازندگان</button>
                 </div>
             </div>
-            <button id="register-btn" class="btn-clash-primary w-full p-3 text-lg mt-6 font-bold">ثبت نام و ورود</button>
+
+            <!-- NEW: Bottom Action Area -->
+            <div id="bottom-action-area">
+                <button id="start-game-btn" class="btn-clash btn-clash-primary clash-font breathing">شروع بازی</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Game Mode Selection Panel (Modal) -->
+    <div id="game-mode-panel-container" class="panel-hidden">
+        <div class="panel-clash p-6 sm:p-8 rounded-xl max-w-lg w-11/12 relative">
+            <button id="close-game-mode-panel-btn">×</button>
+            <h3 class="text-3xl font-bold mb-6 text-center clash-font text-[var(--text-gold)]" style="text-shadow: 2px 2px 3px #000;">انتخاب نوع بازی</h3>
+            <div class="flex flex-col items-center justify-center gap-5 mt-8">
+                <button id="single-player-btn" class="btn-clash btn-clash-primary clash-font text-lg py-3 w-full max-w-xs">👤 بازی تک‌نفره</button>
+                <button id="multiplayer-btn" class="btn-clash btn-clash-primary clash-font text-lg py-3 w-full max-w-xs">👥 بازی چندنفره</button>
+            </div>
         </div>
     </div>
-    
-    <!-- All other pop-up panels would go here (Leaderboard, Developers, etc.) -->
-    <!-- ... their HTML can be copied from the previous version ... -->
+
 
     <script type="module">
-        // JAVASCRIPT LOGIC - Mostly unchanged from the previous version
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, serverTimestamp, collection, query, limit, getDocs, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // This configuration should match your Firebase project.
         const firebaseConfig = {
             apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
             authDomain: "mafia-9fcbf.firebaseapp.com",
@@ -287,160 +363,109 @@
             measurementId: "G-0PDHDWC6NV"
         };
         
-        const appId = 'mafia-game-v2';
-
-        let app, auth, db, currentUserId = null;
-        
-        const gameState = {
-            displayName: '',
-            publicUserId: '',
-            avatarUrl: '',
-        };
+        const appId = 'mafia-game-v2'; // Consistent app ID
 
         // --- Element Selectors ---
-        const mainScreen = document.getElementById('main-screen');
-        const registrationScreen = document.getElementById('registration-screen');
-        
-        const displayNameInput = document.getElementById('display-name-input');
-        const registerBtn = document.getElementById('register-btn');
-        const inputErrorMessage = document.getElementById('input-error-message');
-        const userIdDisplayInput = document.getElementById('user-id-display');
-        const generateUserIdBtn = document.getElementById('generate-user-id-btn');
-
-        const profileHub = document.getElementById('profile-hub');
-        const avatarContainer = document.getElementById('avatar-container');
-        const avatarImage = document.getElementById('avatar-image');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const gameUi = document.getElementById('game-ui');
         const displayNameOutput = document.getElementById('display-name-output');
         const publicUserIdOutput = document.getElementById('public-user-id-output');
-        
-        // --- UI Control Functions ---
-        function showScreen(screenElement) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            if(screenElement) screenElement.classList.add('active');
-        }
+        const avatarImage = document.getElementById('avatar-image');
+        const startGameBtn = document.getElementById('start-game-btn');
+        const gameModePanelContainer = document.getElementById('game-mode-panel-container');
+        const closeGameModePanelBtn = document.getElementById('close-game-mode-panel-btn');
 
-        function updateProfileUI() {
-            if (!gameState.displayName) {
-                profileHub.classList.add('hidden');
-                return;
-            }
-            displayNameOutput.textContent = gameState.displayName;
-            publicUserIdOutput.textContent = `#${gameState.publicUserId}`;
-            avatarImage.src = gameState.avatarUrl || `https://ui-avatars.com/api/?name=${gameState.displayName.charAt(0)}&background=1a140f&color=ffc947&bold=true`;
-            profileHub.classList.remove('hidden');
-        }
-
-        // --- Firebase & Data Logic ---
-        async function initFirebase() {
+        /**
+         * The core function to start the application.
+         * It initializes Firebase and handles user authentication state.
+         */
+        async function initializeGame() {
             try {
-                app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
-                
+                const app = initializeApp(firebaseConfig);
+                const auth = getAuth(app);
+                const db = getFirestore(app);
+
+                // This function will be called whenever the user's sign-in state changes.
                 onAuthStateChanged(auth, async (user) => {
                     if (user) {
-                        currentUserId = user.uid;
-                        await loadUserData(user.uid);
+                        // User is signed in. Now check if they have a profile.
+                        await checkUserProfile(db, user.uid);
                     } else {
+                        // User is not signed in. Sign them in anonymously to get a UID.
+                        // This is a one-time process. After this, onAuthStateChanged will run again.
                         await signInAnonymously(auth);
                     }
                 });
+
             } catch (error) {
                 console.error("Firebase initialization failed:", error);
-                alert("خطا در اتصال به سرور بازی.");
+                loadingIndicator.innerHTML = '<p class="text-red-400 font-bold">خطا در اتصال به سرور</p>';
+            }
+        }
+
+        /**
+         * Checks if a user has a profile document in Firestore.
+         * Redirects the user based on whether the profile exists.
+         * @param {Firestore} db - The Firestore database instance.
+         * @param {string} uid - The user's unique ID.
+         */
+        async function checkUserProfile(db, uid) {
+            // This is the correct, secure path defined in our (future) rules.
+            const userDocRef = doc(db, `artifacts/${appId}/users/${uid}/mafiaGameData/profile`);
+            
+            try {
+                const docSnap = await getDoc(userDocRef);
+
+                if (docSnap.exists() && docSnap.data().displayName) {
+                    // --- USER HAS A PROFILE ---
+                    // Load their data and show the main game UI.
+                    const userData = docSnap.data();
+                    displayUserData(userData);
+                    
+                    // Hide loading indicator and show the main game UI
+                    loadingIndicator.classList.add('hidden');
+                    gameUi.classList.remove('hidden');
+                    gameUi.classList.add('flex', 'flex-col', 'h-full', 'w-full'); // Ensure it takes full space
+                    
+                } else {
+                    // --- USER NEEDS TO REGISTER ---
+                    // They have a UID but no profile. Redirect to registration.
+                    window.location.href = './Registration.html'; 
+                }
+            } catch (error) {
+                console.error("Error checking user profile:", error);
+                // An error occurred. Let's redirect to login to be safe,
+                // as they might need to re-authenticate.
+                window.location.href = './login.html'; 
             }
         }
         
-        async function loadUserData(uid) {
-            // Corrected path to match the security rules logic
-            const userDocRef = doc(db, `artifacts/${appId}/users/${uid}/mafiaGameData/profile`);
-            const docSnap = await getDoc(userDocRef);
-
-            if (docSnap.exists() && docSnap.data().displayName) {
-                const data = docSnap.data();
-                gameState.displayName = data.displayName;
-                gameState.publicUserId = data.publicUserId;
-                gameState.avatarUrl = data.avatarUrl || '';
-                updateProfileUI();
-                showScreen(mainScreen);
-            } else {
-                showScreen(registrationScreen);
-            }
+        /**
+         * Populates the UI with the user's data.
+         * @param {object} data - The user's profile data from Firestore.
+         */
+        function displayUserData(data) {
+            displayNameOutput.textContent = data.displayName;
+            publicUserIdOutput.textContent = `#${data.publicUserId}`;
+            avatarImage.src = data.avatarUrl || `https://placehold.co/80x80/1a140f/e0dacc?text=${data.displayName.charAt(0)}`;
         }
 
-        async function saveUserData() {
-            if (!currentUserId) return;
-            const userDocRef = doc(db, `artifacts/${appId}/users/${currentUserId}/mafiaGameData/profile`);
-            
-            const dataToSave = {
-                ...gameState, // Saves all properties from gameState
-                lastUpdated: serverTimestamp(),
-                // Add default stage if it doesn't exist
-                currentStage: gameState.currentStage || 1, 
-                seenQuestionHashes: Array.from(gameState.seenQuestionHashes || [])
-            };
-            
-            try {
-                await setDoc(userDocRef, dataToSave, { merge: true });
-                console.log("User data saved successfully.");
-            } catch (error) {
-                console.error("Error saving user data: ", error);
-            }
-        }
-
-        async function isDisplayNameTaken(name) {
-             const q = query(collection(db, `artifacts/${appId}/users`), where("displayName", "==", name), limit(1));
-             const querySnapshot = await getDocs(q);
-             return !querySnapshot.empty;
-        }
-
-        // --- Event Handlers ---
+        /**
+         * Sets up event listeners for interactive elements.
+         */
         function setupEventListeners() {
-            generateUserIdBtn.addEventListener('click', () => {
-                const newId = 'XXXXX'.replace(/[X]/g, () => "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".charAt(Math.floor(Math.random() * 36)));
-                userIdDisplayInput.value = newId;
+            startGameBtn.addEventListener('click', () => {
+                gameModePanelContainer.classList.remove('panel-hidden');
+            });
+            closeGameModePanelBtn.addEventListener('click', () => {
+                gameModePanelContainer.classList.add('panel-hidden');
             });
 
-            registerBtn.addEventListener('click', async () => {
-                const name = displayNameInput.value.trim();
-                const publicId = userIdDisplayInput.value;
-                inputErrorMessage.classList.add('hidden');
-
-                if (name.length < 3 || !/^[a-zA-Z0-9_.-]+$/.test(name)) {
-                    inputErrorMessage.textContent = "نام باید حداقل ۳ کاراکتر و فقط انگلیسی باشد.";
-                    inputErrorMessage.classList.remove('hidden');
-                    return;
-                }
-                if (!publicId) {
-                    inputErrorMessage.textContent = "لطفاً یک شناسه کاربری بسازید.";
-                    inputErrorMessage.classList.remove('hidden');
-                    return;
-                }
-
-                registerBtn.disabled = true;
-                registerBtn.textContent = "در حال بررسی...";
-
-                // Simplified check for demonstration
-                // Note: The previous 'isDisplayNameTaken' is more robust with security rules.
-                // This version might be slow on large datasets without an index.
-                gameState.displayName = name;
-                gameState.publicUserId = publicId;
-                await saveUserData();
-                updateProfileUI();
-                showScreen(mainScreen);
-                
-                registerBtn.disabled = false;
-                registerBtn.textContent = "ثبت نام و ورود";
-            });
+            // Add other event listeners (leaderboard, developers, etc.) here if needed
         }
 
-        // --- Game Initialization ---
-        async function initializeGame() {
-            setupEventListeners();
-            await initFirebase();
-        }
-
-        // Run the game
+        // Run the game initialization
+        setupEventListeners();
         initializeGame();
 
     </script>
