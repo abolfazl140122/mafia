@@ -10,25 +10,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
     
     <style>
-        /* ==================== THEME: DARK WOOD & NEON GOLD ==================== */
         :root {
             --wood-dark: #1a140f;
             --wood-texture-url: url('https://www.transparenttextures.com/patterns/dark-wood.png');
             --panel-bg-gradient: linear-gradient(145deg, #4a3a2a, #2c2218);
             --panel-border: #5c4a3a;
             --text-gold: #ffc947;
-            --text-gold-dark: #e5a500;
-            --text-light: #e0dacc;
-            --glow-green: #39ff14;
-            --glow-red: #ff3131;
             --logo-glow-main: #ffdd00;
             --progress-bar-bg: #2a1f15;
             --progress-bar-fill-start: #1eff00;
             --progress-bar-fill-end: #00ff87;
             --progress-bar-error-start: #ff416c;
             --progress-bar-error-end: #ff4b2b;
-            --success-color: #28a745;
-            --error-color: #dc3545;
+            --text-light: #e0dacc;
         }
 
         @keyframes panel-intro {
@@ -43,10 +37,6 @@
         @keyframes logo-glow {
             0%, 100% { filter: drop-shadow(0 0 8px var(--logo-glow-main)) drop-shadow(0 0 16px rgba(255, 221, 0, 0.5)); }
             50% { filter: drop-shadow(0 0 16px var(--logo-glow-main)) drop-shadow(0 0 32px rgba(255, 221, 0, 0.7)); }
-        }
-        @keyframes fade-in-up {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -63,14 +53,9 @@
         }
 
         #loading-panel {
-            width: 100%;
-            max-width: 480px;
-            background: var(--panel-bg-gradient);
-            border-radius: 24px;
-            border: 2px solid var(--panel-border);
-            padding: 30px 40px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
-            text-align: center;
+            width: 100%; max-width: 480px; background: var(--panel-bg-gradient);
+            border-radius: 24px; border: 2px solid var(--panel-border); padding: 30px 40px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5); text-align: center;
             animation: panel-intro 1s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
@@ -80,7 +65,7 @@
         }
         #logo-container::before {
             content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: conic-gradient(var(--glow-green), var(--glow-red), var(--glow-green));
+            background: conic-gradient(#39ff14, #ff3131, #39ff14);
             filter: blur(40px); animation: dual-glow-pulse 6s linear infinite;
         }
         #logo {
@@ -107,18 +92,6 @@
         }
 
         #status-message { font-size: 1rem; font-weight: 700; min-height: 24px; }
-        
-        #action-button {
-            display: none; /* مخفی در ابتدا */
-            margin-top: 25px; padding: 12px 40px; font-family: 'Vazirmatn', sans-serif;
-            font-size: 1.2rem; font-weight: 700; color: var(--wood-dark);
-            background: linear-gradient(180deg, var(--text-gold), var(--text-gold-dark));
-            border: 2px solid #a07200; border-radius: 12px; cursor: pointer;
-            box-shadow: 0 5px 0 #a07200; transition: all 0.15s ease-out;
-            animation: fade-in-up 0.5s 0.2s ease-out forwards;
-        }
-        #action-button:hover { transform: translateY(-2px); box-shadow: 0 7px 0 #a07200; }
-        #action-button:active { transform: translateY(3px); box-shadow: 0 2px 0 #a07200; }
     </style>
 </head>
 <body>
@@ -132,95 +105,80 @@
             <div id="progress-bar-fill"></div>
         </div>
         <p id="status-message">در حال آماده سازی...</p>
-        <button id="action-button"></button>
     </div>
     
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-        // КОНФИГУРАЦИЯ FIREBASE ВАШЕГО ВЕБ-ПРИЛОЖЕНИЯ
         const firebaseConfig = {
-            apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
-            authDomain: "mafia-9fcbf.firebaseapp.com",
-            projectId: "mafia-9fcbf",
-            storageBucket: "mafia-9fcbf.appspot.com",
-            messagingSenderId: "471627157488",
-            appId: "1:471627157488:web:92f008548a5596619a5735",
-            measurementId: "G-0PDHDWC6NV"
+          apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
+          authDomain: "mafia-9fcbf.firebaseapp.com",
+          projectId: "mafia-9fcbf",
+          storageBucket: "mafia-9fcbf.appspot.com",
+          messagingSenderId: "471627157488",
+          appId: "1:471627157488:web:92f008548a5596619a5735",
+          measurementId: "G-0PDHDWC6NV"
         };
         
-        // ВЫБОР ЭЛЕМЕНТОВ DOM
         const progressBarFill = document.getElementById('progress-bar-fill');
         const statusMessage = document.getElementById('status-message');
-        const actionButton = document.getElementById('action-button');
 
-        /**
-         * تابع برای به‌روزرسانی نوار پیشرفت و پیام
-         */
         function updateProgress(percent, message) {
             progressBarFill.style.width = `${percent}%`;
             statusMessage.textContent = message;
         }
 
-        /**
-         * تابع اصلی برای شروع فرآیند لودینگ واقعی
-         */
         async function initLoadingSequence() {
             try {
-                // مرحله 1: شروع اتصال
+                // مرحله ۱: شروع اتصال و نمایش پیشرفت اولیه
                 updateProgress(20, '...در حال راه‌اندازی سیستم');
                 const app = initializeApp(firebaseConfig);
                 const auth = getAuth(app);
                 updateProgress(50, '...برقراری ارتباط با سرورهای شهر');
                 
-                // مرحله 2: بررسی وضعیت احراز هویت کاربر
-                const user = await new Promise((resolve, reject) => {
-                    const unsubscribe = onAuthStateChanged(auth, (user) => {
-                        unsubscribe(); // فقط یکبار اجرا شود
-                        resolve(user);
-                    }, (error) => {
-                        unsubscribe();
-                        reject(error);
-                    });
-                    // تایم‌اوت برای جلوگیری از انتظار بی‌نهایت
-                    setTimeout(() => reject(new Error("Connection timed out")), 10000);
+                // مرحله ۲: انتظار برای مشخص شدن وضعیت ورود کاربر
+                onAuthStateChanged(auth, (user) => {
+                    // این تابع به محض مشخص شدن وضعیت کاربر اجرا می‌شود
+                    updateProgress(100, 'اتصال با موفقیت برقرار شد!');
+                    
+                    if (user) {
+                        // کاربر وارد شده است
+                        // **استفاده از نام نمایشی به جای ایمیل**
+                        const displayName = user.displayName || 'بازیکن';
+                        statusMessage.textContent = `خوش آمدید، ${displayName}! در حال ورود به شهر...`;
+                        
+                        // تاخیر کوتاه برای نمایش پیام و سپس هدایت خودکار
+                        setTimeout(() => {
+                            window.location.href = './شهر مافIA رفع باگ.txt'; // <-- هدایت به صفحه اصلی بازی
+                        }, 2000); // 2 ثانیه تاخیر
+
+                    } else {
+                        // کاربر وارد نشده است
+                        statusMessage.textContent = 'برای ورود به شهر، ابتدا باید شناسایی شوید...';
+
+                        // تاخیر کوتاه و هدایت خودکار به صفحه ورود/ثبت‌نام
+                        setTimeout(() => {
+                            window.location.href = './login.html'; // <-- هدایت به صفحه ورود
+                        }, 2000); // 2 ثانیه تاخیر
+                    }
+                }, (error) => {
+                    // این تابع در صورت بروز خطا در حین بررسی وضعیت اجرا می‌شود
+                    console.error("Auth State Error:", error);
+                    handleLoadingError();
                 });
 
-                // مرحله 3: تصمیم‌گیری بر اساس وضعیت کاربر
-                updateProgress(100, 'اتصال با موفقیت برقرار شد!');
-                
-                if (user) {
-                    // کاربر وارد شده است
-                    statusMessage.textContent = `خوش آمدید، ${user.email || 'بازیکن'}!`;
-                    actionButton.textContent = 'ورود به بازی';
-                    actionButton.style.display = 'block';
-                    actionButton.onclick = () => {
-                        // **مهم:** آدرس صفحه اصلی بازی را اینجا قرار دهید
-                         window.location.href = './شهر مافیا رفع باگ.txt'; // <-- اینجا را ویرایش کنید
-                    };
-                } else {
-                    // کاربر وارد نشده است
-                    statusMessage.textContent = 'برای ورود به شهر آماده شوید.';
-                    actionButton.textContent = 'ورود / ثبت نام';
-                    actionButton.style.display = 'block';
-                    actionButton.onclick = () => {
-                        window.location.href = './login.html';
-                    };
-                }
-
             } catch (error) {
-                // مدیریت خطا در فرآیند لودینگ
-                console.error("Loading sequence failed:", error);
-                progressBarFill.classList.add('error');
-                updateProgress(100, 'خطا در اتصال به سرور!');
-                statusMessage.textContent = 'امکان اتصال به سرورهای بازی وجود ندارد.';
-                actionButton.textContent = 'تلاش مجدد';
-                actionButton.style.display = 'block';
-                actionButton.onclick = () => {
-                    window.location.reload();
-                };
+                // این بخش برای خطاهای اولیه در راه‌اندازی Firebase است
+                console.error("Firebase Initialization Error:", error);
+                handleLoadingError();
             }
+        }
+
+        function handleLoadingError() {
+            progressBarFill.classList.add('error');
+            updateProgress(100, 'خطا در اتصال به سرور!');
+            statusMessage.textContent = 'امکان اتصال به سرورهای بازی وجود ندارد. لطفاً اتصال اینترنت خود را بررسی کرده و صفحه را دوباره بارگذاری کنید.';
         }
 
         // شروع فرآیند لودینگ پس از بارگذاری کامل صفحه
