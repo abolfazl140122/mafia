@@ -116,11 +116,11 @@
             background-image: url('https://www.transparenttextures.com/patterns/dark-wood.png');
             color: var(--mafia-text-light);
             display: flex;
-            align-items: center;
+            align-items: center; /* مرکز چین عمودی در حالت دسکتاپ */
             justify-content: center;
             min-height: 100vh;
             padding: 20px;
-            overflow: hidden;
+            overflow: hidden; /* جلوگیری از اسکرول در حالت دسکتاپ */
             animation: fadeIn 1s ease-out;
             position: relative;
         }
@@ -201,6 +201,7 @@
             animation: panelIntro 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
             position: relative;
             overflow: hidden;
+            width: 100%;
         }
         
         @media (min-width: 500px) {
@@ -470,6 +471,45 @@
         /* --- UTILITY CLASSES --- */
         .hidden {
             display: none !important;
+        }
+
+        /*
+         * ===================================================================
+         * MOBILE & SMALL SCREEN RESPONSIVE ADJUSTMENTS (ADDED)
+         * ===================================================================
+         * This media query targets devices with short heights (like phones in landscape)
+         * or narrow widths (like phones in portrait) to provide a better, scrollable layout.
+        */
+        @media (max-height: 800px), (max-width: 500px) {
+            body {
+                /* 1. Allow vertical scrolling if content is too tall */
+                overflow-y: auto;
+                
+                /* 2. Align panel to the top instead of center */
+                align-items: flex-start;
+
+                /* 3. Adjust padding for a "full-screen" feel */
+                padding: 30px 10px; 
+            }
+
+            .auth-container {
+                /* Ensure the container can grow to fill the space */
+                display: flex;
+                flex-direction: column;
+                min-height: 100%;
+            }
+
+            #auth-panel {
+                /* 4. Allow the panel to grow and fill available vertical space */
+                flex-grow: 1;
+
+                /* 5. Optional: Tweak padding and title size for small screens */
+                padding: 2rem 1.25rem;
+            }
+
+            .glitch {
+                font-size: 2.8rem;
+            }
         }
 
     </style>
