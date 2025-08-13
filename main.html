@@ -1,1 +1,588 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>شهر مافیا - لابی اصلی</title>
+    
+    <!-- Google Fonts (Consistent with other pages) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&family=Lalezar&display=swap" rel="stylesheet">
 
+    <style>
+        /* 
+        ==========================================================================
+         MAFIA CITY - MAIN LOBBY STYLES
+         Designed with a mobile-first, high-fidelity approach, consistent
+         with the login and registration pages.
+        ==========================================================================
+        */
+
+        /* --- ROOT VARIABLES (Consistent Theming) --- */
+        :root {
+            --mafia-dark-wood: #1e1a17;
+            --mafia-panel-brown: #3a322d;
+            --mafia-panel-border: #2c2521;
+            --mafia-gold-accent: #e6b800;
+            --mafia-gold-glow: rgba(230, 184, 0, 0.6);
+            --mafia-gold-dark: #a88700;
+            --mafia-text-light: #e8e0d9;
+            --mafia-text-dark: #1a1a1a;
+            --mafia-red-accent: #a03c3c;
+            --font-display: 'Lalezar', cursive;
+            --font-body: 'Vazirmatn', sans-serif;
+        }
+
+        /* --- KEYFRAME ANIMATIONS --- */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes backgroundPan {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 100%; }
+        }
+        
+        @keyframes pulseGlow {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 15px var(--mafia-gold-glow), 0 0 25px var(--mafia-gold-glow);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 0 25px var(--mafia-gold-glow), 0 0 45px var(--mafia-gold-glow);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 15px var(--mafia-gold-glow), 0 0 25px var(--mafia-gold-glow);
+            }
+        }
+        
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        
+        @keyframes modal-fade-in {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes modal-panel-grow {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* --- GENERAL & BODY STYLES --- */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden; /* Prevent scrolling on the main page */
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--mafia-dark-wood);
+            background-image: url('https://www.transparenttextures.com/patterns/dark-wood.png');
+            color: var(--mafia-text-light);
+            display: flex;
+            justify-content: center;
+            position: relative;
+            animation: fadeIn 1s ease-out;
+        }
+
+        /* Faux background layer for subtle movement */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background-image: url('https://www.transparenttextures.com/patterns/foggy-birds.png');
+            opacity: 0.05;
+            z-index: 0;
+            animation: backgroundPan 180s linear infinite;
+        }
+        
+        /* --- MAIN APP CONTAINER (Mobile-First Layout) --- */
+        #main-app-container {
+            width: 100%;
+            max-width: 500px; /* Max width for larger phone screens */
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 1;
+            background-color: rgba(30, 26, 23, 0.5); /* Slight tint to separate from bg */
+            box-shadow: 0 0 40px rgba(0,0,0,0.5);
+        }
+
+        /* --- HEADER PANEL --- */
+        #header-panel {
+            flex-shrink: 0;
+            background: linear-gradient(to bottom, var(--mafia-panel-brown), #312a25);
+            padding: 15px 20px;
+            border-bottom: 3px solid var(--mafia-panel-border);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: fadeInUp 0.5s ease-out;
+        }
+        
+        #user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        #user-avatar {
+            width: 50px;
+            height: 50px;
+            background-color: var(--mafia-dark-wood);
+            border: 2px solid var(--mafia-gold-accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        #welcome-message {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+        
+        #display-name {
+            display: block;
+            color: var(--mafia-gold-accent);
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            letter-spacing: 1px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+
+        /* --- MAIN CONTENT AREA --- */
+        #main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        #central-graphic {
+            position: relative;
+            margin-bottom: 40px;
+            animation: fadeInUp 0.8s 0.2s ease-out backwards;
+        }
+        
+        #central-graphic-logo {
+            width: 150px;
+            animation: logoFloat 5s ease-in-out infinite;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.6));
+        }
+        
+        #central-graphic::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 180px;
+            height: 50px;
+            background: radial-gradient(ellipse, var(--mafia-gold-glow) 0%, transparent 70%);
+            border-radius: 50%;
+            opacity: 0.7;
+            filter: blur(10px);
+            animation: logoFloat 5s ease-in-out infinite;
+        }
+
+        /* --- START GAME BUTTON --- */
+        #start-game-btn {
+            padding: 1rem 3rem;
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            color: var(--mafia-text-dark);
+            background: linear-gradient(to top, var(--mafia-gold-dark), var(--mafia-gold-accent));
+            border: 3px solid #816600;
+            border-radius: 15px;
+            cursor: pointer;
+            letter-spacing: 2px;
+            box-shadow: 0 6px 0 #816600, 0 10px 20px rgba(0,0,0,0.5);
+            transition: all 0.15s ease-out;
+            animation: pulseGlow 3s infinite ease-in-out, fadeInUp 1s 0.4s ease-out backwards;
+        }
+
+        #start-game-btn:active {
+            transform: translateY(5px);
+            box-shadow: 0 1px 0 #816600, 0 2px 5px rgba(0,0,0,0.4);
+            animation: none;
+        }
+        
+        /* --- FOOTER PANEL --- */
+        #footer-panel {
+            flex-shrink: 0;
+            padding: 15px;
+            border-top: 3px solid var(--mafia-panel-border);
+            background: var(--mafia-panel-brown);
+            text-align: center;
+            animation: fadeInUp 1s 0.6s ease-out backwards;
+        }
+        
+        #logout-btn {
+            background: transparent;
+            border: 2px solid var(--mafia-red-accent);
+            color: var(--mafia-red-accent);
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        #logout-btn:hover {
+            background-color: var(--mafia-red-accent);
+            color: var(--mafia-text-light);
+            box-shadow: 0 0 10px rgba(160, 60, 60, 0.5);
+        }
+
+        /* --- MODAL FOR GAME TYPE SELECTION --- */
+        #game-type-modal {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(10, 5, 2, 0.85);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        #game-type-modal.visible {
+            opacity: 1;
+            visibility: visible;
+            animation: modal-fade-in 0.3s ease;
+        }
+        
+        #modal-panel {
+            background: linear-gradient(145deg, var(--mafia-panel-brown), #312a25);
+            border: 3px solid var(--mafia-panel-border);
+            border-radius: 20px;
+            padding: 2rem 1.5rem;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            position: relative;
+        }
+        
+        #game-type-modal.visible #modal-panel {
+            animation: modal-panel-grow 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        #modal-close-btn {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 30px;
+            height: 30px;
+            background-color: var(--mafia-red-accent);
+            border: 1px solid var(--mafia-panel-border);
+            color: var(--mafia-text-light);
+            border-radius: 50%;
+            font-size: 1.2rem;
+            font-weight: 900;
+            cursor: pointer;
+            line-height: 28px;
+        }
+
+        #modal-title {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            color: var(--mafia-gold-accent);
+            margin-bottom: 2rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .modal-options {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .modal-btn {
+            width: 100%;
+            padding: 1rem;
+            font-family: var(--font-body);
+            font-weight: 900;
+            font-size: 1.1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+        }
+        
+        #ranked-game-btn {
+            background: linear-gradient(to top, var(--mafia-gold-dark), var(--mafia-gold-accent));
+            border: 2px solid #816600;
+            color: var(--mafia-text-dark);
+            box-shadow: 0 5px 0 #816600, 0 8px 15px rgba(0,0,0,0.4);
+        }
+        #ranked-game-btn:hover {
+            filter: brightness(1.1);
+        }
+        
+        #friendly-game-btn {
+            background: linear-gradient(to top, #555, #777);
+            border: 2px solid #444;
+            color: var(--mafia-text-light);
+            box-shadow: 0 5px 0 #444, 0 8px 15px rgba(0,0,0,0.4);
+        }
+        #friendly-game-btn:hover {
+            background: linear-gradient(to top, #666, #888);
+        }
+        
+        /* --- UTILITY CLASSES --- */
+        .hidden {
+            display: none !important;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Main Application Container -->
+    <div id="main-app-container" class="hidden">
+        
+        <!-- Header with User Info -->
+        <header id="header-panel">
+            <div id="user-info">
+                <div id="user-avatar">?</div>
+                <div id="welcome-message">
+                    خوش آمدی،
+                    <span id="display-name">بازیکن</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content (Lobby) -->
+        <main id="main-content">
+            <div id="central-graphic">
+                <img id="central-graphic-logo" src="https://up.20script.ir/file/40b6-Copilot-20250812-110015-removebg-preview.png" alt="Mafia City Logo">
+            </div>
+            
+            <button id="start-game-btn">شروع بازی</button>
+        </main>
+
+        <!-- Footer -->
+        <footer id="footer-panel">
+            <button id="logout-btn">خروج از حساب</button>
+        </footer>
+
+    </div>
+
+    <!-- Game Type Selection Modal -->
+    <div id="game-type-modal">
+        <div id="modal-panel">
+            <button id="modal-close-btn">&times;</button>
+            <h2 id="modal-title">انتخاب نوع بازی</h2>
+            <div class="modal-options">
+                <button id="ranked-game-btn" class="modal-btn">بازی امتیازی</button>
+                <button id="friendly-game-btn" class="modal-btn">بازی دوستانه</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Loading/Redirecting Message -->
+    <div id="auth-check-message" style="text-align: center; font-size: 1.2rem; animation: fadeIn 1s;">
+        <p>در حال بررسی وضعیت حساب کاربری...</p>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+        // --- FIREBASE CONFIGURATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
+            authDomain: "mafia-9fcbf.firebaseapp.com",
+            projectId: "mafia-9fcbf",
+            storageBucket: "mafia-9fcbf.appspot.com",
+            messagingSenderId: "471627157488",
+            appId: "1:471627157488:web:92f008548a5596619a5735",
+            measurementId: "G-0PDHDWC6NV"
+        };
+        
+        /**
+         * ------------------------------------------------------------------
+         * Game Manager Class
+         * Handles all logic for the main lobby screen.
+         * ------------------------------------------------------------------
+         */
+        class GameManager {
+            constructor() {
+                // Firebase services
+                this.app = null;
+                this.auth = null;
+
+                // DOM Elements
+                this.mainContainer = document.getElementById('main-app-container');
+                this.authCheckMessage = document.getElementById('auth-check-message');
+                
+                // User Info Elements
+                this.userAvatar = document.getElementById('user-avatar');
+                this.displayNameElem = document.getElementById('display-name');
+                
+                // Buttons
+                this.startGameBtn = document.getElementById('start-game-btn');
+                this.logoutBtn = document.getElementById('logout-btn');
+                
+                // Modal Elements
+                this.modal = document.getElementById('game-type-modal');
+                this.modalCloseBtn = document.getElementById('modal-close-btn');
+                this.rankedGameBtn = document.getElementById('ranked-game-btn');
+                this.friendlyGameBtn = document.getElementById('friendly-game-btn');
+            }
+
+            /**
+             * Initializes the game manager, sets up Firebase, and checks auth state.
+             */
+            initialize() {
+                try {
+                    this.app = initializeApp(firebaseConfig);
+                    this.auth = getAuth(this.app);
+                    console.log("Firebase initialized successfully on main page.");
+                    this.checkAuthenticationState();
+                } catch (error) {
+                    console.error("Firebase initialization failed:", error);
+                    this.authCheckMessage.textContent = "خطای بحرانی در اتصال به سرور!";
+                }
+            }
+
+            /**
+             * Listens for changes in the user's authentication state.
+             * This is the core of the page's logic.
+             */
+            checkAuthenticationState() {
+                onAuthStateChanged(this.auth, (user) => {
+                    if (user) {
+                        // User is signed in.
+                        console.log("User is logged in:", user.uid, "DisplayName:", user.displayName);
+                        this.showMainApp();
+                        this.updateUserInfo(user);
+                        this.setupEventListeners();
+                    } else {
+                        // User is signed out.
+                        console.log("No user is logged in. Redirecting...");
+                        this.redirectToLogin();
+                    }
+                });
+            }
+            
+            /**
+             * Hides the loading message and displays the main application interface.
+             */
+            showMainApp() {
+                this.authCheckMessage.classList.add('hidden');
+                this.mainContainer.classList.remove('hidden');
+            }
+
+            /**
+             * Updates the UI with the logged-in user's information.
+             * @param {object} user - The Firebase user object.
+             */
+            updateUserInfo(user) {
+                const displayName = user.displayName || "مهمان";
+                this.displayNameElem.textContent = displayName;
+                this.userAvatar.textContent = displayName.charAt(0).toUpperCase();
+            }
+            
+            /**
+             * Redirects the user to the login page after a short delay.
+             */
+            redirectToLogin() {
+                this.authCheckMessage.textContent = "شما وارد حساب کاربری نشده‌اید. در حال انتقال به صفحه ورود...";
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 2500);
+            }
+            
+            /**
+             * Attaches all necessary event listeners for the page's interactive elements.
+             */
+            setupEventListeners() {
+                this.startGameBtn.addEventListener('click', () => this.showModal());
+                this.modalCloseBtn.addEventListener('click', () => this.hideModal());
+                this.logoutBtn.addEventListener('click', () => this.handleLogout());
+
+                // Modal button actions as per request
+                this.rankedGameBtn.addEventListener('click', () => {
+                    // Does nothing for now
+                    console.log("Ranked game button clicked - no action.");
+                });
+                
+                this.friendlyGameBtn.addEventListener('click', () => {
+                    alert('این قابلیت به زودی اضافه می‌شود...');
+                });
+            }
+            
+            /**
+             * Signs the user out of Firebase.
+             * onAuthStateChanged will automatically handle the redirect.
+             */
+            async handleLogout() {
+                try {
+                    await signOut(this.auth);
+                    console.log("User signed out successfully.");
+                } catch (error) {
+                    console.error("Sign out error:", error);
+                    alert("خطایی در هنگام خروج از حساب رخ داد.");
+                }
+            }
+            
+            /**
+             * Displays the game type selection modal.
+             */
+            showModal() {
+                this.modal.classList.add('visible');
+            }
+            
+            /**
+             * Hides the game type selection modal.
+             */
+            hideModal() {
+                this.modal.classList.remove('visible');
+            }
+        }
+
+        // --- Entry Point ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const game = new GameManager();
+            game.initialize();
+        });
+
+    </script>
+</body>
+</html>
