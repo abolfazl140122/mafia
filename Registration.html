@@ -4,461 +4,523 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ثبت نام در شهر مافیا</title>
-    <!-- Vazirmatn Font for a clean, modern look -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <style>
-        /* --- NEW BROWN & WHITE THEME --- */
+        /* --- THEME: VINTAGE PARCHMENT (BROWN & WHITE) --- */
+
         :root {
-            --theme-bg: #EFEBE9; /* A soft, off-white background */
-            --theme-panel-bg: #FFFFFF; /* Clean white for the main panel */
-            --theme-brown-dark: #4E342E; /* Dark brown for text and important elements */
-            --theme-brown-accent: #6D4C41; /* A rich, mid-tone brown for buttons */
-            --theme-brown-light: #A1887F; /* A lighter brown for secondary text or borders */
-            --theme-error: #B71C1C; /* A deep red for error messages */
-            --theme-success: #2E7D32; /* A nice green for success messages */
+            --color-parchment: #fdf6e3;
+            --color-dark-brown: #5c4b3cc7;
+            --color-medium-brown: #8a6d4a;
+            --color-light-brown: #c8b7a1;
+            --color-accent: #a52a2a; /* A darker red for errors */
+            --color-text: #3d2c1c;
+            --color-text-light: #fff;
+            --color-success: #28a745;
         }
 
-        /* --- KEYFRAME ANIMATIONS --- */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-20px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
 
-        /* --- GENERAL STYLES --- */
         body {
             font-family: 'Vazirmatn', sans-serif;
-            background-color: var(--theme-bg);
-            color: var(--theme-brown-dark);
+            background-color: var(--color-parchment);
+            background-image: url('https://www.transparenttextures.com/patterns/old-paper.png');
+            color: var(--color-text);
             display: flex;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
             margin: 0;
-            padding: 20px;
+            padding: 1rem;
             box-sizing: border-box;
+            line-height: 1.6;
         }
 
-        .registration-container {
-            width: 100%;
-            max-width: 450px;
-            animation: fadeIn 0.6s ease-out;
-        }
-
-        /* --- PANEL STYLING --- */
         .registration-panel {
-            background-color: var(--theme-panel-bg);
+            background-color: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(5px);
+            border: 2px solid var(--color-medium-brown);
             border-radius: 12px;
             padding: 2rem 2.5rem;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            border-top: 5px solid var(--theme-brown-accent);
+            max-width: 450px;
+            width: 100%;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.7s ease-out;
+            transition: opacity 0.5s, transform 0.5s;
         }
         
-        #registration-success-panel {
-             text-align: center;
-        }
-        #registration-success-panel h2 {
-            color: var(--theme-success);
+        .registration-panel.hidden {
+            opacity: 0;
+            transform: scale(0.95);
+            pointer-events: none;
         }
 
-        .panel-title {
+        h1 {
+            font-family: 'Playfair Display', serif;
+            color: var(--color-dark-brown);
             text-align: center;
-            font-size: 2rem;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
             font-weight: 700;
-            color: var(--theme-brown-dark);
-            margin-bottom: 1.5rem;
         }
 
-        /* --- FORM ELEMENTS STYLING --- */
+        p.subtitle {
+            text-align: center;
+            color: var(--color-medium-brown);
+            margin-bottom: 2rem;
+            font-size: 1rem;
+        }
+
         .form-group {
             margin-bottom: 1.25rem;
         }
 
         .form-label {
             display: block;
+            font-weight: 700;
             margin-bottom: 0.5rem;
             font-size: 0.9rem;
-            font-weight: 700;
         }
 
-        .input-theme {
+        .input-field {
             width: 100%;
             padding: 12px 15px;
-            font-size: 1rem;
             border-radius: 8px;
-            border: 2px solid #D7CCC8;
-            background-color: #F9F9F9;
-            color: var(--theme-brown-dark);
-            transition: border-color 0.3s, box-shadow 0.3s;
+            border: 1px solid var(--color-light-brown);
+            background-color: #fff;
+            font-size: 1rem;
+            font-family: 'Vazirmatn', sans-serif;
+            color: var(--color-text);
             box-sizing: border-box;
+            transition: border-color 0.3s, box-shadow 0.3s;
         }
 
-        .input-theme:focus {
+        .input-field:focus {
             outline: none;
-            border-color: var(--theme-brown-accent);
-            box-shadow: 0 0 0 3px rgba(109, 76, 65, 0.2);
-        }
-        
-        .input-theme:read-only {
-            background-color: #E0E0E0;
-            cursor: not-allowed;
+            border-color: var(--color-medium-brown);
+            box-shadow: 0 0 0 3px rgba(138, 109, 74, 0.2);
         }
 
-        .input-theme.invalid {
-            border-color: var(--theme-error);
+        .input-field.invalid {
+            border-color: var(--color-accent);
+        }
+
+        .input-field[readonly] {
+            background-color: #f0f0f0;
+            cursor: not-allowed;
+            color: #888;
         }
 
         .error-message {
-            color: var(--theme-error);
+            color: var(--color-accent);
             font-size: 0.85rem;
             margin-top: 0.5rem;
             min-height: 1.2rem;
-            font-weight: bold;
+            display: none; /* Hidden by default */
         }
-        
-        .hidden {
-            display: none;
+        .error-message.visible {
+            display: block;
         }
 
-        /* --- BUTTON STYLING --- */
         .btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            border: none;
+            width: 100%;
+            padding: 14px 20px;
             border-radius: 8px;
+            border: none;
             font-family: 'Vazirmatn', sans-serif;
+            font-size: 1.1rem;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.2s ease-in-out;
-            white-space: nowrap;
-            padding: 12px 20px;
-            font-size: 1rem;
+            transition: background-color 0.3s, transform 0.1s;
         }
-
+        
         .btn-primary {
-            background-color: var(--theme-brown-accent);
-            color: white;
-            width: 100%;
+            background-color: var(--color-dark-brown);
+            color: var(--color-text-light);
+            box-shadow: 0 4px 0 #3a2f23;
         }
 
         .btn-primary:hover:not(:disabled) {
-            background-color: var(--theme-brown-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            background-color: #4a3c2e;
         }
         
+        .btn-primary:active:not(:disabled) {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #3a2f23;
+        }
+
         .btn-primary:disabled {
-            background-color: var(--theme-brown-light);
-            cursor: not-allowed;
-            opacity: 0.7;
+            background-color: #9e8a76;
+            cursor: wait;
+            opacity: 0.8;
+            box-shadow: 0 4px 0 #7c6c5a;
         }
-
+        
         .btn-secondary {
-            background-color: #F5F5F5;
-            color: var(--theme-brown-accent);
-            border: 2px solid var(--theme-brown-light);
+            background-color: var(--color-medium-brown);
+            color: var(--color-text-light);
+            padding: 10px 15px;
+            font-size: 0.9rem;
+        }
+        
+        .btn-secondary:hover:not(:disabled) {
+            background-color: #a0815f;
         }
 
-        .btn-secondary:hover:not(:disabled) {
-            background-color: #E0E0E0;
-            border-color: var(--theme-brown-accent);
+        .id-generator-container {
+            display: flex;
+            gap: 0.75rem;
         }
+
+        .loader {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: var(--color-text-light);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-left: 10px;
+        }
+        
+        #success-message {
+            text-align: center;
+            background-color: #e9f5ec;
+            border: 2px solid var(--color-success);
+            color: #1a5c2d;
+            padding: 1.5rem 2rem;
+            border-radius: 12px;
+            animation: fadeIn 0.5s ease-out;
+            max-width: 450px;
+            width: 100%;
+        }
+        
+        #success-message h2 {
+            margin-top: 0;
+            color: #1a5c2d;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
     </style>
 </head>
 <body>
 
-    <div class="registration-container">
-        <!-- Registration Form Panel -->
-        <div id="registration-form-panel" class="registration-panel">
-            <h1 class="panel-title">ساخت حساب کاربری</h1>
-            
-            <div class="form-group">
-                <label for="display-name-input" class="form-label">نام نمایشی (فقط انگلیسی، ۳ تا ۲۰ کاراکتر)</label>
-                <input type="text" id="display-name-input" placeholder="مثال: godfather1972" class="input-theme" maxlength="20">
-                <p id="input-error-message" class="error-message"></p>
-            </div>
+    <div id="registration-panel" class="registration-panel">
+        <h1>شهر مافیا</h1>
+        <p class="subtitle">برای ورود به شهر، هویت خود را بسازید</p>
 
-            <div class="form-group">
-                <label for="user-id-display" class="form-label">شناسه کاربری (۵ رقمی)</label>
-                <div style="display: flex; gap: 10px;">
-                    <input type="text" id="user-id-display" class="input-theme" readonly placeholder="ابتدا شناسه بسازید">
-                    <button id="generate-user-id-btn" class="btn btn-secondary" style="flex-shrink: 0;">ساخت شناسه</button>
-                </div>
-                <p id="user-id-error-message" class="error-message"></p>
-            </div>
-
-            <button id="register-btn" class="btn btn-primary" style="margin-top: 1rem;">ثبت نام و ورود به شهر</button>
+        <div class="form-group">
+            <label for="display-name-input" class="form-label">نام نمایشی (فقط حروف و اعداد انگلیسی)</label>
+            <input type="text" id="display-name-input" placeholder="مثال: Godfather" class="input-field" maxlength="20">
+            <p id="name-error-message" class="error-message"></p>
         </div>
 
-        <!-- Registration Success Panel (Initially hidden) -->
-        <div id="registration-success-panel" class="registration-panel hidden">
-            <h2 class="panel-title">ثبت نام موفق!</h2>
-            <p style="text-align: center; line-height: 1.7;">
-                حساب شما با موفقیت ساخته شد. حالا شما یکی از شهروندان شهر مافیا هستید.
-                <br>
-                می‌توانید این پنجره را ببندید و به بازی اصلی برگردید.
-            </p>
+        <div class="form-group">
+            <label for="user-id-display" class="form-label">شناسه کاربری شما (۵ رقمی)</label>
+            <div class="id-generator-container">
+                <input type="text" id="user-id-display" class="input-field" readonly placeholder="ابتدا شناسه بسازید">
+                <button id="generate-user-id-btn" class="btn btn-secondary">ساخت شناسه</button>
+            </div>
+            <p id="id-error-message" class="error-message"></p>
+        </div>
+
+        <div class="form-group" style="margin-top: 2rem;">
+            <button id="register-btn" class="btn btn-primary">
+                <span id="register-btn-text">ورود به شهر</span>
+                <div id="register-loader" class="loader hidden"></div>
+            </button>
         </div>
     </div>
 
+    <div id="success-message" class="hidden">
+        <h2>ثبت نام موفقیت آمیز بود!</h2>
+        <p>خوش آمدی <strong id="success-name"></strong>!</p>
+        <p>شما اکنون به صفحه اصلی بازی هدایت خواهید شد...</p>
+    </div>
+
     <script type="module">
-        // --- JAVASCRIPT LOGIC (Focused on Registration) ---
+        // --- JAVASCRIPT LOGIC FOR REGISTRATION ---
+
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, serverTimestamp, collection, query, where, getDocs, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDocs, collection, query, where, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase configuration (replace with your actual config if needed)
+        // --- NEW FIREBASE CONFIGURATION ---
         const firebaseConfig = {
-            apiKey: "AIzaSyBkUfmc3_TvcR8AkepIr1eB7YEvCD-7P3s",
-            authDomain: "city-mafia.firebaseapp.com",
-            projectId: "city-mafia",
-            storageBucket: "city-mafia.appspot.com",
-            messagingSenderId: "66458127103",
-            appId: "1:66458127103:web:8bcc2ad470f51b5db45aca",
-            measurementId: "G-8M0M6BJ0GG"
+            apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
+            authDomain: "mafia-9fcbf.firebaseapp.com",
+            projectId: "mafia-9fcbf",
+            storageBucket: "mafia-9fcbf.appspot.com",
+            messagingSenderId: "471627157488",
+            appId: "1:471627157488:web:92f008548a5596619a5735",
+            measurementId: "G-0PDHDWC6NV"
         };
         
-        // A unique identifier for this application instance within Firebase
-        const appId = 'mafia-game-default';
+        // --- APP CONFIG ---
+        // This ID helps separate data if you run multiple apps on the same Firebase project.
+        // Make sure this ID is the same across all your game files (registration, main game, etc.)
+        const appId = 'mafia-game-v1';
 
-        // --- Firebase & State Variables ---
+        // --- Firebase Globals ---
+        let app;
         let auth;
         let db;
         let currentUserId = null;
-        let publicUserId = ''; // Temporary state for the form
 
         // --- DOM Elements ---
-        const registrationFormPanel = document.getElementById('registration-form-panel');
-        const successPanel = document.getElementById('registration-success-panel');
+        const registrationPanel = document.getElementById('registration-panel');
         const displayNameInput = document.getElementById('display-name-input');
-        const registerBtn = document.getElementById('register-btn');
-        const inputErrorMessage = document.getElementById('input-error-message');
-        const userIdDisplayInput = document.getElementById('user-id-display');
+        const nameErrorMessage = document.getElementById('name-error-message');
+        const userIdDisplay = document.getElementById('user-id-display');
+        const idErrorMessage = document.getElementById('id-error-message');
         const generateUserIdBtn = document.getElementById('generate-user-id-btn');
-        const userIdErrorMessage = document.getElementById('user-id-error-message');
+        const registerBtn = document.getElementById('register-btn');
+        const registerBtnText = document.getElementById('register-btn-text');
+        const registerLoader = document.getElementById('register-loader');
+        const successMessage = document.getElementById('success-message');
+        const successName = document.getElementById('success-name');
+        
+        // --- Utility Functions ---
 
-        /**
-         * Initializes Firebase services and sets up authentication listener.
-         */
-        async function initFirebase() {
-            try {
-                const app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
-                console.log("Firebase initialized for registration.");
-
-                onAuthStateChanged(auth, async (user) => {
-                    if (user) {
-                        currentUserId = user.uid;
-                        console.log("User is signed in:", currentUserId);
-                        // Optional: Check if user already has a profile.
-                        // For a dedicated registration page, we assume they don't,
-                        // or we allow them to create one anyway.
-                    } else {
-                        console.log("No user signed in. Attempting anonymous sign-in.");
-                        await signInAnonymously(auth);
-                    }
-                });
-            } catch (error) {
-                console.error("Firebase initialization error:", error);
-                inputErrorMessage.textContent = "خطا در اتصال به سرور. لطفا صفحه را رفرش کنید.";
-                inputErrorMessage.classList.remove('hidden');
-                if (registerBtn) registerBtn.disabled = true;
-            }
+        function showErrorMessage(element, message) {
+            element.textContent = message;
+            element.classList.add('visible');
         }
 
-        /**
-         * Validates the display name input.
-         * @param {string} nameValue - The value from the input field.
-         * @returns {string|null} The sanitized name or null if invalid.
-         */
-        function validateAndSanitizeName(nameValue) {
-            const regex = /[^a-zA-Z0-9_.-]/g; // Allow letters, numbers, underscore, dot, hyphen
-            let sanitizedValue = nameValue.replace(regex, '');
-
-            if (nameValue !== sanitizedValue) {
-                displayNameInput.value = sanitizedValue;
-            }
-            const trimmedName = sanitizedValue.trim();
-
-            if (trimmedName.length < 3 || trimmedName.length > 20) {
-                inputErrorMessage.textContent = "نام نمایشی باید بین ۳ تا ۲۰ کاراکتر انگلیسی باشد.";
-                inputErrorMessage.classList.remove('hidden');
-                displayNameInput.classList.add('invalid');
-                return null;
-            }
-            
-            inputErrorMessage.textContent = "";
-            inputErrorMessage.classList.add('hidden');
-            displayNameInput.classList.remove('invalid');
-            return trimmedName;
+        function hideErrorMessage(element) {
+            element.textContent = '';
+            element.classList.remove('visible');
         }
 
-        /**
-         * Checks if a display name is already taken by another user.
-         * @param {string} nameToCheck - The name to check for uniqueness.
-         * @returns {Promise<boolean>} True if the name is taken, false otherwise.
-         */
-        async function isDisplayNameTaken(nameToCheck) {
-            const usersRef = collection(db, `artifacts/${appId}/publicLeaderboard`);
-            const q = query(usersRef, where("displayName", "==", nameToCheck), limit(1));
-            
-            try {
-                const querySnapshot = await getDocs(q);
-                // The name is taken if we find a document AND its ID is not the current user's ID.
-                return !querySnapshot.empty && querySnapshot.docs[0].id !== currentUserId;
-            } catch (error) {
-                console.error("Error checking display name:", error);
-                inputErrorMessage.textContent = "خطا در بررسی نام کاربری. لطفا دوباره تلاش کنید.";
-                inputErrorMessage.classList.remove('hidden');
-                return true; // Fail-safe: assume it's taken if an error occurs.
+        function toggleLoading(isLoading) {
+            registerBtn.disabled = isLoading;
+            if (isLoading) {
+                registerBtnText.classList.add('hidden');
+                registerLoader.classList.remove('hidden');
+            } else {
+                registerBtnText.classList.remove('hidden');
+                registerLoader.classList.add('hidden');
             }
         }
         
-        /**
-         * Generates a 5-character alphanumeric ID.
-         * @returns {string} The generated ID.
-         */
-        function generateAlphanumericPublicUserId() {
+        function validateAndSanitizeName(nameValue) {
+            const inputElement = displayNameInput;
+            const errorElement = nameErrorMessage;
+            
+            // Allow only English letters, numbers, and underscore/hyphen
+            const regex = /[^a-zA-Z0-9_-]/g;
+            let sanitizedValue = nameValue.replace(regex, '');
+
+            if (nameValue !== sanitizedValue) {
+                inputElement.value = sanitizedValue;
+            }
+
+            const trimmedName = sanitizedValue.trim();
+
+            if (trimmedName === '') {
+                showErrorMessage(errorElement, "نام نمایشی نمی‌تواند خالی باشد.");
+                inputElement.classList.add('invalid');
+                return null;
+            }
+            if (trimmedName.length < 3) {
+                showErrorMessage(errorElement, "نام نمایشی باید حداقل ۳ کاراکتر باشد.");
+                inputElement.classList.add('invalid');
+                return null;
+            }
+            if (trimmedName.length > 20) {
+                showErrorMessage(errorElement, "نام نمایشی نمی‌تواند بیشتر از ۲۰ کاراکتر باشد.");
+                inputElement.classList.add('invalid');
+                return null;
+            }
+            
+            hideErrorMessage(errorElement);
+            inputElement.classList.remove('invalid');
+            return trimmedName;
+        }
+        
+        function generateAlphanumericPublicUserId(length = 5) {
             const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
             let result = '';
-            for (let i = 0; i < 5; i++) {
-                result += characters.charAt(Math.floor(Math.random() * characters.length));
+            const charactersLength = characters.length;
+            for (let i = 0; i < length; i++) {
+                result += characters.charAt(Math.floor(Math.random() * charactersLength));
             }
             return result;
         }
 
-        /**
-         * Saves the new user's data to Firestore.
-         * @param {string} displayName - The user's chosen display name.
-         */
-        async function saveUserData(displayName) {
-            if (!currentUserId || !publicUserId) {
-                console.error("Cannot save data: missing user ID or public ID.");
-                return;
+        // --- Firebase Functions ---
+        
+        async function isDisplayNameTaken(nameToCheck) {
+            if (!db) {
+                console.error("Firestore DB not initialized.");
+                showErrorMessage(nameErrorMessage, "خطا در اتصال به سرور. لطفاً صفحه را رفرش کنید.");
+                return true; // Fail safe
             }
             
-            // Data for the user's private profile
-            const userDocRef = doc(db, `artifacts/${appId}/users/${currentUserId}/mafiaGameData/profile`);
-            const privateData = {
-                displayName: displayName,
-                publicUserId: publicUserId,
-                currentStage: 1, // Start at stage 1
-                avatarUrl: '', // No avatar on registration
-                seenQuestionHashes: [],
-                createdAt: serverTimestamp()
-            };
-
-            // Data for the public leaderboard
-            const leaderboardDocRef = doc(db, `artifacts/${appId}/publicLeaderboard/${currentUserId}`);
-            const publicData = {
-                displayName: displayName,
-                publicUserId: publicUserId,
-                currentStage: 1,
-                avatarUrl: '',
-                lastUpdated: serverTimestamp()
-            };
-
+            // IMPORTANT: This query requires a Firestore index.
+            // Go to your Firebase console -> Firestore -> Indexes and create a single-field index for 'displayName' on the 'publicLeaderboard' collection.
+            const leaderboardRef = collection(db, `publicLeaderboard`);
+            const q = query(leaderboardRef, where("displayName", "==", nameToCheck), limit(1));
+            
             try {
-                // Save both documents in parallel
-                await Promise.all([
-                    setDoc(userDocRef, privateData),
-                    setDoc(leaderboardDocRef, publicData)
-                ]);
-                console.log("User data created successfully for:", currentUserId);
+                const querySnapshot = await getDocs(q);
+                return !querySnapshot.empty; // If it's not empty, the name is taken.
             } catch (error) {
-                console.error("Error saving user data:", error);
-                throw new Error("مشکلی در ذخیره اطلاعات شما در سرور پیش آمد.");
+                console.error("Error checking display name uniqueness:", error);
+                showErrorMessage(nameErrorMessage, `خطای سرور: ${error.message}. (آیا ایندکس را در فایربیس ساخته‌اید؟)`);
+                return true; // Assume it's taken to prevent duplicates
             }
         }
 
-        /**
-         * Handles the main registration button click.
-         */
+        async function saveUserData(uid, displayName, publicUserId) {
+            if (!db || !uid) return;
+
+            const userData = {
+                displayName: displayName,
+                publicUserId: publicUserId,
+                currentStage: 1, // Start every new user at stage 1
+                avatarUrl: '',   // Default empty avatar
+                lastUpdated: serverTimestamp()
+            };
+            
+            // We save the same data to two places:
+            // 1. A private path for the user's full game data
+            // 2. A public path for the leaderboard
+            const userDocRef = doc(db, `users/${uid}`);
+            const leaderboardDocRef = doc(db, `publicLeaderboard/${uid}`);
+
+            try {
+                await Promise.all([
+                    setDoc(userDocRef, userData, { merge: true }),
+                    setDoc(leaderboardDocRef, userData, { merge: true })
+                ]);
+                console.log("User data saved successfully for", uid);
+            } catch (error) {
+                console.error("Error saving user data:", error);
+                alert("مشکلی در ذخیره اطلاعات شما پیش آمد. لطفاً دوباره تلاش کنید.");
+            }
+        }
+
+        // --- Event Handlers ---
+
+        function handleGenerateId() {
+            const newId = generateAlphanumericPublicUserId();
+            userIdDisplay.value = newId;
+            hideErrorMessage(idErrorMessage);
+        }
+
         async function handleRegistration() {
             // 1. Validate inputs
             const validatedName = validateAndSanitizeName(displayNameInput.value);
-            
-            let isPublicIdValid = false;
-            if (!publicUserId) {
-                userIdErrorMessage.textContent = "لطفاً ابتدا یک شناسه کاربری بسازید.";
-                userIdErrorMessage.classList.remove('hidden');
-            } else {
-                userIdErrorMessage.classList.add('hidden');
-                isPublicIdValid = true;
+            const publicId = userIdDisplay.value;
+
+            let isFormValid = true;
+            if (!validatedName) {
+                isFormValid = false;
+            }
+            if (!publicId) {
+                showErrorMessage(idErrorMessage, "لطفاً ابتدا یک شناسه کاربری بسازید.");
+                isFormValid = false;
             }
 
-            if (!validatedName || !isPublicIdValid) return;
+            if (!isFormValid) return;
+            
+            if (!currentUserId) {
+                alert("در حال اتصال به سرور... لطفاً چند لحظه صبر کرده و دوباره تلاش کنید.");
+                return;
+            }
 
-            // 2. Disable button to prevent multiple submissions
-            registerBtn.disabled = true;
-            registerBtn.textContent = 'در حال بررسی...';
+            // 2. Start loading state
+            toggleLoading(true);
 
+            // 3. Check if name is taken
+            const nameIsTaken = await isDisplayNameTaken(validatedName);
+            if (nameIsTaken) {
+                showErrorMessage(nameErrorMessage, "این نام قبلا توسط شخص دیگری انتخاب شده است.");
+                displayNameInput.classList.add('invalid');
+                toggleLoading(false);
+                return;
+            }
+            
+            // 4. Save data to Firebase
             try {
-                // 3. Check if name is unique
-                const nameIsTaken = await isDisplayNameTaken(validatedName);
-                if (nameIsTaken) {
-                    inputErrorMessage.textContent = "این نام قبلا توسط شخص دیگری انتخاب شده است.";
-                    inputErrorMessage.classList.remove('hidden');
-                    displayNameInput.classList.add('invalid');
-                    return; // Stop the process
-                }
+                await saveUserData(currentUserId, validatedName, publicId);
 
-                // 4. Save data to Firestore
-                await saveUserData(validatedName);
-                
-                // 5. Show success message
-                registrationFormPanel.classList.add('hidden');
-                successPanel.classList.remove('hidden');
+                // 5. Show success and redirect
+                registrationPanel.classList.add('hidden');
+                successName.textContent = validatedName;
+                successMessage.classList.remove('hidden');
+
+                setTimeout(() => {
+                    // *** ACTION AFTER SUCCESSFUL REGISTRATION ***
+                    // You can redirect to the main game page here.
+                    // For example: window.location.href = 'index.html';
+                    console.log("Registration successful! Redirecting...");
+                    alert(`ثبت نام موفق! به صفحه بازی هدایت می‌شوید. (این یک پیام تستی است، کد ریدایرکت را فعال کنید)`);
+                }, 3000);
 
             } catch (error) {
-                inputErrorMessage.textContent = error.message;
-                inputErrorMessage.classList.remove('hidden');
-            } finally {
-                // 6. Re-enable button in case of failure
-                registerBtn.disabled = false;
-                registerBtn.textContent = 'ثبت نام و ورود به شهر';
+                console.error("Registration failed:", error);
+                alert("خطایی در فرآیند ثبت نام رخ داد. لطفاً دوباره تلاش کنید.");
+                toggleLoading(false);
             }
+        }
+
+        // --- Initialization ---
+
+        function setupEventListeners() {
+            generateUserIdBtn.addEventListener('click', handleGenerateId);
+            registerBtn.addEventListener('click', handleRegistration);
+            displayNameInput.addEventListener('keydown', (e) => {
+                if(e.key === 'Enter') {
+                    registerBtn.click();
+                }
+            });
         }
         
-        /**
-         * Sets up all event listeners for the form.
-         */
-        function setupEventListeners() {
-            if (generateUserIdBtn) {
-                generateUserIdBtn.addEventListener('click', () => {
-                    publicUserId = generateAlphanumericPublicUserId();
-                    userIdDisplayInput.value = publicUserId;
-                    userIdErrorMessage.classList.add('hidden');
-                });
-            }
-            
-            if (registerBtn) {
-                registerBtn.addEventListener('click', handleRegistration);
-            }
+        async function initialize() {
+            try {
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+                console.log("Firebase Initialized Successfully.");
 
-            if (displayNameInput) {
-                // Allow submitting with the Enter key
-                displayNameInput.addEventListener('keydown', (event) => {
-                    if (event.key === 'Enter') {
-                        event.preventDefault();
-                        handleRegistration();
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        currentUserId = user.uid;
+                        console.log("User is signed in anonymously:", currentUserId);
+                    } else {
+                        console.log("No user found. Signing in anonymously...");
+                        await signInAnonymously(auth);
                     }
                 });
-                // Real-time validation feedback
-                displayNameInput.addEventListener('input', () => {
-                     validateAndSanitizeName(displayNameInput.value);
-                });
+
+                setupEventListeners();
+
+            } catch (error) {
+                console.error("Firebase Initialization Error:", error);
+                document.body.innerHTML = `<div style="color: var(--color-accent); text-align: center;"><h1>خطای اساسی</h1><p>امکان اتصال به سرور بازی وجود ندارد. لطفاً از اتصال اینترنت خود مطمئن شوید و صفحه را رفرش کنید.</p></div>`;
             }
         }
 
-        // --- Start the application ---
-        document.addEventListener('DOMContentLoaded', () => {
-            setupEventListeners();
-            initFirebase();
-        });
+        initialize();
+
     </script>
+
 </body>
 </html>
