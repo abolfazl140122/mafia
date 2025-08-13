@@ -3,250 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>شهر مافیا - ثبت نام</title>
-    
-    <!-- فونت وزیرمتن برای خوانایی -->
+    <title>شهر مافیا - ساخت حساب کاربری</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
-    
     <style>
-        /* ==================== CSS - تم چوب تیره و طلا ==================== */
         :root {
-            --wood-dark: #1a140f;
-            --wood-texture-url: url('https://www.transparenttextures.com/patterns/dark-wood.png');
-            --panel-bg: #3a2d20;
-            --panel-bg-gradient: linear-gradient(145deg, #4a3a2a, #2c2218);
-            --panel-border: #5c4a3a;
-            --text-gold: #ffc947;
-            --text-gold-dark: #e5a500;
-            --text-light: #e0dacc;
-            --error-color: #ff5252;
-            --success-color: #4caf50;
+            --bg-color: #f4f1ea;
+            --panel-bg: #ffffff;
+            --primary-color: #4a2c2a;
+            --accent-color: #c5a687;
+            --text-color: #3d3d3d;
+            --error-color: #d9534f;
+            --border-color: #e0dacc;
         }
 
-        /* --- انیمیشن‌ها --- */
-        @keyframes panel-intro {
-            from { opacity: 0; transform: translateY(40px) scale(0.98); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* --- استایل‌های اصلی --- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { height: 100%; }
         body {
             font-family: 'Vazirmatn', sans-serif;
-            background-color: var(--wood-dark);
-            background-image: var(--wood-texture-url);
-            color: var(--text-light);
+            background-color: var(--bg-color);
+            color: var(--text-color);
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 100%;
+            min-height: 100vh;
             padding: 20px;
         }
 
-        .container {
+        .auth-container {
             width: 100%;
-            max-width: 450px;
-            animation: panel-intro 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+            max-width: 420px;
+            background: var(--panel-bg);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+            text-align: center;
         }
 
-        .register-panel {
-            background: var(--panel-bg-gradient);
-            border-radius: 20px;
-            border: 2px solid var(--panel-border);
-            padding: 30px 35px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 1px 3px rgba(255,255,255,0.1);
-        }
-
-        .panel-header { text-align: center; margin-bottom: 25px; }
-        .panel-header img { width: 100px; margin-bottom: 10px; }
-        .panel-header h1 {
+        .auth-title {
             font-size: 2.5rem;
             font-weight: 900;
-            color: var(--text-gold);
-            text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+            color: var(--primary-color);
+            margin-bottom: 10px;
         }
-        .panel-header p { font-size: 1rem; color: var(--text-light); opacity: 0.8; }
 
-        /* --- فرم --- */
-        .input-group { margin-bottom: 20px; }
+        .auth-subtitle {
+            font-size: 1rem;
+            color: #777;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: right;
+        }
+
         .input-group label {
             display: block;
             margin-bottom: 8px;
             font-weight: 700;
             font-size: 0.9rem;
-            color: var(--text-gold);
         }
 
-        .input-field {
+        .auth-input {
             width: 100%;
             padding: 12px 15px;
-            background-color: #2a1f15;
-            border: 2px solid var(--panel-border);
-            border-radius: 10px;
-            color: var(--text-light);
-            font-family: 'Vazirmatn', sans-serif;
             font-size: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
             transition: border-color 0.3s, box-shadow 0.3s;
-        }
-        .input-field:focus {
-            outline: none;
-            border-color: var(--text-gold);
-            box-shadow: 0 0 10px rgba(255, 201, 71, 0.3);
-        }
-        .input-field.invalid { border-color: var(--error-color); }
-
-        .password-group { position: relative; }
-        .password-toggle {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: #999;
-            font-size: 1.2rem;
-        }
-
-        #generate-user-id-btn {
-            padding: 12px 15px;
-            font-size: 0.9rem;
-            background: #555;
-            border: none;
-            color: #fff;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        #generate-user-id-btn:hover { background: #666; }
-
-        .register-btn {
-            width: 100%;
-            padding: 15px;
             font-family: 'Vazirmatn', sans-serif;
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--wood-dark);
-            background: linear-gradient(180deg, var(--text-gold), var(--text-gold-dark));
-            border: 2px solid #a07200;
-            border-radius: 12px;
-            cursor: pointer;
-            box-shadow: 0 4px 0 #a07200;
-            transition: all 0.15s ease-out;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
         }
-        .register-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 0 #a07200; }
-        .register-btn:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 2px 0 #a07200; }
-        .register-btn:disabled {
-            background: #555;
-            box-shadow: 0 4px 0 #333;
-            cursor: not-allowed;
-            color: #999;
+        .auth-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(197, 166, 135, 0.3);
         }
 
-        .loader {
-            width: 18px;
-            height: 18px;
-            border: 2px solid #fff;
-            border-bottom-color: transparent;
-            border-radius: 50%;
-            display: inline-block;
-            animation: spin 1s linear infinite;
+        .auth-button {
+            width: 100%;
+            padding: 14px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+            background-color: var(--primary-color);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
         }
-        .hidden { display: none; }
+        .auth-button:hover {
+            background-color: #382120;
+        }
+        .auth-button:active {
+            transform: scale(0.98);
+        }
+        .auth-button:disabled {
+            background-color: #9d8a7a;
+            cursor: not-allowed;
+        }
+
+        .auth-link {
+            margin-top: 25px;
+            font-size: 0.9rem;
+        }
+        .auth-link a {
+            color: var(--primary-color);
+            font-weight: 700;
+            text-decoration: none;
+        }
 
         .error-message {
             color: var(--error-color);
-            font-size: 0.9rem;
-            margin-top: 5px;
-            min-height: 1.2em;
-        }
-
-        .form-footer {
+            background-color: rgba(217, 83, 79, 0.1);
+            padding: 10px;
+            border-radius: 8px;
             margin-top: 20px;
-            text-align: center;
             font-size: 0.9rem;
+            display: none; /* Hidden by default */
         }
-        .form-footer a {
-            color: var(--text-gold);
-            text-decoration: none;
-            font-weight: 700;
-        }
-        .form-footer a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
-
-    <div class="container">
-        <div class="register-panel">
-            <div class="panel-header">
-                <img src="https://up.20script.ir/file/40b6-Copilot-20250812-110015-removebg-preview.png" alt="لوگو">
-                <h1>ثبت نام</h1>
-                <p>به شهر مافیا خوش آمدید. یک حساب کاربری بسازید.</p>
+    <div class="auth-container">
+        <h1 class="auth-title">ثبت نام</h1>
+        <p class="auth-subtitle">برای ورود به شهر مافیا، یک حساب کاربری بسازید.</p>
+        
+        <form id="registration-form">
+            <div class="input-group">
+                <label for="display-name">نام نمایشی (فقط انگلیسی)</label>
+                <input type="text" id="display-name" class="auth-input" required>
             </div>
-
-            <form id="register-form" novalidate>
-                <!-- نام نمایشی -->
-                <div class="input-group">
-                    <label for="display-name">نام نمایشی (فقط انگلیسی)</label>
-                    <input type="text" id="display-name" class="input-field" placeholder="مثال: Godfather" required maxlength="20">
-                    <p class="error-message" id="display-name-error"></p>
-                </div>
-                <!-- ایمیل -->
-                <div class="input-group">
-                    <label for="email">ایمیل</label>
-                    <input type="email" id="email" class="input-field" placeholder="email@example.com" required>
-                    <p class="error-message" id="email-error"></p>
-                </div>
-                <!-- رمز عبور -->
-                <div class="input-group password-group">
-                    <label for="password">رمز عبور (حداقل ۶ کاراکتر)</label>
-                    <input type="password" id="password" class="input-field" placeholder="••••••••" required minlength="6">
-                    <span id="toggle-password" class="password-toggle">👁️</span>
-                    <p class="error-message" id="password-error"></p>
-                </div>
-                <!-- شناسه کاربری -->
-                <div class="input-group">
-                    <label for="user-id-display">شناسه کاربری شما (۵ رقمی)</label>
-                    <div style="display: flex; gap: 10px;">
-                        <input type="text" id="user-id-display" class="input-field" readonly>
-                        <button type="button" id="generate-user-id-btn">ساخت</button>
-                    </div>
-                    <p class="error-message" id="user-id-error"></p>
-                </div>
-
-                <!-- پیام خطای کلی -->
-                <p class="error-message" id="general-error" style="text-align:center; font-weight:bold;"></p>
-
-                <!-- دکمه ثبت نام -->
-                <button type="submit" class="register-btn" id="register-btn">
-                    <span id="btn-text">ساخت حساب کاربری</span>
-                    <div id="btn-loader" class="loader hidden"></div>
-                </button>
-            </form>
-
-            <div class="form-footer">
-                <p>قبلا ثبت نام کرده‌اید؟ <a href="login.html">وارد شوید</a></p>
+            <div class="input-group">
+                <label for="email">ایمیل</label>
+                <input type="email" id="email" class="auth-input" required>
             </div>
-        </div>
+            <div class="input-group">
+                <label for="password">رمز عبور (حداقل ۶ کاراکتر)</label>
+                <input type="password" id="password" class="auth-input" required>
+            </div>
+            <button type="submit" id="register-button" class="auth-button">ساخت حساب</button>
+        </form>
+
+        <p id="error-message" class="error-message"></p>
+
+        <p class="auth-link">
+            حساب کاربری دارید؟ <a href="./login.html">وارد شوید</a>
+        </p>
     </div>
 
     <script type="module">
-        // ==================== JAVASCRIPT - منطق ثبت نام ====================
-
-        // ایمپورت توابع مورد نیاز از فایربیس
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getAuth, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // کانفیگ فایربیس شما
         const firebaseConfig = {
           apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
           authDomain: "mafia-9fcbf.firebaseapp.com",
@@ -257,131 +168,83 @@
           measurementId: "G-0PDHDWC6NV"
         };
 
-        // راه‌اندازی فایربیس
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // انتخاب عناصر DOM
-        const form = document.getElementById('register-form');
+        const registrationForm = document.getElementById('registration-form');
         const displayNameInput = document.getElementById('display-name');
         const emailInput = document.getElementById('email');
         const passwordInput = document.getElementById('password');
-        const userIdInput = document.getElementById('user-id-display');
-        const generateIdBtn = document.getElementById('generate-user-id-btn');
-        const togglePasswordBtn = document.getElementById('toggle-password');
-        const registerBtn = document.getElementById('register-btn');
-        const btnText = document.getElementById('btn-text');
-        const btnLoader = document.getElementById('btn-loader');
+        const registerButton = document.getElementById('register-button');
+        const errorMessage = document.getElementById('error-message');
 
-        // انتخاب عناصر خطا
-        const displayNameError = document.getElementById('display-name-error');
-        const emailError = document.getElementById('email-error');
-        const passwordError = document.getElementById('password-error');
-        const userIdError = document.getElementById('user-id-error');
-        const generalError = document.getElementById('general-error');
-
-        // --- توابع کمکی ---
-
-        function showLoader(isLoading) {
-            registerBtn.disabled = isLoading;
-            btnText.classList.toggle('hidden', isLoading);
-            btnLoader.classList.toggle('hidden', !isLoading);
-        }
-        
-        function generatePublicId(length = 5) {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let result = '';
-            for (let i = 0; i < length; i++) {
-                result += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return result;
-        }
-
-        // --- رویدادها ---
-
-        generateIdBtn.addEventListener('click', () => {
-            userIdInput.value = generatePublicId();
-            userIdError.textContent = '';
-        });
-
-        togglePasswordBtn.addEventListener('click', () => {
-            const isPassword = passwordInput.type === 'password';
-            passwordInput.type = isPassword ? 'text' : 'password';
-            togglePasswordBtn.textContent = isPassword ? '🙈' : '👁️';
-        });
-
-        form.addEventListener('submit', async (e) => {
+        registrationForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            // پاک کردن خطاهای قبلی
-            displayNameError.textContent = '';
-            emailError.textContent = '';
-            passwordError.textContent = '';
-            userIdError.textContent = '';
-            generalError.textContent = '';
-
-            // گرفتن مقادیر
             const displayName = displayNameInput.value.trim();
             const email = emailInput.value.trim();
             const password = passwordInput.value.trim();
-            const publicId = userIdInput.value;
 
-            // اعتبارسنجی
-            let isValid = true;
-            if (!/^[a-zA-Z0-9_.-]{3,20}$/.test(displayName)) {
-                displayNameError.textContent = 'نام باید 3 تا 20 کاراکتر انگلیسی باشد.';
-                isValid = false;
+            if (!displayName || !email || !password) {
+                showError("لطفاً تمام فیلدها را پر کنید.");
+                return;
             }
             if (password.length < 6) {
-                passwordError.textContent = 'رمز عبور باید حداقل ۶ کاراکتر باشد.';
-                isValid = false;
+                showError("رمز عبور باید حداقل ۶ کاراکتر باشد.");
+                return;
             }
-            if (publicId.length !== 5) {
-                userIdError.textContent = 'لطفا یک شناسه کاربری بسازید.';
-                isValid = false;
+            if (/[^a-zA-Z0-9_.]/.test(displayName)) {
+                showError("نام نمایشی فقط می‌تواند شامل حروف و اعداد انگلیسی، نقطه و آندرلاین باشد.");
+                return;
             }
-            if (!isValid) return;
 
-            showLoader(true);
+            registerButton.disabled = true;
+            registerButton.textContent = 'در حال ساخت...';
+            errorMessage.style.display = 'none';
 
             try {
-                // 1. ساخت کاربر جدید در Firebase Authentication
+                // 1. Create user in Firebase Auth
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
+                
+                // 2. Update user's profile with display name
+                await updateProfile(user, { displayName: displayName });
 
-                // 2. ذخیره اطلاعات تکمیلی در Firestore
-                // ما یک سند جدید در مجموعه 'users' با شناسه (UID) کاربر ایجاد می‌کنیم.
-                await setDoc(doc(db, "users", user.uid), {
+                // 3. Create a user document in Firestore
+                const userDocRef = doc(db, 'users', user.uid);
+                await setDoc(userDocRef, {
+                    uid: user.uid,
                     displayName: displayName,
-                    publicId: publicId,
-                    email: user.email, // ذخیره ایمیل برای مراجعات بعدی
-                    createdAt: new Date(), // تاریخ ساخت حساب
-                    currentStage: 1 // مرحله اولیه بازی
+                    email: user.email,
+                    createdAt: new Date(),
+                    currentStage: 1, // Start at stage 1
+                    avatarUrl: '' // Empty avatar initially
                 });
 
-                // 3. موفقیت! انتقال به صفحه اصلی بازی
-                alert(`ثبت نام موفقیت آمیز بود! خوش آمدی ${displayName}. در حال انتقال به بازی...`);
-                // در پروژه واقعی، کاربر به صفحه اصلی بازی یا لودینگ هدایت می‌شود
-                window.location.href = 'main.html'; // یا هر صفحه دیگری که بازی اصلی در آن است
+                // 4. Redirect to the game page after successful registration
+                window.location.href = './شهر مافیا رفع باگ.txt'; // <-- آدرس صفحه اصلی بازی
 
             } catch (error) {
-                // مدیریت خطاهای فایربیس
-                console.error("Firebase registration error:", error.code, error.message);
+                let friendlyMessage = "خطایی رخ داد. لطفاً دوباره تلاش کنید.";
                 if (error.code === 'auth/email-already-in-use') {
-                    generalError.textContent = 'این ایمیل قبلا ثبت نام شده است.';
-                } else if (error.code === 'auth/invalid-email') {
-                    emailError.textContent = 'فرمت ایمیل وارد شده صحیح نیست.';
+                    friendlyMessage = "این ایمیل قبلاً ثبت شده است. لطفاً وارد شوید.";
                 } else if (error.code === 'auth/weak-password') {
-                    passwordError.textContent = 'رمز عبور ضعیف است. لطفاً رمز قوی‌تری انتخاب کنید.';
-                } else {
-                    generalError.textContent = 'خطایی در ثبت نام رخ داد. لطفاً دوباره تلاش کنید.';
+                    friendlyMessage = "رمز عبور ضعیف است. لطفاً رمز قوی‌تری انتخاب کنید.";
                 }
+                console.error("Registration Error:", error);
+                showError(friendlyMessage);
             } finally {
-                showLoader(false);
+                registerButton.disabled = false;
+                registerButton.textContent = 'ساخت حساب';
             }
         });
-    </script>
 
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+        }
+
+    </script>
 </body>
 </html>
