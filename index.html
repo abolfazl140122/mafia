@@ -22,10 +22,12 @@
             --glow-red: #ff3131;
             --logo-glow-main: #ffdd00;
             --progress-bar-bg: #2a1f15;
-            --progress-bar-fill-start: #1eff00; /* Green for success */
+            --progress-bar-fill-start: #1eff00;
             --progress-bar-fill-end: #00ff87;
-            --progress-bar-error-start: #ff416c; /* Red for error */
+            --progress-bar-error-start: #ff416c;
             --progress-bar-error-end: #ff4b2b;
+            --success-color: #28a745;
+            --error-color: #dc3545;
         }
 
         @keyframes panel-intro {
@@ -67,8 +69,6 @@
             animation: panel-intro 1s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
-        /* The original image used a different logo, I've used a placeholder that matches the style. */
-        /* Please replace "YOUR_LOGO_URL.png" with the actual URL to your logo. */
         #logo-container {
             position: relative; margin: 0 auto 25px auto; width: 180px; height: 180px;
             display: flex; align-items: center; justify-content: center;
@@ -79,10 +79,7 @@
             filter: blur(40px); animation: dual-glow-pulse 6s linear infinite;
         }
         #logo {
-            /* This is a generated logo to match the image. Replace with your own if you have it. */
-            content: url('https://i.ibb.co/6y40Wd4/escort-game-logo.png');
             width: 100%; height: auto; position: relative; z-index: 1;
-            filter: drop-shadow(0 0 8px var(--logo-glow-main));
             animation: logo-glow 3s ease-in-out infinite;
         }
         
@@ -92,29 +89,23 @@
         }
 
         #progress-bar-container {
-            width: 100%; height: 14px; background-color: var(--progress-bar-bg);
+            width: 100%; height: 20px; background-color: var(--progress-bar-bg);
             border-radius: 10px; padding: 3px; margin-bottom: 15px;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.4);
         }
         #progress-bar-fill {
             width: 0%; height: 100%; border-radius: 7px;
             background: linear-gradient(90deg, var(--progress-bar-fill-start), var(--progress-bar-fill-end));
-            transition: width 0.4s cubic-bezier(0.65, 0, 0.35, 1), background 0.5s ease;
+            transition: width 0.5s cubic-bezier(0.65, 0, 0.35, 1), background 0.5s ease;
         }
         #progress-bar-fill.error {
             background: linear-gradient(90deg, var(--progress-bar-error-start), var(--progress-bar-error-end));
         }
 
         #status-message { 
-            font-size: 1rem; 
-            font-weight: 400; 
-            min-height: 24px; 
+            font-size: 1.1rem; 
+            font-weight: 700; 
+            min-height: 28px; 
             color: var(--text-light);
-            transition: color 0.5s ease;
-        }
-        #status-message.error {
-            color: var(--progress-bar-error-start);
-            font-weight: 700;
         }
     </style>
 </head>
@@ -122,7 +113,7 @@
 
     <div id="loading-panel">
         <div id="logo-container">
-            <div id="logo"></div>
+            <img id="logo" src="https://up.20script.ir/file/40b6-Copilot-20250812-110015-removebg-preview.png" alt="لوگوی شهر مافیا">
         </div>
         <h1 id="title">شهر مافیا</h1>
         <div id="progress-bar-container">
@@ -132,13 +123,12 @@
     </div>
     
     <script type="module">
-        // --- وارد کردن ماژول‌های لازم از Firebase ---
+        // وارد کردن ماژول‌های لازم از Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, getDoc, enableNetwork } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // --- کانفیگ Firebase شما ---
-        // !!! توجه: این اطلاعات حساس نیستند و عمومی محسوب می‌شوند
+        // کانفیگ Firebase شما
         const firebaseConfig = {
             apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
             authDomain: "mafia-9fcbf.firebaseapp.com",
@@ -149,96 +139,95 @@
             measurementId: "G-0PDHDWC6NV"
         };
         
-        // --- انتخاب عناصر DOM ---
+        // انتخاب عناصر DOM
         const progressBarFill = document.getElementById('progress-bar-fill');
         const statusMessage = document.getElementById('status-message');
 
         /**
+         * تابع کمکی برای ایجاد تاخیر
+         * @param {number} ms - مدت زمان تاخیر به میلی‌ثانیه
+         */
+        const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+        /**
          * تابع برای به‌روزرسانی نوار پیشرفت و پیام
          * @param {number} percent - درصد پیشرفت
-         * @param {string} message - پیام جدید برای کاربر
-         * @param {boolean} [isError=false] - آیا این پیام یک خطاست؟
+         * @param {string} message - پیام جدید
          */
-        function updateProgress(percent, message, isError = false) {
+        function updateProgress(percent, message) {
             progressBarFill.style.width = `${percent}%`;
             statusMessage.textContent = message;
-            if (isError) {
-                progressBarFill.classList.add('error');
-                statusMessage.classList.add('error');
-            } else {
-                progressBarFill.classList.remove('error');
-                statusMessage.classList.remove('error');
-            }
         }
 
         /**
-         * تابع اصلی برای شروع فرآیند لودینگ
+         * تابع اصلی برای شروع فرآیند لودینگ واقعی و هوشمند
          */
         async function initLoadingSequence() {
-            // مرحله 1: بررسی اتصال اولیه اینترنت در مرورگر
-            if (!navigator.onLine) {
-                updateProgress(100, 'امکان اتصال وجود ندارد. لطفاً اتصال اینترنت خود را بررسی کنید.', true);
-                return;
-            }
-
             try {
-                // مرحله 2: راه‌اندازی Firebase
-                updateProgress(15, '...در حال راه‌اندازی سیستم');
+                // --- مرحله ۱: شروع و راه‌اندازی اولیه ---
+                updateProgress(20, '...در حال راه‌اندازی سیستم');
                 const app = initializeApp(firebaseConfig);
                 const auth = getAuth(app);
                 const db = getFirestore(app);
-                await enableNetwork(db); // اطمینان از فعال بودن شبکه برای Firestore
+                updateProgress(40, '...برقراری ارتباط با سرورهای شهر');
                 
-                updateProgress(30, '...برقراری ارتباط با سرورهای شهر');
+                // --- مرحله ۲: بررسی وضعیت ورود کاربر ---
+                const user = await new Promise((resolve, reject) => {
+                    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+                        unsubscribe(); // این تابع فقط یک بار اجرا می‌شود و سپس لغو می‌شود
+                        resolve(currentUser);
+                    }, (error) => {
+                        unsubscribe();
+                        reject(error);
+                    });
 
-                // مرحله 3: بررسی وضعیت ورود کاربر با onAuthStateChanged
-                // این تابع بهترین راه برای چک کردن وضعیت کاربر است
-                onAuthStateChanged(auth, async (user) => {
-                    if (user) {
-                        // کاربر وارد شده است
-                        updateProgress(60, '...خوش آمدید! در حال واکشی اطلاعات');
-                        
-                        try {
-                            // واکشی اطلاعات پروفایل از Firestore
-                            const userDocRef = doc(db, "users", user.uid); // فرض بر این است که اطلاعات در کالکشن users ذخیره شده
-                            const userDocSnap = await getDoc(userDocRef);
-                            let displayName = user.email.split('@')[0]; // نام پیش‌فرض
-
-                            if (userDocSnap.exists() && userDocSnap.data().displayName) {
-                                displayName = userDocSnap.data().displayName;
-                            }
-                            
-                            updateProgress(100, `!${displayName} عزیز، در حال ورود به بازی`);
-                            
-                            // تاخیر کوتاه برای نمایش پیام و سپس هدایت
-                            setTimeout(() => {
-                                window.location.href = './main.html'; // هدایت به صفحه اصلی بازی
-                            }, 1500);
-
-                        } catch (firestoreError) {
-                            console.error("خطا در واکشی اطلاعات Firestore:", firestoreError);
-                            updateProgress(100, 'خطا در دریافت اطلاعات بازیکن!', true);
-                        }
-
-                    } else {
-                        // کاربر وارد نشده است
-                        updateProgress(100, 'در حال هدایت به صفحه ورود...');
-                        
-                        // تاخیر کوتاه برای نمایش پیام و سپس هدایت
-                        setTimeout(() => {
-                            window.location.href = './login.html'; // هدایت به صفحه ورود/ثبت‌نام
-                        }, 2000);
-                    }
-                }, (authError) => {
-                    // این بخش برای خطاهایی است که در خود onAuthStateChanged رخ می‌دهد
-                    console.error("خطای احراز هویت Firebase:", authError);
-                    updateProgress(100, 'خطا در سیستم احراز هویت!', true);
+                    // یک تایم‌اوت ۱۰ ثانیه‌ای برای جلوگیری از انتظار بی‌نهایت
+                    setTimeout(() => reject(new Error("اتصال به سرور زمان‌بر شد")), 10000);
                 });
 
-            } catch (initializationError) {
-                // مدیریت خطا در فرآیند اولیه راه‌اندازی Firebase
-                console.error("خطا در راه‌اندازی اولیه Firebase:", initializationError);
-                updateProgress(100, 'امکان اتصال وجود ندارد. لطفاً اتصال اینترنت خود را بررسی کنید.', true);
+                await delay(1000); // تاخیر کوتاه برای نمایش بهتر
+
+                // --- مرحله ۳: تصمیم‌گیری بر اساس وضعیت کاربر ---
+                if (user) {
+                    // کاربر وارد شده است
+                    updateProgress(70, '...در حال واکشی اطلاعات بازیکن');
+
+                    // واکشی نام نمایشی از Firestore
+                    const userDocRef = doc(db, 'users', user.uid); // **مهم:** فرض شده اطلاعات در کالکشن 'users' است
+                    const userDocSnap = await getDoc(userDocRef);
+                    let displayName = 'بازیکن'; // نام پیش‌فرض
+                    
+                    if (userDocSnap.exists() && userDocSnap.data().displayName) {
+                        displayName = userDocSnap.data().displayName;
+                    } else {
+                        // اگر پروفایل یا نام نمایشی وجود نداشت، از بخش اول ایمیل استفاده کن
+                        displayName = user.email.split('@')[0];
+                    }
+
+                    updateProgress(100, `خوش آمدید، ${displayName}!`);
+                    await delay(2000); // ۲ ثانیه صبر می‌کنیم تا کاربر پیام را ببیند
+
+                    // **هدایت به صفحه اصلی بازی**
+                    window.location.href = './main.html';
+
+                } else {
+                    // کاربر وارد نشده است
+                    updateProgress(100, 'احراز هویت انجام نشده است.');
+                    await delay(1500);
+                    updateProgress(100, 'در حال هدایت به صفحه ورود...');
+                    await delay(1500);
+
+                    // **هدایت به صفحه ورود/ثبت‌نام**
+                    window.location.href = './login.html';
+                }
+
+            } catch (error) {
+                // مدیریت خطا در فرآیند لودینگ
+                console.error("خطا در فرآیند لودینگ:", error);
+                progressBarFill.classList.add('error');
+                updateProgress(100, 'خطا در اتصال به سرور!');
+                statusMessage.textContent = 'امکان اتصال وجود ندارد. لطفاً اتصال اینترنت خود را بررسی کنید.';
+                // در صورت خطا، کاربر در همین صفحه باقی می‌ماند.
             }
         }
 
