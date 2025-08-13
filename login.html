@@ -1,1 +1,188 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ورود به شهر مافیا</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #F8F4F1;
+            --panel-bg: #FFFFFF;
+            --text-dark: #4E342E;
+            --text-light: #795548;
+            --primary-brown: #795548;
+            --primary-brown-dark: #4E342E;
+        }
 
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        .auth-panel {
+            background-color: var(--panel-bg);
+            border-radius: 16px;
+            padding: 3rem;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            border: 1px solid #E0D8D3;
+            text-align: center;
+        }
+        
+        .welcome-title {
+            font-weight: 900;
+            font-size: 2rem;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        #display-name {
+            color: var(--primary-brown-dark);
+            font-weight: 900;
+        }
+
+        .welcome-subtitle {
+            color: var(--text-light);
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            border-radius: 8px;
+            font-weight: 700;
+            padding: 0.8rem 1.5rem;
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+            border: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-brown);
+            color: white;
+            width: 100%;
+            font-size: 1.1rem;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background-color: var(--primary-brown-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .loader {
+            border: 5px solid #EFEBE9;
+            border-top: 5px solid var(--primary-brown);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1.2s linear infinite;
+            margin: 1rem auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="auth-panel">
+        <!-- Loading State -->
+        <div id="loading-state">
+            <div class="loader"></div>
+            <p class="font-bold text-lg">در حال بررسی هویت شما...</p>
+            <p class="text-sm text-gray-500">لطفا کمی صبر کنید</p>
+        </div>
+
+        <!-- Welcome State (hidden by default) -->
+        <div id="welcome-state" class="hidden">
+            <h1 class="welcome-title">خوش آمدی، <span id="display-name"></span>!</h1>
+            <p class="welcome-subtitle">آماده‌ای که شهر رو به دست بگیری؟</p>
+            <button class="btn btn-primary">ورود به بازی</button>
+             <p class="text-xs text-gray-400 mt-4">
+                این یک دکمه نمایشی است. می‌توانید آن را به صفحه اصلی بازی لینک دهید.
+            </p>
+        </div>
+    </div>
+
+    <script type="module">
+        // 1. Import Firebase SDKs
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // 2. Your NEW Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
+            authDomain: "mafia-9fcbf.firebaseapp.com",
+            projectId: "mafia-9fcbf",
+            storageBucket: "mafia-9fcbf.appspot.com", // Corrected the domain
+            messagingSenderId: "471627157488",
+            appId: "1:471627157488:web:92f008548a5596619a5735",
+            measurementId: "G-0PDHDWC6NV"
+        };
+        
+        // 3. Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // 4. Get DOM Elements
+        const loadingState = document.getElementById('loading-state');
+        const welcomeState = document.getElementById('welcome-state');
+        const displayNameSpan = document.getElementById('display-name');
+
+        // 5. Firebase Authentication Flow
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // A user session exists (could be new or returning)
+                const userDocRef = doc(db, "users", user.uid);
+                
+                try {
+                    const docSnap = await getDoc(userDocRef);
+
+                    if (docSnap.exists()) {
+                        // Profile found! This is a returning, registered user.
+                        const userData = docSnap.data();
+                        console.log("Welcome back:", userData.displayName);
+                        
+                        // Show welcome message
+                        displayNameSpan.textContent = userData.displayName;
+                        loadingState.classList.add('hidden');
+                        welcomeState.classList.remove('hidden');
+
+                    } else {
+                        // No profile found for this UID. They need to register.
+                        console.log("No profile found. Redirecting to registration.");
+                        window.location.href = 'Registration.html';
+                    }
+                } catch (error) {
+                    console.error("Error fetching user document:", error);
+                    alert("خطا در دریافت اطلاعات. لطفاً اینترنت خود را بررسی کرده و صفحه را رفرش کنید.");
+                }
+
+            } else {
+                // No user session at all. Create one and then redirect.
+                console.log("No session found. Creating anonymous user and redirecting to registration.");
+                signInAnonymously(auth).catch((error) => {
+                    console.error("Anonymous sign-in error:", error);
+                    alert("خطا در برقراری ارتباط با سرور. لطفاً صفحه را رفرش کنید.");
+                });
+                // The onAuthStateChanged will run again after sign-in, and will then redirect.
+            }
+        });
+    </script>
+</body>
+</html>
