@@ -17,6 +17,7 @@
             --error-color: #d9534f;
             --border-color: #e0dacc;
         }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Vazirmatn', sans-serif;
@@ -28,6 +29,7 @@
             min-height: 100vh;
             padding: 20px;
         }
+
         .auth-container {
             width: 100%;
             max-width: 420px;
@@ -38,27 +40,88 @@
             border: 1px solid var(--border-color);
             text-align: center;
         }
-        .auth-title { font-size: 2.5rem; font-weight: 900; color: var(--primary-color); margin-bottom: 10px; }
-        .auth-subtitle { font-size: 1rem; color: #777; margin-bottom: 30px; }
-        .input-group { margin-bottom: 20px; text-align: right; }
-        .input-group label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 0.9rem; }
+
+        .auth-title {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .auth-subtitle {
+            font-size: 1rem;
+            color: #777;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: right;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
         .auth-input {
-            width: 100%; padding: 12px 15px; font-size: 1rem; border: 2px solid var(--border-color);
-            border-radius: 8px; transition: border-color 0.3s, box-shadow 0.3s; font-family: 'Vazirmatn', sans-serif;
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            font-family: 'Vazirmatn', sans-serif;
         }
-        .auth-input:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(197, 166, 135, 0.3); }
+        .auth-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(197, 166, 135, 0.3);
+        }
+
         .auth-button {
-            width: 100%; padding: 14px; font-size: 1.1rem; font-weight: 700; color: #fff; background-color: var(--primary-color);
-            border: none; border-radius: 8px; cursor: pointer; transition: background-color 0.3s, transform 0.1s;
+            width: 100%;
+            padding: 14px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+            background-color: var(--primary-color);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
         }
-        .auth-button:hover { background-color: #382120; }
-        .auth-button:active { transform: scale(0.98); }
-        .auth-button:disabled { background-color: #9d8a7a; cursor: not-allowed; }
-        .auth-link { margin-top: 25px; font-size: 0.9rem; }
-        .auth-link a { color: var(--primary-color); font-weight: 700; text-decoration: none; }
+        .auth-button:hover {
+            background-color: #382120;
+        }
+        .auth-button:active {
+            transform: scale(0.98);
+        }
+        .auth-button:disabled {
+            background-color: #9d8a7a;
+            cursor: not-allowed;
+        }
+
+        .auth-link {
+            margin-top: 25px;
+            font-size: 0.9rem;
+        }
+        .auth-link a {
+            color: var(--primary-color);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
         .error-message {
-            color: var(--error-color); background-color: rgba(217, 83, 79, 0.1); padding: 10px;
-            border-radius: 8px; margin-top: 20px; font-size: 0.9rem; display: none;
+            color: var(--error-color);
+            background-color: rgba(217, 83, 79, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            display: none; /* Hidden by default */
         }
     </style>
 </head>
@@ -82,7 +145,7 @@
         <p id="error-message" class="error-message"></p>
 
         <p class="auth-link">
-            هنوز عضو نشده‌اید؟ <a href="./Registration.html">ثبت‌نام کنید</a> <!-- **FIXED LINK** -->
+            هنوز عضو نشده‌اید؟ <a href="./registration.html">ثبت‌نام کنید</a>
         </p>
     </div>
 
@@ -90,14 +153,15 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
+        // NEW: Unified Firebase Config
         const firebaseConfig = {
-          apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
-          authDomain: "mafia-9fcbf.firebaseapp.com",
-          projectId: "mafia-9fcbf",
-          storageBucket: "mafia-9fcbf.appspot.com",
-          messagingSenderId: "471627157488",
-          appId: "1:471627157488:web:92f008548a5596619a5735",
-          measurementId: "G-0PDHDWC6NV"
+            apiKey: "AIzaSyBkUfmc3_TvcR8AkepIr1eB7YEvCD-7P3s",
+            authDomain: "city-mafia.firebaseapp.com",
+            projectId: "city-mafia",
+            storageBucket: "city-mafia.appspot.com",
+            messagingSenderId: "66458127103",
+            appId: "1:66458127103:web:8bcc2ad470f51b5db45aca",
+            measurementId: "G-8M0M6BJ0GG"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -116,7 +180,8 @@
             const password = passwordInput.value.trim();
 
             if (!email || !password) {
-                showError("لطفاً ایمیل و رمز عبور را وارد کنید."); return;
+                showError("لطفاً ایمیل و رمز عبور را وارد کنید.");
+                return;
             }
 
             loginButton.disabled = true;
@@ -125,8 +190,9 @@
 
             try {
                 await signInWithEmailAndPassword(auth, email, password);
-                // **FIXED REDIRECT**: Go to the loading page to check auth state
-                window.location.href = './index.html';
+                // On successful login, redirect to the main game page
+                // NEW: Correct redirect path
+                window.location.href = './main.html';
             } catch (error) {
                 let friendlyMessage = "ایمیل یا رمز عبور اشتباه است.";
                 if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
