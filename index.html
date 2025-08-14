@@ -17,8 +17,10 @@
             --panel-border: #5c4a3a;
             --text-gold: #ffc947;
             --text-light: #e0dacc;
+            --text-maintenance-message: #c7b8a8;
             --glow-green: #39ff14;
             --glow-red: #ff3131;
+            --glow-orange: #ff8c00;
             --logo-glow-main: #ffdd00;
             --progress-bar-bg: #2a1f15;
             --progress-bar-fill-start: #1eff00;
@@ -31,8 +33,23 @@
         @keyframes logo-glow { 0%, 100% { filter: drop-shadow(0 0 8px var(--logo-glow-main)) drop-shadow(0 0 16px rgba(255, 221, 0, 0.5)); } 50% { filter: drop-shadow(0 0 16px var(--logo-glow-main)) drop-shadow(0 0 32px rgba(255, 221, 0, 0.7)); } }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { height: 100%; overflow: hidden; }
-        body { font-family: 'Vazirmatn', sans-serif; background-color: var(--wood-dark); background-image: var(--wood-texture-url); color: var(--text-light); display: flex; align-items: center; justify-content: center; }
-        #loading-panel { width: 100%; max-width: 480px; background: var(--panel-bg-gradient); border-radius: 24px; border: 2px solid var(--panel-border); padding: 30px 40px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5); text-align: center; animation: panel-intro 1s cubic-bezier(0.25, 1, 0.5, 1); }
+        body { font-family: 'Vazirmatn', sans-serif; background-color: var(--wood-dark); background-image: var(--wood-texture-url); color: var(--text-light); display: flex; align-items: center; justify-content: center; padding: 20px; }
+        
+        /* General Panel Style */
+        .panel {
+            width: 100%;
+            max-width: 480px;
+            background: var(--panel-bg-gradient);
+            border-radius: 24px;
+            border: 2px solid var(--panel-border);
+            padding: 30px 40px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            animation: panel-intro 1s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .hidden { display: none; }
+
+        /* Loading Panel Specifics */
         #logo-container { position: relative; margin: 0 auto 25px auto; width: 180px; height: 180px; display: flex; align-items: center; justify-content: center; }
         #logo-container::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: conic-gradient(var(--glow-green), var(--glow-red), var(--glow-green)); filter: blur(40px); animation: dual-glow-pulse 6s linear infinite; }
         #logo { width: 100%; height: auto; position: relative; z-index: 1; animation: logo-glow 3s ease-in-out infinite; }
@@ -41,11 +58,47 @@
         #progress-bar-fill { width: 0%; height: 100%; border-radius: 7px; background: linear-gradient(90deg, var(--progress-bar-fill-start), var(--progress-bar-fill-end)); transition: width 0.5s cubic-bezier(0.65, 0, 0.35, 1), background 0.5s ease; }
         #progress-bar-fill.error { background: linear-gradient(90deg, var(--progress-bar-error-start), var(--progress-bar-error-end)); }
         #status-message { font-size: 1.1rem; font-weight: 700; min-height: 28px; color: var(--text-light); }
+
+        /* Maintenance Panel Specifics */
+        #maintenance-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        #maintenance-icon {
+            width: 80px;
+            height: 80px;
+            color: var(--glow-orange);
+            filter: drop-shadow(0 0 10px var(--glow-orange));
+        }
+        #maintenance-title {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: var(--text-gold);
+            text-shadow: 0 0 5px rgba(255, 201, 71, 0.5);
+        }
+        #maintenance-message {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--text-maintenance-message);
+            max-width: 90%;
+        }
+        #maintenance-time {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-gold);
+            background-color: rgba(0,0,0,0.2);
+            padding: 8px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--panel-border);
+        }
     </style>
 </head>
 <body>
 
-    <div id="loading-panel">
+    <!-- پنل لودینگ اصلی -->
+    <div id="loading-panel" class="panel">
         <div id="logo-container">
             <img id="logo" src="https://up.20script.ir/file/40b6-Copilot-20250812-110015-removebg-preview.png" alt="لوگوی شهر مافیا">
         </div>
@@ -55,77 +108,114 @@
         </div>
         <p id="status-message">در حال آماده سازی...</p>
     </div>
+
+    <!-- پنل جدید برای حالت تعمیرات (به‌روزرسانی) -->
+    <div id="maintenance-panel" class="panel hidden">
+        <svg id="maintenance-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.73-.664 1.192-.832M11.42 15.17l-4.25-4.25a2.652 2.652 0 0 1 0-3.749 2.652 2.652 0 0 1 3.749 0l4.25 4.25M11.42 15.17 15.17 11.42M4.5 21.75l3.75-3.75M8.25 21.75l3.75-3.75M12 21.75l3.75-3.75M15.75 21.75l3.75-3.75M4.5 18l3.75-3.75M8.25 18l3.75-3.75M12 18l3.75-3.75M15.75 18l3.75-3.75M4.5 14.25l3.75-3.75M8.25 14.25l3.75-3.75M12 14.25l3.75-3.75M15.75 14.25l3.75-3.75M4.5 10.5l3.75-3.75M8.25 10.5l3.75-3.75M12 10.5l3.75-3.75M15.75 10.5l3.75-3.75M4.5 6.75l3.75-3.75M8.25 6.75l3.75-3.75M12 6.75l3.75-3.75M15.75 6.75l3.75-3.75" />
+        </svg>
+        <h1 id="maintenance-title"></h1>
+        <p id="maintenance-message"></p>
+        <p id="maintenance-time"></p>
+    </div>
     
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
-            authDomain: "mafia-9fcbf.firebaseapp.com",
-            projectId: "mafia-9fcbf",
-            storageBucket: "mafia-9fcbf.appspot.com",
-            messagingSenderId: "471627157488",
-            appId: "1:471627157488:web:92f008548a5596619a5735",
-            measurementId: "G-0PDHDWC6NV"
+        // ========================================================================
+        // بخش تنظیمات حالت تعمیرات (اطلاعیه)
+        // برای فعال‌سازی، enabled را به true تغییر دهید.
+        // ========================================================================
+        const maintenanceConfig = {
+            enabled: false, // برای فعال‌سازی این را true کنید
+            title: "🚀 به‌روزرسانی بزرگ 🚀",
+            message: "شهر مافیا برای یک به‌روزرسانی هیجان‌انگیز به طور موقت از دسترس خارج شده است. ما در حال اضافه کردن نقش‌ها و امکانات جدید هستیم. از شکیبایی شما متشکریم!",
+            estimatedTime: "حدود ۲ ساعت" // می‌توانید بنویسید: "تا ساعت ۵ عصر" یا "تا فردا صبح"
         };
-        
-        const progressBarFill = document.getElementById('progress-bar-fill');
-        const statusMessage = document.getElementById('status-message');
-        const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+        // ========================================================================
+        // پایان بخش تنظیمات
+        // ========================================================================
 
-        function updateProgress(percent, message) {
-            progressBarFill.style.width = `${percent}%`;
-            statusMessage.textContent = message;
-        }
 
-        // [FIX] - Refactored the entire loading logic to be more robust
-        try {
-            updateProgress(20, '...در حال راه‌اندازی سیستم');
-            const app = initializeApp(firebaseConfig);
-            const auth = getAuth(app);
-            const db = getFirestore(app);
-            updateProgress(40, '...برقراری ارتباط با سرورهای شهر');
+        // چک کردن وضعیت تعمیرات قبل از هر کاری
+        if (maintenanceConfig.enabled) {
+            // مخفی کردن پنل لودینگ
+            document.getElementById('loading-panel').classList.add('hidden');
+            
+            // پر کردن و نمایش پنل تعمیرات
+            const maintenancePanel = document.getElementById('maintenance-panel');
+            document.getElementById('maintenance-title').textContent = maintenanceConfig.title;
+            document.getElementById('maintenance-message').textContent = maintenanceConfig.message;
+            document.getElementById('maintenance-time').textContent = `زمان تخمینی بازگشت: ${maintenanceConfig.estimatedTime}`;
+            maintenancePanel.classList.remove('hidden');
+            
+            // در اینجا اجرای اسکریپت متوقف می‌شود و به سراغ کدهای فایربیس نمی‌رود.
 
-            onAuthStateChanged(auth, async (user) => {
-                // This listener waits until Firebase is certain about the auth state.
-                await delay(500); // A small artificial delay for better UX
+        } else {
+            // اگر حالت تعمیرات غیرفعال بود، فرآیند لودینگ عادی را اجرا کن
+            
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+            import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+            import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-                if (user) {
-                    // User is signed in.
-                    updateProgress(70, '...در حال واکشی اطلاعات بازیکن');
-                    const userDocRef = doc(db, 'users', user.uid);
-                    const userDocSnap = await getDoc(userDocRef);
-                    let displayName = user.displayName || 'بازیکن';
-                    
-                    if (userDocSnap.exists()) {
-                        displayName = userDocSnap.data().displayName || displayName;
+            const firebaseConfig = {
+                apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
+                authDomain: "mafia-9fcbf.firebaseapp.com",
+                projectId: "mafia-9fcbf",
+                storageBucket: "mafia-9fcbf.appspot.com",
+                messagingSenderId: "471627157488",
+                appId: "1:471627157488:web:92f008548a5596619a5735",
+                measurementId: "G-0PDHDWC6NV"
+            };
+            
+            const progressBarFill = document.getElementById('progress-bar-fill');
+            const statusMessage = document.getElementById('status-message');
+            const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+            function updateProgress(percent, message) {
+                progressBarFill.style.width = `${percent}%`;
+                statusMessage.textContent = message;
+            }
+
+            try {
+                updateProgress(20, '...در حال راه‌اندازی سیستم');
+                const app = initializeApp(firebaseConfig);
+                const auth = getAuth(app);
+                const db = getFirestore(app);
+                updateProgress(40, '...برقراری ارتباط با سرورهای شهر');
+
+                onAuthStateChanged(auth, async (user) => {
+                    await delay(500); 
+
+                    if (user) {
+                        updateProgress(70, '...در حال واکشی اطلاعات بازیکن');
+                        const userDocRef = doc(db, 'users', user.uid);
+                        const userDocSnap = await getDoc(userDocRef);
+                        let displayName = user.displayName || 'بازیکن';
+                        
+                        if (userDocSnap.exists()) {
+                            displayName = userDocSnap.data().displayName || displayName;
+                        }
+
+                        updateProgress(100, `خوش آمدید، ${displayName}!`);
+                        await delay(1500); 
+                        
+                        window.location.href = './main.html';
+
+                    } else {
+                        updateProgress(100, 'احراز هویت انجام نشد.');
+                        await delay(1000);
+                        updateProgress(100, 'در حال هدایت به صفحه ورود...');
+                        await delay(1500);
+                        
+                        window.location.href = './login.html';
                     }
+                });
 
-                    updateProgress(100, `خوش آمدید، ${displayName}!`);
-                    await delay(1500); 
-                    
-                    // Correct redirect to the main game page
-                    window.location.href = './main.html';
-
-                } else {
-                    // No user is signed in.
-                    updateProgress(100, 'احراز هویت انجام نشد.');
-                    await delay(1000);
-                    updateProgress(100, 'در حال هدایت به صفحه ورود...');
-                    await delay(1500);
-                    
-                    // Correct redirect to the login page
-                    window.location.href = './login.html';
-                }
-            });
-
-        } catch (error) {
-            console.error("خطا در فرآیند لودینگ:", error);
-            progressBarFill.classList.add('error');
-            updateProgress(100, 'خطا در اتصال!');
-            statusMessage.textContent = 'امکان اتصال وجود ندارد. اتصال اینترنت خود را بررسی کنید.';
+            } catch (error) {
+                console.error("خطا در فرآیند لودینگ:", error);
+                progressBarFill.classList.add('error');
+                updateProgress(100, 'خطا در اتصال!');
+                statusMessage.textContent = 'امکان اتصال وجود ندارد. اتصال اینترنت خود را بررسی کنید.';
+            }
         }
     </script>
 </body>
