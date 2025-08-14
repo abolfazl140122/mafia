@@ -3,582 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بازی مافیا</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>شهر مافیا - بازی اصلی</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        /* --- NEW THEME: DARK GODFATHER --- */
-        :root {
-            --theme-bg-image: url('https://up.20script.ir/file/6195-file-000000001500622f9419de6c322df297-1-.jpg');
-            --bg-overlay: rgba(10, 5, 5, 0.5);
-            --panel-bg: rgba(20, 15, 15, 0.85);
-            --panel-border: #8c7853; /* Dull Gold */
-            --panel-border-light: #ab9a7d;
-            --text-primary: #e0dacc;
-            --text-accent: #d4af37; /* Brighter Gold */
-            --text-dark: #1a140f;
-            --button-primary-bg: linear-gradient(to bottom, #6d5440, #4a3a2a); /* Dark Wood */
-            --button-primary-border: #2a2218;
-            --button-primary-shadow: #1c1711;
-            --button-secondary-bg: linear-gradient(to bottom, #5a5a5a, #3d3d3d); /* Metal Gray */
-            --button-secondary-border: #2b2b2b;
-            --button-secondary-shadow: #1e1e1e;
-            --error-color: #d9534f;
-            --success-color: #5cb85c;
-            --green-glow: #6ab04c;
-            --red-glow: #e44d26;
-        }
-
-        /* --- KEYFRAME ANIMATIONS --- */
-        @keyframes panel-intro {
-            from { opacity: 0; transform: scale(0.95) translateY(20px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
-        }
-        @keyframes subtle-glow {
-            0%, 100% { box-shadow: 0 0 15px -5px var(--text-accent); }
-            50% { box-shadow: 0 0 25px 0px var(--text-accent); }
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
         body {
             font-family: 'Vazirmatn', sans-serif;
-            color: var(--text-primary);
-            background-color: #000;
-            background-image: var(--theme-bg-image);
-            background-size: cover;
-            background-position: center center;
-            background-attachment: fixed;
-            overflow-x: hidden;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
-        }
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: var(--bg-overlay);
-            z-index: -1;
-        }
-
-        .panel-mafia {
-            background-color: var(--panel-bg);
-            border: 2px solid var(--panel-border);
-            border-radius: 12px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.5), inset 0 1px 2px rgba(255,255,255,0.1);
-            backdrop-filter: blur(8px);
-            transition: all 0.4s ease-out;
-        }
-        .panel-hidden {
-            opacity: 0;
-            transform: scale(0.9);
-            pointer-events: none;
-            visibility: hidden;
-        }
-        .panel-visible {
-            opacity: 1;
-            transform: scale(1);
-            visibility: visible;
-            animation: panel-intro 0.5s ease-out;
-        }
-
-        .btn-mafia {
-            border-radius: 8px;
-            font-weight: 700;
-            transition: all 0.15s ease-out;
-            cursor: pointer;
-            position: relative;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-            padding: 12px 28px;
-            font-size: 1.1rem;
-        }
-        .btn-mafia:disabled {
-            filter: grayscale(80%) brightness(0.7);
-            cursor: not-allowed;
-            box-shadow: 0 2px 0 var(--button-primary-shadow) !important;
-            transform: translateY(0) !important;
-        }
-
-        /* Primary Button (Wood) */
-        .btn-mafia-primary {
-            background: var(--button-primary-bg);
-            border: 2px solid var(--button-primary-border);
-            box-shadow: 0 4px 0 var(--button-primary-shadow);
-            color: var(--text-primary);
-        }
-        .btn-mafia-primary:hover:not(:disabled) {
-            background: linear-gradient(to bottom, #8a735e, #5e4c3a);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 8px rgba(0,0,0,0.3), 0 6px 0 var(--button-primary-shadow);
-        }
-        .btn-mafia-primary:active:not(:disabled) {
-            transform: translateY(2px) !important;
-            box-shadow: 0 2px 0 var(--button-primary-shadow) !important;
-        }
-        #start-game-btn {
-            animation: subtle-glow 3s ease-in-out infinite;
-            border-color: var(--text-accent);
-        }
-
-        /* Secondary Button (Metal) */
-        .btn-mafia-secondary {
-            background: var(--button-secondary-bg);
-            border: 2px solid var(--button-secondary-border);
-            box-shadow: 0 4px 0 var(--button-secondary-shadow);
-            color: var(--text-primary);
-        }
-        .btn-mafia-secondary:hover:not(:disabled) {
-            background: linear-gradient(to bottom, #7a7a7a, #5d5d5d);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 8px rgba(0,0,0,0.3), 0 6px 0 var(--button-secondary-shadow);
-        }
-        .btn-mafia-secondary:active:not(:disabled) {
-            transform: translateY(2px) !important;
-            box-shadow: 0 2px 0 var(--button-secondary-shadow) !important;
-        }
-
-        .input-mafia {
-            background-color: rgba(0,0,0,0.4);
-            border: 2px solid #444;
-            color: #fff;
-            border-radius: 8px;
-            padding: 12px;
-            font-size: 1rem;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
-            transition: all 0.3s;
-        }
-        .input-mafia:focus {
-            outline: none;
-            border-color: var(--text-accent);
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.4), 0 0 10px var(--text-accent);
-        }
-
-        .loader {
-            border: 6px solid rgba(255,255,255,0.2);
-            border-top-color: var(--text-accent);
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-        }
-
-        /* Correct/Incorrect styles */
-        .option-btn.correct {
-            box-shadow: 0 0 15px 3px var(--green-glow) !important;
-            background: var(--success-color) !important;
-            border-color: #4a9d4a !important;
-            transform: scale(1.05);
-        }
-        .option-btn.incorrect {
-            box-shadow: 0 0 15px 3px var(--red-glow) !important;
-            background: var(--error-color) !important;
-            border-color: #b33e3a !important;
-            opacity: 0.7;
-        }
-
-        /* General layout */
-        .screen {
-            position: absolute; top: 0; left: 0; width: 100%; min-height: 100vh;
-            padding: 20px; box-sizing: border-box;
-            opacity: 0; visibility: hidden; transition: opacity 0.5s ease;
-            display: flex; flex-direction: column; align-items: center;
-        }
-        .screen.active { opacity: 1; visibility: visible; position: relative; }
-
-        /* User Profile Area */
-        #user-profile-area {
-            position: fixed; z-index: 100;
-            top: 15px; right: 15px;
+            background-color: #1a140f;
+            color: #e0dacc;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 15px;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
         }
-        #user-info-box {
-            background-color: var(--panel-bg);
-            border: 2px solid var(--panel-border);
-            border-radius: 10px;
-            padding: 10px 15px;
-            display: flex; flex-direction: column; gap: 8px;
-            min-width: 180px;
+        h1 {
+            font-size: 3rem;
+            color: #ffc947;
+            text-shadow: 0 0 10px #ffc947;
         }
-        .user-info-item .label { color: var(--panel-border-light); font-size: 0.9em; }
-        .user-info-item .value { font-weight: 700; font-size: 1.1em; color: var(--text-primary); }
-        #display-name-output { color: var(--text-accent); }
-        #edit-name-btn { cursor: pointer; color: var(--panel-border-light); transition: color 0.2s; }
-        #edit-name-btn:hover { color: var(--text-accent); }
-
-        #avatar-container {
-            width: 70px; height: 70px; border-radius: 50%;
-            border: 4px solid var(--panel-border);
-            background-color: var(--text-dark);
-            cursor: pointer; overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        p {
+            font-size: 1.2rem;
+            margin-top: 20px;
         }
-        #avatar-image { width: 100%; height: 100%; object-fit: cover; }
-        
-        #main-title {
-            font-size: clamp(3rem, 10vw, 6rem);
-            font-weight: 900;
-            color: var(--text-primary);
-            text-shadow: 0 0 15px rgba(212, 175, 55, 0.6), 3px 3px 5px #000;
+        #logout-button {
+            margin-top: 40px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1a140f;
+            background-color: #ffc947;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
         }
-
-        .hidden { display: none !important; }
-        .error-text { color: #ffdddd; font-size: 0.9rem; text-align: center; min-height: 1.2rem; margin-top: 0.5rem; font-weight: bold; background-color: rgba(200, 60, 60, 0.7); padding: 4px 8px; border-radius: 6px; border: 1px solid var(--error-color); }
-        #avatar-preview-container { margin: 1rem auto; width: 120px; height: 120px; border-radius: 50%; border: 3px solid var(--text-accent); overflow: hidden; background-color: #000; }
-        #avatar-preview-image { width: 100%; height: 100%; object-fit: cover; }
-
-        /* Leaderboard styles */
-        .leaderboard-item { border-bottom: 1px solid var(--panel-border); }
-        .leaderboard-rank { font-size: 1.5rem; color: var(--text-accent); width: 40px; }
-        .leaderboard-avatar { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--panel-border-light); }
-        .leaderboard-name { font-weight: 700; color: var(--text-primary); }
-        .leaderboard-stage { color: var(--panel-border-light); }
+        #logout-button:hover {
+            background-color: #ffdd00;
+        }
     </style>
 </head>
 <body>
-
-    <!-- This screen will be active while data is loading -->
-    <div id="loading-screen" class="screen active justify-center">
-        <div class="loader"></div>
-        <p class="mt-4 text-xl font-semibold">در حال بارگذاری اطلاعات بازیکن...</p>
-    </div>
-
-    <!-- Main Menu Screen -->
-    <div id="main-screen" class="screen">
-        <div id="user-profile-area" class="hidden">
-            <div id="user-info-box" class="panel-mafia">
-                <div id="display-name-output-box" class="user-info-item">
-                    <span class="label">بازیکن:</span>
-                    <div class="flex items-center gap-2">
-                        <span id="display-name-output" class="value"></span>
-                        <span id="edit-name-btn" title="تغییر نام">✏️</span>
-                    </div>
-                </div>
-                <div class="user-info-item">
-                    <span class="label">مرحله:</span>
-                    <span id="user-stage-output" class="value"></span>
-                </div>
-            </div>
-            <div id="avatar-container" title="تغییر آواتار">
-                <img id="avatar-image" src="https://placehold.co/80x80/1a140f/8c7853?text=?" alt="آواتار کاربر" onerror="this.src='https://placehold.co/80x80/1a140f/8c7853?text=?'">
-            </div>
-        </div>
-        
-        <div class="flex flex-col items-center justify-center text-center w-full max-w-2xl mx-auto h-full">
-            <h1 id="main-title">شهر مافیا</h1>
-            <div id="main-screen-buttons-layout" class="mt-12 flex flex-col items-center gap-6 w-full px-4">
-                <button id="start-game-btn" class="btn-mafia btn-mafia-primary w-full max-w-xs">شروع بازی</button>
-                <div class="flex gap-4 w-full max-w-xs">
-                    <button id="leaderboard-btn" class="btn-mafia btn-mafia-secondary flex-1">🏆 رتبه‌بندی</button>
-                    <button id="logout-btn" class="btn-mafia btn-mafia-secondary flex-1">خروج</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Game Screen -->
-    <div id="game-screen" class="screen">
-        <!-- Game content will be similar to the original, just styled with new theme -->
-    </div>
-    
-    <!-- Generic Modal -->
-    <div id="modal-container" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 panel-hidden z-50">
-        <div class="panel-mafia p-6 sm:p-8 rounded-lg max-w-md w-full text-center relative">
-             <button id="modal-close-btn" class="absolute top-3 right-4 text-2xl text-gray-400 hover:text-white transition-colors">&times;</button>
-            <h3 id="modal-title" class="text-2xl font-bold mb-4 text-[var(--text-accent)]"></h3>
-            <div id="modal-content-dynamic">
-                <!-- Content injected by JS -->
-            </div>
-            <div id="modal-actions" class="flex justify-center gap-4 mt-6">
-                <button id="modal-confirm-btn" class="btn-mafia btn-mafia-primary"></button>
-                <button id="modal-cancel-btn" class="btn-mafia btn-mafia-secondary"></button>
-            </div>
-        </div>
-    </div>
-
+    <h1>به شهر مافیا خوش آمدید!</h1>
+    <p>اینجا صفحه اصلی بازی شما خواهد بود.</p>
+    <p id="user-info">در حال بارگذاری اطلاعات کاربر...</p>
+    <button id="logout-button">خروج از حساب</button>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, serverTimestamp, collection, query, orderBy, limit, getDocs, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // --- UNIFIED CONFIG ---
         const firebaseConfig = {
-            apiKey: "AIzaSyBkUfmc3_TvcR8AkepIr1eB7YEvCD-7P3s",
-            authDomain: "city-mafia.firebaseapp.com",
-            projectId: "city-mafia",
-            storageBucket: "city-mafia.appspot.com",
-            messagingSenderId: "66458127103",
-            appId: "1:66458127103:web:8bcc2ad470f51b5db45aca",
-            measurementId: "G-8M0M6BJ0GG"
+          apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
+          authDomain: "mafia-9fcbf.firebaseapp.com",
+          projectId: "mafia-9fcbf",
+          storageBucket: "mafia-9fcbf.appspot.com",
+          messagingSenderId: "471627157488",
+          appId: "1:471627157488:web:92f008548a5596619a5735",
+          measurementId: "G-0PDHDWC6NV"
         };
         
-        // --- INITIALIZATION ---
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app);
-        
-        let currentUserId = null;
-        let currentUserData = null;
-        let modalConfirmCallback = null;
 
-        // --- DOM ELEMENTS ---
-        const loadingScreen = document.getElementById('loading-screen');
-        const mainScreen = document.getElementById('main-screen');
-        const userProfileArea = document.getElementById('user-profile-area');
-        const displayNameOutput = document.getElementById('display-name-output');
-        const userStageOutput = document.getElementById('user-stage-output');
-        const avatarImage = document.getElementById('avatar-image');
-        const editNameBtn = document.getElementById('edit-name-btn');
-        const avatarContainer = document.getElementById('avatar-container');
-        const startGameBtn = document.getElementById('start-game-btn');
-        const leaderboardBtn = document.getElementById('leaderboard-btn');
-        const logoutBtn = document.getElementById('logout-btn');
-        
-        const modalContainer = document.getElementById('modal-container');
-        const modalTitle = document.getElementById('modal-title');
-        const modalContentDynamic = document.getElementById('modal-content-dynamic');
-        const modalConfirmBtn = document.getElementById('modal-confirm-btn');
-        const modalCancelBtn = document.getElementById('modal-cancel-btn');
-        const modalCloseBtn = document.getElementById('modal-close-btn');
+        const userInfo = document.getElementById('user-info');
+        const logoutButton = document.getElementById('logout-button');
 
-        // --- AUTHENTICATION ---
-        onAuthStateChanged(auth, async (user) => {
+        // Check user status and display name
+        onAuthStateChanged(auth, (user) => {
             if (user) {
-                currentUserId = user.uid;
-                await loadUserData();
-                showScreen(mainScreen);
-                userProfileArea.classList.remove('hidden');
+                // User is signed in.
+                userInfo.textContent = `شما با نام کاربری ${user.displayName || 'ناشناس'} وارد شده‌اید.`;
             } else {
-                // If user is not logged in, redirect to login page.
+                // No user is signed in, redirect to login page.
                 window.location.href = './login.html';
             }
         });
-        
-        function showScreen(screen) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            screen.classList.add('active');
-        }
 
-        // --- DATA HANDLING (SIMPLIFIED PATH) ---
-        async function loadUserData() {
-            if (!currentUserId) return;
-            const userDocRef = doc(db, 'users', currentUserId);
+        // Handle logout
+        logoutButton.addEventListener('click', async () => {
             try {
-                const docSnap = await getDoc(userDocRef);
-                if (docSnap.exists()) {
-                    currentUserData = docSnap.data();
-                    updateUI();
-                } else {
-                    // This case should ideally not happen if registration works correctly
-                    console.error("User document not found in Firestore!");
-                    alert("خطا: اطلاعات کاربری شما یافت نشد. لطفاً خارج شده و دوباره وارد شوید.");
-                    handleLogout();
-                }
-            } catch (error) {
-                console.error("Error loading user data:", error);
-                alert("خطا در بارگذاری اطلاعات. لطفاً اتصال اینترنت خود را بررسی کنید.");
-            }
-        }
-        
-        async function saveUserData() {
-            if (!currentUserId || !currentUserData) return;
-            const userDocRef = doc(db, 'users', currentUserId);
-            try {
-                // Add lastUpdated timestamp before saving
-                currentUserData.lastUpdated = serverTimestamp();
-                await setDoc(userDocRef, currentUserData, { merge: true });
-                console.log("User data saved successfully.");
-            } catch (error) {
-                console.error("Error saving user data:", error);
-            }
-        }
-
-        function updateUI() {
-            if (!currentUserData) return;
-            displayNameOutput.textContent = currentUserData.displayName;
-            userStageOutput.textContent = currentUserData.currentStage || 1;
-            if (currentUserData.avatarUrl) {
-                avatarImage.src = currentUserData.avatarUrl;
-            } else {
-                avatarImage.src = `https://placehold.co/80x80/1a140f/8c7853?text=${currentUserData.displayName.charAt(0)}`;
-            }
-        }
-        
-        // --- MODAL CONTROLS ---
-        function showModal({ title, contentHTML, confirmText, cancelText, onConfirm }) {
-            modalTitle.textContent = title;
-            modalContentDynamic.innerHTML = contentHTML;
-            modalConfirmBtn.textContent = confirmText;
-            modalConfirmBtn.classList.toggle('hidden', !confirmText);
-            modalCancelBtn.textContent = cancelText || "لغو";
-            modalCancelBtn.classList.toggle('hidden', !cancelText && !onConfirm);
-            modalConfirmCallback = onConfirm;
-            modalContainer.classList.remove('panel-hidden');
-            modalContainer.querySelector('.panel-mafia').classList.add('panel-visible');
-        }
-
-        function hideModal() {
-            modalContainer.classList.add('panel-hidden');
-            modalContainer.querySelector('.panel-mafia').classList.remove('panel-visible');
-        }
-
-        // --- EVENT LISTENERS ---
-        modalConfirmBtn.addEventListener('click', () => {
-            if (modalConfirmCallback) {
-                modalConfirmCallback();
-            }
-        });
-        modalCancelBtn.addEventListener('click', hideModal);
-        modalCloseBtn.addEventListener('click', hideModal);
-
-        editNameBtn.addEventListener('click', () => {
-            showModal({
-                title: "تغییر نام نمایشی",
-                contentHTML: `
-                    <p class="mb-4 text-gray-300">نام جدید خود را وارد کنید (فقط حروف و اعداد انگلیسی).</p>
-                    <input type="text" id="new-name-input" class="input-mafia w-full" value="${currentUserData.displayName}" maxlength="20">
-                    <p id="modal-error" class="error-text hidden mt-2"></p>
-                `,
-                confirmText: "ذخیره",
-                cancelText: "لغو",
-                onConfirm: handleChangeDisplayName
-            });
-        });
-        
-        avatarContainer.addEventListener('click', () => {
-            showModal({
-                title: "تغییر آواتار",
-                contentHTML: `
-                    <p class="mb-2 text-gray-300">لینک مستقیم تصویر (URL) را وارد کنید.</p>
-                    <input type="url" id="avatar-url-input" class="input-mafia w-full" placeholder="https://example.com/image.png" style="direction: ltr; text-align: left;">
-                    <div id="avatar-preview-container" class="hidden"><img id="avatar-preview-image" src="#"/></div>
-                    <p id="modal-error" class="error-text hidden mt-2"></p>
-                `,
-                confirmText: "ذخیره",
-                cancelText: "لغو",
-                onConfirm: handleSaveAvatar
-            });
-            // Add a listener for the new input to show a preview
-            document.getElementById('avatar-url-input').addEventListener('input', previewAvatar);
-        });
-
-        leaderboardBtn.addEventListener('click', showLeaderboard);
-        
-        logoutBtn.addEventListener('click', handleLogout);
-
-        // --- GAME LOGIC FUNCTIONS ---
-        async function handleChangeDisplayName() {
-            const input = document.getElementById('new-name-input');
-            const errorP = document.getElementById('modal-error');
-            const newName = input.value.trim();
-
-            if (newName.length < 3 || /[^a-zA-Z0-9_.]/.test(newName)) {
-                errorP.textContent = "نام نامعتبر است (حداقل ۳ کاراکتر انگلیسی).";
-                errorP.classList.remove('hidden');
-                return;
-            }
-            
-            // Optional: Check if name is taken
-            const isTaken = await isDisplayNameTaken(newName);
-            if(isTaken) {
-                errorP.textContent = "این نام قبلاً توسط شخص دیگری انتخاب شده.";
-                errorP.classList.remove('hidden');
-                return;
-            }
-
-            currentUserData.displayName = newName;
-            await saveUserData();
-            updateUI();
-            hideModal();
-        }
-
-        function previewAvatar() {
-            const url = document.getElementById('avatar-url-input').value.trim();
-            const previewContainer = document.getElementById('avatar-preview-container');
-            const previewImage = document.getElementById('avatar-preview-image');
-            const errorP = document.getElementById('modal-error');
-
-            if (url && url.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
-                previewImage.src = url;
-                previewContainer.classList.remove('hidden');
-                errorP.classList.add('hidden');
-            } else {
-                previewContainer.classList.add('hidden');
-            }
-        }
-        
-        async function handleSaveAvatar() {
-            const input = document.getElementById('avatar-url-input');
-            const errorP = document.getElementById('modal-error');
-            const newUrl = input.value.trim();
-
-            if (!newUrl || !newUrl.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
-                 errorP.textContent = "لینک تصویر معتبر نیست.";
-                 errorP.classList.remove('hidden');
-                 return;
-            }
-            currentUserData.avatarUrl = newUrl;
-            await saveUserData();
-            updateUI();
-            hideModal();
-        }
-
-        async function isDisplayNameTaken(name) {
-            const q = query(collection(db, "users"), where("displayName", "==", name), limit(1));
-            const snapshot = await getDocs(q);
-            if(snapshot.empty) return false;
-            // It's taken, check if it's taken by the current user
-            return snapshot.docs[0].id !== currentUserId;
-        }
-
-        async function showLeaderboard() {
-            const leaderboardQuery = query(collection(db, "users"), orderBy("currentStage", "desc"), limit(10));
-            const snapshot = await getDocs(leaderboardQuery);
-            let rank = 1;
-            const userRows = snapshot.docs.map(doc => {
-                const user = doc.data();
-                const avatar = user.avatarUrl || `https://placehold.co/50x50/1a140f/8c7853?text=${user.displayName.charAt(0)}`;
-                return `
-                    <div class="leaderboard-item flex items-center gap-4 p-3 ${doc.id === currentUserId ? 'bg-black/30' : ''}">
-                        <span class="leaderboard-rank text-center">${rank++}</span>
-                        <img src="${avatar}" class="leaderboard-avatar object-cover" onerror="this.src='https://placehold.co/50x50/1a140f/8c7853?text=?'"/>
-                        <div class="flex-grow">
-                            <div class="leaderboard-name">${user.displayName}</div>
-                            <div class="leaderboard-stage text-sm">مرحله: ${user.currentStage}</div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-            
-            showModal({
-                title: "کاربران برتر",
-                contentHTML: `<div class="text-right max-h-[60vh] overflow-y-auto">${userRows}</div>`,
-                confirmText: "بستن",
-                onConfirm: hideModal
-            });
-            modalCancelBtn.classList.add('hidden');
-        }
-
-        function handleLogout() {
-            signOut(auth).then(() => {
+                await signOut(auth);
                 window.location.href = './login.html';
-            }).catch((error) => {
-                console.error("Logout Error:", error);
-            });
-        }
-        
-        // Placeholder for starting the game
-        startGameBtn.addEventListener('click', () => {
-            alert('منطق شروع بازی در اینجا پیاده‌سازی خواهد شد!');
-            // Here you would hide main-screen and show game-screen
-            // showScreen(document.getElementById('game-screen'));
-            // And then call a function to load the first question.
+            } catch (error) {
+                console.error("Error signing out: ", error);
+                alert("خطا در خروج از حساب.");
+            }
         });
-
     </script>
 </body>
 </html>
