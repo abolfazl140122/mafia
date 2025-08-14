@@ -1,1 +1,97 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>شهر مافیا - بازی اصلی</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: #1a140f;
+            color: #e0dacc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+        h1 {
+            font-size: 3rem;
+            color: #ffc947;
+            text-shadow: 0 0 10px #ffc947;
+        }
+        p {
+            font-size: 1.2rem;
+            margin-top: 20px;
+        }
+        #logout-button {
+            margin-top: 40px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1a140f;
+            background-color: #ffc947;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #logout-button:hover {
+            background-color: #ffdd00;
+        }
+    </style>
+</head>
+<body>
+    <h1>به شهر مافیا خوش آمدید!</h1>
+    <p>اینجا صفحه اصلی بازی شما خواهد بود.</p>
+    <p id="user-info">در حال بارگذاری اطلاعات کاربر...</p>
+    <button id="logout-button">خروج از حساب</button>
 
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
+          authDomain: "mafia-9fcbf.firebaseapp.com",
+          projectId: "mafia-9fcbf",
+          storageBucket: "mafia-9fcbf.appspot.com",
+          messagingSenderId: "471627157488",
+          appId: "1:471627157488:web:92f008548a5596619a5735",
+          measurementId: "G-0PDHDWC6NV"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        const userInfo = document.getElementById('user-info');
+        const logoutButton = document.getElementById('logout-button');
+
+        // Check user status and display name
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User is signed in.
+                userInfo.textContent = `شما با نام کاربری ${user.displayName || 'ناشناس'} وارد شده‌اید.`;
+            } else {
+                // No user is signed in, redirect to login page.
+                window.location.href = './login.html';
+            }
+        });
+
+        // Handle logout
+        logoutButton.addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+                window.location.href = './login.html';
+            } catch (error) {
+                console.error("Error signing out: ", error);
+                alert("خطا در خروج از حساب.");
+            }
+        });
+    </script>
+</body>
+</html>
