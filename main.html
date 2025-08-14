@@ -3,52 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>شهر مافیا - بازی اصلی</title>
+    <title>شهر مافیا - صفحه اصلی</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-accent: #e6c58a; /* A moody gold/brass color */
+            --dark-bg: #1a140f;
+            --text-light: #f0e6d8;
+            --shadow-color: rgba(0, 0, 0, 0.7);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            height: 100%;
+        }
+
         body {
             font-family: 'Vazirmatn', sans-serif;
-            background-color: #1a140f;
-            color: #e0dacc;
+            /* تنظیمات پس‌زمینه */
+            background-image: url('https://up.20script.ir/file/6195-file-000000001500622f9419de6c322df297-1-.jpg');
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            
+            /* لایه تیره روی پس‌زمینه برای خوانایی بهتر متن */
+            background-color: rgba(0, 0, 0, 0.4);
+            background-blend-mode: multiply;
+
+            color: var(--text-light);
+            
+            /* چیدمان اصلی برای اندروید */
             display: flex;
             flex-direction: column;
+            justify-content: space-between; /* کلید اصلی چیدمان: بالا، وسط، پایین */
             align-items: center;
-            justify-content: center;
             min-height: 100vh;
+            padding: 24px;
             text-align: center;
         }
-        h1 {
-            font-size: 3rem;
-            color: #ffc947;
-            text-shadow: 0 0 10px #ffc947;
+
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
         }
-        p {
-            font-size: 1.2rem;
-            margin-top: 20px;
+
+        #user-info {
+            width: 100%;
+            font-size: 1rem;
+            padding: 8px 12px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            border: 1px solid var(--primary-accent);
+            text-shadow: 1px 1px 3px var(--shadow-color);
         }
+
+        /* دکمه جدید شروع بازی */
+        #start-game-button {
+            padding: 20px 40px;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--dark-bg);
+            background-color: var(--primary-accent);
+            border: 2px solid #fff;
+            border-radius: 12px;
+            cursor: pointer;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 8px 15px var(--shadow-color);
+            transition: all 0.2s ease-in-out;
+            letter-spacing: 1px;
+        }
+
+        #start-game-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 20px var(--shadow-color);
+            background-color: #f5d8a0; /* رنگ روشن‌تر هنگام هاور */
+        }
+
+        #start-game-button:active {
+            transform: translateY(1px);
+            box-shadow: 0 4px 8px var(--shadow-color);
+        }
+
+        /* استایل جدید برای دکمه خروج */
         #logout-button {
-            margin-top: 40px;
-            padding: 10px 20px;
+            width: 100%;
+            max-width: 300px;
+            padding: 12px 20px;
             font-size: 1rem;
             font-weight: 700;
-            color: #1a140f;
-            background-color: #ffc947;
-            border: none;
+            color: var(--text-light);
+            background-color: transparent;
+            border: 2px solid var(--primary-accent);
             border-radius: 8px;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s, color 0.3s;
         }
+
         #logout-button:hover {
-            background-color: #ffdd00;
+            background-color: var(--primary-accent);
+            color: var(--dark-bg);
         }
     </style>
 </head>
 <body>
-    <h1>به شهر مافیا خوش آمدید!</h1>
-    <p>اینجا صفحه اصلی بازی شما خواهد بود.</p>
+    
+    <!-- اطلاعات کاربر در بالای صفحه -->
     <p id="user-info">در حال بارگذاری اطلاعات کاربر...</p>
+
+    <!-- محتوای اصلی (دکمه شروع) در وسط صفحه -->
+    <div class="main-content">
+        <button id="start-game-button">شروع بازی</button>
+    </div>
+
+    <!-- دکمه خروج در پایین صفحه -->
     <button id="logout-button">خروج از حساب</button>
 
     <script type="module">
@@ -70,6 +147,7 @@
 
         const userInfo = document.getElementById('user-info');
         const logoutButton = document.getElementById('logout-button');
+        const startGameButton = document.getElementById('start-game-button');
 
         // Check user status and display name
         onAuthStateChanged(auth, (user) => {
@@ -92,6 +170,13 @@
                 alert("خطا در خروج از حساب.");
             }
         });
+        
+        // همانطور که خواسته شد، دکمه شروع بازی فعلا کاری انجام نمی‌دهد
+        startGameButton.addEventListener('click', () => {
+            // در آینده می‌توانید کد مربوط به شروع بازی را اینجا بنویسید
+            console.log("Start Game button clicked!");
+        });
+
     </script>
 </body>
 </html>
