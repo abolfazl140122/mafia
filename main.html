@@ -34,7 +34,7 @@
             padding: 20px;
         }
 
-        /* کانتینر برای عناصر بالا-راست */
+        /* کانتینر برای تمام عناصر بالا-راست */
         .top-right-container {
             width: 100%;
             display: flex;
@@ -42,20 +42,24 @@
             align-items: flex-start;
         }
 
-        .profile-section {
+        /* پوسته‌ای برای گروه‌بندی پروفایل و دکمه‌ها */
+        .user-area-wrapper {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            background-color: rgba(0, 0, 0, 0.4);
-            padding: 10px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            align-items: flex-end; /* چینش کادر پروفایل و دکمه‌ها به سمت راست */
+            gap: 12px; /* فاصله بین کادر پروفایل و دکمه‌ها */
         }
 
-        .avatar-container {
+        /* کادر اصلی پروفایل (فقط آواتار و نام) */
+        .profile-section {
             display: flex;
             align-items: center;
-            gap: 12px; /* فاصله بین آواتار و نام */
+            gap: 12px;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 10px 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
         
         #user-avatar {
@@ -67,38 +71,42 @@
         }
 
         #user-display-name {
-            font-size: 1rem;
+            font-size: 1.1rem;
             font-weight: 700;
-            text-shadow: 1px 1px 3px #000;
+            text-shadow: 2px 2px 4px #000;
         }
         
+        /* کانتینر برای دکمه‌های زیر پروفایل */
         .menu-buttons {
             display: flex;
-            flex-direction: column;
-            gap: 8px; /* فاصله بین دکمه‌ها */
-            margin-top: 12px;
-            width: 100%;
+            gap: 10px; /* فاصله بین دکمه‌ها */
         }
 
+        /* استایل جدید و جذاب‌تر برای دکمه‌ها */
         .menu-button {
-            background-color: rgba(74, 44, 42, 0.7); /* رنگ قهوه‌ای تیره نیمه‌شفاف */
+            background: linear-gradient(145deg, #5f3a38, #3a2220);
             color: #e0dacc;
-            border: 1px solid #c5a687;
-            padding: 8px 15px;
-            border-radius: 8px;
+            border: 2px solid #a88a6d;
+            padding: 8px 20px;
+            border-radius: 10px;
             font-size: 0.9rem;
             font-weight: 700;
             cursor: pointer;
-            transition: background-color 0.3s, transform 0.1s;
-            text-align: center;
+            transition: all 0.3s ease;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
         }
 
         .menu-button:hover {
-            background-color: rgba(94, 61, 59, 0.9);
+            background: linear-gradient(145deg, #724643, #4a2c2a);
+            border-color: #ffc947;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4), 0 0 8px rgba(255, 201, 71, 0.3);
         }
         
         .menu-button:active {
-            transform: scale(0.97);
+            transform: translateY(0) scale(0.97);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         /* کانتینر برای دکمه شروع بازی در پایین */
@@ -137,11 +145,13 @@
 <body>
 
     <div class="top-right-container">
-        <div class="profile-section">
-            <div class="avatar-container">
+        <div class="user-area-wrapper">
+            <div class="profile-section">
+                <!-- آواتار به سمت راست نام منتقل شد -->
+                <img id="user-avatar" src="https://i.imgur.com/A6j4g5t.png" alt="آواتار کاربر"> <!-- آواتار پیش‌فرض جدید (علامت سوال) -->
                 <span id="user-display-name">در حال بارگذاری...</span>
-                <img id="user-avatar" src="https://i.imgur.com/T2bT1tG.png" alt="آواتار کاربر"> <!-- آواتار پیش‌فرض -->
             </div>
+            <!-- دکمه ها از کادر پروفایل خارج شده و در زیر آن قرار گرفتند -->
             <div class="menu-buttons">
                 <button class="menu-button">رده بندی</button>
                 <button class="menu-button">سازندگان</button>
