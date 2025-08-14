@@ -17,7 +17,6 @@
             --error-color: #d9534f;
             --border-color: #e0dacc;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Vazirmatn', sans-serif;
@@ -29,7 +28,6 @@
             min-height: 100vh;
             padding: 20px;
         }
-
         .auth-container {
             width: 100%;
             max-width: 420px;
@@ -40,88 +38,27 @@
             border: 1px solid var(--border-color);
             text-align: center;
         }
-
-        .auth-title {
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: var(--primary-color);
-            margin-bottom: 10px;
-        }
-
-        .auth-subtitle {
-            font-size: 1rem;
-            color: #777;
-            margin-bottom: 30px;
-        }
-
-        .input-group {
-            margin-bottom: 20px;
-            text-align: right;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 700;
-            font-size: 0.9rem;
-        }
-
+        .auth-title { font-size: 2.5rem; font-weight: 900; color: var(--primary-color); margin-bottom: 10px; }
+        .auth-subtitle { font-size: 1rem; color: #777; margin-bottom: 30px; }
+        .input-group { margin-bottom: 20px; text-align: right; }
+        .input-group label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 0.9rem; }
         .auth-input {
-            width: 100%;
-            padding: 12px 15px;
-            font-size: 1rem;
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            transition: border-color 0.3s, box-shadow 0.3s;
-            font-family: 'Vazirmatn', sans-serif;
+            width: 100%; padding: 12px 15px; font-size: 1rem; border: 2px solid var(--border-color);
+            border-radius: 8px; transition: border-color 0.3s, box-shadow 0.3s; font-family: 'Vazirmatn', sans-serif;
         }
-        .auth-input:focus {
-            outline: none;
-            border-color: var(--accent-color);
-            box-shadow: 0 0 0 3px rgba(197, 166, 135, 0.3);
-        }
-
+        .auth-input:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(197, 166, 135, 0.3); }
         .auth-button {
-            width: 100%;
-            padding: 14px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #fff;
-            background-color: var(--primary-color);
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.1s;
+            width: 100%; padding: 14px; font-size: 1.1rem; font-weight: 700; color: #fff; background-color: var(--primary-color);
+            border: none; border-radius: 8px; cursor: pointer; transition: background-color 0.3s, transform 0.1s;
         }
-        .auth-button:hover {
-            background-color: #382120;
-        }
-        .auth-button:active {
-            transform: scale(0.98);
-        }
-        .auth-button:disabled {
-            background-color: #9d8a7a;
-            cursor: not-allowed;
-        }
-
-        .auth-link {
-            margin-top: 25px;
-            font-size: 0.9rem;
-        }
-        .auth-link a {
-            color: var(--primary-color);
-            font-weight: 700;
-            text-decoration: none;
-        }
-
+        .auth-button:hover { background-color: #382120; }
+        .auth-button:active { transform: scale(0.98); }
+        .auth-button:disabled { background-color: #9d8a7a; cursor: not-allowed; }
+        .auth-link { margin-top: 25px; font-size: 0.9rem; }
+        .auth-link a { color: var(--primary-color); font-weight: 700; text-decoration: none; }
         .error-message {
-            color: var(--error-color);
-            background-color: rgba(217, 83, 79, 0.1);
-            padding: 10px;
-            border-radius: 8px;
-            margin-top: 20px;
-            font-size: 0.9rem;
-            display: none; /* Hidden by default */
+            color: var(--error-color); background-color: rgba(217, 83, 79, 0.1); padding: 10px;
+            border-radius: 8px; margin-top: 20px; font-size: 0.9rem; display: none;
         }
     </style>
 </head>
@@ -149,7 +86,7 @@
         <p id="error-message" class="error-message"></p>
 
         <p class="auth-link">
-            حساب کاربری دارید؟ <a href="./login.html">وارد شوید</a>
+            حساب کاربری دارید؟ <a href="./login.html">وارد شوید</a> <!-- **FIXED LINK** -->
         </p>
     </div>
 
@@ -187,16 +124,13 @@
             const password = passwordInput.value.trim();
 
             if (!displayName || !email || !password) {
-                showError("لطفاً تمام فیلدها را پر کنید.");
-                return;
+                showError("لطفاً تمام فیلدها را پر کنید."); return;
             }
             if (password.length < 6) {
-                showError("رمز عبور باید حداقل ۶ کاراکتر باشد.");
-                return;
+                showError("رمز عبور باید حداقل ۶ کاراکتر باشد."); return;
             }
             if (/[^a-zA-Z0-9_.]/.test(displayName)) {
-                showError("نام نمایشی فقط می‌تواند شامل حروف و اعداد انگلیسی، نقطه و آندرلاین باشد.");
-                return;
+                showError("نام نمایشی فقط می‌تواند شامل حروف و اعداد انگلیسی، نقطه و آندرلاین باشد."); return;
             }
 
             registerButton.disabled = true;
@@ -204,26 +138,23 @@
             errorMessage.style.display = 'none';
 
             try {
-                // 1. Create user in Firebase Auth
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
                 
-                // 2. Update user's profile with display name
                 await updateProfile(user, { displayName: displayName });
 
-                // 3. Create a user document in Firestore
                 const userDocRef = doc(db, 'users', user.uid);
                 await setDoc(userDocRef, {
                     uid: user.uid,
                     displayName: displayName,
                     email: user.email,
                     createdAt: new Date(),
-                    currentStage: 1, // Start at stage 1
-                    avatarUrl: '' // Empty avatar initially
+                    currentStage: 1,
+                    avatarUrl: ''
                 });
 
-                // 4. Redirect to the game page after successful registration
-                window.location.href = './شهر مافیا رفع باگ.txt'; // <-- آدرس صفحه اصلی بازی
+                // **FIXED REDIRECT**: Go to the loading page to check auth state
+                window.location.href = './index.html'; 
 
             } catch (error) {
                 let friendlyMessage = "خطایی رخ داد. لطفاً دوباره تلاش کنید.";
@@ -244,7 +175,6 @@
             errorMessage.textContent = message;
             errorMessage.style.display = 'block';
         }
-
     </script>
 </body>
 </html>
