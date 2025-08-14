@@ -34,25 +34,37 @@
             padding: 20px;
         }
 
-        /* [MODIFIED] کانتینر برای همه عناصر بالا-راست */
+        /* کانتینر برای عناصر بالا-راست */
         .top-right-container {
             width: 100%;
             display: flex;
-            flex-direction: column; /* چیدن آیتم‌ها به صورت عمودی */
-            align-items: flex-end; /* همه چیز را به سمت راست هل می‌دهد */
-            gap: 15px; /* فاصله بین بخش پروفایل و دکمه‌ها */
+            justify-content: flex-end; /* همه چیز را به سمت راست هل می‌دهد */
+            align-items: flex-start;
+        }
+        
+        /* [NEW] Wrapper for profile and its menu buttons */
+        .profile-and-menu-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end; /* Aligns profile box and buttons to the right */
+            gap: 12px; /* Space between profile box and the buttons below it */
         }
 
-        /* [MODIFIED] بخش پروفایل فقط شامل آواتار و نام */
+        /* [MODIFIED] Profile section now only contains the avatar and name */
         .profile-section {
             display: flex;
             align-items: center;
             background-color: rgba(0, 0, 0, 0.5);
-            padding: 12px 18px;
+            padding: 10px 15px;
             border-radius: 12px;
             border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
-            gap: 15px; /* فاصله بین آواتار و نام */
+            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+        }
+
+        .avatar-container {
+            display: flex;
+            align-items: center;
+            gap: 12px; /* فاصله بین آواتار و نام */
         }
         
         #user-avatar {
@@ -61,50 +73,48 @@
             border-radius: 50%;
             border: 2px solid #c5a687;
             object-fit: cover;
-            background-color: #333; /* رنگ پس زمینه برای علامت سوال */
         }
 
         #user-display-name {
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 700;
-            text-shadow: 2px 2px 4px #000;
+            text-shadow: 1px 1px 3px #000;
         }
         
-        /* [NEW] کانتینر برای دکمه‌های منو که خارج از پروفایل است */
+        /* [MODIFIED] Buttons are now outside the profile box */
         .menu-buttons {
             display: flex;
             flex-direction: column;
             gap: 10px; /* فاصله بین دکمه‌ها */
-            width: 150px; /* عرض ثابت برای دکمه‌ها */
+            align-items: flex-end; /* To align buttons to the right if they have different widths */
         }
 
-        /* [MODIFIED] استایل جدید و جذاب‌تر برای دکمه‌ها */
+        /* [MODIFIED] More attractive buttons with original width */
         .menu-button {
-            background: rgba(26, 20, 15, 0.6);
-            backdrop-filter: blur(4px);
+            background: linear-gradient(145deg, rgba(80, 50, 48, 0.8), rgba(56, 33, 32, 0.9));
             color: #e0dacc;
-            border: 1px solid #7a5e4a;
-            padding: 10px 15px;
+            border: 1px solid #c5a687;
+            padding: 8px 15px; /* Reverted to original padding to keep the width small */
             border-radius: 8px;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.2s ease-in-out;
+            transition: all 0.3s ease;
             text-align: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.4);
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
         }
 
         .menu-button:hover {
-            background-color: rgba(50, 38, 28, 0.8);
-            border-color: #c5a687;
+            background: linear-gradient(145deg, rgba(100, 65, 63, 0.9), rgba(74, 44, 42, 1));
+            border-color: #ffc947;
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
         }
         
         .menu-button:active {
-            transform: translateY(0px) scale(0.98);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+            transform: translateY(0) scale(0.98);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
         }
 
         /* کانتینر برای دکمه شروع بازی در پایین */
@@ -142,17 +152,26 @@
 </head>
 <body>
 
-    <!-- [MODIFIED] ساختار HTML برای بخش پروفایل و دکمه‌ها تغییر کرد -->
     <div class="top-right-container">
-        <div class="profile-section">
-            <span id="user-display-name">در حال بارگذاری...</span>
-            <!-- [MODIFIED] آواتار به یک علامت سوال تغییر کرد -->
-            <img id="user-avatar" src="https://i.imgur.com/gsvf8Hw.png" alt="آواتار کاربر">
-        </div>
-        <!-- [MODIFIED] دکمه‌ها خارج از کادر و با ترتیب جدید قرار گرفتند -->
-        <div class="menu-buttons">
-            <button class="menu-button">سازندگان</button>
-            <button class="menu-button">رده بندی</button>
+        <!-- [NEW] Wrapper for profile and buttons -->
+        <div class="profile-and-menu-wrapper">
+            
+            <!-- Profile box with avatar and name -->
+            <div class="profile-section">
+                <div class="avatar-container">
+                    <!-- [MODIFIED] Avatar on the left, name on the right (for RTL) -->
+                    <img id="user-avatar" src="https://i.imgur.com/T2bT1tG.png" alt="آواتار کاربر">
+                    <span id="user-display-name">در حال بارگذاری...</span>
+                </div>
+            </div>
+
+            <!-- Menu buttons below the profile box -->
+            <div class="menu-buttons">
+                <!-- [MODIFIED] Button order changed -->
+                <button class="menu-button">سازندگان</button>
+                <button class="menu-button">رده بندی</button>
+            </div>
+
         </div>
     </div>
 
