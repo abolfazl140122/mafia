@@ -3,134 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>شهر مافیا - صفحه اصلی</title>
+    <title>شهر مافیا - لابی اصلی</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary-accent: #e6c58a; /* A moody gold/brass color */
-            --dark-bg: #1a140f;
-            --text-light: #f0e6d8;
-            --shadow-color: rgba(0, 0, 0, 0.7);
-        }
-
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        html {
+        html, body {
             height: 100%;
+            overflow: hidden; /* جلوگیری از اسکرول */
         }
 
         body {
             font-family: 'Vazirmatn', sans-serif;
-            /* تنظیمات پس‌زمینه */
             background-image: url('https://up.20script.ir/file/6195-file-000000001500622f9419de6c322df297-1-.jpg');
             background-size: cover;
             background-position: center center;
             background-repeat: no-repeat;
-            
-            /* لایه تیره روی پس‌زمینه برای خوانایی بهتر متن */
-            background-color: rgba(0, 0, 0, 0.4);
-            background-blend-mode: multiply;
-
-            color: var(--text-light);
-            
-            /* چیدمان اصلی برای اندروید */
+            background-attachment: fixed; /* باعث می‌شود پس‌زمینه هنگام باز شدن کیبورد ثابت بماند */
+            color: #f0e6d2;
             display: flex;
             flex-direction: column;
-            justify-content: space-between; /* کلید اصلی چیدمان: بالا، وسط، پایین */
+            justify-content: space-between; /* عناصر را در بالا و پایین قرار می‌دهد */
             align-items: center;
-            min-height: 100vh;
-            padding: 24px;
+            padding: 20px;
+        }
+
+        /* کانتینر برای عناصر بالا-راست */
+        .top-right-container {
+            width: 100%;
+            display: flex;
+            justify-content: flex-end; /* همه چیز را به سمت راست هل می‌دهد */
+            align-items: flex-start;
+        }
+
+        .profile-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.4);
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .avatar-container {
+            display: flex;
+            align-items: center;
+            gap: 12px; /* فاصله بین آواتار و نام */
+        }
+        
+        #user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid #c5a687;
+            object-fit: cover;
+        }
+
+        #user-display-name {
+            font-size: 1rem;
+            font-weight: 700;
+            text-shadow: 1px 1px 3px #000;
+        }
+        
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px; /* فاصله بین دکمه‌ها */
+            margin-top: 12px;
+            width: 100%;
+        }
+
+        .menu-button {
+            background-color: rgba(74, 44, 42, 0.7); /* رنگ قهوه‌ای تیره نیمه‌شفاف */
+            color: #e0dacc;
+            border: 1px solid #c5a687;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
             text-align: center;
         }
 
-        .main-content {
-            flex-grow: 1;
+        .menu-button:hover {
+            background-color: rgba(94, 61, 59, 0.9);
+        }
+        
+        .menu-button:active {
+            transform: scale(0.97);
+        }
+
+        /* کانتینر برای دکمه شروع بازی در پایین */
+        .start-game-container {
+            width: 100%;
             display: flex;
-            align-items: center;
             justify-content: center;
-            width: 100%;
+            padding-bottom: 20px; /* فاصله از لبه پایین صفحه */
         }
 
-        #user-info {
-            width: 100%;
-            font-size: 1rem;
-            padding: 8px 12px;
-            background-color: rgba(0, 0, 0, 0.5);
-            border-radius: 8px;
-            border: 1px solid var(--primary-accent);
-            text-shadow: 1px 1px 3px var(--shadow-color);
-        }
-
-        /* دکمه جدید شروع بازی */
         #start-game-button {
-            padding: 20px 40px;
-            font-size: 1.8rem;
+            padding: 15px 40px;
+            font-size: 1.3rem;
             font-weight: 900;
-            color: var(--dark-bg);
-            background-color: var(--primary-accent);
-            border: 2px solid #fff;
-            border-radius: 12px;
+            color: #ffffff;
+            background: linear-gradient(145deg, #8c4843, #5a2c2a);
+            border: 2px solid #ffc947;
+            border-radius: 15px;
             cursor: pointer;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-            box-shadow: 0 8px 15px var(--shadow-color);
-            transition: all 0.2s ease-in-out;
-            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5), inset 0 -2px 5px rgba(0,0,0,0.3);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.7);
         }
 
         #start-game-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 20px var(--shadow-color);
-            background-color: #f5d8a0; /* رنگ روشن‌تر هنگام هاور */
+            background: linear-gradient(145deg, #a1534d, #6b3431);
+            box-shadow: 0 8px 20px rgba(255, 201, 71, 0.3), inset 0 -2px 5px rgba(0,0,0,0.3);
         }
 
         #start-game-button:active {
-            transform: translateY(1px);
-            box-shadow: 0 4px 8px var(--shadow-color);
+            transform: scale(0.96);
         }
 
-        /* استایل جدید برای دکمه خروج */
-        #logout-button {
-            width: 100%;
-            max-width: 300px;
-            padding: 12px 20px;
-            font-size: 1rem;
-            font-weight: 700;
-            color: var(--text-light);
-            background-color: transparent;
-            border: 2px solid var(--primary-accent);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        #logout-button:hover {
-            background-color: var(--primary-accent);
-            color: var(--dark-bg);
-        }
     </style>
 </head>
 <body>
-    
-    <!-- اطلاعات کاربر در بالای صفحه -->
-    <p id="user-info">در حال بارگذاری اطلاعات کاربر...</p>
 
-    <!-- محتوای اصلی (دکمه شروع) در وسط صفحه -->
-    <div class="main-content">
+    <div class="top-right-container">
+        <div class="profile-section">
+            <div class="avatar-container">
+                <span id="user-display-name">در حال بارگذاری...</span>
+                <img id="user-avatar" src="https://i.imgur.com/T2bT1tG.png" alt="آواتار کاربر"> <!-- آواتار پیش‌فرض -->
+            </div>
+            <div class="menu-buttons">
+                <button class="menu-button">رده بندی</button>
+                <button class="menu-button">سازندگان</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="start-game-container">
         <button id="start-game-button">شروع بازی</button>
     </div>
 
-    <!-- دکمه خروج در پایین صفحه -->
-    <button id="logout-button">خروج از حساب</button>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
@@ -145,38 +170,32 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        const userInfo = document.getElementById('user-info');
-        const logoutButton = document.getElementById('logout-button');
-        const startGameButton = document.getElementById('start-game-button');
+        const userDisplayName = document.getElementById('user-display-name');
+        const userAvatar = document.getElementById('user-avatar');
 
-        // Check user status and display name
+        // بررسی وضعیت ورود کاربر
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // User is signed in.
-                userInfo.textContent = `شما با نام کاربری ${user.displayName || 'ناشناس'} وارد شده‌اید.`;
+                // کاربر وارد شده است
+                const displayName = user.displayName || "کاربر ناشناس";
+                userDisplayName.textContent = displayName;
+                
+                // در آینده می‌توانید آدرس عکس پروفایل کاربر را از اینجا بگیرید
+                // if (user.photoURL) {
+                //     userAvatar.src = user.photoURL;
+                // }
+
             } else {
-                // No user is signed in, redirect to login page.
+                // هیچ کاربری وارد نشده است، به صفحه ورود هدایت شود
                 window.location.href = './login.html';
             }
         });
 
-        // Handle logout
-        logoutButton.addEventListener('click', async () => {
-            try {
-                await signOut(auth);
-                window.location.href = './login.html';
-            } catch (error) {
-                console.error("Error signing out: ", error);
-                alert("خطا در خروج از حساب.");
-            }
+        // رویداد کلیک برای دکمه شروع بازی (فعلا کاری انجام نمی‌دهد)
+        document.getElementById('start-game-button').addEventListener('click', () => {
+            console.log("دکمه شروع بازی کلیک شد.");
+            // در آینده منطق شروع بازی اینجا قرار می‌گیرد
         });
-        
-        // همانطور که خواسته شد، دکمه شروع بازی فعلا کاری انجام نمی‌دهد
-        startGameButton.addEventListener('click', () => {
-            // در آینده می‌توانید کد مربوط به شروع بازی را اینجا بنویسید
-            console.log("Start Game button clicked!");
-        });
-
     </script>
 </body>
 </html>
