@@ -335,9 +335,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        // --- START: موارد جدید اضافه شده برای قابلیت شما ---
-        import { getFirestore, doc, getDoc, collection, getDocs, updateDoc, runTransaction, arrayUnion, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-        // --- END: موارد جدید اضافه شده ---
+        import { getFirestore, doc, getDoc, collection, getDocs, updateDoc, runTransaction, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         // --- Firebase Configuration ---
         const firebaseConfig = {
@@ -382,51 +380,40 @@
             });
         }
         
-        // --- START: تابع loadShopData با منطق جدید ---
         async function loadShopData(user) {
             loader.style.display = 'flex';
             try {
+                // Fetch user data and all avatars in parallel
                 const userDocRef = doc(db, 'users', user.uid);
-                let userDocSnap = await getDoc(userDocRef);
-                let userData;
+                const avatarsCollectionRef = collection(db, 'avatars');
+                
+                let [userDocSnap, avatarsSnapshot] = await Promise.all([
+                    getDoc(userDocRef),
+                    getDocs(avatarsCollectionRef)
+                ]);
 
                 if (!userDocSnap.exists()) {
-                    // کاربر جدید است! پروفایل او را با 25 الماس هدیه ایجاد می‌کنیم
-                    console.log("کاربر جدید شناسایی شد. در حال ایجاد پروفایل و افزودن 25 الماس هدیه...");
-                    
-                    // آواتار پیش‌فرض برای کاربران جدید
-                    const defaultAvatarUrl = "https://up.20script.ir/file/40b6-Copilot-20250812-110015-removebg-preview.png";
-                    
-                    const newUserProfile = {
-                        uid: user.uid,
-                        email: user.email,
-                        displayName: user.displayName || user.email.split('@')[0],
-                        gems: 25, // <<<< هدیه ثبت‌نام!
-                        avatarUrl: defaultAvatarUrl,
-                        ownedAvatars: ["default"], // آیدی آواتار پیش‌فرض
-                        createdAt: serverTimestamp()
-                    };
-
-                    await setDoc(userDocRef, newUserProfile);
-                    userData = newUserProfile;
-                    console.log("پروفایل کاربر جدید با موفقیت ساخته شد.");
-                } else {
-                    // کاربر قدیمی است، اطلاعاتش را می‌خوانیم
-                    userData = userDocSnap.data();
+                    throw new Error("اطلاعات کاربر یافت نشد! لطفاً با پشتیبانی تماس بگیرید.");
                 }
-
-                // ذخیره اطلاعات کاربر در متغیر سراسری
+                
+                let userData = userDocSnap.data() || {};
+                
+                // <--- تغییر کلیدی 1: بررسی و افزودن جم پیش‌فرض --->
+                // اگر فیلد 'game' وجود نداشت، آن را با مقدار 25 ایجاد می‌کنیم
+                if (userData.game === undefined) {
+                    console.log("کاربر جم پیش‌فرض را ندارد. در حال افزودن 25 جم...");
+                    await updateDoc(userDocRef, { game: 25 });
+                    userData.game = 25; // مقدار را به صورت محلی هم آپدیت می‌کنیم
+                }
+                
+                // <--- تغییر کلیدی 2: خواندن اطلاعات از فیلد 'game' --->
                 currentUserData = {
                     uid: user.uid,
                     displayName: userData.displayName || "کاربر",
-                    gems: userData.gems || 0,
+                    gems: userData.game || 0, // <<<<<<<< اینجا از 'game' می‌خوانیم
                     ownedAvatars: userData.ownedAvatars || [],
                     avatarUrl: userData.avatarUrl || ""
                 };
-
-                // حالا که اطلاعات کاربر را داریم، لیست آواتارها را بارگذاری می‌کنیم
-                const avatarsCollectionRef = collection(db, 'avatars');
-                const avatarsSnapshot = await getDocs(avatarsCollectionRef);
                 
                 allAvatars = [];
                 avatarsSnapshot.forEach(doc => {
@@ -438,7 +425,6 @@
                     }
                 });
 
-                // نمایش فروشگاه با اطلاعات به‌روز شده
                 renderShop();
 
             } catch (error) {
@@ -448,29 +434,20 @@
                 loader.style.display = 'none';
             }
         }
-        // --- END: تابع loadShopData با منطق جدید ---
 
         function renderShop() {
-            // Update user info bar
             userDisplayNameEl.textContent = currentUserData.displayName;
             userGemsEl.textContent = currentUserData.gems.toLocaleString('fa');
-
-            // Clear previous items
             avatarGrid.innerHTML = '';
             
-            // Render each avatar card
             allAvatars.forEach(avatar => {
                 const card = document.createElement('div');
                 card.className = 'avatar-card';
-
                 const isOwned = currentUserData.ownedAvatars.includes(avatar.id);
                 const isEquipped = currentUserData.avatarUrl === avatar.imageUrl;
-
                 if (isOwned) card.classList.add('owned');
                 if (isEquipped) card.classList.add('equipped');
-
                 let content = `<img src="${avatar.imageUrl}" alt="${avatar.name}" class="avatar-image">`;
-
                 if (isOwned) {
                     if(isEquipped) {
                          content += `<div class="status-badge" style="background-color: #ffc947; color: #333;">فعال</div>`;
@@ -484,7 +461,6 @@
                             <img src="https://i.imgur.com/2jw9S5s.png" alt="Gem" class="gem-icon">
                         </div>`;
                 }
-                
                 card.innerHTML = content;
                 card.addEventListener('click', () => handleAvatarClick(avatar, isOwned, isEquipped));
                 avatarGrid.appendChild(card);
@@ -492,19 +468,17 @@
         }
 
         function handleAvatarClick(avatar, isOwned, isEquipped) {
-            if (isEquipped) return; // Do nothing if already equipped
+            if (isEquipped) return; 
 
             modalImg.src = avatar.imageUrl;
 
             if (isOwned) {
-                // Show equip modal
                 modalTitle.textContent = "تجهیز آواتار";
                 modalText.textContent = `آیا می‌خواهید آواتار "${avatar.name}" را به عنوان پروفایل خود انتخاب کنید؟`;
                 modalConfirmBtn.textContent = "تجهیز";
                 modalConfirmBtn.onclick = () => equipAvatar(avatar);
                 showModal();
             } else {
-                // Show purchase modal
                 if (currentUserData.gems >= avatar.price) {
                     modalTitle.textContent = "خرید آواتار";
                     modalText.innerHTML = `آیا می‌خواهید آواتار "${avatar.name}" را با قیمت <strong style="color: #ffc947;">${avatar.price.toLocaleString('fa')}</strong> الماس خریداری کنید؟`;
@@ -512,12 +486,11 @@
                     modalConfirmBtn.onclick = () => purchaseAvatar(avatar);
                     showModal();
                 } else {
-                    // Not enough gems
                     modalTitle.textContent = "الماس کافی نیست";
                     modalText.innerHTML = `شما برای خرید این آواتار به <strong style="color: #ffc947;">${avatar.price.toLocaleString('fa')}</strong> الماس نیاز دارید، اما فقط <strong>${currentUserData.gems.toLocaleString('fa')}</strong> الماس دارید.`;
                     modalConfirmBtn.textContent = "باشه";
                     modalConfirmBtn.onclick = hideModal;
-                    modalCancelBtn.style.display = 'none'; // Hide cancel button
+                    modalCancelBtn.style.display = 'none'; 
                     showModal();
                 }
             }
@@ -537,14 +510,15 @@
                         throw "کاربر یافت نشد!";
                     }
 
-                    const currentGems = userDoc.data().gems || 0;
+                    // <--- تغییر کلیدی 3: خواندن و آپدیت فیلد 'game' در تراکنش --->
+                    const currentGems = userDoc.data().game || 0; // <<<<<<<< اینجا از 'game' می‌خوانیم
                     if (currentGems < avatar.price) {
                         throw "الماس کافی نیست!";
                     }
 
                     const newGems = currentGems - avatar.price;
                     transaction.update(userDocRef, {
-                        gems: newGems,
+                        game: newGems, // <<<<<<<< اینجا فیلد 'game' را آپدیت می‌کنیم
                         ownedAvatars: arrayUnion(avatar.id)
                     });
                 });
@@ -575,7 +549,6 @@
                     avatarUrl: avatar.imageUrl
                 });
 
-                // Update local data and re-render
                 currentUserData.avatarUrl = avatar.imageUrl;
                 renderShop();
                 alert('آواتار با موفقیت تجهیز شد!');
@@ -593,7 +566,7 @@
         // --- Modal Helper Functions ---
         function showModal() {
             modal.classList.add('visible');
-            modalCancelBtn.style.display = 'flex'; // Ensure cancel is visible by default
+            modalCancelBtn.style.display = 'flex'; 
         }
 
         function hideModal() {
