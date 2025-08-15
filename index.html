@@ -13,7 +13,7 @@
         :root {
             --wood-dark: #1a140f;
             --wood-texture-url: url('https://www.transparenttextures.com/patterns/dark-wood.png');
-            --panel-bg-gradient: linear-gradient(145deg, #4a3a2a, #2c2218);
+            --panel-bg-gradient: linear-gradient(145deg, #3a2e22, #1c160f);
             --panel-border: #5c4a3a;
             --text-gold: #ffc947;
             --text-light: #e0dacc;
@@ -21,63 +21,126 @@
             --glow-red: #ff3131;
             --logo-glow-main: #ffdd00;
             --progress-bar-bg: #2a1f15;
-            --progress-bar-fill-start: #1eff00;
-            --progress-bar-fill-end: #00ff87;
-            --progress-bar-error-start: #ff416c;
-            --progress-bar-error-end: #ff4b2b;
-            --maintenance-icon-color: #ffc947;
-            --countdown-bg: rgba(0,0,0,0.2);
-            --glow-border-color: #ffc947;
+            --progress-bar-fill: #1eff00;
+            --countdown-bg: rgba(0,0,0,0.3);
+            --panel-glow-color: rgba(255, 201, 71, 0.6);
         }
         @keyframes panel-intro { from { opacity: 0; transform: translateY(50px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
         @keyframes dual-glow-pulse { 0% { transform: rotate(0deg) scale(1); opacity: 0.7; } 50% { transform: rotate(180deg) scale(1.1); opacity: 1; } 100% { transform: rotate(360deg) scale(1); opacity: 0.7; } }
-        @keyframes logo-glow { 0%, 100% { filter: drop-shadow(0 0 8px var(--logo-glow-main)) drop-shadow(0 0 16px rgba(255, 221, 0, 0.5)); } 50% { filter: drop-shadow(0 0 16px var(--logo-glow-main)) drop-shadow(0 0 32px rgba(255, 221, 0, 0.7)); } }
-        @keyframes border-glow { 0%, 100% { box-shadow: 0 0 15px 0px var(--glow-border-color), inset 0 0 5px 0px rgba(255,201,71,0.5); } 50% { box-shadow: 0 0 25px 5px var(--glow-border-color), inset 0 0 10px 2px rgba(255,201,71,0.5); } }
-
+        @keyframes logo-glow { 0%, 100% { filter: drop-shadow(0 0 8px var(--logo-glow-main)); } 50% { filter: drop-shadow(0 0 16px var(--logo-glow-main)); } }
+        
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { height: 100%; overflow: hidden; }
-        body { font-family: 'Vazirmatn', sans-serif; background-color: var(--wood-dark); background-image: var(--wood-texture-url); color: var(--text-light); display: flex; align-items: center; justify-content: center; }
+        body { font-family: 'Vazirmatn', sans-serif; background-color: var(--wood-dark); background-image: var(--wood-texture-url); color: var(--text-light); display: flex; align-items: center; justify-content: center; padding: 20px; }
         
         .panel { width: 100%; max-width: 480px; background: var(--panel-bg-gradient); border-radius: 24px; border: 2px solid var(--panel-border); padding: 30px 40px; text-align: center; animation: panel-intro 1s cubic-bezier(0.25, 1, 0.5, 1); }
         
-        /* Loading Panel */
+        /* Loading Panel Styles */
+        #loading-panel { box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5); }
         #logo-container { position: relative; margin: 0 auto 25px auto; width: 180px; height: 180px; display: flex; align-items: center; justify-content: center; }
         #logo-container::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: conic-gradient(var(--glow-green), var(--glow-red), var(--glow-green)); filter: blur(40px); animation: dual-glow-pulse 6s linear infinite; }
         #logo { width: 100%; height: auto; position: relative; z-index: 1; animation: logo-glow 3s ease-in-out infinite; }
         #title { font-size: 3rem; font-weight: 900; color: var(--text-gold); margin-bottom: 30px; text-shadow: 0 0 5px rgba(255, 201, 71, 0.5), 2px 2px 4px rgba(0,0,0,0.5); }
         #progress-bar-container { width: 100%; height: 20px; background-color: var(--progress-bar-bg); border-radius: 10px; padding: 3px; margin-bottom: 15px; }
-        #progress-bar-fill { width: 0%; height: 100%; border-radius: 7px; background: linear-gradient(90deg, var(--progress-bar-fill-start), var(--progress-bar-fill-end)); transition: width 0.5s cubic-bezier(0.65, 0, 0.35, 1), background 0.5s ease; }
-        #progress-bar-fill.error { background: linear-gradient(90deg, var(--progress-bar-error-start), var(--progress-bar-error-end)); }
+        #progress-bar-fill { width: 0%; height: 100%; border-radius: 7px; background: var(--progress-bar-fill); transition: width 0.5s cubic-bezier(0.65, 0, 0.35, 1); }
         #status-message { font-size: 1.1rem; font-weight: 700; min-height: 28px; color: var(--text-light); }
 
-        /* --- Maintenance Panel (Upgraded) --- */
-        #maintenance-panel { animation: border-glow 4s ease-in-out infinite; }
-        #maintenance-banner { width: 100%; margin-bottom: 25px; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.5); }
-        #banner-image { width: 100%; display: block; aspect-ratio: 16 / 9; object-fit: cover; }
-        #maintenance-icon { width: 80px; height: 80px; color: var(--maintenance-icon-color); margin: 0 auto 20px auto; filter: drop-shadow(0 0 10px rgba(255, 201, 71, 0.6)); }
-        #maintenance-title { font-size: 2.2rem; font-weight: 900; color: var(--text-gold); margin-bottom: 15px; text-shadow: 0 2px 4px rgba(0,0,0,0.4); }
-        #maintenance-message { font-size: 1rem; line-height: 1.8; margin-bottom: 30px; color: var(--text-light); }
-        #countdown-timer { display: flex; justify-content: center; gap: 10px; }
-        .time-block { background-color: var(--countdown-bg); padding: 10px; border-radius: 8px; border: 1px solid var(--panel-border); min-width: 75px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
-        .time-value { font-size: 2.5rem; font-weight: 900; color: white; line-height: 1.1; text-shadow: 0 0 5px var(--glow-green); }
-        .time-label { font-size: 0.8rem; font-weight: 400; color: var(--text-light); margin-top: 5px; }
+        /* [NEW] - Enhanced Maintenance Panel Styles */
+        #maintenance-panel {
+            box-shadow: 0 0 15px var(--panel-glow-color), 0 0 30px var(--panel-glow-color);
+            padding: 20px;
+        }
+        #maintenance-banner-container {
+            width: 100%;
+            margin-bottom: 20px;
+            border-radius: 16px;
+            overflow: hidden; /* Ensures the image respects the border radius */
+            background-color: var(--progress-bar-bg);
+        }
+        #maintenance-banner-img {
+            width: 100%;
+            height: auto; /* Crucial for maintaining aspect ratio */
+            display: block; /* Removes any extra space below the image */
+        }
+        #maintenance-title {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: var(--text-gold);
+            margin-bottom: 15px;
+        }
+        #maintenance-message {
+            font-size: 1rem;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            color: var(--text-light);
+            max-width: 90%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        #countdown-timer {
+            display: flex;
+            justify-content: center;
+            gap: 10px; /* Reduced gap for a tighter look */
+        }
+        .time-block {
+            background-color: var(--countdown-bg);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--panel-border);
+            width: 75px; /* Fixed width for uniformity */
+        }
+        .time-value {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: white;
+            line-height: 1;
+        }
+        .time-label {
+            font-size: 0.8rem;
+            font-weight: 400;
+            color: var(--text-light);
+            margin-top: 5px;
+        }
+        #refresh-button {
+            background: linear-gradient(45deg, var(--glow-green), #00ff87);
+            color: var(--wood-dark);
+            border: none;
+            padding: 12px 30px;
+            font-family: 'Vazirmatn', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px var(--glow-green);
+        }
+        #refresh-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px var(--glow-green);
+        }
+
     </style>
 </head>
 <body>
 
     <div id="loading-panel" class="panel">
-        <div id="logo-container"><img id="logo" src="https://up.20script.ir/file/40b6-Copilot-20250812-110015-removebg-preview.png" alt="لوگوی شهر مافیا"></div>
+        <div id="logo-container">
+            <img id="logo" src="https://up.20script.ir/file/40b6-Copilot-20250812-110015-removebg-preview.png" alt="لوگوی شهر مافیا">
+        </div>
         <h1 id="title">شهر مافیا</h1>
         <div id="progress-bar-container"><div id="progress-bar-fill"></div></div>
         <p id="status-message">در حال آماده سازی...</p>
     </div>
 
     <div id="maintenance-panel" class="panel" style="display: none;">
-        <div id="maintenance-banner" style="display: none;"><img id="banner-image" src="" alt="اطلاعیه بروزرسانی"></div>
-        <svg id="maintenance-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"></path></svg>
+        <div id="maintenance-banner-container">
+            <!-- The banner image will be loaded here by JavaScript -->
+            <img id="maintenance-banner-img" src="" alt="بنر بروزرسانی">
+        </div>
         <h1 id="maintenance-title"></h1>
         <p id="maintenance-message"></p>
         <div id="countdown-timer">
+            <!-- Swapped order to be visually correct in RTL: Days, Hours, Minutes, Seconds -->
             <div class="time-block"><div id="days" class="time-value">00</div><div class="time-label">روز</div></div>
             <div class="time-block"><div id="hours" class="time-value">00</div><div class="time-label">ساعت</div></div>
             <div class="time-block"><div id="minutes" class="time-value">00</div><div class="time-label">دقیقه</div></div>
@@ -115,7 +178,7 @@
                 }
             } catch (error) {
                 console.error("خطا در اتصال اولیه:", error);
-                showConnectionError();
+                document.getElementById('status-message').textContent = 'خطا در اتصال! اینترنت خود را بررسی کنید.';
             }
         }
 
@@ -123,20 +186,14 @@
             document.getElementById('loading-panel').style.display = 'none';
             document.getElementById('maintenance-panel').style.display = 'block';
 
-            // --- منطق جدید برای بنر ---
-            const bannerContainer = document.getElementById('maintenance-banner');
-            const bannerImage = document.getElementById('banner-image');
-            const defaultIcon = document.getElementById('maintenance-icon');
-
-            if (config.url && config.url.trim() !== '') {
-                bannerImage.src = config.url;
+            // [NEW] - Logic for dynamic banner
+            const bannerContainer = document.getElementById('maintenance-banner-container');
+            if (config.bannerUrl && typeof config.bannerUrl === 'string' && config.bannerUrl.trim() !== '') {
+                document.getElementById('maintenance-banner-img').src = config.bannerUrl;
                 bannerContainer.style.display = 'block';
-                defaultIcon.style.display = 'none';
             } else {
-                bannerContainer.style.display = 'none';
-                defaultIcon.style.display = 'block';
+                bannerContainer.style.display = 'none'; // Hide banner if no URL is provided
             }
-            // --- پایان منطق بنر ---
 
             document.getElementById('maintenance-title').textContent = config.title || "در حال بروزرسانی";
             document.getElementById('maintenance-message').textContent = config.message || "به زودی باز خواهیم گشت.";
@@ -149,6 +206,7 @@
         }
 
         function startCountdown(targetDate) {
+            const countdownTimerEl = document.getElementById('countdown-timer');
             const countdownElements = {
                 days: document.getElementById('days'), hours: document.getElementById('hours'),
                 minutes: document.getElementById('minutes'), seconds: document.getElementById('seconds')
@@ -156,24 +214,29 @@
 
             const interval = setInterval(() => {
                 const distance = targetDate.getTime() - new Date().getTime();
+
                 if (distance < 0) {
                     clearInterval(interval);
-                    document.getElementById('countdown-timer').innerHTML = "<p style='font-size: 1.2rem; color: var(--glow-green);'>بروزرسانی تمام شد! لطفاً صفحه را رفرش کنید.</p>";
+                    // [NEW] - Show a refresh button instead of just text
+                    countdownTimerEl.innerHTML = `<button id="refresh-button">ورود به بازی</button>`;
+                    document.getElementById('refresh-button').onclick = () => location.reload();
                     return;
                 }
                 const f = (n) => String(Math.floor(n)).padStart(2, '0');
-                countdownElements.days.textContent = f(distance / 86400000);
-                countdownElements.hours.textContent = f((distance % 86400000) / 3600000);
-                countdownElements.minutes.textContent = f((distance % 3600000) / 60000);
-                countdownElements.seconds.textContent = f((distance % 60000) / 1000);
+                countdownElements.days.textContent = f(distance / (1000 * 60 * 60 * 24));
+                countdownElements.hours.textContent = f((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                countdownElements.minutes.textContent = f((distance % (1000 * 60 * 60)) / (1000 * 60));
+                countdownElements.seconds.textContent = f((distance % (1000 * 60)) / 1000);
             }, 1000);
         }
 
         function startNormalLoading(auth, db) {
+            // ... (The normal loading function remains unchanged) ...
+            const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
             const progressBarFill = document.getElementById('progress-bar-fill');
             const statusMessage = document.getElementById('status-message');
-            const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
             const updateProgress = (p, m) => { progressBarFill.style.width = `${p}%`; statusMessage.textContent = m; };
+
             updateProgress(40, '...برقراری ارتباط با سرورهای شهر');
             onAuthStateChanged(auth, async (user) => {
                 await delay(500); 
@@ -186,19 +249,11 @@
                     await delay(1500); 
                     window.location.href = './main.html';
                 } else {
-                    updateProgress(100, 'احراز هویت انجام نشد.'); await delay(1000);
-                    updateProgress(100, 'در حال هدایت به صفحه ورود...'); await delay(1500);
+                    updateProgress(100, 'احراز هویت انجام نشد. در حال هدایت به صفحه ورود...');
+                    await delay(2000);
                     window.location.href = './login.html';
                 }
             });
-        }
-
-        function showConnectionError() {
-            const progressBarFill = document.getElementById('progress-bar-fill');
-            const statusMessage = document.getElementById('status-message');
-            progressBarFill.classList.add('error');
-            progressBarFill.style.width = `100%`;
-            statusMessage.textContent = 'خطا در اتصال! اتصال اینترنت خود را بررسی کنید.';
         }
 
         initializeAppAndCheckStatus();
