@@ -73,11 +73,10 @@
             border-radius: 50%;
             border: 2px solid #c5a687;
             object-fit: cover;
-            cursor: pointer; /* [تغییر جدید] - نشانگر موس را به حالت دست تغییر می‌دهد تا قابل کلیک بودن را نشان دهد */
-            transition: all 0.2s ease-in-out; /* [تغییر جدید] - انیمیشن نرم برای حالت هاور */
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
         }
 
-        /* [تغییر جدید] - افکت زیبا هنگام بردن موس روی آواتار */
         #user-avatar:hover {
             transform: scale(1.1);
             border-color: #ffc947;
@@ -98,12 +97,11 @@
             align-items: flex-end; /* To align buttons to the right if they have different widths */
         }
 
-        /* More attractive buttons with original width */
         .menu-button {
             background: linear-gradient(145deg, rgba(80, 50, 48, 0.8), rgba(56, 33, 32, 0.9));
             color: #e0dacc;
             border: 1px solid #c5a687;
-            padding: 8px 15px; /* Reverted to original padding to keep the width small */
+            padding: 8px 15px;
             border-radius: 8px;
             font-size: 0.9rem;
             font-weight: 700;
@@ -162,25 +160,17 @@
 <body>
 
     <div class="top-right-container">
-        <!-- Wrapper for profile and buttons -->
         <div class="profile-and-menu-wrapper">
-            
-            <!-- Profile box with avatar and name -->
             <div class="profile-section">
                 <div class="avatar-container">
-                    <!-- Avatar on the left, name on the right (for RTL) -->
                     <img id="user-avatar" src="https://i.imgur.com/T2bT1tG.png" alt="آواتار کاربر">
                     <span id="user-display-name">در حال بارگذاری...</span>
                 </div>
             </div>
-
-            <!-- Menu buttons below the profile box -->
             <div class="menu-buttons">
-                <!-- Button order changed -->
                 <button class="menu-button">سازندگان</button>
                 <button class="menu-button">رده بندی</button>
             </div>
-
         </div>
     </div>
 
@@ -191,6 +181,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        // <--- تغییر 1: افزودن Firestore --->
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
@@ -204,21 +196,44 @@
         
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        // <--- تغییر 2: مقداردهی اولیه Firestore --->
+        const db = getFirestore(app);
 
         const userDisplayName = document.getElementById('user-display-name');
         const userAvatar = document.getElementById('user-avatar');
 
-        // بررسی وضعیت ورود کاربر
-        onAuthStateChanged(auth, (user) => {
+        // <--- تغییر 3: تبدیل تابع به async برای استفاده از await --->
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
                 // کاربر وارد شده است
-                const displayName = user.displayName || "کاربر ناشناس";
-                userDisplayName.textContent = displayName;
-                
-                // در آینده می‌توانید آدرس عکس پروفایل کاربر را از اینجا بگیرید
-                // if (user.photoURL) {
-                //     userAvatar.src = user.photoURL;
-                // }
+                // <--- تغییر 4: دریافت اطلاعات کامل کاربر از دیتابیس Firestore --->
+                const userDocRef = doc(db, 'users', user.uid);
+                try {
+                    const userDocSnap = await getDoc(userDocRef);
+                    if (userDocSnap.exists()) {
+                        const userData = userDocSnap.data();
+                        
+                        // نمایش نام از دیتابیس
+                        userDisplayName.textContent = userData.displayName || "کاربر ناشناس";
+                        
+                        // نمایش آواتار از دیتابیس
+                        // اگر کاربر آواتاری انتخاب کرده بود (avatarUrl خالی نبود)، آن را نمایش بده
+                        if (userData.avatarUrl) {
+                            userAvatar.src = userData.avatarUrl;
+                        } else {
+                            // در غیر این صورت، از آواتار پیش‌فرض استفاده می‌شود که در HTML مشخص شده است
+                             console.log("کاربر آواتار مشخصی ندارد. از آواتار پیش‌فرض استفاده می‌شود.");
+                        }
+                    } else {
+                        // اگر داکیومنت کاربر در Firestore وجود نداشت (که حالت نادری است)
+                        userDisplayName.textContent = user.displayName || "کاربر ناشناس";
+                        console.error("اطلاعات کاربر در دیتابیس یافت نشد!");
+                    }
+                } catch (error) {
+                    console.error("خطا در دریافت اطلاعات کاربر از Firestore:", error);
+                    // در صورت بروز خطا، از نام کاربری پیش‌فرض استفاده کن
+                    userDisplayName.textContent = user.displayName || "کاربر ناشناس";
+                }
 
             } else {
                 // هیچ کاربری وارد نشده است، به صفحه ورود هدایت شود
@@ -226,16 +241,15 @@
             }
         });
 
-        // [تغییر جدید] - رویداد کلیک برای آواتار کاربر جهت هدایت به فروشگاه
+        // رویداد کلیک برای آواتار کاربر جهت هدایت به فروشگاه
         userAvatar.addEventListener('click', () => {
             console.log("آواتار کاربر کلیک شد. انتقال به فروشگاه آواتار...");
             window.location.href = './Avatar shop.html';
         });
 
-        // رویداد کلیک برای دکمه شروع بازی (فعلا کاری انجام نمی‌دهد)
+        // رویداد کلیک برای دکمه شروع بازی
         document.getElementById('start-game-button').addEventListener('click', () => {
             console.log("دکمه شروع بازی کلیک شد.");
-            // در آینده منطق شروع بازی اینجا قرار می‌گیرد
         });
     </script>
 </body>
