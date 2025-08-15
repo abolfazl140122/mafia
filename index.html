@@ -42,27 +42,26 @@
         #progress-bar-container { width: 100%; height: 20px; background-color: var(--progress-bar-bg); border-radius: 10px; padding: 3px; margin-bottom: 15px; }
         #progress-bar-fill { width: 0%; height: 100%; border-radius: 7px; background: linear-gradient(90deg, var(--progress-bar-fill-start), var(--progress-bar-fill-end)); transition: width 0.5s cubic-bezier(0.65, 0, 0.35, 1), background 0.5s ease; }
         
-        /* ===== Upgraded Maintenance Panel Styles (EDITED) ===== */
+        /* ===== Upgraded Maintenance Panel Styles ===== */
         #maintenance-panel {
             box-shadow: 0 0 25px var(--panel-glow), 0 15px 45px rgba(0, 0, 0, 0.7);
             padding: 25px;
         }
         #maintenance-banner-container {
             width: 100%;
-            height: 200px; /* 1. تعیین یک ارتفاع ثابت برای کادر بنر */
             margin-bottom: 25px;
             border-radius: 16px;
-            overflow: hidden; /* 2. این ویژگی برای برش قسمت‌های اضافی عکس ضروری است */
-            background-color: rgba(0,0,0,0.2); /* رنگ پس‌زمینه در صورت عدم بارگذاری عکس */
+            overflow: hidden; /* Ensures image stays within rounded corners */
+            background-color: rgba(0,0,0,0.2);
             border: 1px solid var(--panel-border);
         }
+        /* ===== START: EDIT FOR IMAGE SIZING ===== */
         #maintenance-banner {
-            width: 100%;
-            height: 100%; /* 3. عکس تمام ارتفاع و عرض کادر والد خود را می‌گیرد */
-            object-fit: cover; /* 4. این ویژگی کلیدی، عکس را برای پوشش کامل کادر، بزرگ کرده و قسمت‌های اضافی را برش می‌زند */
-            object-position: center; /* 5. اطمینان از اینکه مرکز عکس در کادر قرار گیرد */
-            display: block;
+            width: 100%; /* عرض عکس همیشه ۱۰۰٪ کانتینر والدش باشه */
+            height: auto; /* ارتفاع به صورت خودکار و متناسب با عرض تنظیم بشه تا نسبت تصویر حفظ بشه */
+            display: block; /* برای حذف فضای خالی احتمالی زیر عکس */
         }
+        /* ===== END: EDIT FOR IMAGE SIZING ===== */
         #maintenance-title {
             font-size: 2rem;
             font-weight: 900;
