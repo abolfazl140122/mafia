@@ -34,6 +34,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { height: 100%; overflow: hidden; }
         body { font-family: 'Vazirmatn', sans-serif; background-color: var(--wood-dark); background-image: var(--wood-texture-url); color: var(--text-light); display: flex; align-items: center; justify-content: center; }
+        
         .panel { width: 100%; max-width: 480px; background: var(--panel-bg-gradient); border-radius: 24px; border: 2px solid var(--panel-border); padding: 30px 40px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5); text-align: center; animation: panel-intro 1s cubic-bezier(0.25, 1, 0.5, 1); }
         #logo-container { position: relative; margin: 0 auto 25px auto; width: 180px; height: 180px; display: flex; align-items: center; justify-content: center; }
         #logo-container::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: conic-gradient(var(--glow-green), var(--glow-red), var(--glow-green)); filter: blur(40px); animation: dual-glow-pulse 6s linear infinite; }
@@ -53,12 +54,18 @@
     </style>
 </head>
 <body>
+
     <div id="loading-panel" class="panel">
-        <div id="logo-container"><img id="logo" src="https://up.20script.ir/file/40b6-Copilot-20250812-110015-removebg-preview.png" alt="لوگوی شهر مافیا"></div>
+        <div id="logo-container">
+            <img id="logo" src="https://up.20script.ir/file/40b6-Copilot-20250812-110015-removebg-preview.png" alt="لوگوی شهر مافیا">
+        </div>
         <h1 id="title">شهر مافیا</h1>
-        <div id="progress-bar-container"><div id="progress-bar-fill"></div></div>
+        <div id="progress-bar-container">
+            <div id="progress-bar-fill"></div>
+        </div>
         <p id="status-message">در حال آماده سازی...</p>
     </div>
+
     <div id="maintenance-panel" class="panel" style="display: none;">
         <svg id="maintenance-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"></path></svg>
         <h1 id="maintenance-title"></h1>
@@ -74,7 +81,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
@@ -86,65 +93,57 @@
             measurementId: "G-0PDHDWC6NV"
         };
         
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
         // ===================================================================
-        // ======================= تابع کنترل پنل ادمین ======================
+        // =========== شروع منطق اصلی برنامه - خواندن تنظیمات از سرور ==========
         // ===================================================================
-        /**
-         * تابع ادمین برای کنترل حالت بروزرسانی از طریق کنسول مرورگر.
-         * @param {boolean} enabled - آیا حالت بروزرسانی فعال شود یا خیر.
-         * @param {object} options - تنظیمات در صورت فعال‌سازی.
-         * @param {string} options.title - عنوان پنل بروزرسانی.
-         * @param {string} options.message - متن پنل بروزرسانی.
-         * @param {number} options.durationInMinutes - مدت زمان بروزرسانی به دقیقه.
-         */
-        async function updateMaintenanceStatus(enabled, options = {}) {
-            const maintenanceDocRef = doc(db, "settings", "maintenance");
 
-            if (!enabled) {
-                await setDoc(maintenanceDocRef, { enabled: false }, { merge: true });
-                console.log("✅ حالت بروزرسانی با موفقیت غیرفعال شد.");
-                alert("حالت بروزرسانی غیرفعال شد. صفحه را رفرش کنید.");
-                return;
+        const progressBarFill = document.getElementById('progress-bar-fill');
+        const statusMessage = document.getElementById('status-message');
+
+        // تابع اصلی که در ابتدا اجرا می‌شود
+        async function initializeAppAndCheckStatus() {
+            try {
+                // 1. اتصال به فایربیس
+                const app = initializeApp(firebaseConfig);
+                const db = getFirestore(app);
+                const auth = getAuth(app);
+
+                // 2. واکشی تنظیمات بروزرسانی از دیتابیس
+                const maintenanceDocRef = doc(db, 'settings', 'maintenance');
+                const docSnap = await getDoc(maintenanceDocRef);
+
+                // 3. بررسی وضعیت بروزرسانی
+                if (docSnap.exists() && docSnap.data().enabled === true) {
+                    // اگر بروزرسانی فعال بود، پنل آن را نمایش بده
+                    const config = docSnap.data();
+                    showMaintenancePanel(config);
+                } else {
+                    // در غیر این صورت، فرآیند لودینگ عادی را شروع کن
+                    startNormalLoading(auth, db);
+                }
+
+            } catch (error) {
+                console.error("خطا در اتصال اولیه یا واکشی تنظیمات:", error);
+                showConnectionError();
             }
-
-            const { title, message, durationInMinutes } = options;
-            if (!title || !message || !durationInMinutes) {
-                console.error("برای فعال‌سازی، باید عنوان، متن و مدت زمان را مشخص کنید.");
-                return;
-            }
-
-            const now = new Date();
-            const endTime = new Date(now.getTime() + durationInMinutes * 60 * 1000);
-
-            const maintenanceData = {
-                enabled: true,
-                title,
-                message,
-                endTime: endTime // Firestore به صورت خودکار Date را به Timestamp تبدیل می‌کند
-            };
-
-            await setDoc(maintenanceDocRef, maintenanceData);
-            console.log(`✅ حالت بروزرسانی فعال شد. پایان در: ${endTime.toLocaleString('fa-IR')}`);
-            alert(`حالت بروزرسانی تا ${durationInMinutes} دقیقه دیگر فعال شد.`);
         }
-        // این تابع را در دسترس کنسول قرار می‌دهیم تا بتوانیم آن را فراخوانی کنیم
-        window.setMaintenance = updateMaintenanceStatus;
-        // ===================================================================
 
-        function showMaintenancePanel(title, message, endTimeDate) {
+        function showMaintenancePanel(config) {
             document.getElementById('loading-panel').style.display = 'none';
             const maintenancePanel = document.getElementById('maintenance-panel');
             maintenancePanel.style.display = 'block';
 
-            document.getElementById('maintenance-title').textContent = title;
-            document.getElementById('maintenance-message').textContent = message;
+            document.getElementById('maintenance-title').textContent = config.title || "در حال بروزرسانی";
+            document.getElementById('maintenance-message').textContent = config.message || "به زودی باز خواهیم گشت.";
 
-            startCountdown(endTimeDate);
+            // نکته مهم: فایربیس زمان را با فرمت Timestamp ذخیره می‌کند
+            // ما باید آن را به فرمت Date جاوااسکریپت تبدیل کنیم
+            if (config.endTime && typeof config.endTime.toDate === 'function') {
+                const targetDate = config.endTime.toDate();
+                startCountdown(targetDate);
+            } else {
+                 document.getElementById('countdown-timer').innerHTML = "<p>زمان پایان مشخص نشده است.</p>";
+            }
         }
 
         function startCountdown(targetDate) {
@@ -156,98 +155,57 @@
             };
 
             const interval = setInterval(() => {
-                const now = new Date().getTime();
-                const distance = targetDate.getTime() - now;
+                const distance = targetDate.getTime() - new Date().getTime();
 
                 if (distance < 0) {
                     clearInterval(interval);
                     document.getElementById('countdown-timer').innerHTML = "<p style='font-size: 1.2rem; color: var(--glow-green);'>بروزرسانی تمام شد! لطفاً صفحه را رفرش کنید.</p>";
                     return;
                 }
-
-                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-                countdownElements.days.textContent = String(days).padStart(2, '0');
-                countdownElements.hours.textContent = String(hours).padStart(2, '0');
-                countdownElements.minutes.textContent = String(minutes).padStart(2, '0');
-                countdownElements.seconds.textContent = String(seconds).padStart(2, '0');
+                const f = (n) => String(Math.floor(n)).padStart(2, '0');
+                countdownElements.days.textContent = f(distance / (1000 * 60 * 60 * 24));
+                countdownElements.hours.textContent = f((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                countdownElements.minutes.textContent = f((distance % (1000 * 60 * 60)) / (1000 * 60));
+                countdownElements.seconds.textContent = f((distance % (1000 * 60)) / 1000);
             }, 1000);
         }
 
-        async function startNormalLoading() {
-            const progressBarFill = document.getElementById('progress-bar-fill');
-            const statusMessage = document.getElementById('status-message');
+        function startNormalLoading(auth, db) {
             const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+            const updateProgress = (p, m) => { progressBarFill.style.width = `${p}%`; statusMessage.textContent = m; };
 
-            function updateProgress(percent, message) {
-                progressBarFill.style.width = `${percent}%`;
-                statusMessage.textContent = message;
-            }
-
-            try {
-                updateProgress(20, '...در حال راه‌اندازی سیستم');
-                updateProgress(40, '...برقراری ارتباط با سرورهای شهر');
-                onAuthStateChanged(auth, async (user) => {
-                    await delay(500); 
-                    if (user) {
-                        updateProgress(70, '...در حال واکشی اطلاعات بازیکن');
-                        const userDocRef = doc(db, 'users', user.uid);
-                        const userDocSnap = await getDoc(userDocRef);
-                        let displayName = user.displayName || 'بازیکن';
-                        if (userDocSnap.exists()) {
-                            displayName = userDocSnap.data().displayName || displayName;
-                        }
-                        updateProgress(100, `خوش آمدید، ${displayName}!`);
-                        await delay(1500); 
-                        window.location.href = './main.html';
-                    } else {
-                        updateProgress(100, 'احراز هویت انجام نشد.');
-                        await delay(1000);
-                        updateProgress(100, 'در حال هدایت به صفحه ورود...');
-                        await delay(1500);
-                        window.location.href = './login.html';
-                    }
-                });
-            } catch (error) {
-                console.error("خطا در فرآیند لودینگ:", error);
-                progressBarFill.classList.add('error');
-                updateProgress(100, 'خطا در اتصال!');
-                statusMessage.textContent = 'امکان اتصال وجود ندارد. اتصال اینترنت خود را بررسی کنید.';
-            }
-        }
-
-        // نقطه شروع اصلی برنامه
-        async function main() {
-            try {
-                // اولین کار: بررسی وضعیت بروزرسانی از سرور
-                const maintenanceDocRef = doc(db, "settings", "maintenance");
-                const maintenanceDocSnap = await getDoc(maintenanceDocRef);
-
-                if (maintenanceDocSnap.exists() && maintenanceDocSnap.data().enabled === true) {
-                    const config = maintenanceDocSnap.data();
-                    const endTime = config.endTime.toDate(); // تبدیل Timestamp فایربیس به Date جاوااسکریپت
-                    
-                    // اگر زمان بروزرسانی هنوز تمام نشده باشد
-                    if (endTime > new Date()) {
-                        showMaintenancePanel(config.title, config.message, endTime);
-                        return; // اجرای ادامه کد متوقف می‌شود
-                    }
+            updateProgress(20, '...در حال راه‌اندازی سیستم');
+            updateProgress(40, '...برقراری ارتباط با سرورهای شهر');
+            
+            onAuthStateChanged(auth, async (user) => {
+                await delay(500); 
+                if (user) {
+                    updateProgress(70, '...در حال واکشی اطلاعات بازیکن');
+                    const userDocRef = doc(db, 'users', user.uid);
+                    const userDocSnap = await getDoc(userDocRef);
+                    let displayName = (userDocSnap.exists() && userDocSnap.data().displayName) ? userDocSnap.data().displayName : (user.displayName || 'بازیکن');
+                    updateProgress(100, `خوش آمدید، ${displayName}!`);
+                    await delay(1500); 
+                    window.location.href = './main.html';
+                } else {
+                    updateProgress(100, 'احراز هویت انجام نشد.');
+                    await delay(1000);
+                    updateProgress(100, 'در حال هدایت به صفحه ورود...');
+                    await delay(1500);
+                    window.location.href = './login.html';
                 }
-                
-                // اگر بروزرسانی فعال نبود یا زمانش تمام شده بود، لودینگ عادی را شروع کن
-                startNormalLoading();
-
-            } catch (error) {
-                console.error("خطا در بررسی وضعیت بروزرسانی:", error);
-                // در صورت خطا در اتصال به دیتابیس، لودینگ عادی را ادامه می‌دهیم
-                startNormalLoading(); 
-            }
+            });
         }
 
-        main();
+        function showConnectionError() {
+            progressBarFill.classList.add('error');
+            progressBarFill.style.width = `100%`;
+            statusMessage.textContent = 'خطا در اتصال! اتصال اینترنت خود را بررسی کنید.';
+        }
+
+        // اجرای برنامه
+        initializeAppAndCheckStatus();
+
     </script>
 </body>
 </html>
