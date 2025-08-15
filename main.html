@@ -181,8 +181,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        // <--- تغییر 1: افزودن Firestore --->
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        // <--- تغییر ۱: افزودن onSnapshot برای بررسی لحظه‌ای --->
+        import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
@@ -196,61 +196,104 @@
         
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        // <--- تغییر 2: مقداردهی اولیه Firestore --->
         const db = getFirestore(app);
 
         const userDisplayName = document.getElementById('user-display-name');
         const userAvatar = document.getElementById('user-avatar');
+        const startGameButton = document.getElementById('start-game-button');
+        const menuButtons = document.querySelectorAll('.menu-button');
 
-        // <--- تغییر 3: تبدیل تابع به async برای استفاده از await --->
+        // <--- تغییر ۲: تابع کمکی برای بررسی وضعیت بروزرسانی قبل از هر عملیات --->
+        /**
+         * Checks maintenance status. If enabled, redirects to index.html.
+         * Otherwise, executes the provided callback function.
+         * @param {Function} actionCallback The function to run if maintenance is off.
+         */
+        async function checkMaintenanceAndProceed(actionCallback) {
+            const maintenanceDocRef = doc(db, 'settings', 'maintenance');
+            try {
+                const docSnap = await getDoc(maintenanceDocRef);
+                if (docSnap.exists() && docSnap.data().enabled === true) {
+                    console.log("حالت بروزرسانی فعال است. انتقال به صفحه لودینگ...");
+                    window.location.href = './index.html';
+                } else {
+                    // بروزرسانی فعال نیست، عملکرد اصلی دکمه را اجرا کن
+                    actionCallback();
+                }
+            } catch (error) {
+                console.error("خطا در بررسی وضعیت بروزرسانی:", error);
+                // در صورت خطا، برای امنیت بیشتر، اجازه ادامه کار را نمی‌دهیم و به کاربر هشدار می‌دهیم
+                alert("خطا در ارتباط با سرور. لطفا اتصال اینترنت خود را بررسی کرده و مجددا تلاش کنید.");
+            }
+        }
+
+
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                // کاربر وارد شده است
-                // <--- تغییر 4: دریافت اطلاعات کامل کاربر از دیتابیس Firestore --->
+                // --- بخش اول: بارگذاری اطلاعات کاربر مثل قبل ---
                 const userDocRef = doc(db, 'users', user.uid);
                 try {
                     const userDocSnap = await getDoc(userDocRef);
                     if (userDocSnap.exists()) {
                         const userData = userDocSnap.data();
-                        
-                        // نمایش نام از دیتابیس
                         userDisplayName.textContent = userData.displayName || "کاربر ناشناس";
-                        
-                        // نمایش آواتار از دیتابیس
-                        // اگر کاربر آواتاری انتخاب کرده بود (avatarUrl خالی نبود)، آن را نمایش بده
                         if (userData.avatarUrl) {
                             userAvatar.src = userData.avatarUrl;
-                        } else {
-                            // در غیر این صورت، از آواتار پیش‌فرض استفاده می‌شود که در HTML مشخص شده است
-                             console.log("کاربر آواتار مشخصی ندارد. از آواتار پیش‌فرض استفاده می‌شود.");
                         }
                     } else {
-                        // اگر داکیومنت کاربر در Firestore وجود نداشت (که حالت نادری است)
                         userDisplayName.textContent = user.displayName || "کاربر ناشناس";
-                        console.error("اطلاعات کاربر در دیتابیس یافت نشد!");
                     }
                 } catch (error) {
-                    console.error("خطا در دریافت اطلاعات کاربر از Firestore:", error);
-                    // در صورت بروز خطا، از نام کاربری پیش‌فرض استفاده کن
+                    console.error("خطا در دریافت اطلاعات کاربر:", error);
                     userDisplayName.textContent = user.displayName || "کاربر ناشناس";
                 }
 
+                // <--- تغییر ۳: فعال‌سازی listener لحظه‌ای برای بروزرسانی --->
+                // این کد به صورت دائم به داکیومنت maintenance گوش می‌دهد
+                const maintenanceDocRef = doc(db, 'settings', 'maintenance');
+                onSnapshot(maintenanceDocRef, (docSnap) => {
+                    if (docSnap.exists() && docSnap.data().enabled === true) {
+                        console.log("تغییر در وضعیت بروزرسانی شناسایی شد. در حال انتقال...");
+                        // از آنجایی که ممکن است کاربر در حال انجام کاری باشد، یک پیام کوتاه نمایش می‌دهیم
+                        alert("سرور در حالت بروزرسانی قرار گرفت. شما به صفحه اصلی منتقل می‌شوید.");
+                        window.location.href = './index.html';
+                    }
+                });
+
             } else {
-                // هیچ کاربری وارد نشده است، به صفحه ورود هدایت شود
                 window.location.href = './login.html';
             }
         });
 
-        // رویداد کلیک برای آواتار کاربر جهت هدایت به فروشگاه
+        // <--- تغییر ۴: به‌روزرسانی تمام Event Listener ها برای استفاده از تابع کمکی --->
+        // رویداد کلیک برای آواتار کاربر
         userAvatar.addEventListener('click', () => {
-            console.log("آواتار کاربر کلیک شد. انتقال به فروشگاه آواتار...");
-            window.location.href = './Avatar shop.html';
+            checkMaintenanceAndProceed(() => {
+                console.log("آواتار کلیک شد. انتقال به فروشگاه...");
+                window.location.href = './Avatar shop.html';
+            });
         });
 
         // رویداد کلیک برای دکمه شروع بازی
-        document.getElementById('start-game-button').addEventListener('click', () => {
-            console.log("دکمه شروع بازی کلیک شد.");
+        startGameButton.addEventListener('click', () => {
+            checkMaintenanceAndProceed(() => {
+                console.log("دکمه شروع بازی کلیک شد.");
+                // در آینده منطق شروع بازی اینجا قرار می‌گیرد
+            });
         });
+        
+        // رویداد کلیک برای سایر دکمه‌های منو
+        menuButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                checkMaintenanceAndProceed(() => {
+                    const buttonText = button.textContent;
+                    console.log(`دکمه "${buttonText}" کلیک شد.`);
+                    // در آینده منطق مربوط به هر دکمه اینجا قرار می‌گیرد
+                    alert(`عملکرد دکمه "${buttonText}" هنوز پیاده‌سازی نشده است.`);
+                });
+            });
+        });
+
     </script>
 </body>
 </html>
