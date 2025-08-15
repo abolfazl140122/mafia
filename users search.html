@@ -12,58 +12,60 @@
         html, body { height: 100%; overflow: hidden; }
         body {
             font-family: 'Vazirmatn', sans-serif;
-            background-image: url('https://up.20script.ir/file/6195-file-000000001500622f9419de6c322df297-1-.jpg');
-            background-size: cover; background-position: center center; background-repeat: no-repeat; background-attachment: fixed;
             color: #f0e6d2;
             display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             padding: 20px;
+            position: relative;
         }
 
-        /* --- پنل بارگذاری و اتصال به سرور --- */
-        .loading-overlay {
+        /* لایه تار کننده پس زمینه */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image: url('https://up.20script.ir/file/6195-file-000000001500622f9419de6c322df297-1-.jpg');
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            filter: blur(4px) brightness(0.8);
+            z-index: -1;
+        }
+
+        /* پنل لودینگ اولیه */
+        .initial-loader-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(10, 5, 5, 0.9);
-            z-index: 1000;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(10, 5, 5, 0.85);
+            backdrop-filter: blur(8px);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            gap: 20px;
+            z-index: 100;
             opacity: 1;
-            transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
-            visibility: visible;
+            transition: opacity 0.5s ease;
         }
-        .loading-overlay.hidden {
+        .initial-loader-overlay.hidden {
             opacity: 0;
-            visibility: hidden;
+            pointer-events: none;
         }
-        .loading-overlay .loader {
-            width: 60px;
-            height: 60px;
-            border: 6px solid rgba(240, 230, 210, 0.2);
+        .initial-loader-overlay h2 {
+            font-size: 1.5rem;
+            color: #ffc947;
+            margin-bottom: 20px;
+            text-shadow: 0 1px 4px #000;
+        }
+        .initial-loader-overlay .loader {
+            width: 60px; height: 60px;
+            border: 5px solid rgba(240, 230, 210, 0.3);
             border-top-color: #ffc947;
             border-radius: 50%;
-            animation: spin 1.2s cubic-bezier(0.6, 0.2, 0.4, 0.8) infinite;
-        }
-        .loading-overlay p {
-            font-size: 1.3rem;
-            color: #ffc947;
-            text-shadow: 0 1px 4px #000;
-            animation: pulse 2s infinite;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 0.8; }
-            50% { opacity: 1; }
+            animation: spin 1.2s cubic-bezier(0.6, 0.1, 0.4, 0.9) infinite;
         }
 
         .main-container {
@@ -73,6 +75,13 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
+            opacity: 0;
+            transform: scale(0.95);
+            animation: fadeInContainer 0.6s ease forwards;
+            animation-delay: 0.2s;
+        }
+        @keyframes fadeInContainer {
+            to { opacity: 1; transform: scale(1); }
         }
 
         /* بخش پروفایل کاربر فعلی */
@@ -85,34 +94,19 @@
             align-items: center;
             gap: 15px;
             box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+            flex-shrink: 0; /* جلوگیری از کوچک شدن */
         }
         #current-user-avatar {
-            width: 45px;
-            height: 45px;
+            width: 45px; height: 45px;
             border-radius: 50%;
             border: 2px solid #c5a687;
             object-fit: cover;
         }
-        #current-user-name { font-size: 1.1rem; font-weight: 700; }
+        #current-user-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
 
-        /* بخش وضعیت جستجو */
-        .search-status { text-align: center; padding: 15px; }
-        .search-status h2 {
-            font-size: 1.4rem;
-            color: #ffc947;
-            margin-bottom: 10px;
-            text-shadow: 0 1px 3px #000;
-        }
-        .search-status .loader-inline {
-            width: 50px;
-            height: 50px;
-            border: 5px solid #f0e6d2;
-            border-top-color: #8c4843;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-        }
-        
         /* لیست بازیکنان در حال جستجو */
         .players-list-container {
             flex-grow: 1;
@@ -121,8 +115,11 @@
             padding: 15px;
             overflow-y: auto;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            min-height: 0; /* برای کارکرد صحیح flex-grow در Firefox */
         }
+        /* استایل برای اسکرول بار */
         .players-list-container::-webkit-scrollbar { width: 8px; }
         .players-list-container::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 4px; }
         .players-list-container::-webkit-scrollbar-thumb { background: #5c4a3a; border-radius: 4px; }
@@ -137,36 +134,80 @@
             border-radius: 10px;
             margin-bottom: 10px;
             border: 1px solid #5c4a3a;
-            transition: all 0.3s ease;
-            animation: fadeIn 0.5s ease;
+            transition: all 0.2s ease;
+            animation: fadeInItem 0.5s ease;
+            flex-shrink: 0; /* جلوگیری از کوچک شدن آیتم‌ها */
         }
         .player-item:hover {
             border-color: #ffc947;
             transform: scale(1.02);
-            box-shadow: 0 0 15px rgba(255, 201, 71, 0.3);
+            box-shadow: 0 0 15px rgba(255, 201, 71, 0.2);
         }
         .player-avatar {
-            width: 40px;
-            height: 40px;
+            width: 40px; height: 40px;
             border-radius: 50%;
             object-fit: cover;
             border: 2px solid #c5a687;
         }
-        .player-name { font-size: 1rem; font-weight: 700; }
+        .player-name {
+            font-size: 1rem;
+            font-weight: 700;
+        }
 
-        @keyframes fadeIn {
+        /* بخش وضعیت جستجو در انتهای لیست */
+        .search-status-footer {
+            text-align: center;
+            padding: 20px 0 10px 0;
+            margin-top: auto; /* این بخش را به پایین می‌چسباند */
+            opacity: 0.8;
+        }
+        .search-status-footer h2 {
+            font-size: 1.1rem;
+            color: #ffc947;
+            margin-bottom: 15px;
+            text-shadow: 0 1px 3px #000;
+            animation: pulseText 2s infinite;
+        }
+        .search-status-footer .dots-loader {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .search-status-footer .dots-loader div {
+            width: 10px; height: 10px;
+            background-color: #f0e6d2;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        .dots-loader .dot1 { animation-delay: -0.32s; }
+        .dots-loader .dot2 { animation-delay: -0.16s; }
+
+        @keyframes fadeInItem {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        @keyframes pulseText {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1.0); }
+        }
         
-        /* کانتینر دکمه‌ها */
-        .action-buttons-container {
-            padding: 10px 0;
+        /* بخش دکمه‌ها */
+        .button-container {
             display: flex;
             gap: 15px;
+            padding: 10px 0;
+            flex-shrink: 0; /* جلوگیری از کوچک شدن */
         }
-        .action-buttons-container button {
+        .button-container button {
             flex-grow: 1;
+            width: 50%;
             padding: 15px;
             font-size: 1.2rem;
             font-weight: 900;
@@ -176,41 +217,38 @@
             transition: all 0.3s ease;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
             text-shadow: 0 1px 3px rgba(0,0,0,0.6);
-            border: 2px solid transparent;
+            border: none;
         }
-        .action-buttons-container button:disabled {
-            cursor: not-allowed;
-            opacity: 0.6;
-            filter: grayscale(50%);
-        }
-
-        /* دکمه لغو جستجو */
         #cancel-search-btn {
             background: linear-gradient(145deg, #a13d3d, #7c1f1f);
-            border-color: #ff8f8f;
+            border: 2px solid #ff8f8f;
         }
-        #cancel-search-btn:hover:not(:disabled) {
+        #cancel-search-btn:hover {
             background: linear-gradient(145deg, #b84a4a, #912525);
             box-shadow: 0 6px 15px rgba(255, 100, 100, 0.25);
         }
-        
-        /* دکمه تازه سازی */
         #refresh-btn {
-            background: linear-gradient(145deg, #b8860b, #8b6508);
-            border-color: #ffd700;
+            background: linear-gradient(145deg, #d4ac0d, #b8860b);
+            border: 2px solid #ffd700;
         }
         #refresh-btn:hover:not(:disabled) {
-            background: linear-gradient(145deg, #daa520, #a0791b);
+            background: linear-gradient(145deg, #e7c03e, #d49d1a);
             box-shadow: 0 6px 15px rgba(255, 215, 0, 0.25);
+        }
+        #refresh-btn:disabled {
+            background: linear-gradient(145deg, #78642a, #5c4a2a);
+            border-color: #9e8a4a;
+            cursor: not-allowed;
+            opacity: 0.6;
         }
     </style>
 </head>
 <body>
 
-    <!-- پنل لودینگ اولیه -->
-    <div id="loading-overlay" class="loading-overlay">
+    <!-- لودر اولیه صفحه -->
+    <div id="initial-loader-overlay" class="initial-loader-overlay">
+        <h2>در حال اتصال به سرور...</h2>
         <div class="loader"></div>
-        <p>در حال اتصال به سرور...</p>
     </div>
 
     <div class="main-container">
@@ -219,20 +257,24 @@
             <img id="current-user-avatar" src="https://i.imgur.com/T2bT1tG.png" alt="آواتار شما">
             <span id="current-user-name">...</span>
         </div>
-
-        <!-- وضعیت جستجو -->
-        <div class="search-status">
-            <h2>در حال جستجو برای بازیکنان</h2>
-            <div class="loader-inline"></div>
-        </div>
         
         <!-- لیست بازیکنان -->
         <div id="players-list-container" class="players-list-container">
             <!-- بازیکنان به صورت پویا اینجا اضافه می‌شوند -->
+            
+            <!-- وضعیت جستجو در انتها -->
+            <div class="search-status-footer">
+                <h2>در حال جستجو برای بازیکنان</h2>
+                <div class="dots-loader">
+                    <div class="dot1"></div>
+                    <div class="dot2"></div>
+                    <div class="dot3"></div>
+                </div>
+            </div>
         </div>
 
         <!-- دکمه‌ها -->
-        <div class="action-buttons-container">
+        <div class="button-container">
             <button id="refresh-btn">تازه‌سازی</button>
             <button id="cancel-search-btn">لغو جستجو</button>
         </div>
@@ -241,7 +283,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
@@ -257,33 +299,32 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // --- DOM Elements ---
-        const loadingOverlay = document.getElementById('loading-overlay');
+        // DOM Elements
+        const initialLoaderOverlay = document.getElementById('initial-loader-overlay');
         const currentUserAvatar = document.getElementById('current-user-avatar');
         const currentUserName = document.getElementById('current-user-name');
         const playersListContainer = document.getElementById('players-list-container');
         const cancelSearchBtn = document.getElementById('cancel-search-btn');
         const refreshBtn = document.getElementById('refresh-btn');
+        const searchStatusFooter = document.querySelector('.search-status-footer');
 
-        // --- State Variables ---
+
         let currentUserData = null;
         let unsubscribeFromPlayersList = null;
-        let isInitialLoad = true;
+        let refreshCooldownSeconds = 5;
+        let isRefreshOnCooldown = false;
+        let cooldownInterval;
 
-        // --- Refresh Cooldown Logic ---
-        let refreshCooldownDuration = 5; // Start with 5 seconds
-        let currentCooldown = 0;
-        let cooldownInterval = null;
-
-        // --- Loading Overlay Functions ---
-        function showLoadingOverlay() {
-            loadingOverlay.classList.remove('hidden');
+        // تابع برای مخفی کردن لودر اولیه
+        function hideInitialLoader() {
+            initialLoaderOverlay.classList.add('hidden');
         }
-        function hideLoadingOverlay() {
-            loadingOverlay.classList.add('hidden');
+        
+        // تابع برای نمایش لودر (برای تازه‌سازی)
+        function showLoader() {
+            initialLoaderOverlay.classList.remove('hidden');
         }
 
-        // --- Core Firebase Functions ---
         async function joinSearch(user) {
             if (!currentUserData) return;
             const searchingUserRef = doc(db, 'searching_users', user.uid);
@@ -291,7 +332,7 @@
                 await setDoc(searchingUserRef, {
                     displayName: currentUserData.displayName,
                     avatarUrl: currentUserData.avatarUrl,
-                    joinedAt: new Date()
+                    joinedAt: serverTimestamp()
                 });
                 console.log("شما به لیست جستجو اضافه شدید.");
             } catch (error) {
@@ -301,9 +342,6 @@
 
         async function leaveSearch(user) {
             if (!user) return;
-            if (unsubscribeFromPlayersList) {
-                unsubscribeFromPlayersList(); // قطع شنونده
-            }
             const searchingUserRef = doc(db, 'searching_users', user.uid);
             try {
                 await deleteDoc(searchingUserRef);
@@ -314,7 +352,10 @@
         }
 
         function renderPlayersList(docs) {
-            playersListContainer.innerHTML = '';
+            // پاک کردن لیست قبلی (به جز بخش لودر)
+            const existingPlayers = playersListContainer.querySelectorAll('.player-item');
+            existingPlayers.forEach(p => p.remove());
+
             docs.forEach(doc => {
                 const playerData = doc.data();
                 const playerElement = document.createElement('div');
@@ -323,42 +364,72 @@
                     <img src="${playerData.avatarUrl || 'https://i.imgur.com/T2bT1tG.png'}" alt="آواتار" class="player-avatar">
                     <span class="player-name">${playerData.displayName || 'بازیکن ناشناس'}</span>
                 `;
-                playersListContainer.appendChild(playerElement);
+                // اضافه کردن آیتم جدید قبل از بخش لودینگ
+                playersListContainer.insertBefore(playerElement, searchStatusFooter);
+            });
+        }
+        
+        function startRefreshCooldown() {
+            isRefreshOnCooldown = true;
+            refreshBtn.disabled = true;
+            let timer = refreshCooldownSeconds;
+            
+            refreshBtn.textContent = `تازه‌سازی (${timer})`;
+            
+            cooldownInterval = setInterval(() => {
+                timer--;
+                refreshBtn.textContent = `تازه‌سازی (${timer})`;
+                if (timer <= 0) {
+                    clearInterval(cooldownInterval);
+                    refreshBtn.disabled = false;
+                    isRefreshOnCooldown = false;
+                    refreshBtn.textContent = 'تازه‌سازی';
+                    // افزایش زمان انتظار برای دفعه بعد
+                    refreshCooldownSeconds += 5;
+                }
+            }, 1000);
+        }
+
+        async function handleRefresh(user) {
+            if (isRefreshOnCooldown) return;
+
+            showLoader();
+
+            // قطع شنونده قبلی
+            if (unsubscribeFromPlayersList) {
+                unsubscribeFromPlayersList();
+            }
+
+            // پاک کردن لیست فعلی
+            const existingPlayers = playersListContainer.querySelectorAll('.player-item');
+            existingPlayers.forEach(p => p.remove());
+            
+            // شروع مجدد جستجو و گوش دادن به لیست
+            await joinSearch(user);
+            listenToPlayersList(true); // true یعنی این یک رفرش است
+            
+            startRefreshCooldown();
+        }
+        
+        function listenToPlayersList(isRefresh = false) {
+             const searchingUsersCollection = collection(db, 'searching_users');
+             let isFirstSnapshot = true;
+             
+             unsubscribeFromPlayersList = onSnapshot(searchingUsersCollection, (snapshot) => {
+                renderPlayersList(snapshot.docs);
+                
+                // اگر لودر نمایش داده میشد (در حالت اولیه یا رفرش)، آن را مخفی کن
+                if (isFirstSnapshot) {
+                    hideInitialLoader();
+                    isFirstSnapshot = false;
+                }
+            }, (error) => {
+                console.error("خطا در دریافت لیست بازیکنان:", error);
+                hideInitialLoader(); // در صورت خطا هم لودر را مخفی کن
             });
         }
 
-        // --- Refresh Button Handler ---
-        function handleRefresh() {
-            if (currentCooldown > 0) return; // اگر در حال cooldown بود، کاری نکن
 
-            showLoadingOverlay();
-            
-            // شبیه‌سازی یک تاخیر برای نمایش پنل، چون onSnapshot آنی است
-            setTimeout(() => {
-                hideLoadingOverlay();
-            }, 1000); // 1 ثانیه پنل را نشان بده
-
-            // شروع cooldown
-            currentCooldown = refreshCooldownDuration;
-            refreshBtn.disabled = true;
-            refreshBtn.textContent = `صبر کنید (${currentCooldown})`;
-
-            cooldownInterval = setInterval(() => {
-                currentCooldown--;
-                if (currentCooldown > 0) {
-                    refreshBtn.textContent = `صبر کنید (${currentCooldown})`;
-                } else {
-                    clearInterval(cooldownInterval);
-                    refreshBtn.disabled = false;
-                    refreshBtn.textContent = 'تازه‌سازی';
-                }
-            }, 1000);
-
-            // افزایش زمان cooldown برای دفعه بعد
-            refreshCooldownDuration += 5;
-        }
-
-        // --- Main Logic ---
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 // 1. دریافت اطلاعات کاربر فعلی
@@ -376,42 +447,31 @@
                         currentUserData = { displayName: user.displayName || 'کاربر', avatarUrl: user.photoURL || 'https://i.imgur.com/T2bT1tG.png' };
                         currentUserName.textContent = currentUserData.displayName;
                     }
-
-                    // 2. پیوستن به لیست جستجو
-                    await joinSearch(user);
-
-                    // 3. گوش دادن به تغییرات زنده در لیست بازیکنان
-                    const searchingUsersCollection = collection(db, 'searching_users');
-                    unsubscribeFromPlayersList = onSnapshot(searchingUsersCollection, (snapshot) => {
-                        renderPlayersList(snapshot.docs);
-                        
-                        // فقط در بارگذاری اولیه، پنل لودینگ را مخفی کن
-                        if (isInitialLoad) {
-                            hideLoadingOverlay();
-                            isInitialLoad = false;
-                        }
-                    });
-
-                    // 4. تنظیم رویداد دکمه‌ها
-                    refreshBtn.addEventListener('click', handleRefresh);
-
-                    cancelSearchBtn.addEventListener('click', async () => {
-                        await leaveSearch(user);
-                        window.location.href = './main.html';
-                    });
-
-                    // 5. تنظیم رویداد برای زمانی که کاربر صفحه را می‌بندد
-                    window.addEventListener('beforeunload', () => {
-                        leaveSearch(user);
-                    });
-
                 } catch (error) {
-                    console.error("خطای اصلی در بارگذاری:", error);
-                    // در صورت خطا، کاربر را به صفحه لاگین هدایت کن
-                    hideLoadingOverlay();
-                    alert("خطا در اتصال به سرور. لطفا مجددا تلاش کنید.");
-                    window.location.href = './login.html';
+                    console.error("خطا در دریافت اطلاعات کاربر:", error);
+                    // در صورت خطا، از اطلاعات پیش‌فرض استفاده کن
+                     currentUserData = { displayName: user.displayName || 'کاربر', avatarUrl: user.photoURL || 'https://i.imgur.com/T2bT1tG.png' };
+                     currentUserName.textContent = currentUserData.displayName;
                 }
+
+                // 2. پیوستن به لیست جستجو
+                await joinSearch(user);
+
+                // 3. گوش دادن به تغییرات زنده در لیست بازیکنان
+                listenToPlayersList();
+
+                // 4. تنظیم رویداد دکمه‌ها
+                cancelSearchBtn.addEventListener('click', async () => {
+                    await leaveSearch(user);
+                    window.location.href = './main.html';
+                });
+                
+                refreshBtn.addEventListener('click', () => handleRefresh(user));
+
+                // 5. تنظیم رویداد برای زمانی که کاربر صفحه را می‌بندد
+                window.addEventListener('beforeunload', () => {
+                    leaveSearch(user);
+                });
 
             } else {
                 // اگر کاربر وارد نشده بود، به صفحه لاگین برود
