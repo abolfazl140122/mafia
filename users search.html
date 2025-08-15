@@ -1,1 +1,297 @@
-.
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جستجوی بازیکنان...</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-image: url('https://up.20script.ir/file/6195-file-000000001500622f9419de6c322df297-1-.jpg');
+            background-size: cover; background-position: center center; background-repeat: no-repeat; background-attachment: fixed;
+            color: #f0e6d2;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .main-container {
+            width: 100%;
+            height: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* بخش پروفایل کاربر فعلی */
+        .current-user-profile {
+            background-color: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 18px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+        }
+        #current-user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 2px solid #c5a687;
+            object-fit: cover;
+        }
+        #current-user-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        /* بخش وضعیت جستجو و انیمیشن */
+        .search-status {
+            text-align: center;
+            padding: 15px;
+        }
+        .search-status h2 {
+            font-size: 1.4rem;
+            color: #ffc947;
+            margin-bottom: 10px;
+            text-shadow: 0 1px 3px #000;
+        }
+        .loader {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f0e6d2;
+            border-top-color: #8c4843;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* لیست بازیکنان در حال جستجو */
+        .players-list-container {
+            flex-grow: 1;
+            background-color: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
+            padding: 15px;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        /* استایل برای اسکرول بار */
+        .players-list-container::-webkit-scrollbar { width: 8px; }
+        .players-list-container::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 4px; }
+        .players-list-container::-webkit-scrollbar-thumb { background: #5c4a3a; border-radius: 4px; }
+        .players-list-container::-webkit-scrollbar-thumb:hover { background: #c5a687; }
+
+        .player-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: linear-gradient(90deg, rgba(80, 50, 48, 0.5), rgba(56, 33, 32, 0.6));
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #5c4a3a;
+            transition: all 0.2s ease;
+            animation: fadeIn 0.5s ease;
+        }
+        .player-item:hover {
+            border-color: #ffc947;
+            transform: scale(1.02);
+        }
+        .player-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #c5a687;
+        }
+        .player-name {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* دکمه لغو جستجو */
+        .cancel-container {
+            padding: 10px 0;
+        }
+        #cancel-search-btn {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2rem;
+            font-weight: 900;
+            color: #ffffff;
+            background: linear-gradient(145deg, #a13d3d, #7c1f1f);
+            border: 2px solid #ff8f8f;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+        }
+        #cancel-search-btn:hover {
+            background: linear-gradient(145deg, #b84a4a, #912525);
+            box-shadow: 0 6px 15px rgba(255, 100, 100, 0.25);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        <!-- نمایش اطلاعات کاربر فعلی -->
+        <div class="current-user-profile">
+            <img id="current-user-avatar" src="https://i.imgur.com/T2bT1tG.png" alt="آواتار شما">
+            <span id="current-user-name">...</span>
+        </div>
+
+        <!-- وضعیت جستجو -->
+        <div class="search-status">
+            <h2>در حال جستجو برای بازیکنان</h2>
+            <div class="loader"></div>
+        </div>
+        
+        <!-- لیست بازیکنان -->
+        <div id="players-list-container" class="players-list-container">
+            <!-- بازیکنان به صورت پویا اینجا اضافه می‌شوند -->
+        </div>
+
+        <!-- دکمه لغو -->
+        <div class="cancel-container">
+            <button id="cancel-search-btn">لغو جستجو</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
+            authDomain: "mafia-9fcbf.firebaseapp.com",
+            projectId: "mafia-9fcbf",
+            storageBucket: "mafia-9fcbf.appspot.com",
+            messagingSenderId: "471627157488",
+            appId: "1:471627157488:web:92f008548a5596619a5735",
+            measurementId: "G-0PDHDWC6NV"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // DOM Elements
+        const currentUserAvatar = document.getElementById('current-user-avatar');
+        const currentUserName = document.getElementById('current-user-name');
+        const playersListContainer = document.getElementById('players-list-container');
+        const cancelSearchBtn = document.getElementById('cancel-search-btn');
+
+        let currentUserData = null;
+        let unsubscribeFromPlayersList = null; // برای قطع کردن شنونده هنگام خروج
+
+        // تابع برای اضافه کردن کاربر به لیست جستجو
+        async function joinSearch(user) {
+            if (!currentUserData) return;
+            const searchingUserRef = doc(db, 'searching_users', user.uid);
+            try {
+                await setDoc(searchingUserRef, {
+                    displayName: currentUserData.displayName,
+                    avatarUrl: currentUserData.avatarUrl,
+                    joinedAt: new Date() // زمان پیوستن برای مدیریت کاربران آفلاین
+                });
+                console.log("شما به لیست جستجو اضافه شدید.");
+            } catch (error) {
+                console.error("خطا در اضافه شدن به لیست جستجو:", error);
+            }
+        }
+
+        // تابع برای حذف کاربر از لیست جستجو
+        async function leaveSearch(user) {
+            if (!user) return;
+            const searchingUserRef = doc(db, 'searching_users', user.uid);
+            try {
+                await deleteDoc(searchingUserRef);
+                console.log("شما از لیست جستجو خارج شدید.");
+            } catch (error) {
+                console.error("خطا در خروج از لیست جستجو:", error);
+            }
+        }
+
+        // تابع برای رندر کردن لیست بازیکنان در صفحه
+        function renderPlayersList(docs) {
+            playersListContainer.innerHTML = ''; // پاک کردن لیست قبلی
+            docs.forEach(doc => {
+                const playerData = doc.data();
+                const playerElement = document.createElement('div');
+                playerElement.className = 'player-item';
+                playerElement.innerHTML = `
+                    <img src="${playerData.avatarUrl || 'https://i.imgur.com/T2bT1tG.png'}" alt="آواتار" class="player-avatar">
+                    <span class="player-name">${playerData.displayName || 'بازیکن ناشناس'}</span>
+                `;
+                playersListContainer.appendChild(playerElement);
+            });
+        }
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // 1. دریافت اطلاعات کاربر فعلی
+                const userDocRef = doc(db, 'users', user.uid);
+                const userDocSnap = await getDoc(userDocRef);
+
+                if (userDocSnap.exists()) {
+                    currentUserData = userDocSnap.data();
+                    currentUserName.textContent = currentUserData.displayName || 'کاربر';
+                    if (currentUserData.avatarUrl) {
+                        currentUserAvatar.src = currentUserData.avatarUrl;
+                    }
+                } else {
+                    // اگر پروفایل کاربر در دیتابیس نبود
+                    currentUserData = { displayName: user.displayName || 'کاربر', avatarUrl: user.photoURL || 'https://i.imgur.com/T2bT1tG.png' };
+                    currentUserName.textContent = currentUserData.displayName;
+                }
+
+                // 2. پیوستن به لیست جستجو
+                await joinSearch(user);
+
+                // 3. گوش دادن به تغییرات زنده در لیست بازیکنان
+                const searchingUsersCollection = collection(db, 'searching_users');
+                unsubscribeFromPlayersList = onSnapshot(searchingUsersCollection, (snapshot) => {
+                    renderPlayersList(snapshot.docs);
+                });
+
+                // 4. تنظیم رویداد دکمه لغو
+                cancelSearchBtn.addEventListener('click', async () => {
+                    await leaveSearch(user);
+                    window.location.href = './main.html';
+                });
+
+                // 5. تنظیم رویداد برای زمانی که کاربر صفحه را می‌بندد
+                window.addEventListener('beforeunload', (event) => {
+                    // این تابع به صورت همزمان اجرا می‌شود و فرصت await را ندارد
+                    // اما درخواست حذف را به سرور ارسال می‌کند
+                    leaveSearch(user);
+                });
+
+            } else {
+                // اگر کاربر وارد نشده بود، به صفحه لاگین برود
+                window.location.href = './login.html';
+            }
+        });
+    </script>
+</body>
+</html>
