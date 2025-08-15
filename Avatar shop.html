@@ -2,394 +2,570 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>شهر مافیا - فروشگاه آواتار</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>فروشگاه آواتار - شهر مافیا</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --wood-dark: #1a140f;
-            --wood-texture-url: url('https://www.transparenttextures.com/patterns/dark-wood.png');
-            --panel-bg-gradient: linear-gradient(145deg, #3c3022, #1e170f);
-            --panel-border: #5c4a3a;
-            --text-gold: #ffc947;
-            --text-light: #e0dacc;
-            --green-confirm: #28a745;
-            --blue-select: #007bff;
-            --disabled-color: #555;
-            --panel-glow: rgba(255, 201, 71, 0.5);
-        }
-
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent; /* جلوگیری از هایلایت شدن هنگام لمس */
         }
 
         html, body {
             height: 100%;
+            overflow: hidden;
         }
 
         body {
             font-family: 'Vazirmatn', sans-serif;
-            background-color: var(--wood-dark);
-            background-image: var(--wood-texture-url);
-            color: var(--text-light);
-            padding: 20px;
-            overflow-y: auto; /* اجازه اسکرول در صفحه فروشگاه */
+            background-image: url('https://up.20script.ir/file/6195-file-000000001500622f9419de6c322df297-1-.jpg');
+            background-size: cover;
+            background-position: center center;
+            background-attachment: fixed;
+            color: #f0e6d2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .shop-container {
             width: 100%;
-            max-width: 800px;
-            margin: 0 auto;
-            background: var(--panel-bg-gradient);
-            border-radius: 24px;
-            border: 2px solid var(--panel-border);
-            padding: 25px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), 0 0 25px var(--panel-glow);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            backdrop-filter: blur(3px) brightness(0.7);
+            -webkit-backdrop-filter: blur(3px) brightness(0.7);
         }
 
+        /* --- Header --- */
         .shop-header {
+            width: 100%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid var(--panel-border);
-            padding-bottom: 20px;
-            margin-bottom: 25px;
+            margin-bottom: 15px;
+            flex-shrink: 0;
         }
 
         .shop-title {
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: 900;
-            color: var(--text-gold);
-            text-shadow: 0 0 5px var(--panel-glow), 2px 2px 4px #000;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.7);
+            color: #ffc947;
         }
 
         .back-button {
             background: linear-gradient(145deg, rgba(80, 50, 48, 0.8), rgba(56, 33, 32, 0.9));
-            color: var(--text-light);
-            border: 1px solid var(--panel-border);
-            padding: 10px 20px;
+            color: #e0dacc;
+            border: 1px solid #c5a687;
+            padding: 8px 15px;
             border-radius: 8px;
-            font-size: 1rem;
+            font-size: 0.9rem;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
-            text-decoration: none;
         }
-
         .back-button:hover {
-            border-color: var(--text-gold);
+            border-color: #ffc947;
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
         }
 
-        #user-info {
+        /* --- User Info Bar --- */
+        .user-info-bar {
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 10px 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-shrink: 0;
+        }
+
+        .gem-balance {
             display: flex;
             align-items: center;
-            gap: 10px;
-            background-color: rgba(0,0,0,0.3);
-            padding: 5px 15px;
-            border-radius: 8px;
-            border: 1px solid var(--panel-border);
+            gap: 8px;
+            font-size: 1.1rem;
+            font-weight: 700;
         }
-        #user-coins { font-weight: 700; font-size: 1.1rem; color: var(--text-gold); }
-        .coin-icon { width: 24px; height: 24px; }
+        .gem-icon {
+            width: 24px;
+            height: 24px;
+            filter: drop-shadow(0 0 3px #ff00ff);
+        }
 
-        /* Loading Spinner */
-        .loader-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 50px 0;
-        }
-        .loader {
-            border: 6px solid var(--panel-border);
-            border-top: 6px solid var(--text-gold);
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        /* Avatar Grid */
+        /* --- Avatar Grid --- */
         .avatar-grid {
+            flex-grow: 1;
+            overflow-y: auto;
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 15px;
+            padding: 10px;
+            margin: -10px; /* برای جبران پدینگ آیتم‌ها */
         }
+        /* Style scrollbar */
+        .avatar-grid::-webkit-scrollbar { width: 8px; }
+        .avatar-grid::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 4px; }
+        .avatar-grid::-webkit-scrollbar-thumb { background: #c5a687; border-radius: 4px; }
+        .avatar-grid::-webkit-scrollbar-thumb:hover { background: #ffc947; }
 
-        /* Avatar Card */
+
         .avatar-card {
-            background-color: rgba(0,0,0,0.2);
-            border: 2px solid var(--panel-border);
-            border-radius: 16px;
-            padding: 15px;
-            text-align: center;
+            aspect-ratio: 1 / 1.3;
+            background: linear-gradient(145deg, rgba(40, 30, 28, 0.7), rgba(26, 19, 18, 0.8));
+            border-radius: 12px;
+            border: 2px solid #5a4a3a;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
             transition: all 0.3s ease;
             position: relative;
-            overflow: hidden;
         }
         .avatar-card:hover {
             transform: translateY(-5px);
-            border-color: var(--text-gold);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
-        }
-        .avatar-card.selected {
-            border-color: var(--green-confirm);
-            box-shadow: 0 0 15px rgba(40, 167, 69, 0.7);
-        }
-        .avatar-card.locked::after {
-            content: '🔒';
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 1.5rem;
-            background-color: rgba(0,0,0,0.7);
-            padding: 5px;
-            border-radius: 50%;
+            border-color: #ffc947;
+            box-shadow: 0 5px 15px rgba(255, 201, 71, 0.2);
         }
 
         .avatar-image {
-            width: 90px;
-            height: 90px;
-            border-radius: 50%;
-            border: 3px solid var(--panel-border);
-            object-fit: cover;
-            margin: 0 auto 10px auto;
-            background-color: #333;
-        }
-        .avatar-card.selected .avatar-image { border-color: var(--green-confirm); }
-
-        .avatar-name {
-            font-size: 1rem;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-
-        .avatar-action-btn {
             width: 100%;
-            padding: 8px;
+            aspect-ratio: 1 / 1;
+            border-radius: 8px;
+            object-fit: cover;
+            margin-bottom: 8px;
+        }
+
+        .price-tag {
+            background-color: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
+            padding: 4px 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
             font-size: 0.9rem;
+            font-weight: 700;
+        }
+        .price-tag .gem-icon { width: 16px; height: 16px; }
+
+        /* Card States */
+        .avatar-card.owned {
+            border-color: #4CAF50; /* Green border for owned */
+        }
+        .avatar-card.owned:hover {
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .avatar-card.equipped {
+            border-color: #ffc947;
+            box-shadow: 0 0 15px rgba(255, 201, 71, 0.7);
+            transform: scale(1.05);
+        }
+        
+        .status-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+
+        /* --- Loading Spinner --- */
+        .loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .loader {
+            border: 8px solid #f3f3f330;
+            border-top: 8px solid #ffc947;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+        .loader-text {
+            margin-top: 20px;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* --- Modal --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        .modal-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: linear-gradient(145deg, #3c3022, #1e170f);
+            border: 2px solid #5c4a3a;
+            border-radius: 16px;
+            padding: 25px;
+            width: 90%;
+            max-width: 380px;
+            text-align: center;
+            transform: scale(0.9);
+            transition: all 0.3s ease;
+        }
+        .modal-overlay.visible .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 15px;
+            border: 3px solid #c5a687;
+            margin: 0 auto 15px auto;
+            display: block;
+        }
+        
+        .modal-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 10px; color: #ffc947;}
+        .modal-text { font-size: 1rem; margin-bottom: 25px; line-height: 1.6; }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .modal-button {
+            flex: 1;
+            padding: 12px;
+            font-size: 1rem;
             font-weight: 700;
             border: none;
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.2s ease;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
         }
-
-        /* Button States */
-        .btn-buy { background-color: var(--text-gold); color: var(--wood-dark); }
-        .btn-select { background-color: var(--blue-select); color: white; }
-        .btn-equipped { background-color: var(--green-confirm); color: white; }
-        .btn-disabled { background-color: var(--disabled-color); color: #aaa; cursor: not-allowed; }
-
-        .price-tag {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 5px;
+        .confirm-button {
+            color: #ffffff;
+            background: linear-gradient(145deg, #8c4843, #5a2c2a);
+            border: 1px solid #ffc947;
         }
+        .confirm-button:hover { background: linear-gradient(145deg, #a1534d, #6b3431); }
+        .cancel-button {
+            color: #f0e6d2;
+            background: transparent;
+            border: 1px solid #c5a687;
+        }
+        .cancel-button:hover { background: rgba(255,255,255,0.1); }
+
     </style>
 </head>
 <body>
 
     <div class="shop-container">
         <header class="shop-header">
-            <a href="./main.html" class="back-button">بازگشت به لابی</a>
             <h1 class="shop-title">فروشگاه آواتار</h1>
-            <div id="user-info" style="visibility: hidden;">
-                <span id="user-coins">0</span>
-                <img src="https://i.imgur.com/2s2EaGj.png" alt="سکه" class="coin-icon">
-            </div>
+            <button class="back-button" onclick="window.location.href='./main.html'">بازگشت</button>
         </header>
 
-        <main id="avatar-grid-container">
-            <div class="loader-container" id="loader">
-                <div class="loader"></div>
+        <div class="user-info-bar">
+            <span id="user-display-name">...</span>
+            <div class="gem-balance">
+                <span id="user-gems">0</span>
+                <img src="https://i.imgur.com/2jw9S5s.png" alt="Gem" class="gem-icon">
             </div>
-            <div class="avatar-grid" id="avatar-grid">
-                <!-- Avatar cards will be inserted here by JavaScript -->
-            </div>
-        </main>
+        </div>
+
+        <main id="avatar-grid" class="avatar-grid"></main>
     </div>
 
-    <!-- Template for an avatar card -->
-    <template id="avatar-card-template">
-        <div class="avatar-card">
-            <img class="avatar-image" src="" alt="آواتار">
-            <p class="avatar-name">نام آواتار</p>
-            <button class="avatar-action-btn">
-                <!-- Content set by JS -->
-            </button>
+    <!-- Loading Overlay -->
+    <div id="loader-overlay" class="loader-overlay">
+        <div class="loader"></div>
+        <p class="loader-text">در حال بارگذاری فروشگاه...</p>
+    </div>
+
+    <!-- Action Modal -->
+    <div id="action-modal" class="modal-overlay">
+        <div class="modal-content">
+            <img id="modal-avatar-img" src="" alt="آواتار" class="modal-avatar">
+            <h2 id="modal-title" class="modal-title"></h2>
+            <p id="modal-text" class="modal-text"></p>
+            <div class="modal-buttons">
+                <button id="modal-cancel-btn" class="modal-button cancel-button">انصراف</button>
+                <button id="modal-confirm-btn" class="modal-button confirm-button"></button>
+            </div>
         </div>
-    </template>
+    </div>
+
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, getDoc, updateDoc, collection, getDocs, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, collection, getDocs, updateDoc, runTransaction, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+        // --- Firebase Configuration ---
         const firebaseConfig = {
-          apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
-          authDomain: "mafia-9fcbf.firebaseapp.com",
-          projectId: "mafia-9fcbf",
-          storageBucket: "mafia-9fcbf.appspot.com",
-          messagingSenderId: "471627157488",
-          appId: "1:471627157488:web:92f008548a5596619a5735",
-          measurementId: "G-0PDHDWC6NV"
+            apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
+            authDomain: "mafia-9fcbf.firebaseapp.com",
+            projectId: "mafia-9fcbf",
+            storageBucket: "mafia-9fcbf.appspot.com",
+            messagingSenderId: "471627157488",
+            appId: "1:471627157488:web:92f008548a5596619a5735",
+            measurementId: "G-0PDHDWC6NV"
         };
 
+        // --- Initialize Firebase ---
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        const loader = document.getElementById('loader');
+        // --- DOM Elements ---
+        const loader = document.getElementById('loader-overlay');
         const avatarGrid = document.getElementById('avatar-grid');
-        const userCoinsEl = document.getElementById('user-coins');
-        const userInfoEl = document.getElementById('user-info');
+        const userDisplayNameEl = document.getElementById('user-display-name');
+        const userGemsEl = document.getElementById('user-gems');
+        const modal = document.getElementById('action-modal');
+        const modalImg = document.getElementById('modal-avatar-img');
+        const modalTitle = document.getElementById('modal-title');
+        const modalText = document.getElementById('modal-text');
+        const modalConfirmBtn = document.getElementById('modal-confirm-btn');
+        const modalCancelBtn = document.getElementById('modal-cancel-btn');
 
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                loadShop(user);
-            } else {
-                window.location.href = './login.html';
-            }
-        });
+        let currentUserData = null;
+        let allAvatars = [];
 
-        async function loadShop(user) {
+        // --- Main Function ---
+        async function main() {
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    await loadShopData(user);
+                } else {
+                    window.location.href = './login.html';
+                }
+            });
+        }
+        
+        async function loadShopData(user) {
             loader.style.display = 'flex';
-            avatarGrid.innerHTML = ''; // Clear previous items
-
             try {
-                // Fetch user data and all avatars simultaneously for speed
+                // Fetch user data and all avatars in parallel
                 const userDocRef = doc(db, 'users', user.uid);
+                const avatarsCollectionRef = collection(db, 'avatars');
+                
                 const [userDocSnap, avatarsSnapshot] = await Promise.all([
                     getDoc(userDocRef),
-                    getDocs(collection(db, 'avatars'))
+                    getDocs(avatarsCollectionRef)
                 ]);
 
                 if (!userDocSnap.exists()) {
-                    console.error("User document not found!");
-                    // You might want to create a default document here
-                    alert("خطا در یافتن اطلاعات کاربر!");
-                    return;
+                    throw new Error("اطلاعات کاربر یافت نشد!");
                 }
-
-                const userData = userDocSnap.data();
-                const avatars = [];
-                avatarsSnapshot.forEach(doc => {
-                    avatars.push({ id: doc.id, ...doc.data() });
-                });
-
-                // Update UI with user's coin balance
-                userCoinsEl.textContent = userData.coins || 0;
-                userInfoEl.style.visibility = 'visible';
+                currentUserData = { uid: user.uid, ...userDocSnap.data() };
                 
-                renderAvatars(avatars, userData, user.uid);
+                allAvatars = [];
+                avatarsSnapshot.forEach(doc => allAvatars.push({ id: doc.id, ...doc.data() }));
+
+                renderShop();
 
             } catch (error) {
-                console.error("Error loading shop data: ", error);
-                alert("خطا در بارگذاری فروشگاه. لطفاً اتصال اینترنت خود را بررسی کنید.");
+                console.error("خطا در بارگذاری اطلاعات فروشگاه:", error);
+                alert("خطا در ارتباط با سرور. لطفاً صفحه را رفرش کنید.");
             } finally {
                 loader.style.display = 'none';
             }
         }
 
-        function renderAvatars(avatars, userData, userId) {
-            const template = document.getElementById('avatar-card-template');
-            const ownedAvatars = userData.ownedAvatars || [];
-            const currentAvatar = userData.currentAvatarUrl || '';
-            const userCoins = userData.coins || 0;
+        function renderShop() {
+            // Update user info bar
+            userDisplayNameEl.textContent = currentUserData.displayName || "کاربر";
+            userGemsEl.textContent = currentUserData.gems.toLocaleString('fa');
 
-            avatars.forEach(avatar => {
-                const card = template.content.cloneNode(true).firstElementChild;
-                
-                card.querySelector('.avatar-image').src = avatar.imageUrl;
-                card.querySelector('.avatar-name').textContent = avatar.name;
+            // Clear previous items
+            avatarGrid.innerHTML = '';
+            
+            // Render each avatar card
+            allAvatars.forEach(avatar => {
+                const card = document.createElement('div');
+                card.className = 'avatar-card';
 
-                const actionButton = card.querySelector('.avatar-action-btn');
-                const isOwned = ownedAvatars.includes(avatar.id);
-                const isEquipped = currentAvatar === avatar.imageUrl;
+                const isOwned = currentUserData.ownedAvatars.includes(avatar.id);
+                const isEquipped = currentUserData.avatarUrl === avatar.imageUrl;
 
-                if (isEquipped) {
-                    card.classList.add('selected');
-                    actionButton.textContent = 'مجهز شده';
-                    actionButton.className = 'avatar-action-btn btn-equipped';
-                    actionButton.disabled = true;
-                } else if (isOwned) {
-                    actionButton.textContent = 'انتخاب';
-                    actionButton.className = 'avatar-action-btn btn-select';
-                    actionButton.onclick = () => equipAvatar(userId, avatar.imageUrl);
-                } else { // Not owned
-                    actionButton.innerHTML = `
+                if (isOwned) card.classList.add('owned');
+                if (isEquipped) card.classList.add('equipped');
+
+                let content = `
+                    <img src="${avatar.imageUrl}" alt="${avatar.name}" class="avatar-image">
+                `;
+
+                if(isOwned) {
+                    content += `<div class="status-badge">مالک</div>`;
+                } else {
+                     content += `
                         <div class="price-tag">
-                            <span>${avatar.price}</span>
-                            <img src="https://i.imgur.com/2s2EaGj.png" alt="سکه" style="width:16px; height:16px;">
-                        </div>
-                    `;
-                    if (userCoins >= avatar.price) {
-                        actionButton.className = 'avatar-action-btn btn-buy';
-                        actionButton.onclick = () => buyAvatar(userId, avatar.id, avatar.price);
-                    } else {
-                        card.classList.add('locked');
-                        actionButton.className = 'avatar-action-btn btn-disabled';
-                        actionButton.disabled = true;
-                    }
+                            <span>${avatar.price.toLocaleString('fa')}</span>
+                            <img src="https://i.imgur.com/2jw9S5s.png" alt="Gem" class="gem-icon">
+                        </div>`;
                 }
+                
+                card.innerHTML = content;
+                card.addEventListener('click', () => handleAvatarClick(avatar, isOwned, isEquipped));
                 avatarGrid.appendChild(card);
             });
         }
 
-        async function buyAvatar(userId, avatarId, price) {
-            const confirmed = confirm(`آیا از خرید این آواتار به قیمت ${price} سکه مطمئن هستید؟`);
-            if (!confirmed) return;
+        function handleAvatarClick(avatar, isOwned, isEquipped) {
+            if (isEquipped) return; // Do nothing if already equipped
 
-            const userDocRef = doc(db, 'users', userId);
+            modalImg.src = avatar.imageUrl;
 
-            try {
-                // First, get current user data to ensure we don't overwrite anything
-                const userDocSnap = await getDoc(userDocRef);
-                if (!userDocSnap.exists()) throw new Error("User not found");
-                
-                const currentCoins = userDocSnap.data().coins || 0;
-                if (currentCoins < price) {
-                    alert("سکه شما برای خرید این آواتار کافی نیست!");
-                    return;
+            if (isOwned) {
+                // Show equip modal
+                modalTitle.textContent = "تجهیز آواتار";
+                modalText.textContent = `آیا می‌خواهید آواتار "${avatar.name}" را به عنوان پروفایل خود انتخاب کنید؟`;
+                modalConfirmBtn.textContent = "تجهیز";
+                modalConfirmBtn.onclick = () => equipAvatar(avatar);
+                showModal();
+            } else {
+                // Show purchase modal
+                if (currentUserData.gems >= avatar.price) {
+                    modalTitle.textContent = "خرید آواتار";
+                    modalText.innerHTML = `آیا می‌خواهید آواتار "${avatar.name}" را با قیمت <strong style="color: #ffc947;">${avatar.price.toLocaleString('fa')}</strong> الماس خریداری کنید؟`;
+                    modalConfirmBtn.textContent = "خرید";
+                    modalConfirmBtn.onclick = () => purchaseAvatar(avatar);
+                    showModal();
+                } else {
+                    // Not enough gems
+                    modalTitle.textContent = "الماس کافی نیست";
+                    modalText.innerHTML = `شما برای خرید این آواتار به <strong style="color: #ffc947;">${avatar.price.toLocaleString('fa')}</strong> الماس نیاز دارید، اما فقط <strong>${currentUserData.gems.toLocaleString('fa')}</strong> الماس دارید.`;
+                    modalConfirmBtn.textContent = "باشه";
+                    modalConfirmBtn.onclick = hideModal;
+                    modalCancelBtn.style.display = 'none'; // Hide cancel button
+                    showModal();
                 }
-
-                await updateDoc(userDocRef, {
-                    coins: currentCoins - price,
-                    ownedAvatars: arrayUnion(avatarId)
-                });
-                
-                alert("آواتار با موفقیت خریداری شد!");
-                loadShop(auth.currentUser); // Reload the shop to reflect changes
-                
-            } catch (error) {
-                console.error("Error purchasing avatar: ", error);
-                alert("خطا در هنگام خرید. لطفاً دوباره تلاش کنید.");
             }
         }
         
-        async function equipAvatar(userId, avatarUrl) {
-            const userDocRef = doc(db, 'users', userId);
+        async function purchaseAvatar(avatar) {
+            hideModal();
+            loader.style.display = 'flex';
+            loader.querySelector('.loader-text').textContent = 'در حال انجام تراکنش...';
+
+            const userDocRef = doc(db, 'users', currentUserData.uid);
+
             try {
-                await updateDoc(userDocRef, {
-                    currentAvatarUrl: avatarUrl
+                await runTransaction(db, async (transaction) => {
+                    const userDoc = await transaction.get(userDocRef);
+                    if (!userDoc.exists()) {
+                        throw "کاربر یافت نشد!";
+                    }
+
+                    const currentGems = userDoc.data().gems;
+                    if (currentGems < avatar.price) {
+                        throw "الماس کافی نیست!";
+                    }
+
+                    const newGems = currentGems - avatar.price;
+                    transaction.update(userDocRef, {
+                        gems: newGems,
+                        ownedAvatars: arrayUnion(avatar.id)
+                    });
                 });
-                alert("آواتار جدید با موفقیت مجهز شد!");
-                loadShop(auth.currentUser); // Reload the shop to update the "equipped" status
+
+                // Update local data and re-render
+                currentUserData.gems -= avatar.price;
+                currentUserData.ownedAvatars.push(avatar.id);
+                renderShop();
+                alert('خرید با موفقیت انجام شد!');
+
             } catch (error) {
-                console.error("Error equipping avatar: ", error);
-                alert("خطا در هنگام انتخاب آواتار. لطفاً دوباره تلاش کنید.");
+                console.error("خطا در خرید:", error);
+                alert('خطا در فرآیند خرید. لطفاً دوباره تلاش کنید.');
+            } finally {
+                loader.style.display = 'none';
+                loader.querySelector('.loader-text').textContent = 'در حال بارگذاری فروشگاه...';
             }
         }
+        
+        async function equipAvatar(avatar) {
+             hideModal();
+             loader.style.display = 'flex';
+             loader.querySelector('.loader-text').textContent = 'در حال تجهیز آواتار...';
+            
+             const userDocRef = doc(db, 'users', currentUserData.uid);
+             try {
+                await updateDoc(userDocRef, {
+                    avatarUrl: avatar.imageUrl
+                });
 
+                // Update local data and re-render
+                currentUserData.avatarUrl = avatar.imageUrl;
+                renderShop();
+                alert('آواتار با موفقیت تجهیز شد!');
+
+             } catch(error) {
+                 console.error("خطا در تجهیز آواتار: ", error);
+                 alert('خطا در فرآیند تجهیز. لطفاً دوباره تلاش کنید.');
+             } finally {
+                 loader.style.display = 'none';
+                 loader.querySelector('.loader-text').textContent = 'در حال بارگذاری فروشگاه...';
+             }
+        }
+
+
+        // --- Modal Helper Functions ---
+        function showModal() {
+            modal.classList.add('visible');
+            modalCancelBtn.style.display = 'flex'; // Ensure cancel is visible by default
+        }
+
+        function hideModal() {
+            modal.classList.remove('visible');
+        }
+
+        modalCancelBtn.addEventListener('click', hideModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                hideModal();
+            }
+        });
+
+        // --- Start the app ---
+        main();
     </script>
 </body>
 </html>
