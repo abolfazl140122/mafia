@@ -34,6 +34,70 @@
             padding: 20px;
         }
 
+        /* --- تغییر ۱: استایل‌های پنل بارگذاری و کنترل نمایش محتوا --- */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001; /* بالاتر از پنل هشدار */
+            transition: opacity 0.5s ease;
+        }
+        
+        .loader {
+            border: 6px solid #f3f3f330;
+            border-top: 6px solid #ffc947;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1.5s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #loading-text {
+            margin-top: 20px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #f0e6d2;
+            text-shadow: 1px 1px 3px #000;
+        }
+
+        .main-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            /* به طور پیش‌فرض مخفی است */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        /* کلاسی که با جاوااسکریپت برای نمایش محتوا اضافه می‌شود */
+        body.loaded .main-content {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        body.loaded #loading-overlay {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+
         /* --- Styles for Main Page Elements (no changes here) --- */
         .top-right-container { width: 100%; display: flex; justify-content: flex-end; align-items: flex-start; }
         .profile-and-menu-wrapper { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
@@ -51,104 +115,50 @@
         #start-game-button:hover { background: linear-gradient(145deg, #a1534d, #6b3431); box-shadow: 0 8px 20px rgba(255, 201, 71, 0.3), inset 0 -2px 5px rgba(0,0,0,0.3); }
         #start-game-button:active { transform: scale(0.96); }
 
-
-        /* --- تغییر ۱: استایل‌های پنل هشدار سفارشی --- */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(5px);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .modal-overlay.visible {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .modal-content {
-            background: linear-gradient(145deg, #3c3022, #1e170f);
-            border: 2px solid #5c4a3a;
-            border-radius: 16px;
-            padding: 25px 30px;
-            width: 90%;
-            max-width: 380px;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            transform: scale(0.9);
-            transition: all 0.3s ease;
-        }
-
-        .modal-overlay.visible .modal-content {
-            transform: scale(1);
-        }
-
-        .modal-title {
-            font-size: 1.5rem;
-            font-weight: 900;
-            color: #ffc947;
-            margin-bottom: 15px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-        }
-        
-        .modal-message {
-            font-size: 1rem;
-            line-height: 1.6;
-            margin-bottom: 25px;
-        }
-
-        .modal-button {
-            width: 100%;
-            padding: 12px;
-            font-size: 1rem;
-            font-weight: 700;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            color: #ffffff;
-            background: linear-gradient(145deg, #8c4843, #5a2c2a);
-            border: 1px solid #ffc947;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-        }
-
-        .modal-button:hover {
-            background: linear-gradient(145deg, #a1534d, #6b3431);
-        }
+        /* --- Styles for Custom Alert Modal (no changes here) --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
+        .modal-overlay.visible { opacity: 1; visibility: visible; }
+        .modal-content { background: linear-gradient(145deg, #3c3022, #1e170f); border: 2px solid #5c4a3a; border-radius: 16px; padding: 25px 30px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); transform: scale(0.9); transition: all 0.3s ease; }
+        .modal-overlay.visible .modal-content { transform: scale(1); }
+        .modal-title { font-size: 1.5rem; font-weight: 900; color: #ffc947; margin-bottom: 15px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .modal-message { font-size: 1rem; line-height: 1.6; margin-bottom: 25px; }
+        .modal-button { width: 100%; padding: 12px; font-size: 1rem; font-weight: 700; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; color: #ffffff; background: linear-gradient(145deg, #8c4843, #5a2c2a); border: 1px solid #ffc947; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+        .modal-button:hover { background: linear-gradient(145deg, #a1534d, #6b3431); }
 
     </style>
 </head>
 <body>
 
-    <!-- Main Page Content -->
-    <div class="top-right-container">
-        <div class="profile-and-menu-wrapper">
-            <div class="profile-section">
-                <div class="avatar-container">
-                    <img id="user-avatar" src="https://i.imgur.com/T2bT1tG.png" alt="آواتار کاربر">
-                    <span id="user-display-name">در حال بارگذاری...</span>
+    <!-- تغییر ۲: پنل بارگذاری که در ابتدا نمایش داده می‌شود -->
+    <div id="loading-overlay">
+        <div class="loader"></div>
+        <p id="loading-text">در حال بارگذاری اطلاعات...</p>
+    </div>
+
+    <!-- تغییر ۳: محتوای اصلی صفحه داخل یک wrapper قرار می‌گیرد تا بتوان آن را به صورت گروهی مخفی/نمایش داد -->
+    <div class="main-content">
+        <div class="top-right-container">
+            <div class="profile-and-menu-wrapper">
+                <div class="profile-section">
+                    <div class="avatar-container">
+                        <img id="user-avatar" src="" alt="آواتار کاربر"> <!-- src خالی شد تا تصویر پیش‌فرض نمایش داده نشود -->
+                        <span id="user-display-name"></span> <!-- متن پیش‌فرض حذف شد -->
+                    </div>
+                </div>
+                <div class="menu-buttons">
+                    <button class="menu-button">سازندگان</button>
+                    <button class="menu-button">رده بندی</button>
                 </div>
             </div>
-            <div class="menu-buttons">
-                <button class="menu-button">سازندگان</button>
-                <button class="menu-button">رده بندی</button>
-            </div>
+        </div>
+
+        <div class="start-game-container">
+            <button id="start-game-button">شروع بازی</button>
         </div>
     </div>
 
-    <div class="start-game-container">
-        <button id="start-game-button">شروع بازی</button>
-    </div>
 
-    <!-- تغییر ۲: کدهای HTML پنل هشدار سفارشی -->
+    <!-- Custom Alert Modal (no changes here) -->
     <div id="custom-alert-overlay" class="modal-overlay">
         <div class="modal-content">
             <h2 class="modal-title">توجه!</h2>
@@ -177,42 +187,34 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // --- DOM Elements for main page ---
+        // --- DOM Elements ---
         const userDisplayName = document.getElementById('user-display-name');
         const userAvatar = document.getElementById('user-avatar');
         const startGameButton = document.getElementById('start-game-button');
         const menuButtons = document.querySelectorAll('.menu-button');
-
-        // --- تغییر ۳: DOM Elements و توابع برای پنل هشدار سفارشی ---
         const customAlertOverlay = document.getElementById('custom-alert-overlay');
         const customAlertMessage = document.getElementById('custom-alert-message');
         const customAlertConfirmBtn = document.getElementById('custom-alert-confirm-btn');
+        
+        // تغییر ۴: DOM Elements برای پنل بارگذاری
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const loaderSpinner = loadingOverlay.querySelector('.loader');
+        const loadingText = document.getElementById('loading-text');
 
-        /**
-         * Displays the custom themed alert modal.
-         * @param {string} message The message to show in the modal.
-         * @param {Function} onConfirm The callback function to execute when the confirm button is clicked.
-         */
         function showCustomAlert(message, onConfirm) {
             customAlertMessage.textContent = message;
             customAlertOverlay.classList.add('visible');
-
-            // Set up a one-time click listener for the confirm button
             customAlertConfirmBtn.onclick = () => {
                 customAlertOverlay.classList.remove('visible');
-                if (onConfirm) {
-                    onConfirm();
-                }
+                if (onConfirm) onConfirm();
             };
         }
 
-        
         async function checkMaintenanceAndProceed(actionCallback) {
             const maintenanceDocRef = doc(db, 'settings', 'maintenance');
             try {
                 const docSnap = await getDoc(maintenanceDocRef);
                 if (docSnap.exists() && docSnap.data().enabled === true) {
-                    // اینجا هم می‌توانیم از پنل سفارشی استفاده کنیم
                     showCustomAlert("سرور در حالت بروزرسانی قرار دارد. شما به صفحه اصلی منتقل می‌شوید.", () => {
                         window.location.href = './index.html';
                     });
@@ -230,40 +232,46 @@
             if (user) {
                 const userDocRef = doc(db, 'users', user.uid);
                 try {
+                    // دریافت اطلاعات کاربر
                     const userDocSnap = await getDoc(userDocRef);
                     if (userDocSnap.exists()) {
                         const userData = userDocSnap.data();
                         userDisplayName.textContent = userData.displayName || "کاربر ناشناس";
-                        if (userData.avatarUrl) {
-                            userAvatar.src = userData.avatarUrl;
-                        }
+                        userAvatar.src = userData.avatarUrl || 'https://i.imgur.com/T2bT1tG.png'; // آواتار پیش‌فرض
                     } else {
                         userDisplayName.textContent = user.displayName || "کاربر ناشناس";
+                        userAvatar.src = 'https://i.imgur.com/T2bT1tG.png'; // آواتار پیش‌فرض
                     }
+
+                    // تغییر ۵: پس از دریافت موفق اطلاعات، پنل بارگذاری را محو و محتوای اصلی را نمایش بده
+                    document.body.classList.add('loaded');
+
+                    // فعال کردن شنونده برای وضعیت بروزرسانی سرور
+                    const maintenanceDocRef = doc(db, 'settings', 'maintenance');
+                    onSnapshot(maintenanceDocRef, (docSnap) => {
+                        if (docSnap.exists() && docSnap.data().enabled === true) {
+                            showCustomAlert(
+                                "سرور در حالت بروزرسانی قرار گرفت. شما به صفحه اصلی منتقل می‌شوید.",
+                                () => { window.location.href = './index.html'; }
+                            );
+                        }
+                    });
+
                 } catch (error) {
+                    // تغییر ۶: مدیریت خطا در صورت عدم اتصال به اینترنت
                     console.error("خطا در دریافت اطلاعات کاربر:", error);
-                    userDisplayName.textContent = user.displayName || "کاربر ناشناس";
+                    loaderSpinner.style.display = 'none'; // مخفی کردن اسپینر
+                    loadingText.textContent = 'خطا در اتصال به سرور. لطفا اینترنت خود را بررسی کنید.';
+                    // پنل بارگذاری به عنوان پنل خطا باقی می‌ماند.
                 }
 
-                const maintenanceDocRef = doc(db, 'settings', 'maintenance');
-                onSnapshot(maintenanceDocRef, (docSnap) => {
-                    if (docSnap.exists() && docSnap.data().enabled === true) {
-                        // <--- تغییر ۴: جایگزین کردن alert با پنل سفارشی --->
-                        showCustomAlert(
-                            "سرور در حالت بروزرسانی قرار گرفت. شما به صفحه اصلی منتقل می‌شوید.",
-                            () => {
-                                window.location.href = './index.html';
-                            }
-                        );
-                    }
-                });
-
             } else {
+                // اگر کاربر وارد نشده باشد، به صفحه لاگین هدایت می‌شود
                 window.location.href = './login.html';
             }
         });
 
-        // Event listeners remain unchanged, but now use the improved checkMaintenanceAndProceed
+        // Event Listeners
         userAvatar.addEventListener('click', () => {
             checkMaintenanceAndProceed(() => {
                 window.location.href = './Avatar shop.html';
@@ -272,7 +280,8 @@
 
         startGameButton.addEventListener('click', () => {
             checkMaintenanceAndProceed(() => {
-                console.log("دکمه شروع بازی کلیک شد.");
+                // تغییر ۷: هدایت کاربر به صفحه جستجوی بازیکنان
+                window.location.href = './users search.html';
             });
         });
         
