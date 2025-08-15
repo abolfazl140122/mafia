@@ -22,6 +22,50 @@
             padding: 20px;
         }
 
+        /* --- پنل بارگذاری و اتصال به سرور --- */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(10, 5, 5, 0.9);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            opacity: 1;
+            transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+            visibility: visible;
+        }
+        .loading-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        .loading-overlay .loader {
+            width: 60px;
+            height: 60px;
+            border: 6px solid rgba(240, 230, 210, 0.2);
+            border-top-color: #ffc947;
+            border-radius: 50%;
+            animation: spin 1.2s cubic-bezier(0.6, 0.2, 0.4, 0.8) infinite;
+        }
+        .loading-overlay p {
+            font-size: 1.3rem;
+            color: #ffc947;
+            text-shadow: 0 1px 4px #000;
+            animation: pulse 2s infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+
         .main-container {
             width: 100%;
             height: 100%;
@@ -49,23 +93,17 @@
             border: 2px solid #c5a687;
             object-fit: cover;
         }
-        #current-user-name {
-            font-size: 1.1rem;
-            font-weight: 700;
-        }
+        #current-user-name { font-size: 1.1rem; font-weight: 700; }
 
-        /* بخش وضعیت جستجو و انیمیشن */
-        .search-status {
-            text-align: center;
-            padding: 15px;
-        }
+        /* بخش وضعیت جستجو */
+        .search-status { text-align: center; padding: 15px; }
         .search-status h2 {
             font-size: 1.4rem;
             color: #ffc947;
             margin-bottom: 10px;
             text-shadow: 0 1px 3px #000;
         }
-        .loader {
+        .search-status .loader-inline {
             width: 50px;
             height: 50px;
             border: 5px solid #f0e6d2;
@@ -74,10 +112,7 @@
             animation: spin 1s linear infinite;
             margin: 0 auto;
         }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
+        
         /* لیست بازیکنان در حال جستجو */
         .players-list-container {
             flex-grow: 1;
@@ -86,8 +121,8 @@
             padding: 15px;
             overflow-y: auto;
             border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
         }
-        /* استایل برای اسکرول بار */
         .players-list-container::-webkit-scrollbar { width: 8px; }
         .players-list-container::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 4px; }
         .players-list-container::-webkit-scrollbar-thumb { background: #5c4a3a; border-radius: 4px; }
@@ -102,12 +137,13 @@
             border-radius: 10px;
             margin-bottom: 10px;
             border: 1px solid #5c4a3a;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             animation: fadeIn 0.5s ease;
         }
         .player-item:hover {
             border-color: #ffc947;
             transform: scale(1.02);
+            box-shadow: 0 0 15px rgba(255, 201, 71, 0.3);
         }
         .player-avatar {
             width: 40px;
@@ -116,41 +152,66 @@
             object-fit: cover;
             border: 2px solid #c5a687;
         }
-        .player-name {
-            font-size: 1rem;
-            font-weight: 700;
-        }
+        .player-name { font-size: 1rem; font-weight: 700; }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
         
-        /* دکمه لغو جستجو */
-        .cancel-container {
+        /* کانتینر دکمه‌ها */
+        .action-buttons-container {
             padding: 10px 0;
+            display: flex;
+            gap: 15px;
         }
-        #cancel-search-btn {
-            width: 100%;
+        .action-buttons-container button {
+            flex-grow: 1;
             padding: 15px;
             font-size: 1.2rem;
             font-weight: 900;
             color: #ffffff;
-            background: linear-gradient(145deg, #a13d3d, #7c1f1f);
-            border: 2px solid #ff8f8f;
             border-radius: 12px;
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
             text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+            border: 2px solid transparent;
         }
-        #cancel-search-btn:hover {
+        .action-buttons-container button:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+            filter: grayscale(50%);
+        }
+
+        /* دکمه لغو جستجو */
+        #cancel-search-btn {
+            background: linear-gradient(145deg, #a13d3d, #7c1f1f);
+            border-color: #ff8f8f;
+        }
+        #cancel-search-btn:hover:not(:disabled) {
             background: linear-gradient(145deg, #b84a4a, #912525);
             box-shadow: 0 6px 15px rgba(255, 100, 100, 0.25);
+        }
+        
+        /* دکمه تازه سازی */
+        #refresh-btn {
+            background: linear-gradient(145deg, #b8860b, #8b6508);
+            border-color: #ffd700;
+        }
+        #refresh-btn:hover:not(:disabled) {
+            background: linear-gradient(145deg, #daa520, #a0791b);
+            box-shadow: 0 6px 15px rgba(255, 215, 0, 0.25);
         }
     </style>
 </head>
 <body>
+
+    <!-- پنل لودینگ اولیه -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loader"></div>
+        <p>در حال اتصال به سرور...</p>
+    </div>
 
     <div class="main-container">
         <!-- نمایش اطلاعات کاربر فعلی -->
@@ -162,7 +223,7 @@
         <!-- وضعیت جستجو -->
         <div class="search-status">
             <h2>در حال جستجو برای بازیکنان</h2>
-            <div class="loader"></div>
+            <div class="loader-inline"></div>
         </div>
         
         <!-- لیست بازیکنان -->
@@ -170,8 +231,9 @@
             <!-- بازیکنان به صورت پویا اینجا اضافه می‌شوند -->
         </div>
 
-        <!-- دکمه لغو -->
-        <div class="cancel-container">
+        <!-- دکمه‌ها -->
+        <div class="action-buttons-container">
+            <button id="refresh-btn">تازه‌سازی</button>
             <button id="cancel-search-btn">لغو جستجو</button>
         </div>
     </div>
@@ -195,16 +257,33 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // DOM Elements
+        // --- DOM Elements ---
+        const loadingOverlay = document.getElementById('loading-overlay');
         const currentUserAvatar = document.getElementById('current-user-avatar');
         const currentUserName = document.getElementById('current-user-name');
         const playersListContainer = document.getElementById('players-list-container');
         const cancelSearchBtn = document.getElementById('cancel-search-btn');
+        const refreshBtn = document.getElementById('refresh-btn');
 
+        // --- State Variables ---
         let currentUserData = null;
-        let unsubscribeFromPlayersList = null; // برای قطع کردن شنونده هنگام خروج
+        let unsubscribeFromPlayersList = null;
+        let isInitialLoad = true;
 
-        // تابع برای اضافه کردن کاربر به لیست جستجو
+        // --- Refresh Cooldown Logic ---
+        let refreshCooldownDuration = 5; // Start with 5 seconds
+        let currentCooldown = 0;
+        let cooldownInterval = null;
+
+        // --- Loading Overlay Functions ---
+        function showLoadingOverlay() {
+            loadingOverlay.classList.remove('hidden');
+        }
+        function hideLoadingOverlay() {
+            loadingOverlay.classList.add('hidden');
+        }
+
+        // --- Core Firebase Functions ---
         async function joinSearch(user) {
             if (!currentUserData) return;
             const searchingUserRef = doc(db, 'searching_users', user.uid);
@@ -212,7 +291,7 @@
                 await setDoc(searchingUserRef, {
                     displayName: currentUserData.displayName,
                     avatarUrl: currentUserData.avatarUrl,
-                    joinedAt: new Date() // زمان پیوستن برای مدیریت کاربران آفلاین
+                    joinedAt: new Date()
                 });
                 console.log("شما به لیست جستجو اضافه شدید.");
             } catch (error) {
@@ -220,9 +299,11 @@
             }
         }
 
-        // تابع برای حذف کاربر از لیست جستجو
         async function leaveSearch(user) {
             if (!user) return;
+            if (unsubscribeFromPlayersList) {
+                unsubscribeFromPlayersList(); // قطع شنونده
+            }
             const searchingUserRef = doc(db, 'searching_users', user.uid);
             try {
                 await deleteDoc(searchingUserRef);
@@ -232,9 +313,8 @@
             }
         }
 
-        // تابع برای رندر کردن لیست بازیکنان در صفحه
         function renderPlayersList(docs) {
-            playersListContainer.innerHTML = ''; // پاک کردن لیست قبلی
+            playersListContainer.innerHTML = '';
             docs.forEach(doc => {
                 const playerData = doc.data();
                 const playerElement = document.createElement('div');
@@ -247,45 +327,91 @@
             });
         }
 
+        // --- Refresh Button Handler ---
+        function handleRefresh() {
+            if (currentCooldown > 0) return; // اگر در حال cooldown بود، کاری نکن
+
+            showLoadingOverlay();
+            
+            // شبیه‌سازی یک تاخیر برای نمایش پنل، چون onSnapshot آنی است
+            setTimeout(() => {
+                hideLoadingOverlay();
+            }, 1000); // 1 ثانیه پنل را نشان بده
+
+            // شروع cooldown
+            currentCooldown = refreshCooldownDuration;
+            refreshBtn.disabled = true;
+            refreshBtn.textContent = `صبر کنید (${currentCooldown})`;
+
+            cooldownInterval = setInterval(() => {
+                currentCooldown--;
+                if (currentCooldown > 0) {
+                    refreshBtn.textContent = `صبر کنید (${currentCooldown})`;
+                } else {
+                    clearInterval(cooldownInterval);
+                    refreshBtn.disabled = false;
+                    refreshBtn.textContent = 'تازه‌سازی';
+                }
+            }, 1000);
+
+            // افزایش زمان cooldown برای دفعه بعد
+            refreshCooldownDuration += 5;
+        }
+
+        // --- Main Logic ---
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 // 1. دریافت اطلاعات کاربر فعلی
-                const userDocRef = doc(db, 'users', user.uid);
-                const userDocSnap = await getDoc(userDocRef);
+                try {
+                    const userDocRef = doc(db, 'users', user.uid);
+                    const userDocSnap = await getDoc(userDocRef);
 
-                if (userDocSnap.exists()) {
-                    currentUserData = userDocSnap.data();
-                    currentUserName.textContent = currentUserData.displayName || 'کاربر';
-                    if (currentUserData.avatarUrl) {
-                        currentUserAvatar.src = currentUserData.avatarUrl;
+                    if (userDocSnap.exists()) {
+                        currentUserData = userDocSnap.data();
+                        currentUserName.textContent = currentUserData.displayName || 'کاربر';
+                        if (currentUserData.avatarUrl) {
+                            currentUserAvatar.src = currentUserData.avatarUrl;
+                        }
+                    } else {
+                        currentUserData = { displayName: user.displayName || 'کاربر', avatarUrl: user.photoURL || 'https://i.imgur.com/T2bT1tG.png' };
+                        currentUserName.textContent = currentUserData.displayName;
                     }
-                } else {
-                    // اگر پروفایل کاربر در دیتابیس نبود
-                    currentUserData = { displayName: user.displayName || 'کاربر', avatarUrl: user.photoURL || 'https://i.imgur.com/T2bT1tG.png' };
-                    currentUserName.textContent = currentUserData.displayName;
+
+                    // 2. پیوستن به لیست جستجو
+                    await joinSearch(user);
+
+                    // 3. گوش دادن به تغییرات زنده در لیست بازیکنان
+                    const searchingUsersCollection = collection(db, 'searching_users');
+                    unsubscribeFromPlayersList = onSnapshot(searchingUsersCollection, (snapshot) => {
+                        renderPlayersList(snapshot.docs);
+                        
+                        // فقط در بارگذاری اولیه، پنل لودینگ را مخفی کن
+                        if (isInitialLoad) {
+                            hideLoadingOverlay();
+                            isInitialLoad = false;
+                        }
+                    });
+
+                    // 4. تنظیم رویداد دکمه‌ها
+                    refreshBtn.addEventListener('click', handleRefresh);
+
+                    cancelSearchBtn.addEventListener('click', async () => {
+                        await leaveSearch(user);
+                        window.location.href = './main.html';
+                    });
+
+                    // 5. تنظیم رویداد برای زمانی که کاربر صفحه را می‌بندد
+                    window.addEventListener('beforeunload', () => {
+                        leaveSearch(user);
+                    });
+
+                } catch (error) {
+                    console.error("خطای اصلی در بارگذاری:", error);
+                    // در صورت خطا، کاربر را به صفحه لاگین هدایت کن
+                    hideLoadingOverlay();
+                    alert("خطا در اتصال به سرور. لطفا مجددا تلاش کنید.");
+                    window.location.href = './login.html';
                 }
-
-                // 2. پیوستن به لیست جستجو
-                await joinSearch(user);
-
-                // 3. گوش دادن به تغییرات زنده در لیست بازیکنان
-                const searchingUsersCollection = collection(db, 'searching_users');
-                unsubscribeFromPlayersList = onSnapshot(searchingUsersCollection, (snapshot) => {
-                    renderPlayersList(snapshot.docs);
-                });
-
-                // 4. تنظیم رویداد دکمه لغو
-                cancelSearchBtn.addEventListener('click', async () => {
-                    await leaveSearch(user);
-                    window.location.href = './main.html';
-                });
-
-                // 5. تنظیم رویداد برای زمانی که کاربر صفحه را می‌بندد
-                window.addEventListener('beforeunload', (event) => {
-                    // این تابع به صورت همزمان اجرا می‌شود و فرصت await را ندارد
-                    // اما درخواست حذف را به سرور ارسال می‌کند
-                    leaveSearch(user);
-                });
 
             } else {
                 // اگر کاربر وارد نشده بود، به صفحه لاگین برود
