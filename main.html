@@ -16,7 +16,7 @@
 
         html, body {
             height: 100%;
-            overflow: hidden; /* جلوگیری از اسکرول */
+            overflow: hidden;
         }
 
         body {
@@ -25,140 +25,110 @@
             background-size: cover;
             background-position: center center;
             background-repeat: no-repeat;
-            background-attachment: fixed; /* باعث می‌شود پس‌زمینه هنگام باز شدن کیبورد ثابت بماند */
+            background-attachment: fixed;
             color: #f0e6d2;
             display: flex;
             flex-direction: column;
-            justify-content: space-between; /* عناصر را در بالا و پایین قرار می‌دهد */
+            justify-content: space-between;
             align-items: center;
             padding: 20px;
         }
 
-        /* کانتینر برای عناصر بالا-راست */
-        .top-right-container {
+        /* --- Styles for Main Page Elements (no changes here) --- */
+        .top-right-container { width: 100%; display: flex; justify-content: flex-end; align-items: flex-start; }
+        .profile-and-menu-wrapper { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
+        .profile-section { display: flex; align-items: center; background-color: rgba(0, 0, 0, 0.5); padding: 10px 15px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 3px 8px rgba(0,0,0,0.3); }
+        .avatar-container { display: flex; align-items: center; gap: 12px; }
+        #user-avatar { width: 50px; height: 50px; border-radius: 50%; border: 2px solid #c5a687; object-fit: cover; cursor: pointer; transition: all 0.2s ease-in-out; }
+        #user-avatar:hover { transform: scale(1.1); border-color: #ffc947; box-shadow: 0 0 10px rgba(255, 201, 71, 0.5); }
+        #user-display-name { font-size: 1rem; font-weight: 700; text-shadow: 1px 1px 3px #000; }
+        .menu-buttons { display: flex; flex-direction: column; gap: 10px; align-items: flex-end; }
+        .menu-button { background: linear-gradient(145deg, rgba(80, 50, 48, 0.8), rgba(56, 33, 32, 0.9)); color: #e0dacc; border: 1px solid #c5a687; padding: 8px 15px; border-radius: 8px; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; text-align: center; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); box-shadow: 0 2px 5px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05); }
+        .menu-button:hover { background: linear-gradient(145deg, rgba(100, 65, 63, 0.9), rgba(74, 44, 42, 1)); border-color: #ffc947; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1); }
+        .menu-button:active { transform: translateY(0) scale(0.98); box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+        .start-game-container { width: 100%; display: flex; justify-content: center; padding-bottom: 20px; }
+        #start-game-button { padding: 15px 40px; font-size: 1.3rem; font-weight: 900; color: #ffffff; background: linear-gradient(145deg, #8c4843, #5a2c2a); border: 2px solid #ffc947; border-radius: 15px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5), inset 0 -2px 5px rgba(0,0,0,0.3); text-shadow: 0 2px 4px rgba(0,0,0,0.7); }
+        #start-game-button:hover { background: linear-gradient(145deg, #a1534d, #6b3431); box-shadow: 0 8px 20px rgba(255, 201, 71, 0.3), inset 0 -2px 5px rgba(0,0,0,0.3); }
+        #start-game-button:active { transform: scale(0.96); }
+
+
+        /* --- تغییر ۱: استایل‌های پنل هشدار سفارشی --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            display: flex;
-            justify-content: flex-end; /* همه چیز را به سمت راست هل می‌دهد */
-            align-items: flex-start;
-        }
-        
-        /* Wrapper for profile and its menu buttons */
-        .profile-and-menu-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end; /* Aligns profile box and buttons to the right */
-            gap: 12px; /* Space between profile box and the buttons below it */
-        }
-
-        /* Profile section now only contains the avatar and name */
-        .profile-section {
-            display: flex;
-            align-items: center;
-            background-color: rgba(0, 0, 0, 0.5);
-            padding: 10px 15px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
-        }
-
-        .avatar-container {
-            display: flex;
-            align-items: center;
-            gap: 12px; /* فاصله بین آواتار و نام */
-        }
-        
-        #user-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            border: 2px solid #c5a687;
-            object-fit: cover;
-            cursor: pointer;
-            transition: all 0.2s ease-in-out;
-        }
-
-        #user-avatar:hover {
-            transform: scale(1.1);
-            border-color: #ffc947;
-            box-shadow: 0 0 10px rgba(255, 201, 71, 0.5);
-        }
-
-        #user-display-name {
-            font-size: 1rem;
-            font-weight: 700;
-            text-shadow: 1px 1px 3px #000;
-        }
-        
-        /* Buttons are now outside the profile box */
-        .menu-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 10px; /* فاصله بین دکمه‌ها */
-            align-items: flex-end; /* To align buttons to the right if they have different widths */
-        }
-
-        .menu-button {
-            background: linear-gradient(145deg, rgba(80, 50, 48, 0.8), rgba(56, 33, 32, 0.9));
-            color: #e0dacc;
-            border: 1px solid #c5a687;
-            padding: 8px 15px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
-        }
-
-        .menu-button:hover {
-            background: linear-gradient(145deg, rgba(100, 65, 63, 0.9), rgba(74, 44, 42, 1));
-            border-color: #ffc947;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
-        }
-        
-        .menu-button:active {
-            transform: translateY(0) scale(0.98);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-        }
-
-        /* کانتینر برای دکمه شروع بازی در پایین */
-        .start-game-container {
-            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
             display: flex;
             justify-content: center;
-            padding-bottom: 20px; /* فاصله از لبه پایین صفحه */
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
         }
 
-        #start-game-button {
-            padding: 15px 40px;
-            font-size: 1.3rem;
+        .modal-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: linear-gradient(145deg, #3c3022, #1e170f);
+            border: 2px solid #5c4a3a;
+            border-radius: 16px;
+            padding: 25px 30px;
+            width: 90%;
+            max-width: 380px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transform: scale(0.9);
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.visible .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
             font-weight: 900;
+            color: #ffc947;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .modal-message {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .modal-button {
+            width: 100%;
+            padding: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
             color: #ffffff;
             background: linear-gradient(145deg, #8c4843, #5a2c2a);
-            border: 2px solid #ffc947;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5), inset 0 -2px 5px rgba(0,0,0,0.3);
-            text-shadow: 0 2px 4px rgba(0,0,0,0.7);
+            border: 1px solid #ffc947;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
         }
 
-        #start-game-button:hover {
+        .modal-button:hover {
             background: linear-gradient(145deg, #a1534d, #6b3431);
-            box-shadow: 0 8px 20px rgba(255, 201, 71, 0.3), inset 0 -2px 5px rgba(0,0,0,0.3);
-        }
-
-        #start-game-button:active {
-            transform: scale(0.96);
         }
 
     </style>
 </head>
 <body>
 
+    <!-- Main Page Content -->
     <div class="top-right-container">
         <div class="profile-and-menu-wrapper">
             <div class="profile-section">
@@ -178,10 +148,19 @@
         <button id="start-game-button">شروع بازی</button>
     </div>
 
+    <!-- تغییر ۲: کدهای HTML پنل هشدار سفارشی -->
+    <div id="custom-alert-overlay" class="modal-overlay">
+        <div class="modal-content">
+            <h2 class="modal-title">توجه!</h2>
+            <p id="custom-alert-message" class="modal-message"></p>
+            <button id="custom-alert-confirm-btn" class="modal-button">تایید</button>
+        </div>
+    </div>
+
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        // <--- تغییر ۱: افزودن onSnapshot برای بررسی لحظه‌ای --->
         import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -198,39 +177,57 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // --- DOM Elements for main page ---
         const userDisplayName = document.getElementById('user-display-name');
         const userAvatar = document.getElementById('user-avatar');
         const startGameButton = document.getElementById('start-game-button');
         const menuButtons = document.querySelectorAll('.menu-button');
 
-        // <--- تغییر ۲: تابع کمکی برای بررسی وضعیت بروزرسانی قبل از هر عملیات --->
+        // --- تغییر ۳: DOM Elements و توابع برای پنل هشدار سفارشی ---
+        const customAlertOverlay = document.getElementById('custom-alert-overlay');
+        const customAlertMessage = document.getElementById('custom-alert-message');
+        const customAlertConfirmBtn = document.getElementById('custom-alert-confirm-btn');
+
         /**
-         * Checks maintenance status. If enabled, redirects to index.html.
-         * Otherwise, executes the provided callback function.
-         * @param {Function} actionCallback The function to run if maintenance is off.
+         * Displays the custom themed alert modal.
+         * @param {string} message The message to show in the modal.
+         * @param {Function} onConfirm The callback function to execute when the confirm button is clicked.
          */
+        function showCustomAlert(message, onConfirm) {
+            customAlertMessage.textContent = message;
+            customAlertOverlay.classList.add('visible');
+
+            // Set up a one-time click listener for the confirm button
+            customAlertConfirmBtn.onclick = () => {
+                customAlertOverlay.classList.remove('visible');
+                if (onConfirm) {
+                    onConfirm();
+                }
+            };
+        }
+
+        
         async function checkMaintenanceAndProceed(actionCallback) {
             const maintenanceDocRef = doc(db, 'settings', 'maintenance');
             try {
                 const docSnap = await getDoc(maintenanceDocRef);
                 if (docSnap.exists() && docSnap.data().enabled === true) {
-                    console.log("حالت بروزرسانی فعال است. انتقال به صفحه لودینگ...");
-                    window.location.href = './index.html';
+                    // اینجا هم می‌توانیم از پنل سفارشی استفاده کنیم
+                    showCustomAlert("سرور در حالت بروزرسانی قرار دارد. شما به صفحه اصلی منتقل می‌شوید.", () => {
+                        window.location.href = './index.html';
+                    });
                 } else {
-                    // بروزرسانی فعال نیست، عملکرد اصلی دکمه را اجرا کن
                     actionCallback();
                 }
             } catch (error) {
                 console.error("خطا در بررسی وضعیت بروزرسانی:", error);
-                // در صورت خطا، برای امنیت بیشتر، اجازه ادامه کار را نمی‌دهیم و به کاربر هشدار می‌دهیم
-                alert("خطا در ارتباط با سرور. لطفا اتصال اینترنت خود را بررسی کرده و مجددا تلاش کنید.");
+                showCustomAlert("خطا در ارتباط با سرور. لطفا اتصال اینترنت خود را بررسی کرده و مجددا تلاش کنید.", () => {});
             }
         }
 
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                // --- بخش اول: بارگذاری اطلاعات کاربر مثل قبل ---
                 const userDocRef = doc(db, 'users', user.uid);
                 try {
                     const userDocSnap = await getDoc(userDocRef);
@@ -248,15 +245,16 @@
                     userDisplayName.textContent = user.displayName || "کاربر ناشناس";
                 }
 
-                // <--- تغییر ۳: فعال‌سازی listener لحظه‌ای برای بروزرسانی --->
-                // این کد به صورت دائم به داکیومنت maintenance گوش می‌دهد
                 const maintenanceDocRef = doc(db, 'settings', 'maintenance');
                 onSnapshot(maintenanceDocRef, (docSnap) => {
                     if (docSnap.exists() && docSnap.data().enabled === true) {
-                        console.log("تغییر در وضعیت بروزرسانی شناسایی شد. در حال انتقال...");
-                        // از آنجایی که ممکن است کاربر در حال انجام کاری باشد، یک پیام کوتاه نمایش می‌دهیم
-                        alert("سرور در حالت بروزرسانی قرار گرفت. شما به صفحه اصلی منتقل می‌شوید.");
-                        window.location.href = './index.html';
+                        // <--- تغییر ۴: جایگزین کردن alert با پنل سفارشی --->
+                        showCustomAlert(
+                            "سرور در حالت بروزرسانی قرار گرفت. شما به صفحه اصلی منتقل می‌شوید.",
+                            () => {
+                                window.location.href = './index.html';
+                            }
+                        );
                     }
                 });
 
@@ -265,31 +263,24 @@
             }
         });
 
-        // <--- تغییر ۴: به‌روزرسانی تمام Event Listener ها برای استفاده از تابع کمکی --->
-        // رویداد کلیک برای آواتار کاربر
+        // Event listeners remain unchanged, but now use the improved checkMaintenanceAndProceed
         userAvatar.addEventListener('click', () => {
             checkMaintenanceAndProceed(() => {
-                console.log("آواتار کلیک شد. انتقال به فروشگاه...");
                 window.location.href = './Avatar shop.html';
             });
         });
 
-        // رویداد کلیک برای دکمه شروع بازی
         startGameButton.addEventListener('click', () => {
             checkMaintenanceAndProceed(() => {
                 console.log("دکمه شروع بازی کلیک شد.");
-                // در آینده منطق شروع بازی اینجا قرار می‌گیرد
             });
         });
         
-        // رویداد کلیک برای سایر دکمه‌های منو
         menuButtons.forEach(button => {
             button.addEventListener('click', () => {
                 checkMaintenanceAndProceed(() => {
                     const buttonText = button.textContent;
-                    console.log(`دکمه "${buttonText}" کلیک شد.`);
-                    // در آینده منطق مربوط به هر دکمه اینجا قرار می‌گیرد
-                    alert(`عملکرد دکمه "${buttonText}" هنوز پیاده‌سازی نشده است.`);
+                    showCustomAlert(`عملکرد دکمه "${buttonText}" هنوز پیاده‌سازی نشده است.`, () => {});
                 });
             });
         });
