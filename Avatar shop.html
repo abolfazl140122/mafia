@@ -369,11 +369,12 @@
         let allAvatars = [];
 
         // --- Main Function ---
-        async function main() {
+        function main() {
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
                     await loadShopData(user);
                 } else {
+                    console.log("کاربر وارد نشده است، به صفحه ورود منتقل می‌شود.");
                     window.location.href = './login.html';
                 }
             });
@@ -392,18 +393,35 @@
                 ]);
 
                 if (!userDocSnap.exists()) {
-                    throw new Error("اطلاعات کاربر یافت نشد!");
+                    throw new Error("اطلاعات کاربر یافت نشد! لطفاً با پشتیبانی تماس بگیرید.");
                 }
-                currentUserData = { uid: user.uid, ...userDocSnap.data() };
+                
+                // **IMPROVEMENT**: Safely handle user data with default values
+                const userData = userDocSnap.data() || {};
+                currentUserData = {
+                    uid: user.uid,
+                    displayName: userData.displayName || "کاربر",
+                    gems: userData.gems || 0,
+                    ownedAvatars: userData.ownedAvatars || [], // Prevents error if user has no owned avatars yet
+                    avatarUrl: userData.avatarUrl || ""
+                };
                 
                 allAvatars = [];
-                avatarsSnapshot.forEach(doc => allAvatars.push({ id: doc.id, ...doc.data() }));
+                avatarsSnapshot.forEach(doc => {
+                    const avatarData = doc.data();
+                    // **IMPROVEMENT**: Ensure the document from Firestore has all necessary fields
+                    if (avatarData.id && avatarData.name && avatarData.imageUrl && typeof avatarData.price === 'number') {
+                        allAvatars.push(avatarData); // The 'id' field from your document is used directly
+                    } else {
+                        console.warn("آواتار با اطلاعات ناقص در دیتابیس یافت شد و نادیده گرفته شد:", doc.id);
+                    }
+                });
 
                 renderShop();
 
             } catch (error) {
                 console.error("خطا در بارگذاری اطلاعات فروشگاه:", error);
-                alert("خطا در ارتباط با سرور. لطفاً صفحه را رفرش کنید.");
+                alert("خطا در ارتباط با سرور رخ داد. لطفاً از اتصال اینترنت خود مطمئن شده و صفحه را رفرش کنید.");
             } finally {
                 loader.style.display = 'none';
             }
@@ -411,7 +429,7 @@
 
         function renderShop() {
             // Update user info bar
-            userDisplayNameEl.textContent = currentUserData.displayName || "کاربر";
+            userDisplayNameEl.textContent = currentUserData.displayName;
             userGemsEl.textContent = currentUserData.gems.toLocaleString('fa');
 
             // Clear previous items
@@ -428,12 +446,15 @@
                 if (isOwned) card.classList.add('owned');
                 if (isEquipped) card.classList.add('equipped');
 
-                let content = `
-                    <img src="${avatar.imageUrl}" alt="${avatar.name}" class="avatar-image">
-                `;
+                let content = `<img src="${avatar.imageUrl}" alt="${avatar.name}" class="avatar-image">`;
 
-                if(isOwned) {
-                    content += `<div class="status-badge">مالک</div>`;
+                if (isOwned) {
+                    if(isEquipped) {
+                        // Optionally, you can add a different badge for equipped
+                         content += `<div class="status-badge" style="background-color: #ffc947; color: #333;">فعال</div>`;
+                    } else {
+                         content += `<div class="status-badge">مالک</div>`;
+                    }
                 } else {
                      content += `
                         <div class="price-tag">
@@ -494,7 +515,7 @@
                         throw "کاربر یافت نشد!";
                     }
 
-                    const currentGems = userDoc.data().gems;
+                    const currentGems = userDoc.data().gems || 0;
                     if (currentGems < avatar.price) {
                         throw "الماس کافی نیست!";
                     }
@@ -514,7 +535,7 @@
 
             } catch (error) {
                 console.error("خطا در خرید:", error);
-                alert('خطا در فرآیند خرید. لطفاً دوباره تلاش کنید.');
+                alert('خطا در فرآیند خرید. لطفاً دوباره تلاش کنید. (' + error + ')');
             } finally {
                 loader.style.display = 'none';
                 loader.querySelector('.loader-text').textContent = 'در حال بارگذاری فروشگاه...';
