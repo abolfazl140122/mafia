@@ -335,7 +335,9 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, getDocs, updateDoc, runTransaction, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        // --- START: موارد جدید اضافه شده برای قابلیت شما ---
+        import { getFirestore, doc, getDoc, collection, getDocs, updateDoc, runTransaction, arrayUnion, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        // --- END: موارد جدید اضافه شده ---
 
         // --- Firebase Configuration ---
         const firebaseConfig = {
@@ -380,43 +382,63 @@
             });
         }
         
+        // --- START: تابع loadShopData با منطق جدید ---
         async function loadShopData(user) {
             loader.style.display = 'flex';
             try {
-                // Fetch user data and all avatars in parallel
                 const userDocRef = doc(db, 'users', user.uid);
-                const avatarsCollectionRef = collection(db, 'avatars');
-                
-                const [userDocSnap, avatarsSnapshot] = await Promise.all([
-                    getDoc(userDocRef),
-                    getDocs(avatarsCollectionRef)
-                ]);
+                let userDocSnap = await getDoc(userDocRef);
+                let userData;
 
                 if (!userDocSnap.exists()) {
-                    throw new Error("اطلاعات کاربر یافت نشد! لطفاً با پشتیبانی تماس بگیرید.");
+                    // کاربر جدید است! پروفایل او را با 25 الماس هدیه ایجاد می‌کنیم
+                    console.log("کاربر جدید شناسایی شد. در حال ایجاد پروفایل و افزودن 25 الماس هدیه...");
+                    
+                    // آواتار پیش‌فرض برای کاربران جدید
+                    const defaultAvatarUrl = "https://up.20script.ir/file/40b6-Copilot-20250812-110015-removebg-preview.png";
+                    
+                    const newUserProfile = {
+                        uid: user.uid,
+                        email: user.email,
+                        displayName: user.displayName || user.email.split('@')[0],
+                        gems: 25, // <<<< هدیه ثبت‌نام!
+                        avatarUrl: defaultAvatarUrl,
+                        ownedAvatars: ["default"], // آیدی آواتار پیش‌فرض
+                        createdAt: serverTimestamp()
+                    };
+
+                    await setDoc(userDocRef, newUserProfile);
+                    userData = newUserProfile;
+                    console.log("پروفایل کاربر جدید با موفقیت ساخته شد.");
+                } else {
+                    // کاربر قدیمی است، اطلاعاتش را می‌خوانیم
+                    userData = userDocSnap.data();
                 }
-                
-                // **IMPROVEMENT**: Safely handle user data with default values
-                const userData = userDocSnap.data() || {};
+
+                // ذخیره اطلاعات کاربر در متغیر سراسری
                 currentUserData = {
                     uid: user.uid,
                     displayName: userData.displayName || "کاربر",
                     gems: userData.gems || 0,
-                    ownedAvatars: userData.ownedAvatars || [], // Prevents error if user has no owned avatars yet
+                    ownedAvatars: userData.ownedAvatars || [],
                     avatarUrl: userData.avatarUrl || ""
                 };
+
+                // حالا که اطلاعات کاربر را داریم، لیست آواتارها را بارگذاری می‌کنیم
+                const avatarsCollectionRef = collection(db, 'avatars');
+                const avatarsSnapshot = await getDocs(avatarsCollectionRef);
                 
                 allAvatars = [];
                 avatarsSnapshot.forEach(doc => {
                     const avatarData = doc.data();
-                    // **IMPROVEMENT**: Ensure the document from Firestore has all necessary fields
                     if (avatarData.id && avatarData.name && avatarData.imageUrl && typeof avatarData.price === 'number') {
-                        allAvatars.push(avatarData); // The 'id' field from your document is used directly
+                        allAvatars.push(avatarData);
                     } else {
                         console.warn("آواتار با اطلاعات ناقص در دیتابیس یافت شد و نادیده گرفته شد:", doc.id);
                     }
                 });
 
+                // نمایش فروشگاه با اطلاعات به‌روز شده
                 renderShop();
 
             } catch (error) {
@@ -426,6 +448,7 @@
                 loader.style.display = 'none';
             }
         }
+        // --- END: تابع loadShopData با منطق جدید ---
 
         function renderShop() {
             // Update user info bar
@@ -450,7 +473,6 @@
 
                 if (isOwned) {
                     if(isEquipped) {
-                        // Optionally, you can add a different badge for equipped
                          content += `<div class="status-badge" style="background-color: #ffc947; color: #333;">فعال</div>`;
                     } else {
                          content += `<div class="status-badge">مالک</div>`;
