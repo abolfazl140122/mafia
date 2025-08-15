@@ -22,7 +22,7 @@
         body {
             font-family: 'Vazirmatn', sans-serif;
             background-image: url('https://up.20script.ir/file/6195-file-000000001500622f9419de6c322df297-1-.jpg');
-            background-size: cover;
+            background-size: 110% auto; /* کمی بزرگتر برای افکت زوم */
             background-position: center center;
             background-repeat: no-repeat;
             background-attachment: fixed;
@@ -32,74 +32,49 @@
             justify-content: space-between;
             align-items: center;
             padding: 20px;
+            /* **** تغییر جدید ۱: اضافه کردن انیمیشن دوربین متحرک **** */
+            animation: kenburns-animation 40s ease-in-out infinite alternate;
         }
 
-        /* --- تغییر ۱: استایل‌های پنل بارگذاری و کنترل نمایش محتوا --- */
-        #loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(8px);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 1001; /* بالاتر از پنل هشدار */
-            transition: opacity 0.5s ease;
+        /* **** تغییر جدید ۲: تعریف انیمیشن دوربین متحرک (Ken Burns) **** */
+        @keyframes kenburns-animation {
+            0% {
+                background-size: 110% auto;
+                background-position: center center;
+            }
+            100% {
+                background-size: 120% auto;
+                background-position: top left;
+            }
         }
-        
+
+
+        /* --- استایل‌های پنل بارگذاری --- */
+        #loading-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 1001; transition: opacity 0.5s ease;
+        }
         .loader {
-            border: 6px solid #f3f3f330;
-            border-top: 6px solid #ffc947;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
+            border: 6px solid #f3f3f330; border-top: 6px solid #ffc947;
+            border-radius: 50%; width: 60px; height: 60px;
             animation: spin 1.5s linear infinite;
         }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        #loading-text {
-            margin-top: 20px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #f0e6d2;
-            text-shadow: 1px 1px 3px #000;
-        }
-
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        #loading-text { margin-top: 20px; font-size: 1.1rem; font-weight: 700; color: #f0e6d2; text-shadow: 1px 1px 3px #000; }
         .main-content {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            /* به طور پیش‌فرض مخفی است */
-            opacity: 0;
-            visibility: hidden;
+            width: 100%; height: 100%; display: flex; flex-direction: column;
+            justify-content: space-between; align-items: center;
+            opacity: 0; visibility: hidden;
             transition: opacity 0.5s ease, visibility 0.5s ease;
         }
-
-        /* کلاسی که با جاوااسکریپت برای نمایش محتوا اضافه می‌شود */
-        body.loaded .main-content {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        body.loaded #loading-overlay {
-            opacity: 0;
-            visibility: hidden;
-        }
+        body.loaded .main-content { opacity: 1; visibility: visible; }
+        body.loaded #loading-overlay { opacity: 0; visibility: hidden; }
 
 
-        /* --- Styles for Main Page Elements (no changes here) --- */
-        .top-right-container { width: 100%; display: flex; justify-content: flex-end; align-items: flex-start; }
+        /* --- Styles for Main Page Elements --- */
+        .top-right-container { position: absolute; top: 20px; right: 20px; }
         .profile-and-menu-wrapper { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
         .profile-section { display: flex; align-items: center; background-color: rgba(0, 0, 0, 0.5); padding: 10px 15px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 3px 8px rgba(0,0,0,0.3); }
         .avatar-container { display: flex; align-items: center; gap: 12px; }
@@ -110,12 +85,89 @@
         .menu-button { background: linear-gradient(145deg, rgba(80, 50, 48, 0.8), rgba(56, 33, 32, 0.9)); color: #e0dacc; border: 1px solid #c5a687; padding: 8px 15px; border-radius: 8px; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; text-align: center; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); box-shadow: 0 2px 5px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05); }
         .menu-button:hover { background: linear-gradient(145deg, rgba(100, 65, 63, 0.9), rgba(74, 44, 42, 1)); border-color: #ffc947; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1); }
         .menu-button:active { transform: translateY(0) scale(0.98); box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
-        .start-game-container { width: 100%; display: flex; justify-content: center; padding-bottom: 20px; }
+        .start-game-container { width: 100%; display: flex; justify-content: center; padding-bottom: 20px; align-self: flex-end;}
         #start-game-button { padding: 15px 40px; font-size: 1.3rem; font-weight: 900; color: #ffffff; background: linear-gradient(145deg, #8c4843, #5a2c2a); border: 2px solid #ffc947; border-radius: 15px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5), inset 0 -2px 5px rgba(0,0,0,0.3); text-shadow: 0 2px 4px rgba(0,0,0,0.7); }
         #start-game-button:hover { background: linear-gradient(145deg, #a1534d, #6b3431); box-shadow: 0 8px 20px rgba(255, 201, 71, 0.3), inset 0 -2px 5px rgba(0,0,0,0.3); }
         #start-game-button:active { transform: scale(0.96); }
 
-        /* --- Styles for Custom Alert Modal (no changes here) --- */
+
+        /* **** تغییر جدید ۳: استایل‌های کنترل صدا **** */
+        .audio-controls-container {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 8px 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+            direction: ltr; /* برای چیدمان صحیح کنترل‌ها */
+        }
+        #mute-toggle-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #c5a687;
+            transition: all 0.2s ease;
+        }
+        #mute-toggle-btn:hover {
+            color: #ffc947;
+            transform: scale(1.1);
+        }
+        #mute-toggle-btn svg {
+            width: 100%;
+            height: 100%;
+            fill: currentColor;
+        }
+        .hidden { display: none; }
+        
+        #volume-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100px;
+            height: 5px;
+            background: rgba(0, 0, 0, 0.5);
+            outline: none;
+            border-radius: 5px;
+            border: 1px solid #5c4a3a;
+            cursor: pointer;
+        }
+        #volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #c5a687;
+            border-radius: 50%;
+            border: 2px solid #1e170f;
+            transition: background 0.2s ease;
+        }
+        #volume-slider::-webkit-slider-thumb:hover {
+             background: #ffc947;
+        }
+        #volume-slider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: #c5a687;
+            border-radius: 50%;
+            border: 2px solid #1e170f;
+            transition: background 0.2s ease;
+        }
+        #volume-slider::-moz-range-thumb:hover {
+            background: #ffc947;
+        }
+
+
+        /* --- Styles for Custom Alert Modal --- */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
         .modal-overlay.visible { opacity: 1; visibility: visible; }
         .modal-content { background: linear-gradient(145deg, #3c3022, #1e170f); border: 2px solid #5c4a3a; border-radius: 16px; padding: 25px 30px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); transform: scale(0.9); transition: all 0.3s ease; }
@@ -129,20 +181,29 @@
 </head>
 <body>
 
-    <!-- تغییر ۲: پنل بارگذاری که در ابتدا نمایش داده می‌شود -->
     <div id="loading-overlay">
         <div class="loader"></div>
         <p id="loading-text">در حال بارگذاری اطلاعات...</p>
     </div>
 
-    <!-- تغییر ۳: محتوای اصلی صفحه داخل یک wrapper قرار می‌گیرد تا بتوان آن را به صورت گروهی مخفی/نمایش داد -->
     <div class="main-content">
+        <!-- **** تغییر جدید ۴: اضافه کردن کنترل‌های صدا به صفحه **** -->
+        <div class="audio-controls-container">
+            <button id="mute-toggle-btn" title="قطع/وصل صدا">
+                <!-- آیکون صدای روشن -->
+                <svg id="volume-on-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg>
+                <!-- آیکون صدای خاموش -->
+                <svg id="volume-off-icon" xmlns="http://www.w3.org/2000/svg" class="hidden" viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"></path></svg>
+            </svg>
+            <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.4">
+        </div>
+
         <div class="top-right-container">
             <div class="profile-and-menu-wrapper">
                 <div class="profile-section">
                     <div class="avatar-container">
-                        <img id="user-avatar" src="" alt="آواتار کاربر"> <!-- src خالی شد تا تصویر پیش‌فرض نمایش داده نشود -->
-                        <span id="user-display-name"></span> <!-- متن پیش‌فرض حذف شد -->
+                        <img id="user-avatar" src="" alt="آواتار کاربر">
+                        <span id="user-display-name"></span>
                     </div>
                 </div>
                 <div class="menu-buttons">
@@ -157,14 +218,11 @@
         </div>
     </div>
     
-    <!-- **** تغییر جدید: اضافه کردن تگ صوتی برای موسیقی پس‌زمینه **** -->
     <audio id="background-music" loop>
         <source src="https://raw.githubusercontent.com/abolfazl140122/mafia/main/dark-music-249503.mp3" type="audio/mpeg">
         مرورگر شما از پخش صدا پشتیبانی نمی‌کند.
     </audio>
 
-
-    <!-- Custom Alert Modal (no changes here) -->
     <div id="custom-alert-overlay" class="modal-overlay">
         <div class="modal-content">
             <h2 class="modal-title">توجه!</h2>
@@ -201,15 +259,30 @@
         const customAlertOverlay = document.getElementById('custom-alert-overlay');
         const customAlertMessage = document.getElementById('custom-alert-message');
         const customAlertConfirmBtn = document.getElementById('custom-alert-confirm-btn');
-        
-        // تغییر ۴: DOM Elements برای پنل بارگذاری
         const loadingOverlay = document.getElementById('loading-overlay');
         const loaderSpinner = loadingOverlay.querySelector('.loader');
         const loadingText = document.getElementById('loading-text');
 
-        // **** تغییر جدید: دریافت المان موسیقی ****
+        // **** تغییر جدید ۵: دریافت المان‌های کنترل صدا ****
         const backgroundMusic = document.getElementById('background-music');
+        const muteToggleButton = document.getElementById('mute-toggle-btn');
+        const volumeOnIcon = document.getElementById('volume-on-icon');
+        const volumeOffIcon = document.getElementById('volume-off-icon');
+        const volumeSlider = document.getElementById('volume-slider');
+        let lastVolume = 0.4; // برای ذخیره آخرین مقدار ولوم قبل از میوت کردن
 
+        // Function to attempt playing music, often needs user interaction first
+        async function playMusic() {
+            try {
+                // ولوم اولیه را اینجا تنظیم می‌کنیم
+                backgroundMusic.volume = lastVolume;
+                volumeSlider.value = lastVolume; // همگام‌سازی اسلایدر با ولوم
+                await backgroundMusic.play();
+            } catch (error) {
+                console.warn("پخش خودکار موسیقی توسط مرورگر مسدود شد. منتظر تعامل کاربر می‌مانیم.", error);
+            }
+        }
+        
         function showCustomAlert(message, onConfirm) {
             customAlertMessage.textContent = message;
             customAlertOverlay.classList.add('visible');
@@ -236,37 +309,25 @@
             }
         }
 
-
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 const userDocRef = doc(db, 'users', user.uid);
                 try {
-                    // دریافت اطلاعات کاربر
                     const userDocSnap = await getDoc(userDocRef);
                     if (userDocSnap.exists()) {
                         const userData = userDocSnap.data();
                         userDisplayName.textContent = userData.displayName || "کاربر ناشناس";
-                        userAvatar.src = userData.avatarUrl || 'https://i.imgur.com/T2bT1tG.png'; // آواتار پیش‌فرض
+                        userAvatar.src = userData.avatarUrl || 'https://i.imgur.com/T2bT1tG.png';
                     } else {
                         userDisplayName.textContent = user.displayName || "کاربر ناشناس";
-                        userAvatar.src = 'https://i.imgur.com/T2bT1tG.png'; // آواتار پیش‌فرض
+                        userAvatar.src = 'https://i.imgur.com/T2bT1tG.png';
                     }
 
-                    // تغییر ۵: پس از دریافت موفق اطلاعات، پنل بارگذاری را محو و محتوای اصلی را نمایش بده
                     document.body.classList.add('loaded');
+                    
+                    // تلاش برای پخش موسیقی پس از بارگذاری کامل صفحه
+                    playMusic();
 
-                    // **** تغییر جدید: تلاش برای پخش موسیقی پس از بارگذاری کامل صفحه ****
-                    try {
-                        // می‌توانید ولوم اولیه را اینجا تنظیم کنید (مثلاً 0.4 برای 40%)
-                        backgroundMusic.volume = 0.4;
-                        await backgroundMusic.play();
-                    } catch (error) {
-                        console.warn("پخش خودکار موسیقی توسط مرورگر مسدود شد. منتظر تعامل کاربر می‌مانیم.", error);
-                        // در مرورگرهای مدرن، پخش صدا نیاز به تعامل اولیه کاربر (کلیک) دارد.
-                        // اگر پخش خودکار با خطا مواجه شود، موسیقی پس از اولین کلیک کاربر شروع خواهد شد.
-                    }
-
-                    // فعال کردن شنونده برای وضعیت بروزرسانی سرور
                     const maintenanceDocRef = doc(db, 'settings', 'maintenance');
                     onSnapshot(maintenanceDocRef, (docSnap) => {
                         if (docSnap.exists() && docSnap.data().enabled === true) {
@@ -278,20 +339,56 @@
                     });
 
                 } catch (error) {
-                    // تغییر ۶: مدیریت خطا در صورت عدم اتصال به اینترنت
                     console.error("خطا در دریافت اطلاعات کاربر:", error);
-                    loaderSpinner.style.display = 'none'; // مخفی کردن اسپینر
+                    loaderSpinner.style.display = 'none';
                     loadingText.textContent = 'خطا در اتصال به سرور. لطفا اینترنت خود را بررسی کنید.';
-                    // پنل بارگذاری به عنوان پنل خطا باقی می‌ماند.
                 }
 
             } else {
-                // اگر کاربر وارد نشده باشد، به صفحه لاگین هدایت می‌شود
                 window.location.href = './login.html';
             }
         });
 
-        // Event Listeners
+        // **** تغییر جدید ۶: اضافه کردن منطق و Event Listeners برای کنترل صدا ****
+        
+        // Event Listener برای اسلایدر ولوم
+        volumeSlider.addEventListener('input', (e) => {
+            const newVolume = parseFloat(e.target.value);
+            backgroundMusic.volume = newVolume;
+            
+            if (newVolume === 0) {
+                backgroundMusic.muted = true;
+                volumeOnIcon.classList.add('hidden');
+                volumeOffIcon.classList.remove('hidden');
+            } else {
+                backgroundMusic.muted = false;
+                lastVolume = newVolume;
+                volumeOnIcon.classList.remove('hidden');
+                volumeOffIcon.classList.add('hidden');
+            }
+        });
+
+        // Event Listener برای دکمه Mute/Unmute
+        muteToggleButton.addEventListener('click', () => {
+            backgroundMusic.muted = !backgroundMusic.muted;
+            if (backgroundMusic.muted) {
+                volumeOnIcon.classList.add('hidden');
+                volumeOffIcon.classList.remove('hidden');
+                volumeSlider.value = 0; // اسلایدر را صفر می‌کنیم
+            } else {
+                volumeOnIcon.classList.remove('hidden');
+                volumeOffIcon.classList.add('hidden');
+                // اگر ولوم قبل از میوت صفر بوده، آن را به یک مقدار پیش‌فرض برمی‌گردانیم
+                if (lastVolume === 0) {
+                    lastVolume = 0.4; 
+                }
+                backgroundMusic.volume = lastVolume; // بازگرداندن به آخرین ولوم
+                volumeSlider.value = lastVolume; // همگام‌سازی اسلایدر
+            }
+        });
+
+
+        // Event Listeners for other buttons
         userAvatar.addEventListener('click', () => {
             checkMaintenanceAndProceed(() => {
                 window.location.href = './Avatar shop.html';
@@ -300,7 +397,6 @@
 
         startGameButton.addEventListener('click', () => {
             checkMaintenanceAndProceed(() => {
-                // تغییر ۷: هدایت کاربر به صفحه جستجوی بازیکنان
                 window.location.href = './users search.html';
             });
         });
@@ -313,6 +409,13 @@
                 });
             });
         });
+
+        // برای حل مشکل پخش خودکار در برخی مرورگرها، با اولین کلیک کاربر موسیقی را پخش می‌کنیم
+        document.body.addEventListener('click', () => {
+            if (backgroundMusic.paused) {
+                playMusic();
+            }
+        }, { once: true }); // این event listener فقط یک بار اجرا می‌شود
 
     </script>
 </body>
