@@ -42,7 +42,7 @@
             align-items: flex-start;
         }
         
-        /* [NEW] Wrapper for profile and its menu buttons */
+        /* Wrapper for profile and its menu buttons */
         .profile-and-menu-wrapper {
             display: flex;
             flex-direction: column;
@@ -50,7 +50,7 @@
             gap: 12px; /* Space between profile box and the buttons below it */
         }
 
-        /* [MODIFIED] Profile section now only contains the avatar and name */
+        /* Profile section now only contains the avatar and name */
         .profile-section {
             display: flex;
             align-items: center;
@@ -73,6 +73,15 @@
             border-radius: 50%;
             border: 2px solid #c5a687;
             object-fit: cover;
+            cursor: pointer; /* [تغییر جدید] - نشانگر موس را به حالت دست تغییر می‌دهد تا قابل کلیک بودن را نشان دهد */
+            transition: all 0.2s ease-in-out; /* [تغییر جدید] - انیمیشن نرم برای حالت هاور */
+        }
+
+        /* [تغییر جدید] - افکت زیبا هنگام بردن موس روی آواتار */
+        #user-avatar:hover {
+            transform: scale(1.1);
+            border-color: #ffc947;
+            box-shadow: 0 0 10px rgba(255, 201, 71, 0.5);
         }
 
         #user-display-name {
@@ -81,7 +90,7 @@
             text-shadow: 1px 1px 3px #000;
         }
         
-        /* [MODIFIED] Buttons are now outside the profile box */
+        /* Buttons are now outside the profile box */
         .menu-buttons {
             display: flex;
             flex-direction: column;
@@ -89,7 +98,7 @@
             align-items: flex-end; /* To align buttons to the right if they have different widths */
         }
 
-        /* [MODIFIED] More attractive buttons with original width */
+        /* More attractive buttons with original width */
         .menu-button {
             background: linear-gradient(145deg, rgba(80, 50, 48, 0.8), rgba(56, 33, 32, 0.9));
             color: #e0dacc;
@@ -153,13 +162,13 @@
 <body>
 
     <div class="top-right-container">
-        <!-- [NEW] Wrapper for profile and buttons -->
+        <!-- Wrapper for profile and buttons -->
         <div class="profile-and-menu-wrapper">
             
             <!-- Profile box with avatar and name -->
             <div class="profile-section">
                 <div class="avatar-container">
-                    <!-- [MODIFIED] Avatar on the left, name on the right (for RTL) -->
+                    <!-- Avatar on the left, name on the right (for RTL) -->
                     <img id="user-avatar" src="https://i.imgur.com/T2bT1tG.png" alt="آواتار کاربر">
                     <span id="user-display-name">در حال بارگذاری...</span>
                 </div>
@@ -167,7 +176,7 @@
 
             <!-- Menu buttons below the profile box -->
             <div class="menu-buttons">
-                <!-- [MODIFIED] Button order changed -->
+                <!-- Button order changed -->
                 <button class="menu-button">سازندگان</button>
                 <button class="menu-button">رده بندی</button>
             </div>
@@ -215,6 +224,12 @@
                 // هیچ کاربری وارد نشده است، به صفحه ورود هدایت شود
                 window.location.href = './login.html';
             }
+        });
+
+        // [تغییر جدید] - رویداد کلیک برای آواتار کاربر جهت هدایت به فروشگاه
+        userAvatar.addEventListener('click', () => {
+            console.log("آواتار کاربر کلیک شد. انتقال به فروشگاه آواتار...");
+            window.location.href = './Avatar shop.html';
         });
 
         // رویداد کلیک برای دکمه شروع بازی (فعلا کاری انجام نمی‌دهد)
