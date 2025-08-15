@@ -51,7 +51,8 @@
         #start-game-button:hover { background: linear-gradient(145deg, #a1534d, #6b3431); box-shadow: 0 8px 20px rgba(255, 201, 71, 0.3), inset 0 -2px 5px rgba(0,0,0,0.3); }
         #start-game-button:active { transform: scale(0.96); }
 
-        /* --- Styles for Custom Alert Modal --- */
+
+        /* --- تغییر ۱: استایل‌های پنل هشدار سفارشی --- */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -123,10 +124,6 @@
             background: linear-gradient(145deg, #a1534d, #6b3431);
         }
 
-        /* --- تغییر ۲: استایل‌های پنل اختصاصی بروزرسانی --- */
-        #maintenance-overlay .modal-message {
-            margin-bottom: 0; /* No button, so no bottom margin needed */
-        }
     </style>
 </head>
 <body>
@@ -151,22 +148,12 @@
         <button id="start-game-button">شروع بازی</button>
     </div>
 
-    <!-- Custom Alert Modal (for general messages) -->
+    <!-- تغییر ۲: کدهای HTML پنل هشدار سفارشی -->
     <div id="custom-alert-overlay" class="modal-overlay">
         <div class="modal-content">
             <h2 class="modal-title">توجه!</h2>
             <p id="custom-alert-message" class="modal-message"></p>
             <button id="custom-alert-confirm-btn" class="modal-button">تایید</button>
-        </div>
-    </div>
-
-    <!-- تغییر ۱: پنل اختصاصی برای حالت بروزرسانی سرور -->
-    <div id="maintenance-overlay" class="modal-overlay">
-        <div class="modal-content">
-            <h2 class="modal-title">سرور در حال بروزرسانی است</h2>
-            <p class="modal-message">
-                بازی به طور موقت از دسترس خارج شده است. لطفاً کمی صبر کنید و بعداً دوباره تلاش کنید. از شکیبایی شما متشکریم!
-            </p>
         </div>
     </div>
 
@@ -196,54 +183,49 @@
         const startGameButton = document.getElementById('start-game-button');
         const menuButtons = document.querySelectorAll('.menu-button');
 
-        // --- DOM Elements for Custom Alert Modal ---
+        // --- تغییر ۳: DOM Elements و توابع برای پنل هشدار سفارشی ---
         const customAlertOverlay = document.getElementById('custom-alert-overlay');
         const customAlertMessage = document.getElementById('custom-alert-message');
         const customAlertConfirmBtn = document.getElementById('custom-alert-confirm-btn');
-        
-        // --- تغییر ۳: DOM Element برای پنل بروزرسانی ---
-        const maintenanceOverlay = document.getElementById('maintenance-overlay');
-
 
         /**
-         * Displays the custom themed alert modal for general messages.
+         * Displays the custom themed alert modal.
          * @param {string} message The message to show in the modal.
+         * @param {Function} onConfirm The callback function to execute when the confirm button is clicked.
          */
-        function showCustomAlert(message) {
+        function showCustomAlert(message, onConfirm) {
             customAlertMessage.textContent = message;
             customAlertOverlay.classList.add('visible');
 
             // Set up a one-time click listener for the confirm button
             customAlertConfirmBtn.onclick = () => {
                 customAlertOverlay.classList.remove('visible');
+                if (onConfirm) {
+                    onConfirm();
+                }
             };
         }
 
-        // --- تغییر ۳: منطق جدید برای کنترل پنل بروزرسانی ---
-        /**
-         * Sets up a real-time listener for the maintenance status.
-         * Shows or hides the maintenance overlay based on the data from Firestore.
-         */
-        function listenForMaintenanceStatus() {
+        
+        async function checkMaintenanceAndProceed(actionCallback) {
             const maintenanceDocRef = doc(db, 'settings', 'maintenance');
-            onSnapshot(maintenanceDocRef, (docSnap) => {
-                const isMaintenanceEnabled = docSnap.exists() && docSnap.data().enabled === true;
-
-                if (isMaintenanceEnabled) {
-                    maintenanceOverlay.classList.add('visible');
+            try {
+                const docSnap = await getDoc(maintenanceDocRef);
+                if (docSnap.exists() && docSnap.data().enabled === true) {
+                    // اینجا هم می‌توانیم از پنل سفارشی استفاده کنیم
+                    showCustomAlert("سرور در حالت بروزرسانی قرار دارد. شما به صفحه اصلی منتقل می‌شوید.", () => {
+                        window.location.href = './index.html';
+                    });
                 } else {
-                    maintenanceOverlay.classList.remove('visible');
+                    actionCallback();
                 }
-            }, (error) => {
-                console.error("خطا در شنود وضعیت بروزرسانی:", error);
-                showCustomAlert("خطا در ارتباط با سرور برای بررسی وضعیت بروزرسانی.");
-            });
+            } catch (error) {
+                console.error("خطا در بررسی وضعیت بروزرسانی:", error);
+                showCustomAlert("خطا در ارتباط با سرور. لطفا اتصال اینترنت خود را بررسی کرده و مجددا تلاش کنید.", () => {});
+            }
         }
 
 
-        // --- Main Logic ---
-
-        // Check user authentication status
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 const userDocRef = doc(db, 'users', user.uid);
@@ -263,34 +245,43 @@
                     userDisplayName.textContent = user.displayName || "کاربر ناشناس";
                 }
 
-                // The old snapshot listener inside here is removed.
+                const maintenanceDocRef = doc(db, 'settings', 'maintenance');
+                onSnapshot(maintenanceDocRef, (docSnap) => {
+                    if (docSnap.exists() && docSnap.data().enabled === true) {
+                        // <--- تغییر ۴: جایگزین کردن alert با پنل سفارشی --->
+                        showCustomAlert(
+                            "سرور در حالت بروزرسانی قرار گرفت. شما به صفحه اصلی منتقل می‌شوید.",
+                            () => {
+                                window.location.href = './index.html';
+                            }
+                        );
+                    }
+                });
 
             } else {
-                // If not logged in, redirect to login page
                 window.location.href = './login.html';
             }
         });
-        
-        // Start listening for maintenance status as soon as the script loads
-        listenForMaintenanceStatus();
 
-
-        // --- Event Listeners for Page Buttons ---
-        // Note: The maintenance overlay will block these clicks if it's active.
-        
+        // Event listeners remain unchanged, but now use the improved checkMaintenanceAndProceed
         userAvatar.addEventListener('click', () => {
-            window.location.href = './Avatar shop.html';
+            checkMaintenanceAndProceed(() => {
+                window.location.href = './Avatar shop.html';
+            });
         });
 
         startGameButton.addEventListener('click', () => {
-            console.log("دکمه شروع بازی کلیک شد.");
-            showCustomAlert("در حال جستجو برای یافتن بازی...");
+            checkMaintenanceAndProceed(() => {
+                console.log("دکمه شروع بازی کلیک شد.");
+            });
         });
         
         menuButtons.forEach(button => {
             button.addEventListener('click', () => {
-                const buttonText = button.textContent;
-                showCustomAlert(`عملکرد دکمه "${buttonText}" هنوز پیاده‌سازی نشده است.`);
+                checkMaintenanceAndProceed(() => {
+                    const buttonText = button.textContent;
+                    showCustomAlert(`عملکرد دکمه "${buttonText}" هنوز پیاده‌سازی نشده است.`, () => {});
+                });
             });
         });
 
