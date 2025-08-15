@@ -156,6 +156,12 @@
             <button id="start-game-button">شروع بازی</button>
         </div>
     </div>
+    
+    <!-- **** تغییر جدید: اضافه کردن تگ صوتی برای موسیقی پس‌زمینه **** -->
+    <audio id="background-music" loop>
+        <source src="https://raw.githubusercontent.com/abolfazl140122/mafia/main/dark-music-249503.mp3" type="audio/mpeg">
+        مرورگر شما از پخش صدا پشتیبانی نمی‌کند.
+    </audio>
 
 
     <!-- Custom Alert Modal (no changes here) -->
@@ -201,6 +207,9 @@
         const loaderSpinner = loadingOverlay.querySelector('.loader');
         const loadingText = document.getElementById('loading-text');
 
+        // **** تغییر جدید: دریافت المان موسیقی ****
+        const backgroundMusic = document.getElementById('background-music');
+
         function showCustomAlert(message, onConfirm) {
             customAlertMessage.textContent = message;
             customAlertOverlay.classList.add('visible');
@@ -245,6 +254,17 @@
 
                     // تغییر ۵: پس از دریافت موفق اطلاعات، پنل بارگذاری را محو و محتوای اصلی را نمایش بده
                     document.body.classList.add('loaded');
+
+                    // **** تغییر جدید: تلاش برای پخش موسیقی پس از بارگذاری کامل صفحه ****
+                    try {
+                        // می‌توانید ولوم اولیه را اینجا تنظیم کنید (مثلاً 0.4 برای 40%)
+                        backgroundMusic.volume = 0.4;
+                        await backgroundMusic.play();
+                    } catch (error) {
+                        console.warn("پخش خودکار موسیقی توسط مرورگر مسدود شد. منتظر تعامل کاربر می‌مانیم.", error);
+                        // در مرورگرهای مدرن، پخش صدا نیاز به تعامل اولیه کاربر (کلیک) دارد.
+                        // اگر پخش خودکار با خطا مواجه شود، موسیقی پس از اولین کلیک کاربر شروع خواهد شد.
+                    }
 
                     // فعال کردن شنونده برای وضعیت بروزرسانی سرور
                     const maintenanceDocRef = doc(db, 'settings', 'maintenance');
