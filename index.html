@@ -55,13 +55,11 @@
             background-color: rgba(0,0,0,0.2);
             border: 1px solid var(--panel-border);
         }
-        /* ===== START: EDIT FOR IMAGE SIZING ===== */
         #maintenance-banner {
             width: 100%; /* عرض عکس همیشه ۱۰۰٪ کانتینر والدش باشه */
             height: auto; /* ارتفاع به صورت خودکار و متناسب با عرض تنظیم بشه تا نسبت تصویر حفظ بشه */
             display: block; /* برای حذف فضای خالی احتمالی زیر عکس */
         }
-        /* ===== END: EDIT FOR IMAGE SIZING ===== */
         #maintenance-title {
             font-size: 2rem;
             font-weight: 900;
@@ -133,7 +131,8 @@
                 const docSnap = await getDoc(maintenanceDocRef);
 
                 if (docSnap.exists() && docSnap.data().enabled === true) {
-                    showMaintenancePanel(docSnap.data());
+                    // **MODIFIED:** Pass auth and db objects to handle post-maintenance flow
+                    showMaintenancePanel(docSnap.data(), auth, db);
                 } else {
                     startNormalLoading(auth, db);
                 }
@@ -143,28 +142,26 @@
             }
         }
 
-        function showMaintenancePanel(config) {
+        // **MODIFIED:** Function now accepts auth and db to pass to the countdown
+        function showMaintenancePanel(config, auth, db) {
             document.getElementById('loading-panel').style.display = 'none';
             const maintenancePanel = document.getElementById('maintenance-panel');
             maintenancePanel.style.display = 'block';
 
-            // Set Banner Image
             const bannerContainer = document.getElementById('maintenance-banner-container');
             if (config.imageUrl) {
                 document.getElementById('maintenance-banner').src = config.imageUrl;
                 bannerContainer.style.display = 'block';
             } else {
-                bannerContainer.style.display = 'none'; // Hide banner if no URL is provided
+                bannerContainer.style.display = 'none';
             }
             
-            // Set Title & Custom Color
             const titleEl = document.getElementById('maintenance-title');
             titleEl.textContent = config.title || "در حال بروزرسانی";
             if (config.titleColor) {
                 titleEl.style.color = config.titleColor;
             }
 
-            // Set Message & Custom Color
             const messageEl = document.getElementById('maintenance-message');
             messageEl.textContent = config.message || "به زودی باز خواهیم گشت.";
             if (config.textColor) {
@@ -172,27 +169,45 @@
             }
 
             if (config.endTime && typeof config.endTime.toDate === 'function') {
-                startCountdown(config.endTime.toDate());
+                // **MODIFIED:** Pass auth and db to the countdown function
+                startCountdown(config.endTime.toDate(), auth, db);
             } else {
                 document.getElementById('countdown-timer').innerHTML = "<p>زمان پایان مشخص نشده است.</p>";
             }
         }
 
-        function startCountdown(targetDate) {
+        // **MODIFIED:** Function now accepts auth and db to start normal loading when finished
+        function startCountdown(targetDate, auth, db) {
             const countdownElements = {
                 days: document.getElementById('days'),
                 hours: document.getElementById('hours'),
                 minutes: document.getElementById('minutes'),
                 seconds: document.getElementById('seconds')
             };
-            const countdownTimerEl = document.getElementById('countdown-timer');
 
             const interval = setInterval(() => {
                 const distance = targetDate.getTime() - new Date().getTime();
 
                 if (distance < 0) {
                     clearInterval(interval);
-                    countdownTimerEl.innerHTML = `<p style='font-size: 1.2rem; color: var(--glow-green); font-weight: 700;'>بروزرسانی تمام شد! لطفاً صفحه را رفرش کنید.</p>`;
+                    
+                    // ===== START: CORE LOGIC CHANGE =====
+                    // Instead of showing a message, hide the maintenance panel,
+                    // show the loading panel, and start the normal loading process.
+                    
+                    document.getElementById('maintenance-panel').style.display = 'none';
+                    const loadingPanel = document.getElementById('loading-panel');
+                    loadingPanel.style.display = 'block';
+                    
+                    // Re-trigger animation for a smoother transition
+                    loadingPanel.style.animation = 'none';
+                    requestAnimationFrame(() => {
+                        loadingPanel.style.animation = 'panel-intro 1s cubic-bezier(0.25, 1, 0.5, 1)';
+                    });
+
+                    startNormalLoading(auth, db);
+                    // ===== END: CORE LOGIC CHANGE =====
+                    
                     return;
                 }
                 const f = (n) => String(Math.floor(n)).padStart(2, '0');
