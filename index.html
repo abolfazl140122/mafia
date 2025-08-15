@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>شهر مافیا - در حال بروزرسانی</title>
+    <title>شهر مافیا</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -34,21 +34,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { height: 100%; overflow: hidden; }
         body { font-family: 'Vazirmatn', sans-serif; background-color: var(--wood-dark); background-image: var(--wood-texture-url); color: var(--text-light); display: flex; align-items: center; justify-content: center; }
-        
-        /* Styles for Both Panels */
-        .panel {
-            width: 100%;
-            max-width: 480px;
-            background: var(--panel-bg-gradient);
-            border-radius: 24px;
-            border: 2px solid var(--panel-border);
-            padding: 30px 40px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
-            text-align: center;
-            animation: panel-intro 1s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-        
-        /* Loading Panel Specifics */
+        .panel { width: 100%; max-width: 480px; background: var(--panel-bg-gradient); border-radius: 24px; border: 2px solid var(--panel-border); padding: 30px 40px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5); text-align: center; animation: panel-intro 1s cubic-bezier(0.25, 1, 0.5, 1); }
         #logo-container { position: relative; margin: 0 auto 25px auto; width: 180px; height: 180px; display: flex; align-items: center; justify-content: center; }
         #logo-container::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: conic-gradient(var(--glow-green), var(--glow-red), var(--glow-green)); filter: blur(40px); animation: dual-glow-pulse 6s linear infinite; }
         #logo { width: 100%; height: auto; position: relative; z-index: 1; animation: logo-glow 3s ease-in-out infinite; }
@@ -57,155 +43,111 @@
         #progress-bar-fill { width: 0%; height: 100%; border-radius: 7px; background: linear-gradient(90deg, var(--progress-bar-fill-start), var(--progress-bar-fill-end)); transition: width 0.5s cubic-bezier(0.65, 0, 0.35, 1), background 0.5s ease; }
         #progress-bar-fill.error { background: linear-gradient(90deg, var(--progress-bar-error-start), var(--progress-bar-error-end)); }
         #status-message { font-size: 1.1rem; font-weight: 700; min-height: 28px; color: var(--text-light); }
-
-        /* Maintenance Panel Styles */
-        #maintenance-icon {
-            width: 80px;
-            height: 80px;
-            color: var(--maintenance-icon-color);
-            margin: 0 auto 20px auto;
-            filter: drop-shadow(0 0 10px rgba(255, 201, 71, 0.6));
-        }
-        #maintenance-title {
-            font-size: 2.2rem;
-            font-weight: 900;
-            color: var(--text-gold);
-            margin-bottom: 15px;
-        }
-        #maintenance-message {
-            font-size: 1rem;
-            line-height: 1.8;
-            margin-bottom: 30px;
-            color: var(--text-light);
-        }
-        #countdown-timer {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-        }
-        .time-block {
-            background-color: var(--countdown-bg);
-            padding: 10px 15px;
-            border-radius: 8px;
-            border: 1px solid var(--panel-border);
-            min-width: 70px;
-        }
-        .time-value {
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: white;
-        }
-        .time-label {
-            font-size: 0.8rem;
-            font-weight: 400;
-            color: var(--text-light);
-        }
+        #maintenance-icon { width: 80px; height: 80px; color: var(--maintenance-icon-color); margin: 0 auto 20px auto; filter: drop-shadow(0 0 10px rgba(255, 201, 71, 0.6)); }
+        #maintenance-title { font-size: 2.2rem; font-weight: 900; color: var(--text-gold); margin-bottom: 15px; }
+        #maintenance-message { font-size: 1rem; line-height: 1.8; margin-bottom: 30px; color: var(--text-light); }
+        #countdown-timer { display: flex; justify-content: center; gap: 15px; }
+        .time-block { background-color: var(--countdown-bg); padding: 10px 15px; border-radius: 8px; border: 1px solid var(--panel-border); min-width: 70px; }
+        .time-value { font-size: 2.5rem; font-weight: 900; color: white; }
+        .time-label { font-size: 0.8rem; font-weight: 400; color: var(--text-light); }
     </style>
 </head>
 <body>
-
-    <!-- پنل لودینگ اصلی - در حالت بروزرسانی مخفی می‌شود -->
     <div id="loading-panel" class="panel">
-        <div id="logo-container">
-            <img id="logo" src="https://up.20script.ir/file/40b6-Copilot-20250812-110015-removebg-preview.png" alt="لوگوی شهر مافیا">
-        </div>
+        <div id="logo-container"><img id="logo" src="https://up.20script.ir/file/40b6-Copilot-20250812-110015-removebg-preview.png" alt="لوگوی شهر مافیا"></div>
         <h1 id="title">شهر مافیا</h1>
-        <div id="progress-bar-container">
-            <div id="progress-bar-fill"></div>
-        </div>
+        <div id="progress-bar-container"><div id="progress-bar-fill"></div></div>
         <p id="status-message">در حال آماده سازی...</p>
     </div>
-
-    <!-- پنل جدید برای نمایش وضعیت بروزرسانی - به صورت پیش‌فرض مخفی است -->
     <div id="maintenance-panel" class="panel" style="display: none;">
-        <svg id="maintenance-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"></path>
-        </svg>
+        <svg id="maintenance-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"></path></svg>
         <h1 id="maintenance-title"></h1>
         <p id="maintenance-message"></p>
         <div id="countdown-timer">
-            <div class="time-block">
-                <div id="days" class="time-value">00</div>
-                <div class="time-label">روز</div>
-            </div>
-            <div class="time-block">
-                <div id="hours" class="time-value">00</div>
-                <div class="time-label">ساعت</div>
-            </div>
-            <div class="time-block">
-                <div id="minutes" class="time-value">00</div>
-                <div class="time-label">دقیقه</div>
-            </div>
-            <div class="time-block">
-                <div id="seconds" class="time-value">00</div>
-                <div class="time-label">ثانیه</div>
-            </div>
+            <div class="time-block"><div id="days" class="time-value">00</div><div class="time-label">روز</div></div>
+            <div class="time-block"><div id="hours" class="time-value">00</div><div class="time-label">ساعت</div></div>
+            <div class="time-block"><div id="minutes" class="time-value">00</div><div class="time-label">دقیقه</div></div>
+            <div class="time-block"><div id="seconds" class="time-value">00</div><div class="time-label">ثانیه</div></div>
         </div>
     </div>
     
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // ===================================================================
-        // ================== تنظیمات حالت بروزرسانی (Maintenance) =================
-        // ===================================================================
-        // تابع کمکی برای ساخت زمان آینده
-        const getFutureTime = (hours) => {
-            const future = new Date();
-            future.setHours(future.getHours() + hours);
-            const year = future.getFullYear();
-            const month = String(future.getMonth() + 1).padStart(2, '0');
-            const day = String(future.getDate()).padStart(2, '0');
-            const h = String(future.getHours()).padStart(2, '0');
-            const m = String(future.getMinutes()).padStart(2, '0');
-            const s = String(future.getSeconds()).padStart(2, '0');
-            return `${year}-${month}-${day}T${h}:${m}:${s}`;
+        const firebaseConfig = {
+            apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
+            authDomain: "mafia-9fcbf.firebaseapp.com",
+            projectId: "mafia-9fcbf",
+            storageBucket: "mafia-9fcbf.appspot.com",
+            messagingSenderId: "471627157488",
+            appId: "1:471627157488:web:92f008548a5596619a5735",
+            measurementId: "G-0PDHDWC6NV"
         };
+        
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-        const maintenanceConfig = {
-            // برای فعال کردن حالت بروزرسانی، این مقدار را به true تغییر دهید
-            enabled: true, 
-
-            // موضوع یا عنوان اصلی پنل
-            title: "🚧 سرور در حال بروزرسانی 🚧",
-
-            // متن توضیحات برای کاربران
-            message: "ما در حال انجام برخی بهبودها بر روی سرورهای بازی هستیم. این عملیات حدود ۲ ساعت زمان خواهد برد. از شکیبایی شما سپاسگزاریم!",
-
-            // زمان پایان بروزرسانی (به صورت خودکار برای ۲ ساعت آینده تنظیم شده است)
-            endTime: getFutureTime(2)
-        };
         // ===================================================================
+        // ======================= تابع کنترل پنل ادمین ======================
+        // ===================================================================
+        /**
+         * تابع ادمین برای کنترل حالت بروزرسانی از طریق کنسول مرورگر.
+         * @param {boolean} enabled - آیا حالت بروزرسانی فعال شود یا خیر.
+         * @param {object} options - تنظیمات در صورت فعال‌سازی.
+         * @param {string} options.title - عنوان پنل بروزرسانی.
+         * @param {string} options.message - متن پنل بروزرسانی.
+         * @param {number} options.durationInMinutes - مدت زمان بروزرسانی به دقیقه.
+         */
+        async function updateMaintenanceStatus(enabled, options = {}) {
+            const maintenanceDocRef = doc(db, "settings", "maintenance");
 
-        // تابع اصلی برنامه
-        function main() {
-            // ابتدا بررسی می‌کنیم که آیا حالت بروزرسانی فعال است یا خیر
-            if (maintenanceConfig.enabled) {
-                showMaintenancePanel();
-                return; // اجرای ادامه کد متوقف می‌شود
+            if (!enabled) {
+                await setDoc(maintenanceDocRef, { enabled: false }, { merge: true });
+                console.log("✅ حالت بروزرسانی با موفقیت غیرفعال شد.");
+                alert("حالت بروزرسانی غیرفعال شد. صفحه را رفرش کنید.");
+                return;
             }
 
-            // اگر حالت بروزرسانی فعال نبود، فرآیند لودینگ عادی اجرا می‌شود
-            startNormalLoading();
-        }
+            const { title, message, durationInMinutes } = options;
+            if (!title || !message || !durationInMinutes) {
+                console.error("برای فعال‌سازی، باید عنوان، متن و مدت زمان را مشخص کنید.");
+                return;
+            }
 
-        function showMaintenancePanel() {
-            // مخفی کردن پنل لودینگ و نمایش پنل بروزرسانی
+            const now = new Date();
+            const endTime = new Date(now.getTime() + durationInMinutes * 60 * 1000);
+
+            const maintenanceData = {
+                enabled: true,
+                title,
+                message,
+                endTime: endTime // Firestore به صورت خودکار Date را به Timestamp تبدیل می‌کند
+            };
+
+            await setDoc(maintenanceDocRef, maintenanceData);
+            console.log(`✅ حالت بروزرسانی فعال شد. پایان در: ${endTime.toLocaleString('fa-IR')}`);
+            alert(`حالت بروزرسانی تا ${durationInMinutes} دقیقه دیگر فعال شد.`);
+        }
+        // این تابع را در دسترس کنسول قرار می‌دهیم تا بتوانیم آن را فراخوانی کنیم
+        window.setMaintenance = updateMaintenanceStatus;
+        // ===================================================================
+
+        function showMaintenancePanel(title, message, endTimeDate) {
             document.getElementById('loading-panel').style.display = 'none';
             const maintenancePanel = document.getElementById('maintenance-panel');
             maintenancePanel.style.display = 'block';
 
-            // تنظیم محتوای پنل بر اساس تنظیمات
-            document.getElementById('maintenance-title').textContent = maintenanceConfig.title;
-            document.getElementById('maintenance-message').textContent = maintenanceConfig.message;
+            document.getElementById('maintenance-title').textContent = title;
+            document.getElementById('maintenance-message').textContent = message;
 
-            // شروع شمارشگر معکوس
-            startCountdown(maintenanceConfig.endTime);
+            startCountdown(endTimeDate);
         }
 
-        function startCountdown(endTimeString) {
+        function startCountdown(targetDate) {
             const countdownElements = {
                 days: document.getElementById('days'),
                 hours: document.getElementById('hours'),
@@ -213,11 +155,9 @@
                 seconds: document.getElementById('seconds')
             };
 
-            const targetDate = new Date(endTimeString).getTime();
-
             const interval = setInterval(() => {
                 const now = new Date().getTime();
-                const distance = targetDate - now;
+                const distance = targetDate.getTime() - now;
 
                 if (distance < 0) {
                     clearInterval(interval);
@@ -234,22 +174,10 @@
                 countdownElements.hours.textContent = String(hours).padStart(2, '0');
                 countdownElements.minutes.textContent = String(minutes).padStart(2, '0');
                 countdownElements.seconds.textContent = String(seconds).padStart(2, '0');
-
             }, 1000);
         }
 
-
         async function startNormalLoading() {
-            const firebaseConfig = {
-                apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
-                authDomain: "mafia-9fcbf.firebaseapp.com",
-                projectId: "mafia-9fcbf",
-                storageBucket: "mafia-9fcbf.appspot.com",
-                messagingSenderId: "471627157488",
-                appId: "1:471627157488:web:92f008548a5596619a5735",
-                measurementId: "G-0PDHDWC6NV"
-            };
-            
             const progressBarFill = document.getElementById('progress-bar-fill');
             const statusMessage = document.getElementById('status-message');
             const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -261,39 +189,28 @@
 
             try {
                 updateProgress(20, '...در حال راه‌اندازی سیستم');
-                const app = initializeApp(firebaseConfig);
-                const auth = getAuth(app);
-                const db = getFirestore(app);
                 updateProgress(40, '...برقراری ارتباط با سرورهای شهر');
-
                 onAuthStateChanged(auth, async (user) => {
                     await delay(500); 
-
                     if (user) {
                         updateProgress(70, '...در حال واکشی اطلاعات بازیکن');
                         const userDocRef = doc(db, 'users', user.uid);
                         const userDocSnap = await getDoc(userDocRef);
                         let displayName = user.displayName || 'بازیکن';
-                        
                         if (userDocSnap.exists()) {
                             displayName = userDocSnap.data().displayName || displayName;
                         }
-
                         updateProgress(100, `خوش آمدید، ${displayName}!`);
                         await delay(1500); 
-                        
                         window.location.href = './main.html';
-
                     } else {
                         updateProgress(100, 'احراز هویت انجام نشد.');
                         await delay(1000);
                         updateProgress(100, 'در حال هدایت به صفحه ورود...');
                         await delay(1500);
-                        
                         window.location.href = './login.html';
                     }
                 });
-
             } catch (error) {
                 console.error("خطا در فرآیند لودینگ:", error);
                 progressBarFill.classList.add('error');
@@ -302,9 +219,35 @@
             }
         }
 
-        // اجرای برنامه
-        main();
+        // نقطه شروع اصلی برنامه
+        async function main() {
+            try {
+                // اولین کار: بررسی وضعیت بروزرسانی از سرور
+                const maintenanceDocRef = doc(db, "settings", "maintenance");
+                const maintenanceDocSnap = await getDoc(maintenanceDocRef);
 
+                if (maintenanceDocSnap.exists() && maintenanceDocSnap.data().enabled === true) {
+                    const config = maintenanceDocSnap.data();
+                    const endTime = config.endTime.toDate(); // تبدیل Timestamp فایربیس به Date جاوااسکریپت
+                    
+                    // اگر زمان بروزرسانی هنوز تمام نشده باشد
+                    if (endTime > new Date()) {
+                        showMaintenancePanel(config.title, config.message, endTime);
+                        return; // اجرای ادامه کد متوقف می‌شود
+                    }
+                }
+                
+                // اگر بروزرسانی فعال نبود یا زمانش تمام شده بود، لودینگ عادی را شروع کن
+                startNormalLoading();
+
+            } catch (error) {
+                console.error("خطا در بررسی وضعیت بروزرسانی:", error);
+                // در صورت خطا در اتصال به دیتابیس، لودینگ عادی را ادامه می‌دهیم
+                startNormalLoading(); 
+            }
+        }
+
+        main();
     </script>
 </body>
 </html>
