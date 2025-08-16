@@ -35,7 +35,7 @@
             z-index: -1;
         }
 
-        /* **** استایل‌های پنل دانلود موسیقی (اضافه شده) **** */
+        /* **** استایل‌های پنل دانلود موسیقی **** */
         #music-download-overlay {
             position: fixed;
             top: 0;
@@ -303,6 +303,17 @@
             background: linear-gradient(145deg, #b84a4a, #912525);
             box-shadow: 0 6px 15px rgba(255, 100, 100, 0.25);
         }
+
+        /* [جدید] استایل‌های مودال هشدار */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
+        .modal-overlay.visible { opacity: 1; visibility: visible; }
+        .modal-content { background: linear-gradient(145deg, #3c3022, #1e170f); border: 2px solid #5c4a3a; border-radius: 16px; padding: 25px 30px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); transform: scale(0.9); transition: all 0.3s ease; }
+        .modal-overlay.visible .modal-content { transform: scale(1); }
+        .modal-title { font-size: 1.5rem; font-weight: 900; color: #ffc947; margin-bottom: 15px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .modal-message { font-size: 1rem; line-height: 1.6; margin-bottom: 25px; }
+        .modal-button { width: 100%; padding: 12px; font-size: 1rem; font-weight: 700; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; color: #ffffff; background: linear-gradient(145deg, #8c4843, #5a2c2a); border: 1px solid #ffc947; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+        .modal-button:hover { background: linear-gradient(145deg, #a1534d, #6b3431); }
+
     </style>
 </head>
 <body>
@@ -311,10 +322,10 @@
     <audio id="player-join-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-confirmation-tone-2867.mp3" preload="auto"></audio>
     <audio id="game-start-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-dramatic-orchestra-hit-22dramatic-hit-1317.mp3" preload="auto"></audio>
     
-    <!-- موسیقی پس‌زمینه (اضافه شده) -->
+    <!-- موسیقی پس‌زمینه -->
     <audio id="background-music" loop></audio>
 
-    <!-- پنل دانلود موسیقی (اضافه شده) -->
+    <!-- پنل دانلود موسیقی -->
     <div id="music-download-overlay">
         <div class="download-panel">
             <h2 class="download-title">موسیقی پس‌زمینه</h2>
@@ -361,6 +372,15 @@
         </div>
     </div>
 
+    <!-- [جدید] مودال هشدار -->
+    <div id="custom-alert-overlay" class="modal-overlay">
+        <div class="modal-content">
+            <h2 class="modal-title">توجه!</h2>
+            <p id="custom-alert-message" class="modal-message"></p>
+            <button id="custom-alert-confirm-btn" class="modal-button">تایید</button>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
@@ -397,12 +417,15 @@
         const searchTimer = document.getElementById('search-timer');
         const playerJoinSound = document.getElementById('player-join-sound');
         const gameStartSound = document.getElementById('game-start-sound');
-        
-        // عناصر DOM مربوط به موسیقی (اضافه شده)
         const backgroundMusic = document.getElementById('background-music');
         const musicDownloadOverlay = document.getElementById('music-download-overlay');
         const progressBar = document.getElementById('progress-bar');
         const progressText = document.getElementById('progress-text');
+        
+        // [جدید] عناصر مودال هشدار
+        const customAlertOverlay = document.getElementById('custom-alert-overlay');
+        const customAlertMessage = document.getElementById('custom-alert-message');
+        const customAlertConfirmBtn = document.getElementById('custom-alert-confirm-btn');
 
 
         // --- متغیرهای وضعیت ---
@@ -411,26 +434,58 @@
         let searchTimerInterval;
         let previousPlayerCount = 0;
         let isGameStarting = false;
-
-        // متغیرهای مربوط به مدیریت نسخه و کش موسیقی (اضافه شده)
         const MUSIC_URL = "https://raw.githubusercontent.com/abolfazl140122/mafia/main/mysterious-dark-background-310162%20(1).mp3";
-        const MUSIC_CACHE_NAME = 'mafia-search-music-cache-v1'; // نام متفاوت برای جلوگیری از تداخل
+        const MUSIC_CACHE_NAME = 'mafia-search-music-cache-v1';
         const MUSIC_VERSION_KEY = 'mafia-search-music-version';
         let isMusicPlaying = false;
 
         // --- توابع ---
+        
+        // [جدید] تابع نمایش پنل هشدار سفارشی
+        function showCustomAlert(message, onConfirm) {
+            customAlertMessage.textContent = message;
+            customAlertOverlay.classList.add('visible');
+            customAlertConfirmBtn.onclick = () => {
+                customAlertOverlay.classList.remove('visible');
+                if (onConfirm) onConfirm();
+            };
+        }
+        
+        // [جدید] تابع برای گوش دادن به وضعیت بروزرسانی سرور
+        function listenForMaintenance(user) {
+            const maintenanceDocRef = doc(db, 'settings', 'maintenance');
+            onSnapshot(maintenanceDocRef, async (docSnap) => {
+                if (docSnap.exists() && docSnap.data().enabled === true && !isGameStarting) {
+                    // جلوگیری از اجرای مجدد و تداخل
+                    isGameStarting = true; 
 
-        // توابع مربوط به موسیقی (اضافه شده)
+                    // ۱. قطع اتصال از listener لیست بازیکنان
+                    if (unsubscribeFromPlayersList) {
+                        unsubscribeFromPlayersList();
+                    }
+                    
+                    // ۲. خروج کاربر از صف جستجو (بسیار مهم)
+                    await leaveSearch(user);
+
+                    // ۳. نمایش هشدار و تعریف عملیات پس از تایید
+                    showCustomAlert(
+                        "سرور در حالت بروزرسانی قرار گرفت. شما به صفحه اصلی منتقل می‌شوید.",
+                        () => { window.location.href = './index.html'; }
+                    );
+                }
+            });
+        }
+        
+        // --- توابع موسیقی (بدون تغییر) ---
         const playMusicAfterUserInteraction = () => {
             if (!isMusicPlaying && backgroundMusic.src && backgroundMusic.paused) {
                 backgroundMusic.play()
                     .then(() => {
                         isMusicPlaying = true;
-                        console.log("موسیقی پس از تعامل کاربر با موفقیت پخش شد.");
                         document.body.removeEventListener('click', playMusicAfterUserInteraction, true);
                         document.body.removeEventListener('keydown', playMusicAfterUserInteraction, true);
                     })
-                    .catch(e => console.error("خطا در پخش موسیقی حتی پس از تعامل کاربر.", e));
+                    .catch(e => console.error("Error playing music post-interaction.", e));
             } else {
                 document.body.removeEventListener('click', playMusicAfterUserInteraction, true);
                 document.body.removeEventListener('keydown', playMusicAfterUserInteraction, true);
@@ -440,15 +495,13 @@
         function playMusicFromBlob(blob) {
             const objectUrl = URL.createObjectURL(blob);
             backgroundMusic.src = objectUrl;
-            backgroundMusic.volume = 0.3; // کاهش صدا برای تمرکز بیشتر
+            backgroundMusic.volume = 0.3;
             
             const playPromise = backgroundMusic.play();
             if (playPromise !== undefined) {
                 playPromise.then(() => {
                     isMusicPlaying = true;
-                    console.log("پخش خودکار موسیقی موفقیت آمیز بود.");
                 }).catch(error => {
-                    console.warn("پخش خودکار موسیقی مسدود شد. منتظر تعامل کاربر هستیم...", error);
                     isMusicPlaying = false;
                     document.body.addEventListener('click', playMusicAfterUserInteraction, true);
                     document.body.addEventListener('keydown', playMusicAfterUserInteraction, true);
@@ -470,7 +523,6 @@
                         progressText.textContent = `در حال دانلود... ${percentComplete}%`;
                     }
                 };
-
                 xhr.onload = async () => {
                     if (xhr.status === 200) {
                         const musicBlob = xhr.response;
@@ -478,24 +530,15 @@
                             const cache = await caches.open(MUSIC_CACHE_NAME);
                             await cache.put(MUSIC_URL, new Response(musicBlob));
                             localStorage.setItem(MUSIC_VERSION_KEY, MUSIC_URL);
-                            console.log('موسیقی با موفقیت دانلود و کش شد.');
                             musicDownloadOverlay.classList.remove('visible');
                             resolve(musicBlob);
-                        } catch (cacheError) {
-                            console.error('خطا در ذخیره سازی موسیقی در کش:', cacheError);
-                            reject(cacheError);
-                        }
-                    } else {
-                        reject(new Error(`خطای شبکه: ${xhr.statusText}`));
-                    }
+                        } catch (cacheError) { reject(cacheError); }
+                    } else { reject(new Error(`Network error: ${xhr.statusText}`)); }
                 };
-
                 xhr.onerror = () => {
-                    console.error('خطا در دانلود موسیقی.');
                     musicDownloadOverlay.classList.remove('visible');
-                    reject(new Error('خطای شبکه در دانلود موسیقی.'));
+                    reject(new Error('Network error during download.'));
                 };
-
                 xhr.send();
             });
         }
@@ -503,26 +546,16 @@
         async function handleBackgroundMusic() {
             const cachedVersion = localStorage.getItem(MUSIC_VERSION_KEY);
             if (cachedVersion === MUSIC_URL) {
-                console.log('موسیقی از کش بارگذاری می‌شود.');
                 try {
                     const cache = await caches.open(MUSIC_CACHE_NAME);
                     const cachedResponse = await cache.match(MUSIC_URL);
                     if (cachedResponse) {
                         playMusicFromBlob(await cachedResponse.blob());
-                    } else {
-                        playMusicFromBlob(await downloadAndCacheMusic());
-                    }
-                } catch (error) {
-                    console.error('خطا در خواندن موسیقی از کش:', error);
-                    playMusicFromBlob(await downloadAndCacheMusic());
-                }
+                    } else { playMusicFromBlob(await downloadAndCacheMusic()); }
+                } catch (error) { playMusicFromBlob(await downloadAndCacheMusic()); }
             } else {
-                console.log('نسخه جدید موسیقی یافت شد یا اولین بازدید است. شروع دانلود...');
-                try {
-                    playMusicFromBlob(await downloadAndCacheMusic());
-                } catch (error) {
-                    console.error('فرایند دانلود و پخش موسیقی با خطا مواجه شد:', error);
-                }
+                try { playMusicFromBlob(await downloadAndCacheMusic()); } 
+                catch (error) { console.error('Music download/play process failed:', error); }
             }
         }
         // --- پایان توابع موسیقی ---
@@ -601,7 +634,7 @@
             stopSearchTimer();
             if (unsubscribeFromPlayersList) unsubscribeFromPlayersList();
             
-            if (backgroundMusic) backgroundMusic.pause(); // توقف موسیقی قبل از شروع بازی
+            if (backgroundMusic) backgroundMusic.pause();
 
             searchStatusTitle.textContent = `لابی کامل شد! بازی تا ${REDIRECT_DELAY_MS / 1000} ثانیه دیگر شروع می‌شود...`;
             searchStatusTitle.style.animation = 'none';
@@ -665,7 +698,6 @@
                          currentUserName.textContent = currentUserData.displayName;
                     }
                     
-                    // فراخوانی تابع مدیریت موسیقی پس از بارگذاری اطلاعات کاربر (تغییر کلیدی)
                     await handleBackgroundMusic();
 
                 } catch (error) {
@@ -676,6 +708,9 @@
 
                 await joinSearch(user);
                 listenToPlayersList();
+                
+                // [جدید] فراخوانی تابع برای گوش دادن به وضعیت بروزرسانی
+                listenForMaintenance(user);
 
                 cancelSearchBtn.addEventListener('click', async () => {
                     await leaveSearch(user);
