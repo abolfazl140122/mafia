@@ -99,6 +99,7 @@
         .gem-icon {
             width: 24px;
             height: 24px;
+            filter: drop-shadow(0 0 3px #ff00ff);
         }
 
         /* --- Avatar Grid --- */
@@ -106,8 +107,9 @@
             flex-grow: 1;
             overflow-y: auto;
             display: grid;
-            grid-template-columns: repeat(3, 1fr); /* نمایش 3 آیتم در هر ردیف */
-            gap: 10px; /* کاهش فاصله برای جا شدن بهتر */
+            /* تغییر کلیدی 1: تغییر اندازه minmax برای جا دادن 3 آیتم در موبایل */
+            grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
+            gap: 12px;
             padding: 10px;
             margin: -10px; /* برای جبران پدینگ آیتم‌ها */
         }
@@ -119,7 +121,8 @@
 
 
         .avatar-card {
-            aspect-ratio: 1 / 1.3;
+            /* تغییر کلیدی 2: تنظیم نسبت ابعاد برای نمایش بهتر متن */
+            aspect-ratio: 1 / 1.4;
             background: linear-gradient(145deg, rgba(40, 30, 28, 0.7), rgba(26, 19, 18, 0.8));
             border-radius: 12px;
             border: 2px solid #5a4a3a;
@@ -145,31 +148,31 @@
             object-fit: cover;
             margin-bottom: 8px;
         }
-
-        .price-tag {
+        
+        /* استایل مشترک برای قیمت و متن وضعیت */
+        .price-tag, .status-text {
             background-color: rgba(0, 0, 0, 0.6);
             border-radius: 15px;
             padding: 4px 10px;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 5px;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 700;
-        }
-        .price-tag .gem-icon { width: 16px; height: 16px; }
-        
-        /* New status text for owned/equipped items */
-        .status-text {
-            background-color: rgba(0, 0, 0, 0.6);
-            border-radius: 15px;
-            padding: 5px 12px;
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: #c5a687; /* رنگ پیشفرض برای "خریداری شده" */
+            width: 95%;
             text-align: center;
         }
-        .status-text.selected {
-            color: #ffc947; /* رنگ روشن‌تر برای "انتخاب شده" */
+
+        .price-tag .gem-icon { width: 16px; height: 16px; filter: none; }
+
+        /* استایل اختصاصی برای متن وضعیت */
+        .status-text.owned-text {
+            color: #a0a0a0; /* رنگ خاکستری برای خریداری شده */
+        }
+        
+        .status-text.equipped-text {
+            color: #ffc947; /* رنگ طلایی برای انتخاب شده */
             font-weight: 900;
         }
 
@@ -187,7 +190,7 @@
             box-shadow: 0 0 15px rgba(255, 201, 71, 0.7);
             transform: scale(1.05);
         }
-
+        
         /* --- Loading Spinner --- */
         .loader-overlay {
             position: fixed;
@@ -306,7 +309,7 @@
             <span id="user-display-name">...</span>
             <div class="gem-balance">
                 <span id="user-gems">0</span>
-                <!-- آیکون الماس جدید -->
+                <!-- تغییر کلیدی 3: تغییر آدرس آیکون الماس -->
                 <img src="https://i.imgur.com/T5b9t8j.png" alt="Gem" class="gem-icon">
             </div>
         </div>
@@ -385,7 +388,6 @@
         async function loadShopData(user) {
             loader.style.display = 'flex';
             try {
-                // Fetch user data and all avatars in parallel
                 const userDocRef = doc(db, 'users', user.uid);
                 const avatarsCollectionRef = collection(db, 'avatars');
                 
@@ -400,14 +402,12 @@
                 
                 let userData = userDocSnap.data() || {};
                 
-                // <--- تغییر کلیدی 1: بررسی و افزودن جم پیش‌فرض --->
                 if (userData.game === undefined) {
                     console.log("کاربر جم پیش‌فرض را ندارد. در حال افزودن 25 جم...");
                     await updateDoc(userDocRef, { game: 25 });
-                    userData.game = 25; // مقدار را به صورت محلی هم آپدیت می‌کنیم
+                    userData.game = 25;
                 }
                 
-                // <--- تغییر کلیدی 2: خواندن اطلاعات از فیلد 'game' --->
                 currentUserData = {
                     uid: user.uid,
                     displayName: userData.displayName || "کاربر",
@@ -436,7 +436,6 @@
             }
         }
 
-        // --- تابع رندر فروشگاه با منطق جدید ---
         function renderShop() {
             userDisplayNameEl.textContent = currentUserData.displayName;
             userGemsEl.textContent = currentUserData.gems.toLocaleString('fa');
@@ -445,42 +444,37 @@
             allAvatars.forEach(avatar => {
                 const card = document.createElement('div');
                 card.className = 'avatar-card';
-
                 const isOwned = currentUserData.ownedAvatars.includes(avatar.id);
                 const isEquipped = currentUserData.avatarUrl === avatar.imageUrl;
 
-                // افزودن کلاس برای استایل‌های بوردر و افکت‌ها
                 if (isOwned) card.classList.add('owned');
                 if (isEquipped) card.classList.add('equipped');
 
-                // مشخص کردن محتوای پایین کارت بر اساس وضعیت
+                // تغییر کلیدی 4: منطق جدید برای نمایش وضعیت در پایین کارت
                 let bottomContent = '';
-                if (isEquipped) {
-                    // متن برای آواتار انتخاب شده
-                    bottomContent = `<div class="status-text selected">انتخاب شده</div>`;
-                } else if (isOwned) {
-                    // متن برای آواتار خریداری شده
-                    bottomContent = `<div class="status-text">خریداری شده</div>`;
+                if (isOwned) {
+                    if (isEquipped) {
+                        bottomContent = `<div class="status-text equipped-text">انتخاب شده</div>`;
+                    } else {
+                        bottomContent = `<div class="status-text owned-text">خریداری شده</div>`;
+                    }
                 } else {
-                    // نمایش قیمت برای آواتارهای خریداری نشده
                     bottomContent = `
                         <div class="price-tag">
                             <span>${avatar.price.toLocaleString('fa')}</span>
                             <img src="https://i.imgur.com/T5b9t8j.png" alt="Gem" class="gem-icon">
                         </div>`;
                 }
-                
-                // تنظیم محتوای کامل کارت
+
                 card.innerHTML = `
                     <img src="${avatar.imageUrl}" alt="${avatar.name}" class="avatar-image">
                     ${bottomContent}
                 `;
-
+                
                 card.addEventListener('click', () => handleAvatarClick(avatar, isOwned, isEquipped));
                 avatarGrid.appendChild(card);
             });
         }
-
 
         function handleAvatarClick(avatar, isOwned, isEquipped) {
             if (isEquipped) return; 
@@ -537,7 +531,6 @@
                     });
                 });
 
-                // Update local data and re-render
                 currentUserData.gems -= avatar.price;
                 currentUserData.ownedAvatars.push(avatar.id);
                 renderShop();
