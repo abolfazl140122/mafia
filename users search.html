@@ -107,7 +107,7 @@
             font-weight: 700;
             flex-grow: 1;
         }
-        #search-timer { /* استایل تایمر جدید */
+        #search-timer {
             font-size: 1rem;
             font-weight: 700;
             color: #ffc947;
@@ -115,7 +115,6 @@
             padding: 5px 10px;
             border-radius: 6px;
         }
-
 
         /* لیست بازیکنان در حال جستجو */
         .players-list-container {
@@ -170,7 +169,7 @@
             margin-top: auto;
             opacity: 0.8;
         }
-        #player-counter { /* استایل شمارشگر بازیکنان */
+        #player-counter {
             font-size: 1.4rem;
             font-weight: 900;
             color: #fff;
@@ -189,7 +188,7 @@
             justify-content: center;
             gap: 10px;
         }
-        .search-status-footer .dots-loader.hidden { /* کلاس برای مخفی کردن لودر */
+        .search-status-footer .dots-loader.hidden {
             display: none;
         }
         .search-status-footer .dots-loader div {
@@ -217,8 +216,7 @@
             flex-shrink: 0;
         }
         .button-container button {
-            flex-grow: 1;
-            width: 50%;
+            flex-grow: 1; /* باعث می‌شود دکمه تمام عرض را بگیرد */
             padding: 15px;
             font-size: 1.2rem;
             font-weight: 900;
@@ -242,25 +240,13 @@
             background: linear-gradient(145deg, #b84a4a, #912525);
             box-shadow: 0 6px 15px rgba(255, 100, 100, 0.25);
         }
-        #refresh-btn {
-            background: linear-gradient(145deg, #d4ac0d, #b8860b);
-            border: 2px solid #ffd700;
-        }
-        #refresh-btn:hover:not(:disabled) {
-            background: linear-gradient(145deg, #e7c03e, #d49d1a);
-            box-shadow: 0 6px 15px rgba(255, 215, 0, 0.25);
-        }
-        #refresh-btn:disabled {
-            background: linear-gradient(145deg, #78642a, #5c4a2a);
-            border-color: #9e8a4a;
-        }
     </style>
 </head>
 <body>
 
     <!-- افکت‌های صوتی -->
     <audio id="player-join-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-confirmation-tone-2867.mp3" preload="auto"></audio>
-    <audio id="game-start-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-dramatic-orchestra-hit-22 dramatic-hit-1317.mp3" preload="auto"></audio>
+    <audio id="game-start-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-dramatic-orchestra-hit-22dramatic-hit-1317.mp3" preload="auto"></audio>
 
     <!-- لودر اولیه صفحه -->
     <div id="initial-loader-overlay" class="initial-loader-overlay">
@@ -294,7 +280,6 @@
 
         <!-- دکمه‌ها -->
         <div class="button-container">
-            <button id="refresh-btn">تازه‌سازی</button>
             <button id="cancel-search-btn">لغو جستجو</button>
         </div>
     </div>
@@ -328,7 +313,6 @@
         const currentUserName = document.getElementById('current-user-name');
         const playersListContainer = document.getElementById('players-list-container');
         const cancelSearchBtn = document.getElementById('cancel-search-btn');
-        const refreshBtn = document.getElementById('refresh-btn');
         const searchStatusFooter = document.querySelector('.search-status-footer');
         const playerCounter = document.getElementById('player-counter');
         const searchStatusTitle = document.getElementById('search-status-title');
@@ -340,9 +324,6 @@
         // --- متغیرهای وضعیت ---
         let currentUserData = null;
         let unsubscribeFromPlayersList = null;
-        let refreshCooldownSeconds = 5;
-        let isRefreshOnCooldown = false;
-        let cooldownInterval;
         let searchTimerInterval;
         let previousPlayerCount = 0;
         let isGameStarting = false;
@@ -353,12 +334,8 @@
             initialLoaderOverlay.classList.add('hidden');
         }
         
-        function showLoader() {
-            initialLoaderOverlay.classList.remove('hidden');
-        }
-        
-        // تابع برای شروع تایمر انتظار
         function startSearchTimer() {
+            if (searchTimerInterval) clearInterval(searchTimerInterval); // جلوگیری از ایجاد چندین تایمر
             const startTime = Date.now();
             searchTimerInterval = setInterval(() => {
                 const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
@@ -368,7 +345,6 @@
             }, 1000);
         }
 
-        // تابع برای توقف تایمر انتظار
         function stopSearchTimer() {
             clearInterval(searchTimerInterval);
         }
@@ -383,7 +359,7 @@
                     joinedAt: serverTimestamp()
                 });
                 console.log("شما به لیست جستجو اضافه شدید.");
-                startSearchTimer(); // شروع تایمر بعد از پیوستن موفق
+                startSearchTimer();
             } catch (error) {
                 console.error("خطا در اضافه شدن به لیست جستجو:", error);
                 alert("خطا در اتصال به سرور. لطفا صفحه را تازه‌سازی کنید.");
@@ -395,8 +371,11 @@
             stopSearchTimer();
             const searchingUserRef = doc(db, 'searching_users', user.uid);
             try {
-                await deleteDoc(searchingUserRef);
-                console.log("شما از لیست جستجو خارج شدید.");
+                // فقط در صورتی که بازی شروع نشده باشد، از لیست حذف شو
+                if (!isGameStarting) {
+                    await deleteDoc(searchingUserRef);
+                    console.log("شما از لیست جستجو خارج شدید.");
+                }
             } catch (error) {
                 console.error("خطا در خروج از لیست جستجو:", error);
             }
@@ -418,39 +397,6 @@
             });
         }
         
-        function startRefreshCooldown() {
-            isRefreshOnCooldown = true;
-            refreshBtn.disabled = true;
-            let timer = refreshCooldownSeconds;
-            
-            refreshBtn.textContent = `(${timer})`;
-            
-            cooldownInterval = setInterval(() => {
-                timer--;
-                refreshBtn.textContent = `(${timer})`;
-                if (timer <= 0) {
-                    clearInterval(cooldownInterval);
-                    refreshBtn.disabled = false;
-                    isRefreshOnCooldown = false;
-                    refreshBtn.textContent = 'تازه‌سازی';
-                    refreshCooldownSeconds = Math.min(refreshCooldownSeconds + 5, 30); // افزایش زمان کول‌داون تا حداکثر ۳۰ ثانیه
-                }
-            }, 1000);
-        }
-
-        async function handleRefresh(user) {
-            if (isRefreshOnCooldown || isGameStarting) return;
-            showLoader();
-            if (unsubscribeFromPlayersList) unsubscribeFromPlayersList();
-            
-            const existingPlayers = playersListContainer.querySelectorAll('.player-item');
-            existingPlayers.forEach(p => p.remove());
-            
-            await joinSearch(user);
-            listenToPlayersList();
-            startRefreshCooldown();
-        }
-
         function handleGameStart() {
             if (isGameStarting) return;
             isGameStarting = true;
@@ -461,15 +407,12 @@
 
             // به‌روزرسانی UI برای شروع بازی
             searchStatusTitle.textContent = `لابی کامل شد! بازی تا ${REDIRECT_DELAY_MS / 1000} ثانیه دیگر شروع می‌شود...`;
-            searchStatusTitle.style.animation = 'none'; // توقف انیمیشن چشمک‌زن
+            searchStatusTitle.style.animation = 'none';
             dotsLoader.classList.add('hidden');
             cancelSearchBtn.disabled = true;
-            refreshBtn.disabled = true;
 
-            // پخش صدای شروع بازی
             gameStartSound.play().catch(e => console.error("خطا در پخش صدا:", e));
 
-            // انتقال به صفحه بازی پس از تاخیر
             setTimeout(() => {
                 window.location.href = './game.html'; // آدرس صفحه بازی شما
             }, REDIRECT_DELAY_MS);
@@ -480,15 +423,13 @@
              let isFirstSnapshot = true;
              
              unsubscribeFromPlayersList = onSnapshot(searchingUsersCollection, (snapshot) => {
+                if (isGameStarting) return; // اگر بازی در حال شروع است، آپدیت نکن
+
                 const playerCount = snapshot.size;
                 
-                // رندر کردن لیست بازیکنان
                 renderPlayersList(snapshot.docs);
-                
-                // به‌روزرسانی شمارشگر
                 playerCounter.textContent = `${playerCount} / ${GAME_SIZE} بازیکن`;
 
-                // پخش صدا هنگام ورود بازیکن جدید
                 if (playerCount > previousPlayerCount && !isFirstSnapshot) {
                     playerJoinSound.play().catch(e => console.error("خطا در پخش صدا:", e));
                 }
@@ -499,7 +440,6 @@
                     isFirstSnapshot = false;
                 }
 
-                // بررسی شرط شروع بازی
                 if (playerCount >= GAME_SIZE) {
                     handleGameStart();
                 }
@@ -537,18 +477,12 @@
                 listenToPlayersList();
 
                 cancelSearchBtn.addEventListener('click', async () => {
-                    if (isGameStarting) return;
                     await leaveSearch(user);
                     window.location.href = './main.html';
                 });
                 
-                refreshBtn.addEventListener('click', () => handleRefresh(user));
-
-                window.addEventListener('beforeunload', (event) => {
-                    // فقط در صورتی که بازی در حال شروع نباشد، از لیست خارج شو
-                    if (!isGameStarting) {
-                        leaveSearch(user);
-                    }
+                window.addEventListener('beforeunload', () => {
+                    leaveSearch(user);
                 });
 
             } else {
