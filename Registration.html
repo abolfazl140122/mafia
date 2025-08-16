@@ -8,57 +8,185 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-color: #f4f1ea;
-            --panel-bg: #ffffff;
-            --primary-color: #4a2c2a;
-            --accent-color: #c5a687;
-            --text-color: #3d3d3d;
-            --error-color: #d9534f;
-            --border-color: #e0dacc;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
             font-family: 'Vazirmatn', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            background-image: url('https://up.20script.ir/file/6195-file-000000001500622f9419de6c322df297-1-.jpg');
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: #f0e6d2;
             display: flex;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
             padding: 20px;
         }
+
         .auth-container {
             width: 100%;
             max-width: 420px;
-            background: var(--panel-bg);
+            background: linear-gradient(145deg, rgba(40, 32, 22, 0.9), rgba(20, 15, 10, 0.95));
+            backdrop-filter: blur(8px);
             border-radius: 16px;
             padding: 40px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 2px solid #5c4a3a;
             text-align: center;
         }
-        .auth-title { font-size: 2.5rem; font-weight: 900; color: var(--primary-color); margin-bottom: 10px; }
-        .auth-subtitle { font-size: 1rem; color: #777; margin-bottom: 30px; }
-        .input-group { margin-bottom: 20px; text-align: right; }
-        .input-group label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 0.9rem; }
+
+        .auth-title {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #ffc947;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.7);
+        }
+
+        .auth-subtitle {
+            font-size: 1rem;
+            color: #e0dacc;
+            margin-bottom: 35px;
+            text-shadow: 1px 1px 2px #000;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: right;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #c5a687;
+        }
+
         .auth-input {
-            width: 100%; padding: 12px 15px; font-size: 1rem; border: 2px solid var(--border-color);
-            border-radius: 8px; transition: border-color 0.3s, box-shadow 0.3s; font-family: 'Vazirmatn', sans-serif;
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 1rem;
+            border: 1px solid #5c4a3a;
+            background-color: rgba(0, 0, 0, 0.3);
+            color: #f0e6d2;
+            border-radius: 8px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            font-family: 'Vazirmatn', sans-serif;
         }
-        .auth-input:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(197, 166, 135, 0.3); }
+
+        .auth-input:focus {
+            outline: none;
+            border-color: #ffc947;
+            box-shadow: 0 0 0 3px rgba(255, 201, 71, 0.2);
+        }
+
+        /* --- استایل‌های جدید برای فیلد سن --- */
+        .age-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        #age-input {
+            text-align: center;
+            -moz-appearance: textfield; /* Firefox */
+        }
+        
+        #age-input::-webkit-outer-spin-button,
+        #age-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .age-control-btn {
+            width: 45px;
+            height: 45px;
+            flex-shrink: 0;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #ffc947;
+            background: linear-gradient(145deg, rgba(80, 50, 48, 0.8), rgba(56, 33, 32, 0.9));
+            border: 1px solid #c5a687;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-bottom: 4px; /* for vertical alignment */
+        }
+        .age-control-btn:hover {
+            border-color: #ffc947;
+            background: linear-gradient(145deg, rgba(100, 65, 63, 0.9), rgba(74, 44, 42, 1));
+        }
+        .age-control-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* --- ادامه استایل‌ها --- */
+
         .auth-button {
-            width: 100%; padding: 14px; font-size: 1.1rem; font-weight: 700; color: #fff; background-color: var(--primary-color);
-            border: none; border-radius: 8px; cursor: pointer; transition: background-color 0.3s, transform 0.1s;
+            width: 100%;
+            padding: 14px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #ffffff;
+            background: linear-gradient(145deg, #8c4843, #5a2c2a);
+            border: 2px solid #c5a687;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
         }
-        .auth-button:hover { background-color: #382120; }
-        .auth-button:active { transform: scale(0.98); }
-        .auth-button:disabled { background-color: #9d8a7a; cursor: not-allowed; }
-        .auth-link { margin-top: 25px; font-size: 0.9rem; }
-        .auth-link a { color: var(--primary-color); font-weight: 700; text-decoration: none; }
+
+        .auth-button:hover {
+            border-color: #ffc947;
+            box-shadow: 0 0 15px rgba(255, 201, 71, 0.2);
+        }
+
+        .auth-button:active {
+            transform: scale(0.98);
+        }
+
+        .auth-button:disabled {
+            background: #5c4a3a;
+            border-color: #4a3c30;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .auth-link {
+            margin-top: 25px;
+            font-size: 0.9rem;
+            color: #c5a687;
+        }
+
+        .auth-link a {
+            color: #ffc947;
+            font-weight: 700;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .auth-link a:hover {
+            color: #fff;
+        }
+
         .error-message {
-            color: var(--error-color); background-color: rgba(217, 83, 79, 0.1); padding: 10px;
-            border-radius: 8px; margin-top: 20px; font-size: 0.9rem; display: none;
+            color: #ffadad;
+            background-color: rgba(217, 83, 79, 0.2);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            display: none;
+            border: 1px solid #d9534f;
         }
     </style>
 </head>
@@ -80,13 +208,24 @@
                 <label for="password">رمز عبور (حداقل ۶ کاراکتر)</label>
                 <input type="password" id="password" class="auth-input" required>
             </div>
+
+            <!-- بخش جدید و گرافیکی برای ورود سن -->
+            <div class="input-group">
+                <label for="age-input">سن</label>
+                <div class="age-input-wrapper">
+                    <button type="button" id="decrement-age" class="age-control-btn">-</button>
+                    <input type="number" id="age-input" class="auth-input" placeholder="سن خود را وارد کنید" required>
+                    <button type="button" id="increment-age" class="age-control-btn">+</button>
+                </div>
+            </div>
+
             <button type="submit" id="register-button" class="auth-button">ساخت حساب</button>
         </form>
 
         <p id="error-message" class="error-message"></p>
 
         <p class="auth-link">
-            حساب کاربری دارید؟ <a href="./login.html">وارد شوید</a> <!-- **FIXED LINK** -->
+            حساب کاربری دارید؟ <a href="./login.html">وارد شوید</a>
         </p>
     </div>
 
@@ -109,6 +248,7 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // --- DOM Elements ---
         const registrationForm = document.getElementById('registration-form');
         const displayNameInput = document.getElementById('display-name');
         const emailInput = document.getElementById('email');
@@ -116,14 +256,37 @@
         const registerButton = document.getElementById('register-button');
         const errorMessage = document.getElementById('error-message');
 
+        // --- المان‌های جدید مربوط به سن ---
+        const ageInput = document.getElementById('age-input');
+        const incrementAgeBtn = document.getElementById('increment-age');
+        const decrementAgeBtn = document.getElementById('decrement-age');
+
+        // --- کنترلرهای دکمه‌های سن ---
+        incrementAgeBtn.addEventListener('click', () => {
+            let currentValue = parseInt(ageInput.value) || 8;
+            if (currentValue < 99) {
+                ageInput.value = currentValue + 1;
+            }
+        });
+
+        decrementAgeBtn.addEventListener('click', () => {
+            let currentValue = parseInt(ageInput.value) || 9;
+            if (currentValue > 8) {
+                ageInput.value = currentValue - 1;
+            }
+        });
+
+
         registrationForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const displayName = displayNameInput.value.trim();
             const email = emailInput.value.trim();
             const password = passwordInput.value.trim();
+            const old = parseInt(ageInput.value); // **متغیر جدید برای سن**
 
-            if (!displayName || !email || !password) {
+            // --- اعتبارسنجی‌ها ---
+            if (!displayName || !email || !password || !ageInput.value) {
                 showError("لطفاً تمام فیلدها را پر کنید."); return;
             }
             if (password.length < 6) {
@@ -132,6 +295,11 @@
             if (/[^a-zA-Z0-9_.]/.test(displayName)) {
                 showError("نام نمایشی فقط می‌تواند شامل حروف و اعداد انگلیسی، نقطه و آندرلاین باشد."); return;
             }
+            // **اعتبارسنجی الزامی برای سن**
+            if (isNaN(old) || old < 8 || old > 99) {
+                showError("لطفاً سن معتبری بین ۸ تا ۹۹ سال وارد کنید."); return;
+            }
+
 
             registerButton.disabled = true;
             registerButton.textContent = 'در حال ساخت...';
@@ -150,10 +318,10 @@
                     email: user.email,
                     createdAt: new Date(),
                     currentStage: 1,
-                    avatarUrl: ''
+                    avatarUrl: '',
+                    old: old // **ذخیره کردن سن در دیتابیس**
                 });
 
-                // **FIXED REDIRECT**: Go to the loading page to check auth state
                 window.location.href = './index.html'; 
 
             } catch (error) {
