@@ -99,48 +99,55 @@
         .gem-icon {
             width: 24px;
             height: 24px;
-            filter: drop-shadow(0 0 3px #ff00ff);
+            filter: drop-shadow(0 0 4px #a9d4ff);
         }
-
-        /* --- NEW: Controls Bar (Search, Sort, Filter) --- */
-        .controls-bar {
+        
+        /* --- NEW: Controls Container --- */
+        .controls-container {
             width: 100%;
             display: flex;
-            flex-wrap: wrap; /* This is the key for responsiveness */
-            gap: 10px;
+            flex-direction: column;
+            gap: 15px;
             margin-bottom: 20px;
             flex-shrink: 0;
-            align-items: center;
         }
 
-        #search-input {
-            flex-grow: 1; /* Takes up available space */
-            min-width: 200px; /* Minimum width before wrapping */
+        .search-sort-bar {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap-reverse; /* Puts search on the right on wide screens */
+        }
+
+        .search-input {
+            flex-grow: 1;
+            min-width: 200px;
             background-color: rgba(0,0,0,0.4);
             border: 1px solid #5a4a3a;
-            color: #c5a687;
-            padding: 8px 15px;
+            color: #f0e6d2;
+            padding: 9px 15px;
             border-radius: 20px;
             font-size: 0.9rem;
             font-family: 'Vazirmatn', sans-serif;
             transition: all 0.3s ease;
         }
-        #search-input:focus {
+        .search-input::placeholder {
+            color: #9a8a7a;
+        }
+        .search-input:focus {
             outline: none;
             border-color: #ffc947;
             box-shadow: 0 0 8px rgba(255, 201, 71, 0.3);
         }
-        #search-input::placeholder {
-            color: #8a7a6a;
-        }
-        
-        .control-group {
+
+        .sort-buttons {
             display: flex;
             gap: 10px;
-            flex-shrink: 0; /* Prevents buttons from shrinking */
         }
 
-        .filter-btn, .sort-btn {
+        .sort-btn, .filter-btn {
             background-color: rgba(0,0,0,0.4);
             border: 1px solid #5a4a3a;
             color: #c5a687;
@@ -152,15 +159,36 @@
             transition: all 0.3s ease;
             white-space: nowrap;
         }
-        .filter-btn:hover, .sort-btn:hover {
+        .sort-btn:hover, .filter-btn:hover {
             background-color: rgba(0,0,0,0.6);
             border-color: #ffc947;
         }
-        .filter-btn.active, .sort-btn.active {
+        .sort-btn.active, .filter-btn.active {
             background-color: #ffc947;
             color: #1a130e;
             border-color: #ffc947;
             box-shadow: 0 0 10px rgba(255, 201, 71, 0.5);
+        }
+
+        .filter-bar {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        /* Responsive layout for controls */
+        @media (max-width: 768px) {
+            .search-sort-bar {
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch;
+            }
+            .sort-buttons, .filter-bar {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
         }
 
 
@@ -199,7 +227,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             position: relative;
-            opacity: 0; 
+            opacity: 0;
             animation: fadeIn 0.5s ease-out forwards;
         }
         
@@ -354,19 +382,21 @@
             <span id="user-display-name">...</span>
             <div class="gem-balance">
                 <span id="user-gems">0</span>
-                <img src="https://i.imgur.com/T5b9t8j.png" alt="Gem" class="gem-icon">
+                <img src="https://i.imgur.com/b9s5a2z.png" alt="الماس" class="gem-icon">
             </div>
         </div>
 
-        <!-- NEW/IMPROVED: Controls Bar -->
-        <div class="controls-bar">
-            <input type="text" id="search-input" placeholder="جستجوی نام آواتار...">
-            <div class="control-group">
-                <button class="sort-btn active" data-sort="price-asc">ارزان‌ترین</button>
-                <button class="sort-btn" data-sort="price-desc">گران‌ترین</button>
-                <button class="sort-btn" data-sort="alpha-asc">الفبا</button>
+        <!-- NEW: Controls -->
+        <div class="controls-container">
+            <div class="search-sort-bar">
+                 <div class="sort-buttons">
+                    <button class="sort-btn active" data-sort="price-asc">ارزان‌ترین</button>
+                    <button class="sort-btn" data-sort="price-desc">گران‌ترین</button>
+                    <button class="sort-btn" data-sort="alpha">الفبا</button>
+                </div>
+                <input type="text" id="search-input" class="search-input" placeholder="جستجوی نام آواتار...">
             </div>
-            <div class="control-group">
+            <div class="filter-bar">
                 <button class="filter-btn active" data-filter="all">همه</button>
                 <button class="filter-btn" data-filter="purchasable">قابل خرید</button>
                 <button class="filter-btn" data-filter="owned">خریداری شده</button>
@@ -438,14 +468,16 @@
         const modalConfirmBtn = document.getElementById('modal-confirm-btn');
         const modalCancelBtn = document.getElementById('modal-cancel-btn');
         const filterButtons = document.querySelectorAll('.filter-btn');
-        const sortButtons = document.querySelectorAll('.sort-btn'); // NEW
-        const searchInput = document.getElementById('search-input'); // NEW
+        const searchInput = document.getElementById('search-input');
+        const sortButtons = document.querySelectorAll('.sort-btn');
 
+        // --- State Variables ---
         let currentUserData = null;
         let allAvatars = [];
-        let currentFilter = 'all'; 
-        let currentSort = 'price-asc'; // NEW: Sort state
-        let searchTerm = ''; // NEW: Search state
+        let currentFilter = 'all';
+        let currentSort = 'price-asc';
+        let currentSearchTerm = '';
+
 
         // --- Main Function ---
         function main() {
@@ -457,6 +489,7 @@
                     window.location.href = './login.html';
                 }
             });
+            setupEventListeners();
         }
         
         async function loadShopData(user) {
@@ -523,47 +556,38 @@
             userGemsEl.textContent = currentUserData.gems.toLocaleString('fa');
             avatarGrid.innerHTML = '';
             
-            // --- NEW: Combined Filter, Search, and Sort Logic ---
-            let itemsToRender = [...allAvatars];
-
-            // 1. Apply category filter
-            if (currentFilter !== 'all') {
-                itemsToRender = itemsToRender.filter(avatar => {
-                    const isOwned = currentUserData.ownedAvatars.includes(avatar.id);
-                    if (currentFilter === 'owned') return isOwned;
-                    if (currentFilter === 'purchasable') return !isOwned;
-                    return true;
-                });
-            }
-
-            // 2. Apply search filter
-            if (searchTerm) {
-                itemsToRender = itemsToRender.filter(avatar => 
-                    avatar.name.toLowerCase().includes(searchTerm.toLowerCase())
-                );
-            }
+            // 1. Filter by Search Term
+            let processedAvatars = allAvatars.filter(avatar => 
+                avatar.name.toLowerCase().includes(currentSearchTerm)
+            );
             
-            // 3. Apply sorting
-            switch(currentSort) {
-                case 'price-asc':
-                    itemsToRender.sort((a, b) => a.price - b.price);
-                    break;
-                case 'price-desc':
-                    itemsToRender.sort((a, b) => b.price - a.price);
-                    break;
-                case 'alpha-asc':
-                    itemsToRender.sort((a, b) => a.name.localeCompare(b.name, 'fa'));
-                    break;
-            }
-            
-            // --- End of new logic ---
+            // 2. Filter by Category (all, owned, purchasable)
+            processedAvatars = processedAvatars.filter(avatar => {
+                const isOwned = currentUserData.ownedAvatars.includes(avatar.id);
+                if (currentFilter === 'owned') return isOwned;
+                if (currentFilter === 'purchasable') return !isOwned;
+                return true; // 'all'
+            });
 
-            if (itemsToRender.length === 0) {
+            // 3. Sort
+            processedAvatars.sort((a, b) => {
+                switch (currentSort) {
+                    case 'price-desc':
+                        return b.price - a.price;
+                    case 'alpha':
+                        return a.name.localeCompare(b.name, 'fa');
+                    case 'price-asc':
+                    default:
+                        return a.price - b.price;
+                }
+            });
+
+            if (processedAvatars.length === 0) {
                  avatarGrid.innerHTML = `<p style="text-align:center; grid-column: 1 / -1; font-size: 1.1rem; opacity: 0.7;">آیتمی برای نمایش وجود ندارد.</p>`;
                  return;
             }
             
-            itemsToRender.forEach((avatar, index) => {
+            processedAvatars.forEach((avatar, index) => {
                 const card = document.createElement('div');
                 card.className = `avatar-card rarity-${avatar.rarity}`;
                 card.style.animationDelay = `${index * 50}ms`;
@@ -575,16 +599,14 @@
 
                 let bottomContent = '';
                 if (isOwned) {
-                    if (isEquipped) {
-                        bottomContent = `<div class="status-text equipped-text">انتخاب شده</div>`;
-                    } else {
-                        bottomContent = `<div class="status-text owned-text">خریداری شده</div>`;
-                    }
+                    bottomContent = isEquipped 
+                        ? `<div class="status-text equipped-text">انتخاب شده</div>`
+                        : `<div class="status-text owned-text">خریداری شده</div>`;
                 } else {
                     bottomContent = `
                         <div class="price-tag">
                             <span>${avatar.price.toLocaleString('fa')}</span>
-                            <img src="https://i.imgur.com/T5b9t8j.png" alt="Gem" class="gem-icon">
+                            <img src="https://i.imgur.com/b9s5a2z.png" alt="الماس" class="gem-icon">
                         </div>`;
                 }
 
@@ -637,29 +659,23 @@
             hideModal();
             loader.style.display = 'flex';
             loader.querySelector('.loader-text').textContent = 'در حال انجام تراکنش...';
-
             const userDocRef = doc(db, 'users', currentUserData.uid);
-
             try {
                 await runTransaction(db, async (transaction) => {
                     const userDoc = await transaction.get(userDocRef);
                     if (!userDoc.exists()) throw "کاربر یافت نشد!";
-
                     const currentGems = userDoc.data().game || 0;
                     if (currentGems < avatar.price) throw "الماس کافی نیست!";
-
                     transaction.update(userDocRef, {
                         game: currentGems - avatar.price,
                         ownedAvatars: arrayUnion(avatar.id)
                     });
                 });
-
                 currentUserData.gems -= avatar.price;
                 currentUserData.ownedAvatars.push(avatar.id);
                 renderShop();
                 playSound('audio-success');
                 showToast('خرید با موفقیت انجام شد!', 'success');
-
             } catch (error) {
                 console.error("خطا در خرید:", error);
                 playSound('audio-error');
@@ -674,7 +690,6 @@
              hideModal();
              loader.style.display = 'flex';
              loader.querySelector('.loader-text').textContent = 'در حال تجهیز آواتار...';
-            
              const userDocRef = doc(db, 'users', currentUserData.uid);
              try {
                 await updateDoc(userDocRef, { avatarUrl: avatar.imageUrl });
@@ -691,9 +706,38 @@
                  loader.querySelector('.loader-text').textContent = 'در حال بارگذاری فروشگاه...';
              }
         }
+        
+        // --- Event Listeners and Helpers ---
+        function setupEventListeners() {
+            modalCancelBtn.addEventListener('click', hideModal);
+            modal.addEventListener('click', (e) => e.target === modal && hideModal());
 
+            filterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    playSound('audio-click');
+                    currentFilter = button.dataset.filter;
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    renderShop();
+                });
+            });
 
-        // --- Modal Helper Functions ---
+            sortButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    playSound('audio-click');
+                    currentSort = button.dataset.sort;
+                    sortButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    renderShop();
+                });
+            });
+
+            searchInput.addEventListener('input', (e) => {
+                currentSearchTerm = e.target.value.trim().toLowerCase();
+                renderShop();
+            });
+        }
+        
         function showModal() {
             modal.classList.add('visible');
             modalCancelBtn.style.display = 'flex'; 
@@ -701,50 +745,19 @@
         function hideModal() {
             modal.classList.remove('visible');
         }
-        modalCancelBtn.addEventListener('click', hideModal);
-        modal.addEventListener('click', (e) => e.target === modal && hideModal());
         
-        // --- NEW: Event Listeners for Controls ---
-        filterButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                playSound('audio-click');
-                currentFilter = button.dataset.filter;
-                filterButtons.forEach(btn => btn.classList.remove('active'));
-                button.classList.add('active');
-                renderShop();
-            });
-        });
-
-        sortButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                playSound('audio-click');
-                currentSort = button.dataset.sort;
-                sortButtons.forEach(btn => btn.classList.remove('active'));
-                button.classList.add('active');
-                renderShop();
-            });
-        });
-        
-        searchInput.addEventListener('input', (e) => {
-            searchTerm = e.target.value.trim();
-            renderShop();
-        });
-
-        // --- Toast Notification Function ---
         function showToast(message, type = 'info') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
             toast.textContent = message;
             container.appendChild(toast);
-
             setTimeout(() => {
                 toast.style.animation = 'toast-out 0.3s ease-in forwards';
                 toast.addEventListener('animationend', () => toast.remove());
             }, 3000);
         }
 
-        // --- Play Sound Function ---
         function playSound(soundId) {
             try {
                 const sound = document.getElementById(soundId);
@@ -754,7 +767,6 @@
                 console.warn(`Could not play sound: ${soundId}`, e);
             }
         }
-
 
         // --- Start the app ---
         main();
