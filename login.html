@@ -82,7 +82,7 @@
         <p id="error-message" class="error-message"></p>
 
         <p class="auth-link">
-            هنوز عضو نشده‌اید؟ <a href="./Registration.html">ثبت‌نام کنید</a> <!-- **FIXED LINK** -->
+            هنوز عضو نشده‌اید؟ <a href="./register.html">ثبت‌نام کنید</a>
         </p>
     </div>
 
@@ -125,7 +125,6 @@
 
             try {
                 await signInWithEmailAndPassword(auth, email, password);
-                // **FIXED REDIRECT**: Go to the loading page to check auth state
                 window.location.href = './index.html';
             } catch (error) {
                 let friendlyMessage = "ایمیل یا رمز عبور اشتباه است.";
