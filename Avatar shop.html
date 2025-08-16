@@ -20,6 +20,12 @@
             overflow: hidden;
         }
 
+        @keyframes kenburns-bg {
+            0% { transform: scale(1) translate(0, 0); }
+            50% { transform: scale(1.05) translate(-5px, 5px); }
+            100% { transform: scale(1) translate(0, 0); }
+        }
+
         body {
             font-family: 'Vazirmatn', sans-serif;
             background-image: url('https://up.20script.ir/file/6195-file-000000001500622f9419de6c322df297-1-.jpg');
@@ -31,6 +37,18 @@
             flex-direction: column;
             align-items: center;
         }
+        body::before {
+            content: '';
+            position: fixed;
+            top: -5%; left: -5%;
+            width: 110%; height: 110%;
+            background-image: inherit;
+            background-size: cover;
+            background-position: center;
+            animation: kenburns-bg 40s ease-in-out infinite;
+            z-index: -1;
+        }
+
 
         .shop-container {
             width: 100%;
@@ -38,8 +56,9 @@
             display: flex;
             flex-direction: column;
             padding: 20px;
-            backdrop-filter: blur(4px) brightness(0.7);
-            -webkit-backdrop-filter: blur(4px) brightness(0.7);
+            backdrop-filter: blur(5px) brightness(0.6);
+            -webkit-backdrop-filter: blur(5px) brightness(0.6);
+            overflow: hidden;
         }
 
         /* --- Header --- */
@@ -73,6 +92,7 @@
         .back-button:hover {
             border-color: #ffc947;
             transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(255, 201, 71, 0.2);
         }
 
         /* --- User Info Bar --- */
@@ -102,16 +122,59 @@
             filter: drop-shadow(0 0 3px #ff00ff);
         }
 
-        /* --- NEW: Filter Bar --- */
+        /* --- NEW: Controls Bar (Search, Filter, Sort) --- */
+        .controls-bar {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-shrink: 0;
+        }
+
+        .search-sort-container {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .search-input {
+            flex-grow: 1;
+            background-color: rgba(0,0,0,0.4);
+            border: 1px solid #5a4a3a;
+            color: #f0e6d2;
+            padding: 9px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-family: 'Vazirmatn', sans-serif;
+            transition: all 0.3s ease;
+        }
+        .search-input::placeholder { color: #a09383; }
+        .search-input:focus {
+            outline: none;
+            border-color: #ffc947;
+            background-color: rgba(0,0,0,0.6);
+        }
+        
+        .sort-buttons { display: flex; gap: 5px; }
+        .sort-btn {
+            background-color: transparent;
+            border: 1px solid #5a4a3a;
+            color: #c5a687;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
         .filter-bar {
             width: 100%;
             display: flex;
             justify-content: center;
             gap: 10px;
-            margin-bottom: 20px;
-            flex-shrink: 0;
         }
-        .filter-btn {
+        .filter-btn, .sort-btn {
             background-color: rgba(0,0,0,0.4);
             border: 1px solid #5a4a3a;
             color: #c5a687;
@@ -122,24 +185,23 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        .filter-btn:hover {
+        .filter-btn:hover, .sort-btn:hover {
             background-color: rgba(0,0,0,0.6);
             border-color: #ffc947;
         }
-        .filter-btn.active {
+        .filter-btn.active, .sort-btn.active {
             background-color: #ffc947;
             color: #1a130e;
             border-color: #ffc947;
             box-shadow: 0 0 10px rgba(255, 201, 71, 0.5);
         }
 
-
         /* --- Avatar Grid --- */
         .avatar-grid {
             flex-grow: 1;
             overflow-y: auto;
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
             gap: 15px;
             padding: 10px;
             margin: -10px;
@@ -148,12 +210,21 @@
         .avatar-grid::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 4px; }
         .avatar-grid::-webkit-scrollbar-thumb { background: #c5a687; border-radius: 4px; }
         .avatar-grid::-webkit-scrollbar-thumb:hover { background: #ffc947; }
+        .empty-grid-message {
+            grid-column: 1 / -1;
+            text-align: center;
+            font-size: 1.1rem;
+            color: #c5a687;
+            align-self: center;
+            padding: 40px 0;
+            opacity: 0.8;
+        }
 
 
         /* --- Avatar Card --- */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes fadeInScaleUp {
+            from { opacity: 0; transform: translateY(15px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         .avatar-card {
@@ -165,12 +236,11 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
             cursor: pointer;
             transition: all 0.3s ease;
             position: relative;
-            opacity: 0; /* NEW: for entry animation */
-            animation: fadeIn 0.5s ease-out forwards;
+            opacity: 0;
+            animation: fadeInScaleUp 0.5s ease-out forwards;
         }
         
         .avatar-image-container {
@@ -178,16 +248,20 @@
             aspect-ratio: 1 / 1;
             position: relative;
             margin-bottom: 8px;
+            border-radius: 8px;
+            overflow: hidden;
         }
 
         .avatar-image {
             width: 100%;
             height: 100%;
-            border-radius: 8px;
             object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        .avatar-card:hover .avatar-image {
+            transform: scale(1.05);
         }
         
-        /* NEW: Rarity Tag */
         .rarity-tag {
             position: absolute;
             top: 5px;
@@ -197,6 +271,7 @@
             font-weight: 900;
             border-radius: 5px;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+            z-index: 2;
         }
         .rarity-common .rarity-tag { background-color: rgba(158, 158, 158, 0.8); color: white; }
         .rarity-rare .rarity-tag { background-color: rgba(30, 136, 229, 0.8); color: white; }
@@ -225,95 +300,55 @@
             font-weight: 700;
             width: 100%;
             text-align: center;
-            margin-top: auto; /* Pushes to bottom */
+            margin-top: auto;
         }
         .price-tag .gem-icon { width: 14px; height: 14px; filter: none; }
         .status-text.owned-text { color: #a0a0a0; }
         .status-text.equipped-text { color: #ffc947; font-weight: 900; }
 
-        /* NEW: Rarity Card Styles */
-        /* Common */
         .avatar-card.rarity-common { border-color: #795548; }
         .avatar-card.rarity-common:hover { transform: translateY(-5px); border-color: #a1887f; box-shadow: 0 5px 15px rgba(161, 136, 127, 0.2); }
-        /* Rare */
         .avatar-card.rarity-rare { border-color: #1E88E5; }
-        .avatar-card.rarity-rare:hover { transform: translateY(-5px); border-color: #42A5F5; box-shadow: 0 5px 15px rgba(66, 165, 245, 0.3); }
-        /* Legendary */
+        .avatar-card.rarity-rare:hover { transform: translateY(-5px); border-color: #42A5F5; box-shadow: 0 5px 20px rgba(66, 165, 245, 0.35); }
         .avatar-card.rarity-legendary { border-color: #BA68C8; }
-        .avatar-card.rarity-legendary:hover { transform: translateY(-5px); border-color: #CE93D8; box-shadow: 0 5px 15px rgba(206, 147, 216, 0.4); }
+        .avatar-card.rarity-legendary:hover { transform: translateY(-5px); border-color: #CE93D8; box-shadow: 0 5px 20px rgba(206, 147, 216, 0.45); }
 
         .avatar-card.equipped {
+            border-width: 3px;
             border-color: #ffc947;
             box-shadow: 0 0 15px rgba(255, 201, 71, 0.7), 0 0 25px rgba(255, 201, 71, 0.4);
             transform: scale(1.05) translateY(-2px);
         }
         
         /* --- Loading Spinner --- */
-        .loader-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000;
-        }
-        .loader {
-            border: 8px solid #f3f3f330; border-top: 8px solid #ffc947; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite;
-        }
+        .loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; transition: opacity 0.3s; }
+        .loader { border: 8px solid #f3f3f330; border-top: 8px solid #ffc947; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; }
         .loader-text { margin-top: 20px; font-size: 1.1rem; font-weight: bold; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         /* --- Modal --- */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 1001; opacity: 0; visibility: hidden; transition: all 0.3s ease;
-        }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 1001; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
         .modal-overlay.visible { opacity: 1; visibility: visible; }
-        .modal-content {
-            background: linear-gradient(145deg, #3c3022, #1e170f); border: 2px solid #5c4a3a; border-radius: 16px; padding: 25px; width: 90%; max-width: 380px; text-align: center; transform: scale(0.9); transition: all 0.3s ease;
-        }
+        .modal-content { background: linear-gradient(145deg, #3c3022, #1e170f); border: 2px solid #5c4a3a; border-radius: 16px; padding: 25px; width: 90%; max-width: 380px; text-align: center; transform: scale(0.9); transition: all 0.3s ease; }
         .modal-overlay.visible .modal-content { transform: scale(1); }
-        .modal-avatar {
-            width: 120px; height: 120px; border-radius: 15px; border: 3px solid #c5a687; margin: 0 auto 15px auto; display: block;
-        }
+        .modal-avatar { width: 120px; height: 120px; border-radius: 15px; border: 3px solid #c5a687; margin: 0 auto 15px auto; display: block; }
         .modal-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 10px; color: #ffc947;}
         .modal-text { font-size: 1rem; margin-bottom: 25px; line-height: 1.6; }
         .modal-buttons { display: flex; gap: 10px; }
-        .modal-button {
-            flex: 1; padding: 12px; font-size: 1rem; font-weight: 700; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s ease;
-        }
+        .modal-button { flex: 1; padding: 12px; font-size: 1rem; font-weight: 700; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; }
         .confirm-button { color: #ffffff; background: linear-gradient(145deg, #8c4843, #5a2c2a); border: 1px solid #ffc947; }
         .confirm-button:hover { background: linear-gradient(145deg, #a1534d, #6b3431); }
         .cancel-button { color: #f0e6d2; background: transparent; border: 1px solid #c5a687; }
         .cancel-button:hover { background: rgba(255,255,255,0.1); }
 
-        /* --- NEW: Toast Notifications --- */
-        .toast-container {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 2000;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            align-items: center;
-        }
-        @keyframes toast-in {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes toast-out {
-            to { opacity: 0; transform: translateY(20px); }
-        }
-        .toast {
-            padding: 12px 20px;
-            border-radius: 8px;
-            color: white;
-            font-weight: bold;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            animation: toast-in 0.3s ease-out forwards;
-            min-width: 250px;
-            text-align: center;
-        }
+        /* --- Toast Notifications --- */
+        .toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 2000; display: flex; flex-direction: column; gap: 10px; align-items: center; }
+        @keyframes toast-in { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes toast-out { to { opacity: 0; transform: translateY(20px); } }
+        .toast { padding: 12px 20px; border-radius: 8px; color: white; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.5); animation: toast-in 0.3s ease-out forwards; min-width: 250px; text-align: center; }
         .toast.success { background: linear-gradient(135deg, #4CAF50, #388E3C); }
         .toast.error { background: linear-gradient(135deg, #F44336, #D32F2F); }
         .toast.info { background: linear-gradient(135deg, #2196F3, #1976D2); }
-
     </style>
 </head>
 <body>
@@ -332,11 +367,20 @@
             </div>
         </div>
 
-        <!-- NEW: Filter Bar -->
-        <div class="filter-bar">
-            <button class="filter-btn active" data-filter="all">همه</button>
-            <button class="filter-btn" data-filter="purchasable">قابل خرید</button>
-            <button class="filter-btn" data-filter="owned">خریداری شده</button>
+        <div class="controls-bar">
+             <div class="search-sort-container">
+                <input type="search" id="search-input" class="search-input" placeholder="جستجوی نام آواتار...">
+                <div class="sort-buttons">
+                     <button class="sort-btn active" data-sort="price-asc">ارزان‌ترین</button>
+                     <button class="sort-btn" data-sort="price-desc">گران‌ترین</button>
+                     <button class="sort-btn" data-sort="name-az">الفبا</button>
+                </div>
+            </div>
+            <div class="filter-bar">
+                <button class="filter-btn active" data-filter="all">همه</button>
+                <button class="filter-btn" data-filter="purchasable">قابل خرید</button>
+                <button class="filter-btn" data-filter="owned">خریداری شده</button>
+            </div>
         </div>
 
         <main id="avatar-grid" class="avatar-grid"></main>
@@ -361,10 +405,8 @@
         </div>
     </div>
     
-    <!-- NEW: Toast Container -->
     <div id="toast-container" class="toast-container"></div>
     
-    <!-- NEW: Audio Elements -->
     <audio id="audio-click" src="https://cdn.pixabay.com/audio/2021/08/04/audio_bb63f68b4b.mp3" preload="auto"></audio>
     <audio id="audio-success" src="https://cdn.pixabay.com/audio/2022/03/15/audio_756314f296.mp3" preload="auto"></audio>
     <audio id="audio-equip" src="https://cdn.pixabay.com/audio/2022/03/10/audio_e621b67f58.mp3" preload="auto"></audio>
@@ -376,7 +418,6 @@
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getFirestore, doc, getDoc, collection, getDocs, updateDoc, runTransaction, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // --- Firebase Configuration ---
         const firebaseConfig = {
             apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
             authDomain: "mafia-9fcbf.firebaseapp.com",
@@ -387,7 +428,6 @@
             measurementId: "G-0PDHDWC6NV"
         };
 
-        // --- Initialize Firebase ---
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
@@ -404,10 +444,14 @@
         const modalConfirmBtn = document.getElementById('modal-confirm-btn');
         const modalCancelBtn = document.getElementById('modal-cancel-btn');
         const filterButtons = document.querySelectorAll('.filter-btn');
+        const searchInput = document.getElementById('search-input');
+        const sortButtons = document.querySelectorAll('.sort-btn');
 
         let currentUserData = null;
         let allAvatars = [];
-        let currentFilter = 'all'; // NEW: Filter state
+        let currentFilter = 'all';
+        let currentSort = 'price-asc';
+        let currentSearchTerm = '';
 
         // --- Main Function ---
         function main() {
@@ -453,7 +497,6 @@
                 avatarsSnapshot.forEach(doc => {
                     const avatarData = doc.data();
                     if (avatarData.id && avatarData.name && avatarData.imageUrl && typeof avatarData.price === 'number') {
-                        // NEW: Assign rarity based on price
                         let rarity = 'common';
                         if (avatarData.price >= 500) rarity = 'legendary';
                         else if (avatarData.price >= 150) rarity = 'rare';
@@ -463,9 +506,6 @@
                     }
                 });
                 
-                // NEW: Sort by price to show cheaper items first
-                allAvatars.sort((a, b) => a.price - b.price);
-
                 renderShop();
 
             } catch (error) {
@@ -485,28 +525,49 @@
         }
 
         function renderShop() {
+            if (!currentUserData) return;
+
             userDisplayNameEl.textContent = currentUserData.displayName;
             userGemsEl.textContent = currentUserData.gems.toLocaleString('fa');
             avatarGrid.innerHTML = '';
             
-            // NEW: Filter logic
-            const filteredAvatars = allAvatars.filter(avatar => {
+            // 1. Filter by category
+            let processedAvatars = allAvatars.filter(avatar => {
                 const isOwned = currentUserData.ownedAvatars.includes(avatar.id);
                 if (currentFilter === 'owned') return isOwned;
                 if (currentFilter === 'purchasable') return !isOwned;
                 return true; // 'all'
             });
 
-            if (filteredAvatars.length === 0) {
-                 avatarGrid.innerHTML = `<p style="text-align:center; grid-column: 1 / -1; font-size: 1.1rem; opacity: 0.7;">آیتمی برای نمایش وجود ندارد.</p>`;
+            // 2. Filter by search term
+            if (currentSearchTerm) {
+                processedAvatars = processedAvatars.filter(avatar =>
+                    avatar.name.toLowerCase().includes(currentSearchTerm.toLowerCase())
+                );
+            }
+
+            // 3. Sort
+            processedAvatars.sort((a, b) => {
+                switch (currentSort) {
+                    case 'price-desc':
+                        return b.price - a.price;
+                    case 'name-az':
+                        return a.name.localeCompare(b.name, 'fa');
+                    case 'price-asc':
+                    default:
+                        return a.price - b.price;
+                }
+            });
+
+            if (processedAvatars.length === 0) {
+                 avatarGrid.innerHTML = `<p class="empty-grid-message">آیتمی منطبق با فیلتر شما یافت نشد.</p>`;
                  return;
             }
             
-            filteredAvatars.forEach((avatar, index) => {
+            processedAvatars.forEach((avatar, index) => {
                 const card = document.createElement('div');
                 card.className = `avatar-card rarity-${avatar.rarity}`;
-                // NEW: Staggered animation delay
-                card.style.animationDelay = `${index * 50}ms`;
+                card.style.animationDelay = `${index * 40}ms`;
 
                 const isOwned = currentUserData.ownedAvatars.includes(avatar.id);
                 const isEquipped = currentUserData.avatarUrl === avatar.imageUrl;
@@ -530,7 +591,7 @@
 
                 card.innerHTML = `
                     <div class="avatar-image-container">
-                       <img src="${avatar.imageUrl}" alt="${avatar.name}" class="avatar-image">
+                       <img src="${avatar.imageUrl}" alt="${avatar.name}" class="avatar-image" loading="lazy">
                        <span class="rarity-tag">${getRarityText(avatar.rarity)}</span>
                     </div>
                     <p class="avatar-name">${avatar.name}</p>
@@ -579,27 +640,22 @@
             loader.querySelector('.loader-text').textContent = 'در حال انجام تراکنش...';
 
             const userDocRef = doc(db, 'users', currentUserData.uid);
-
             try {
                 await runTransaction(db, async (transaction) => {
                     const userDoc = await transaction.get(userDocRef);
                     if (!userDoc.exists()) throw "کاربر یافت نشد!";
-
                     const currentGems = userDoc.data().game || 0;
                     if (currentGems < avatar.price) throw "الماس کافی نیست!";
-
                     transaction.update(userDocRef, {
                         game: currentGems - avatar.price,
                         ownedAvatars: arrayUnion(avatar.id)
                     });
                 });
-
                 currentUserData.gems -= avatar.price;
                 currentUserData.ownedAvatars.push(avatar.id);
                 renderShop();
                 playSound('audio-success');
                 showToast('خرید با موفقیت انجام شد!', 'success');
-
             } catch (error) {
                 console.error("خطا در خرید:", error);
                 playSound('audio-error');
@@ -614,7 +670,6 @@
              hideModal();
              loader.style.display = 'flex';
              loader.querySelector('.loader-text').textContent = 'در حال تجهیز آواتار...';
-            
              const userDocRef = doc(db, 'users', currentUserData.uid);
              try {
                 await updateDoc(userDocRef, { avatarUrl: avatar.imageUrl });
@@ -632,19 +687,14 @@
              }
         }
 
-
-        // --- Modal Helper Functions ---
         function showModal() {
             modal.classList.add('visible');
             modalCancelBtn.style.display = 'flex'; 
         }
-        function hideModal() {
-            modal.classList.remove('visible');
-        }
+        function hideModal() { modal.classList.remove('visible'); }
         modalCancelBtn.addEventListener('click', hideModal);
         modal.addEventListener('click', (e) => e.target === modal && hideModal());
         
-        // --- NEW: Filter Button Logic ---
         filterButtons.forEach(button => {
             button.addEventListener('click', () => {
                 playSound('audio-click');
@@ -655,21 +705,42 @@
             });
         });
 
-        // --- NEW: Toast Notification Function ---
+        sortButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                playSound('audio-click');
+                currentSort = button.dataset.sort;
+                sortButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                renderShop();
+            });
+        });
+
+        const debounce = (func, delay) => {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), delay);
+            };
+        };
+
+        searchInput.addEventListener('input', debounce((e) => {
+            currentSearchTerm = e.target.value;
+            renderShop();
+        }, 300));
+
+
         function showToast(message, type = 'info') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
             toast.textContent = message;
             container.appendChild(toast);
-
             setTimeout(() => {
                 toast.style.animation = 'toast-out 0.3s ease-in forwards';
                 toast.addEventListener('animationend', () => toast.remove());
             }, 3000);
         }
 
-        // --- NEW: Play Sound Function ---
         function playSound(soundId) {
             try {
                 const sound = document.getElementById(soundId);
@@ -680,8 +751,6 @@
             }
         }
 
-
-        // --- Start the app ---
         main();
     </script>
 </body>
