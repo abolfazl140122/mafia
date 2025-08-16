@@ -8,57 +8,177 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-color: #f4f1ea;
-            --panel-bg: #ffffff;
-            --primary-color: #4a2c2a;
-            --accent-color: #c5a687;
-            --text-color: #3d3d3d;
-            --error-color: #d9534f;
-            --border-color: #e0dacc;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
             font-family: 'Vazirmatn', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            background-image: url('https://up.20script.ir/file/6195-file-000000001500622f9419de6c322df297-1-.jpg');
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: #f0e6d2;
             display: flex;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
             padding: 20px;
         }
+
         .auth-container {
             width: 100%;
             max-width: 420px;
-            background: var(--panel-bg);
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
             border-radius: 16px;
-            padding: 40px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            border: 1px solid var(--border-color);
+            padding: 30px 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 2px solid #5c4a3a;
             text-align: center;
         }
-        .auth-title { font-size: 2.5rem; font-weight: 900; color: var(--primary-color); margin-bottom: 10px; }
-        .auth-subtitle { font-size: 1rem; color: #777; margin-bottom: 30px; }
-        .input-group { margin-bottom: 20px; text-align: right; }
-        .input-group label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 0.9rem; }
+
+        .auth-title {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: #ffc947;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.7);
+        }
+
+        .auth-subtitle {
+            font-size: 1rem;
+            color: #c5a687;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: right;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #e0dacc;
+        }
+
         .auth-input {
-            width: 100%; padding: 12px 15px; font-size: 1rem; border: 2px solid var(--border-color);
-            border-radius: 8px; transition: border-color 0.3s, box-shadow 0.3s; font-family: 'Vazirmatn', sans-serif;
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 1rem;
+            border: 1px solid #5c4a3a;
+            background-color: rgba(0, 0, 0, 0.4);
+            color: #f0e6d2;
+            border-radius: 8px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            font-family: 'Vazirmatn', sans-serif;
         }
-        .auth-input:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(197, 166, 135, 0.3); }
+
+        .auth-input:focus {
+            outline: none;
+            border-color: #ffc947;
+            box-shadow: 0 0 0 3px rgba(255, 201, 71, 0.2);
+        }
+
+        /* --- استایل‌های کنترلر گرافیکی سن --- */
+        .age-selector {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: rgba(0, 0, 0, 0.4);
+            border: 1px solid #5c4a3a;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .age-control {
+            background: linear-gradient(145deg, #503230, #382120);
+            border: none;
+            color: #ffc947;
+            font-size: 1.5rem;
+            font-weight: 900;
+            width: 50px;
+            height: 48px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .age-control:hover {
+            background: linear-gradient(145deg, #6b4542, #4a2c2a);
+        }
+        
+        #age-input {
+            width: 100%;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 700;
+            background: transparent;
+            border: none;
+            color: #f0e6d2;
+            pointer-events: none; /* جلوگیری از تایپ مستقیم */
+        }
+        #age-input:focus {
+             outline: none;
+        }
+        /* --- پایان استایل‌های سن --- */
+
+
         .auth-button {
-            width: 100%; padding: 14px; font-size: 1.1rem; font-weight: 700; color: #fff; background-color: var(--primary-color);
-            border: none; border-radius: 8px; cursor: pointer; transition: background-color 0.3s, transform 0.1s;
+            width: 100%;
+            padding: 14px;
+            font-size: 1.1rem;
+            font-weight: 900;
+            color: #ffffff;
+            background: linear-gradient(145deg, #8c4843, #5a2c2a);
+            border: 2px solid #ffc947;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.7);
+            margin-top: 10px;
         }
-        .auth-button:hover { background-color: #382120; }
-        .auth-button:active { transform: scale(0.98); }
-        .auth-button:disabled { background-color: #9d8a7a; cursor: not-allowed; }
-        .auth-link { margin-top: 25px; font-size: 0.9rem; }
-        .auth-link a { color: var(--primary-color); font-weight: 700; text-decoration: none; }
+        
+        .auth-button:hover {
+            background: linear-gradient(145deg, #a1534d, #6b3431);
+            box-shadow: 0 4px 12px rgba(255, 201, 71, 0.2);
+        }
+        
+        .auth-button:active {
+            transform: scale(0.98);
+        }
+        
+        .auth-button:disabled {
+            background: #5c4a3a;
+            border-color: #4a3a2a;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .auth-link {
+            margin-top: 25px;
+            font-size: 0.9rem;
+        }
+
+        .auth-link a {
+            color: #ffc947;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
         .error-message {
-            color: var(--error-color); background-color: rgba(217, 83, 79, 0.1); padding: 10px;
-            border-radius: 8px; margin-top: 20px; font-size: 0.9rem; display: none;
+            color: #ffadad;
+            background-color: rgba(217, 83, 79, 0.2);
+            border: 1px solid #d9534f;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            display: none;
         }
     </style>
 </head>
@@ -80,13 +200,24 @@
                 <label for="password">رمز عبور (حداقل ۶ کاراکتر)</label>
                 <input type="password" id="password" class="auth-input" required>
             </div>
+
+            <!-- بخش جدید و الزامی انتخاب سن -->
+            <div class="input-group">
+                <label for="age-input">سن شما (الزامی)</label>
+                <div class="age-selector">
+                    <button type="button" class="age-control" id="age-decrease">-</button>
+                    <input type="text" id="age-input" value="18" readonly>
+                    <button type="button" class="age-control" id="age-increase">+</button>
+                </div>
+            </div>
+
             <button type="submit" id="register-button" class="auth-button">ساخت حساب</button>
         </form>
 
         <p id="error-message" class="error-message"></p>
 
         <p class="auth-link">
-            حساب کاربری دارید؟ <a href="./login.html">وارد شوید</a> <!-- **FIXED LINK** -->
+            حساب کاربری دارید؟ <a href="./login.html">وارد شوید</a>
         </p>
     </div>
 
@@ -109,22 +240,51 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // --- DOM Elements ---
         const registrationForm = document.getElementById('registration-form');
         const displayNameInput = document.getElementById('display-name');
         const emailInput = document.getElementById('email');
         const passwordInput = document.getElementById('password');
         const registerButton = document.getElementById('register-button');
         const errorMessage = document.getElementById('error-message');
+        
+        // --- Age Selector Elements ---
+        const ageInput = document.getElementById('age-input');
+        const ageIncreaseBtn = document.getElementById('age-increase');
+        const ageDecreaseBtn = document.getElementById('age-decrease');
+        
+        let currentAge = 18;
+        const MIN_AGE = 13;
+        const MAX_AGE = 99;
 
+        // --- Age Selector Logic ---
+        ageIncreaseBtn.addEventListener('click', () => {
+            if (currentAge < MAX_AGE) {
+                currentAge++;
+                ageInput.value = currentAge;
+            }
+        });
+
+        ageDecreaseBtn.addEventListener('click', () => {
+            if (currentAge > MIN_AGE) {
+                currentAge--;
+                ageInput.value = currentAge;
+            }
+        });
+
+
+        // --- Form Submission Logic ---
         registrationForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const displayName = displayNameInput.value.trim();
             const email = emailInput.value.trim();
             const password = passwordInput.value.trim();
+            const age = parseInt(ageInput.value, 10); // دریافت سن به صورت عدد
 
+            // --- Validation ---
             if (!displayName || !email || !password) {
-                showError("لطفاً تمام فیلدها را پر کنید."); return;
+                showError("لطفاً تمام فیلدهای نام، ایمیل و رمز عبور را پر کنید."); return;
             }
             if (password.length < 6) {
                 showError("رمز عبور باید حداقل ۶ کاراکتر باشد."); return;
@@ -132,29 +292,37 @@
             if (/[^a-zA-Z0-9_.]/.test(displayName)) {
                 showError("نام نمایشی فقط می‌تواند شامل حروف و اعداد انگلیسی، نقطه و آندرلاین باشد."); return;
             }
+            // بررسی حداقل سن
+            if (age < MIN_AGE) {
+                showError(`برای ثبت نام باید حداقل ${MIN_AGE} سال داشته باشید.`); return;
+            }
 
             registerButton.disabled = true;
             registerButton.textContent = 'در حال ساخت...';
             errorMessage.style.display = 'none';
 
             try {
+                // 1. Create user in Firebase Authentication
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
                 
+                // 2. Update user's profile in Authentication
                 await updateProfile(user, { displayName: displayName });
 
+                // 3. Create user document in Firestore with ALL data, including age
                 const userDocRef = doc(db, 'users', user.uid);
                 await setDoc(userDocRef, {
                     uid: user.uid,
                     displayName: displayName,
                     email: user.email,
+                    old: age, // <<<< ذخیره کردن سن با نام فیلد 'old'
                     createdAt: new Date(),
                     currentStage: 1,
-                    avatarUrl: ''
+                    avatarUrl: '' // آواتار پیش‌فرض خالی است
                 });
 
-                // **FIXED REDIRECT**: Go to the loading page to check auth state
-                window.location.href = './index.html'; 
+                // 4. Redirect to main lobby
+                window.location.href = './صفه اصلی نوین مافیا.html'; // **مهم:** مطمئن شوید نام فایل درست است
 
             } catch (error) {
                 let friendlyMessage = "خطایی رخ داد. لطفاً دوباره تلاش کنید.";
@@ -162,6 +330,8 @@
                     friendlyMessage = "این ایمیل قبلاً ثبت شده است. لطفاً وارد شوید.";
                 } else if (error.code === 'auth/weak-password') {
                     friendlyMessage = "رمز عبور ضعیف است. لطفاً رمز قوی‌تری انتخاب کنید.";
+                } else if (error.code === 'auth/invalid-email') {
+                    friendlyMessage = "فرمت ایمیل وارد شده صحیح نیست.";
                 }
                 console.error("Registration Error:", error);
                 showError(friendlyMessage);
