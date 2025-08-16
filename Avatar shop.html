@@ -99,7 +99,8 @@
         .gem-icon {
             width: 24px;
             height: 24px;
-            filter: drop-shadow(0 0 3px #ff00ff);
+            /* UPDATED: Changed shadow to match new diamond icon */
+            filter: drop-shadow(0 0 4px rgba(173, 216, 230, 0.9)); 
         }
 
         /* --- NEW: Controls Bar (Search, Sort, Filter) --- */
@@ -256,7 +257,8 @@
             text-align: center;
             margin-top: auto; /* Pushes to bottom */
         }
-        .price-tag .gem-icon { width: 14px; height: 14px; filter: none; }
+        /* UPDATED: Increased icon size inside price tags */
+        .price-tag .gem-icon { width: 16px; height: 16px; filter: none; }
         .status-text.owned-text { color: #a0a0a0; }
         .status-text.equipped-text { color: #ffc947; font-weight: 900; }
 
@@ -354,8 +356,8 @@
             <span id="user-display-name">...</span>
             <div class="gem-balance">
                 <span id="user-gems">0</span>
-                <!-- ICON URL CHANGED HERE -->
-                <img src="https://up.20script.ir/file/03e7-4photoshop-diamond-pack1-removebg-preview.png" alt="الماس" class="gem-icon">
+                <!-- UPDATED: New diamond icon URL -->
+                <img src="https://up.20script.ir/file/03e7-4photoshop-diamond-pack1-removebg-preview.png" alt="Diamond" class="gem-icon">
             </div>
         </div>
 
@@ -582,11 +584,11 @@
                         bottomContent = `<div class="status-text owned-text">خریداری شده</div>`;
                     }
                 } else {
-                    // ICON URL CHANGED HERE
+                    // UPDATED: New diamond icon URL
                     bottomContent = `
                         <div class="price-tag">
                             <span>${avatar.price.toLocaleString('fa')}</span>
-                            <img src="https://up.20script.ir/file/03e7-4photoshop-diamond-pack1-removebg-preview.png" alt="الماس" class="gem-icon">
+                            <img src="https://up.20script.ir/file/03e7-4photoshop-diamond-pack1-removebg-preview.png" alt="Diamond" class="gem-icon">
                         </div>`;
                 }
 
