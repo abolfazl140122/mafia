@@ -8,57 +8,148 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-color: #f4f1ea;
-            --panel-bg: #ffffff;
-            --primary-color: #4a2c2a;
-            --accent-color: #c5a687;
-            --text-color: #3d3d3d;
-            --error-color: #d9534f;
-            --border-color: #e0dacc;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
             font-family: 'Vazirmatn', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            background-image: url('https://up.20script.ir/file/6195-file-000000001500622f9419de6c322df297-1-.jpg');
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: #f0e6d2; /* رنگ متن اصلی از تم بازی */
             display: flex;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
             padding: 20px;
         }
+
         .auth-container {
             width: 100%;
-            max-width: 420px;
-            background: var(--panel-bg);
+            max-width: 400px;
+            background: linear-gradient(145deg, rgba(60, 48, 34, 0.85), rgba(30, 23, 15, 0.9));
+            backdrop-filter: blur(8px);
             border-radius: 16px;
             padding: 40px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 2px solid #5c4a3a;
             text-align: center;
         }
-        .auth-title { font-size: 2.5rem; font-weight: 900; color: var(--primary-color); margin-bottom: 10px; }
-        .auth-subtitle { font-size: 1rem; color: #777; margin-bottom: 30px; }
-        .input-group { margin-bottom: 20px; text-align: right; }
-        .input-group label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 0.9rem; }
+
+        .auth-title {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #ffc947; /* رنگ طلایی تاکیدی از تم بازی */
+            margin-bottom: 10px;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.7);
+        }
+
+        .auth-subtitle {
+            font-size: 1rem;
+            color: #d1c8b7;
+            margin-bottom: 35px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: right;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #e0dacc;
+        }
+
         .auth-input {
-            width: 100%; padding: 12px 15px; font-size: 1rem; border: 2px solid var(--border-color);
-            border-radius: 8px; transition: border-color 0.3s, box-shadow 0.3s; font-family: 'Vazirmatn', sans-serif;
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 1rem;
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 2px solid #5c4a3a;
+            color: #f0e6d2;
+            border-radius: 8px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            font-family: 'Vazirmatn', sans-serif;
         }
-        .auth-input:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(197, 166, 135, 0.3); }
+
+        .auth-input::placeholder {
+            color: rgba(240, 230, 210, 0.5);
+        }
+
+        .auth-input:focus {
+            outline: none;
+            border-color: #ffc947;
+            box-shadow: 0 0 10px rgba(255, 201, 71, 0.3);
+        }
+
         .auth-button {
-            width: 100%; padding: 14px; font-size: 1.1rem; font-weight: 700; color: #fff; background-color: var(--primary-color);
-            border: none; border-radius: 8px; cursor: pointer; transition: background-color 0.3s, transform 0.1s;
+            width: 100%;
+            padding: 14px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #ffffff;
+            background: linear-gradient(145deg, #8c4843, #5a2c2a); /* گرادینت دکمه از تم بازی */
+            border: 2px solid #ffc947;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
         }
-        .auth-button:hover { background-color: #382120; }
-        .auth-button:active { transform: scale(0.98); }
-        .auth-button:disabled { background-color: #9d8a7a; cursor: not-allowed; }
-        .auth-link { margin-top: 25px; font-size: 0.9rem; }
-        .auth-link a { color: var(--primary-color); font-weight: 700; text-decoration: none; }
+
+        .auth-button:hover {
+            background: linear-gradient(145deg, #a1534d, #6b3431);
+            box-shadow: 0 6px 15px rgba(255, 201, 71, 0.2);
+        }
+
+        .auth-button:active {
+            transform: scale(0.98);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+        }
+
+        .auth-button:disabled {
+            background: #5c4a3a;
+            border-color: #88786a;
+            color: #a19385;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .auth-link {
+            margin-top: 25px;
+            font-size: 0.9rem;
+            color: #d1c8b7;
+        }
+
+        .auth-link a {
+            color: #ffc947;
+            font-weight: 700;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        
+        .auth-link a:hover {
+            color: #fff;
+        }
+
         .error-message {
-            color: var(--error-color); background-color: rgba(217, 83, 79, 0.1); padding: 10px;
-            border-radius: 8px; margin-top: 20px; font-size: 0.9rem; display: none;
+            color: #ff9e9e;
+            background-color: rgba(217, 83, 79, 0.2);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            border: 1px solid rgba(217, 83, 79, 0.5);
+            display: none;
         }
     </style>
 </head>
@@ -82,7 +173,7 @@
         <p id="error-message" class="error-message"></p>
 
         <p class="auth-link">
-            هنوز عضو نشده‌اید؟ <a href="./register.html">ثبت‌نام کنید</a>
+            هنوز عضو نشده‌اید؟ <a href="./Registration.html">ثبت‌نام کنید</a>
         </p>
     </div>
 
