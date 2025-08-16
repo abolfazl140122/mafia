@@ -214,6 +214,8 @@
                 <div class="menu-buttons">
                     <button class="menu-button">سازندگان</button>
                     <button class="menu-button">رده بندی</button>
+                    <!-- دکمه جدید پنل مدیریت که به صورت پیش‌فرض مخفی است -->
+                    <button id="admin-panel-button" class="menu-button" style="display: none;">پنل مدیریت</button>
                 </div>
             </div>
         </div>
@@ -264,12 +266,15 @@
         const loadingOverlay = document.getElementById('loading-overlay');
         const loaderSpinner = loadingOverlay.querySelector('.loader');
         const loadingText = document.getElementById('loading-text');
+        const adminPanelButton = document.getElementById('admin-panel-button'); // انتخاب دکمه پنل مدیریت
 
+        // المان‌های مربوط به موسیقی و دانلود آن
         const backgroundMusic = document.getElementById('background-music');
         const musicDownloadOverlay = document.getElementById('music-download-overlay');
         const progressBar = document.getElementById('progress-bar');
         const progressText = document.getElementById('progress-text');
 
+        // متغیرهای مربوط به مدیریت نسخه و کش موسیقی
         const MUSIC_URL = "https://raw.githubusercontent.com/abolfazl140122/mafia/main/dark-music-249503.mp3";
         const MUSIC_CACHE_NAME = 'mafia-music-cache-v1';
         const MUSIC_VERSION_KEY = 'mafia-music-version';
@@ -387,6 +392,7 @@
             const cachedVersion = localStorage.getItem(MUSIC_VERSION_KEY);
 
             if (cachedVersion === MUSIC_URL) {
+                console.log('موسیقی از کش بارگذاری می‌شود.');
                 try {
                     const cache = await caches.open(MUSIC_CACHE_NAME);
                     const cachedResponse = await cache.match(MUSIC_URL);
@@ -394,14 +400,17 @@
                         const musicBlob = await cachedResponse.blob();
                         playMusicFromBlob(musicBlob);
                     } else {
+                        console.warn('نسخه در localStorage موجود بود ولی فایل در کش یافت نشد. دانلود مجدد...');
                         const musicBlob = await downloadAndCacheMusic();
                         playMusicFromBlob(musicBlob);
                     }
                 } catch (error) {
+                    console.error('خطا در خواندن موسیقی از کش:', error);
                     const musicBlob = await downloadAndCacheMusic();
                     playMusicFromBlob(musicBlob);
                 }
             } else {
+                console.log('نسخه جدید موسیقی یافت شد یا اولین بازدید است. شروع دانلود...');
                 try {
                     const musicBlob = await downloadAndCacheMusic();
                     playMusicFromBlob(musicBlob);
@@ -411,67 +420,66 @@
             }
         }
 
+        let isInitialLoad = true; // متغیری برای کنترل بارگذاری اولیه
 
-        onAuthStateChanged(auth, async (user) => {
+        onAuthStateChanged(auth, (user) => {
             if (user) {
                 const userDocRef = doc(db, 'users', user.uid);
-                try {
-                    const userDocSnap = await getDoc(userDocRef);
+
+                // *** تغییر کلیدی: استفاده از onSnapshot به جای getDoc برای به‌روزرسانی زنده ***
+                const unsubscribe = onSnapshot(userDocRef, (userDocSnap) => {
                     if (userDocSnap.exists()) {
                         const userData = userDocSnap.data();
                         userDisplayName.textContent = userData.displayName || "کاربر ناشناس";
                         userAvatar.src = userData.avatarUrl || 'https://i.imgur.com/T2bT1tG.png';
                         
-                        // ===== START: کد جدید برای بررسی دسترسی ادمین =====
+                        // *** منطق جدید: بررسی زنده وضعیت ادمین ***
+                        // این کد با هر تغییری در دیتابیس برای این کاربر، دوباره اجرا می‌شود
                         if (userData.isAdmin === true) {
-                            const menuButtonsContainer = document.querySelector('.menu-buttons');
-                            
-                            const adminPanelButton = document.createElement('button');
-                            adminPanelButton.textContent = 'پنل مدیریت';
-                            adminPanelButton.classList.add('menu-button');
-                            
-                            adminPanelButton.addEventListener('click', () => {
-                                checkMaintenanceAndProceed(() => {
-                                    // در اینجا می‌توانید کاربر را به صفحه پنل مدیریت منتقل کنید
-                                    // window.location.href = './admin.html'; 
-                                    showCustomAlert('شما به پنل مدیریت دسترسی دارید.', () => {});
-                                });
-                            });
-                            
-                            menuButtonsContainer.appendChild(adminPanelButton);
+                            adminPanelButton.style.display = 'block'; // یا 'flex' اگر از flexbox استفاده می‌کنید
+                        } else {
+                            adminPanelButton.style.display = 'none';
                         }
-                        // ===== END: کد جدید برای بررسی دسترسی ادمین =====
 
                     } else {
+                        // اگر داکیومنت کاربر وجود نداشت
                         userDisplayName.textContent = user.displayName || "کاربر ناشناس";
                         userAvatar.src = 'https://i.imgur.com/T2bT1tG.png';
+                        adminPanelButton.style.display = 'none'; // مخفی کردن دکمه در صورت نبود اطلاعات
+                    }
+                    
+                    // این بخش فقط در بارگذاری اولیه صفحه اجرا می‌شود
+                    if (isInitialLoad) {
+                        document.body.classList.add('loaded');
+                        handleBackgroundMusic(); // شروع فرایند موسیقی
+                        isInitialLoad = false; // جلوگیری از اجرای مجدد
                     }
 
-                    document.body.classList.add('loaded');
-
-                    await handleBackgroundMusic();
-
-                    const maintenanceDocRef = doc(db, 'settings', 'maintenance');
-                    onSnapshot(maintenanceDocRef, (docSnap) => {
-                        if (docSnap.exists() && docSnap.data().enabled === true) {
-                            showCustomAlert(
-                                "سرور در حالت بروزرسانی قرار گرفت. شما به صفحه اصلی منتقل می‌شوید.",
-                                () => { window.location.href = './index.html'; }
-                            );
-                        }
-                    });
-
-                } catch (error) {
-                    console.error("خطا در دریافت اطلاعات کاربر:", error);
+                }, (error) => {
+                    // مدیریت خطا برای onSnapshot
+                    console.error("خطا در گوش دادن به اطلاعات کاربر:", error);
                     loaderSpinner.style.display = 'none';
                     loadingText.textContent = 'خطا در اتصال به سرور. لطفا اینترنت خود را بررسی کنید.';
-                }
+                });
+
+                // گوش دادن به وضعیت تعمیر و نگهداری سرور
+                const maintenanceDocRef = doc(db, 'settings', 'maintenance');
+                onSnapshot(maintenanceDocRef, (docSnap) => {
+                    if (docSnap.exists() && docSnap.data().enabled === true) {
+                        showCustomAlert(
+                            "سرور در حالت بروزرسانی قرار گرفت. شما به صفحه اصلی منتقل می‌شوید.",
+                            () => { window.location.href = './index.html'; }
+                        );
+                    }
+                });
 
             } else {
                 window.location.href = './login.html';
             }
         });
 
+
+        // Event Listeners
         userAvatar.addEventListener('click', () => {
             checkMaintenanceAndProceed(() => {
                 window.location.href = './Avatar shop.html';
@@ -484,13 +492,25 @@
             });
         });
         
-        menuButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                checkMaintenanceAndProceed(() => {
-                    const buttonText = button.textContent;
-                    showCustomAlert(`عملکرد دکمه "${buttonText}" هنوز پیاده‌سازی نشده است.`, () => {});
-                });
+        // Listener برای دکمه پنل مدیریت
+        adminPanelButton.addEventListener('click', () => {
+            checkMaintenanceAndProceed(() => {
+                // اینجا می‌توانید کاربر را به صفحه پنل مدیریت هدایت کنید
+                // window.location.href = './admin.html';
+                showCustomAlert('شما به پنل مدیریت دسترسی دارید.', () => {});
             });
+        });
+
+        menuButtons.forEach(button => {
+            // مطمئن می‌شویم که listener تکراری به دکمه ادمین اضافه نشود
+            if (button.id !== 'admin-panel-button') {
+                button.addEventListener('click', () => {
+                    checkMaintenanceAndProceed(() => {
+                        const buttonText = button.textContent;
+                        showCustomAlert(`عملکرد دکمه "${buttonText}" هنوز پیاده‌سازی نشده است.`, () => {});
+                    });
+                });
+            }
         });
 
     </script>
