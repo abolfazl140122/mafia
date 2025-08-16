@@ -34,8 +34,6 @@
 
         .shop-container {
             width: 100%;
-            max-width: 500px; /* برای جلوگیری از بزرگ شدن بیش از حد در تبلت و دسکتاپ */
-            margin: 0 auto;
             height: 100%;
             display: flex;
             flex-direction: column;
@@ -101,7 +99,6 @@
         .gem-icon {
             width: 24px;
             height: 24px;
-            /* تغییر ۱: حذف فیلتر سایه که برای عکس قبلی بود */
         }
 
         /* --- Avatar Grid --- */
@@ -109,9 +106,8 @@
             flex-grow: 1;
             overflow-y: auto;
             display: grid;
-            /* تغییر ۲: تعریف ۳ ستون ثابت برای چیدمان */
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
+            grid-template-columns: repeat(3, 1fr); /* نمایش 3 آیتم در هر ردیف */
+            gap: 10px; /* کاهش فاصله برای جا شدن بهتر */
             padding: 10px;
             margin: -10px; /* برای جبران پدینگ آیتم‌ها */
         }
@@ -161,22 +157,20 @@
             font-weight: 700;
         }
         .price-tag .gem-icon { width: 16px; height: 16px; }
-
-        /* تغییر ۳: استایل جدید برای متن وضعیت (خریداری شده / انتخاب شده) */
+        
+        /* New status text for owned/equipped items */
         .status-text {
             background-color: rgba(0, 0, 0, 0.6);
-            color: #e0dacc;
             border-radius: 15px;
             padding: 5px 12px;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             font-weight: 700;
+            color: #c5a687; /* رنگ پیشفرض برای "خریداری شده" */
             text-align: center;
         }
-
-        .status-text.equipped-status {
-            background-color: rgba(255, 201, 71, 0.2);
-            color: #ffc947;
-            border: 1px solid #ffc947;
+        .status-text.selected {
+            color: #ffc947; /* رنگ روشن‌تر برای "انتخاب شده" */
+            font-weight: 900;
         }
 
 
@@ -193,21 +187,6 @@
             box-shadow: 0 0 15px rgba(255, 201, 71, 0.7);
             transform: scale(1.05);
         }
-        
-        /* این قسمت دیگر استفاده نمی‌شود و می‌تواند حذف شود ولی برای اطمینان نگه داشته شده */
-        .status-badge {
-            position: absolute;
-            top: -10px;
-            right: -10px;
-            background-color: #4CAF50;
-            color: white;
-            padding: 3px 8px;
-            border-radius: 10px;
-            font-size: 0.7rem;
-            font-weight: bold;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
-        }
-
 
         /* --- Loading Spinner --- */
         .loader-overlay {
@@ -327,8 +306,8 @@
             <span id="user-display-name">...</span>
             <div class="gem-balance">
                 <span id="user-gems">0</span>
-                <!-- تغییر ۴: آدرس عکس الماس جدید جایگزین شد -->
-                <img src="https://i.imgur.com/b13Y3wN.png" alt="الماس" class="gem-icon">
+                <!-- آیکون الماس جدید -->
+                <img src="https://i.imgur.com/T5b9t8j.png" alt="Gem" class="gem-icon">
             </div>
         </div>
 
@@ -421,16 +400,18 @@
                 
                 let userData = userDocSnap.data() || {};
                 
+                // <--- تغییر کلیدی 1: بررسی و افزودن جم پیش‌فرض --->
                 if (userData.game === undefined) {
                     console.log("کاربر جم پیش‌فرض را ندارد. در حال افزودن 25 جم...");
                     await updateDoc(userDocRef, { game: 25 });
-                    userData.game = 25; 
+                    userData.game = 25; // مقدار را به صورت محلی هم آپدیت می‌کنیم
                 }
                 
+                // <--- تغییر کلیدی 2: خواندن اطلاعات از فیلد 'game' --->
                 currentUserData = {
                     uid: user.uid,
                     displayName: userData.displayName || "کاربر",
-                    gems: userData.game || 0, 
+                    gems: userData.game || 0,
                     ownedAvatars: userData.ownedAvatars || [],
                     avatarUrl: userData.avatarUrl || ""
                 };
@@ -455,6 +436,7 @@
             }
         }
 
+        // --- تابع رندر فروشگاه با منطق جدید ---
         function renderShop() {
             userDisplayNameEl.textContent = currentUserData.displayName;
             userGemsEl.textContent = currentUserData.gems.toLocaleString('fa');
@@ -463,34 +445,42 @@
             allAvatars.forEach(avatar => {
                 const card = document.createElement('div');
                 card.className = 'avatar-card';
+
                 const isOwned = currentUserData.ownedAvatars.includes(avatar.id);
                 const isEquipped = currentUserData.avatarUrl === avatar.imageUrl;
-                
-                // تغییر ۵: منطق نمایش وضعیت آواتار کاملا بازنویسی شد
-                let content = `<img src="${avatar.imageUrl}" alt="${avatar.name}" class="avatar-image">`;
 
-                if (isOwned) {
-                    if (isEquipped) {
-                        card.classList.add('equipped');
-                        content += `<div class="status-text equipped-status">انتخاب شده</div>`;
-                    } else {
-                        card.classList.add('owned');
-                        content += `<div class="status-text">خریداری شده</div>`;
-                    }
+                // افزودن کلاس برای استایل‌های بوردر و افکت‌ها
+                if (isOwned) card.classList.add('owned');
+                if (isEquipped) card.classList.add('equipped');
+
+                // مشخص کردن محتوای پایین کارت بر اساس وضعیت
+                let bottomContent = '';
+                if (isEquipped) {
+                    // متن برای آواتار انتخاب شده
+                    bottomContent = `<div class="status-text selected">انتخاب شده</div>`;
+                } else if (isOwned) {
+                    // متن برای آواتار خریداری شده
+                    bottomContent = `<div class="status-text">خریداری شده</div>`;
                 } else {
-                    // آدرس عکس الماس در اینجا هم تغییر کرد
-                    content += `
+                    // نمایش قیمت برای آواتارهای خریداری نشده
+                    bottomContent = `
                         <div class="price-tag">
                             <span>${avatar.price.toLocaleString('fa')}</span>
-                            <img src="https://i.imgur.com/b13Y3wN.png" alt="الماس" class="gem-icon">
+                            <img src="https://i.imgur.com/T5b9t8j.png" alt="Gem" class="gem-icon">
                         </div>`;
                 }
+                
+                // تنظیم محتوای کامل کارت
+                card.innerHTML = `
+                    <img src="${avatar.imageUrl}" alt="${avatar.name}" class="avatar-image">
+                    ${bottomContent}
+                `;
 
-                card.innerHTML = content;
                 card.addEventListener('click', () => handleAvatarClick(avatar, isOwned, isEquipped));
                 avatarGrid.appendChild(card);
             });
         }
+
 
         function handleAvatarClick(avatar, isOwned, isEquipped) {
             if (isEquipped) return; 
