@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پنل پروفایل کاربر</title>
+    <!-- این فونت باید در صفحه اصلی شما هم وجود داشته باشد -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* --- استایل‌های پنل پروفایل --- */
+
+        /* این استایل‌ها را می‌توانید به فایل CSS اصلی خود منتقل کنید */
+        
+        .profile-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001; /* بالاتر از لودینگ نباشد ولی بالاتر از محتوای اصلی باشد */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+            font-family: 'Vazirmatn', sans-serif;
+        }
+
+        .profile-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .profile-panel {
+            background: linear-gradient(145deg, #2c2317, #1a140d);
+            border: 2px solid #5c4a3a;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 360px;
+            text-align: center;
+            padding: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+            position: relative;
+            transform: translateY(20px) scale(0.95);
+            transition: transform 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+            color: #f0e6d2;
+        }
+
+        .profile-overlay.visible .profile-panel {
+            transform: translateY(0) scale(1);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            left: 15px; /* برای صفحات RTL در سمت چپ قرار می‌گیرد */
+            background: transparent;
+            border: none;
+            color: #c5a687;
+            font-size: 2.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            line-height: 1;
+        }
+
+        .close-btn:hover {
+            color: #ffc947;
+            transform: rotate(90deg);
+        }
+
+        .profile-header {
+            margin-bottom: 20px;
+        }
+
+        #profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 4px solid #c5a687;
+            box-shadow: 0 0 15px rgba(255, 201, 71, 0.3);
+            object-fit: cover;
+            margin-bottom: 10px;
+            transition: transform 0.3s ease;
+        }
+        
+        #profile-avatar:hover {
+            transform: scale(1.05);
+        }
+
+        #profile-display-name {
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: #ffc947;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.7);
+        }
+
+        #profile-email {
+            font-size: 0.8rem;
+            color: #a09383;
+            margin-top: -5px;
+            display: block; /* برای اعمال margin */
+        }
+
+        .profile-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .info-item {
+            background-color: rgba(0, 0, 0, 0.25);
+            padding: 12px 8px;
+            border-radius: 10px;
+            border: 1px solid #4a3c2e;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: fadeInItem 0.5s forwards;
+        }
+        
+        /* انیمیشن برای نمایش آیتم‌ها با تاخیر */
+        .info-item:nth-child(1) { animation-delay: 0.2s; }
+        .info-item:nth-child(2) { animation-delay: 0.3s; }
+        .info-item:nth-child(3) { animation-delay: 0.4s; }
+        .info-item:nth-child(4) { animation-delay: 0.5s; }
+
+
+        @keyframes fadeInItem {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .info-label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 400;
+            color: #a09383;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #ffc947;
+        }
+
+        .join-date-item {
+            grid-column: 1 / -1; /* این آیتم تمام عرض گرید را اشغال می‌کند */
+            animation-delay: 0.6s; /* تاخیر بیشتر */
+        }
+        
+        /* اسپینر برای حالت لودینگ */
+        .profile-loader {
+            border: 4px solid #f3f3f330;
+            border-top: 4px solid #ffc947;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 40px auto;
+            display: none; /* در حالت عادی مخفی است */
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+    </style>
+</head>
+<body>
+
+<!-- ======================= HTML پنل پروفایل ======================= -->
+<!-- این بخش را به انتهای تگ <body> در فایل اصلی خود (صفه اصلی نوین مافیا.txt) منتقل کنید -->
+
+<div id="profile-overlay" class="profile-overlay">
+    <div class="profile-panel">
+        
+        <button id="close-profile-btn" class="close-btn">&times;</button>
+        
+        <!-- اسپینر لودینگ -->
+        <div id="profile-loader" class="profile-loader"></div>
+
+        <!-- محتوای اصلی پنل (بعد از لود شدن نمایش داده می‌شود) -->
+        <div id="profile-content" style="display: none;">
+            <div class="profile-header">
+                <img id="profile-avatar" src="" alt="آواتار کاربر">
+                <h2 id="profile-display-name"></h2>
+                <span id="profile-email"></span>
+            </div>
+    
+            <div class="profile-body">
+                <div class="info-item">
+                    <span class="info-label">سن</span>
+                    <span id="profile-age" class="info-value"></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">تعداد بازی</span>
+                    <span id="profile-games" class="info-value"></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">مرحله</span>
+                    <span id="profile-stage" class="info-value"></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">آواتارها</span>
+                    <span id="profile-owned-avatars" class="info-value"></span>
+                </div>
+                <div class="info-item join-date-item">
+                    <span class="info-label">تاریخ عضویت</span>
+                    <span id="profile-join-date" class="info-value"></span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ======================= JavaScript پنل پروفایل ======================= -->
+<script type="module">
+    // این کدها برای تست مستقل هستند. در پروژه اصلی باید با کد خودتان ادغام شوند
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+
+    // این کانفیگ باید از فایل اصلی شما بیاید
+    const firebaseConfig = {
+      apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
+      authDomain: "mafia-9fcbf.firebaseapp.com",
+      projectId: "mafia-9fcbf",
+      storageBucket: "mafia-9fcbf.appspot.com",
+      messagingSenderId: "471627157488",
+      appId: "1:471627157488:web:92f008548a5596619a5735",
+      measurementId: "G-0PDHDWC6NV"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+
+    // --- DOM Elements ---
+    const profileOverlay = document.getElementById('profile-overlay');
+    const closeProfileBtn = document.getElementById('close-profile-btn');
+    const profileLoader = document.getElementById('profile-loader');
+    const profileContent = document.getElementById('profile-content');
+    
+    // Element haye dakhele panel
+    const pAvatar = document.getElementById('profile-avatar');
+    const pDisplayName = document.getElementById('profile-display-name');
+    const pEmail = document.getElementById('profile-email');
+    const pAge = document.getElementById('profile-age');
+    const pGames = document.getElementById('profile-games');
+    const pStage = document.getElementById('profile-stage');
+    const pOwnedAvatars = document.getElementById('profile-owned-avatars');
+    const pJoinDate = document.getElementById('profile-join-date');
+
+
+    /**
+     * تابع اصلی برای نمایش پنل پروفایل کاربر
+     * @param {object} dbInstance - نمونه `db` از Firestore
+     * @param {string} userId - شناسه‌ی کاربری (UID) که می‌خواهید پروفایلش را ببینید
+     */
+    async function showUserProfile(dbInstance, userId) {
+        profileOverlay.classList.add('visible');
+        profileLoader.style.display = 'block';
+        profileContent.style.display = 'none';
+
+        // ریست کردن انیمیشن آیتم‌ها
+        document.querySelectorAll('.info-item').forEach(item => {
+            item.style.animation = 'none';
+            // Trigger reflow
+            item.offsetHeight; 
+            item.style.animation = '';
+        });
+
+        try {
+            const userDocRef = doc(dbInstance, 'users', userId);
+            const docSnap = await getDoc(userDocRef);
+
+            if (docSnap.exists()) {
+                const userData = docSnap.data();
+
+                // پر کردن اطلاعات در پنل
+                pAvatar.src = userData.avatarUrl || 'https://i.imgur.com/T2bT1tG.png';
+                pDisplayName.textContent = userData.displayName || 'کاربر ناشناس';
+                pEmail.textContent = userData.email || '';
+                pAge.textContent = userData.old || 'نامشخص';
+                pGames.textContent = userData.game || 0;
+                pStage.textContent = userData.currentStage || 1;
+                pOwnedAvatars.textContent = userData.ownedAvatars ? userData.ownedAvatars.length : 0;
+                
+                // فرمت کردن تاریخ عضویت
+                if (userData.createdAt && typeof userData.createdAt.toDate === 'function') {
+                    const joinDate = userData.createdAt.toDate();
+                    pJoinDate.textContent = new Intl.DateTimeFormat('fa-IR', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    }).format(joinDate);
+                } else {
+                    pJoinDate.textContent = 'نامشخص';
+                }
+
+                // نمایش محتوا و پنهان کردن لودر
+                profileLoader.style.display = 'none';
+                profileContent.style.display = 'block';
+
+            } else {
+                console.error("کاربری با این شناسه یافت نشد!");
+                // می‌توانید اینجا یک پیام خطا در پنل نمایش دهید
+                pDisplayName.textContent = "کاربر یافت نشد";
+                profileLoader.style.display = 'none';
+                profileContent.style.display = 'block';
+            }
+        } catch (error) {
+            console.error("خطا در دریافت اطلاعات کاربر:", error);
+            // می‌توانید اینجا یک پیام خطا در پنل نمایش دهید
+            pDisplayName.textContent = "خطا در اتصال";
+            profileLoader.style.display = 'none';
+            profileContent.style.display = 'block';
+        }
+    }
+
+    // --- Event Listeners ---
+    function closeProfile() {
+        profileOverlay.classList.remove('visible');
+    }
+
+    closeProfileBtn.addEventListener('click', closeProfile);
+    profileOverlay.addEventListener('click', (event) => {
+        // اگر روی پس‌زمینه تیره کلیک شد، پنل بسته شود
+        if (event.target === profileOverlay) {
+            closeProfile();
+        }
+    });
+
+    // --- نحوه استفاده (برای تست) ---
+    // در پروژه اصلی، شما این تابع را از هرجایی که نیاز دارید صدا می‌زنید
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            // برای تست، پروفایل کاربر لاگین شده را نمایش می‌دهیم
+            // شما می‌توانید این تابع را مثلا با کلیک روی آواتار کاربر در صفحه اصلی فراخوانی کنید
+            
+            // یک دکمه برای تست می‌سازیم
+            const testButton = document.createElement('button');
+            testButton.textContent = 'نمایش پروفایل من';
+            testButton.style.position = 'fixed';
+            testButton.style.bottom = '20px';
+            testButton.style.left = '20px';
+            testButton.style.zIndex = '2000';
+            testButton.style.padding = '10px 20px';
+            document.body.appendChild(testButton);
+
+            testButton.addEventListener('click', () => {
+                showUserProfile(db, user.uid);
+            });
+
+        }
+    });
+    
+</script>
+
+</body>
+</html>
