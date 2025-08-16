@@ -265,18 +265,15 @@
         const loaderSpinner = loadingOverlay.querySelector('.loader');
         const loadingText = document.getElementById('loading-text');
 
-        // المان‌های مربوط به موسیقی و دانلود آن
         const backgroundMusic = document.getElementById('background-music');
         const musicDownloadOverlay = document.getElementById('music-download-overlay');
         const progressBar = document.getElementById('progress-bar');
         const progressText = document.getElementById('progress-text');
 
-        // متغیرهای مربوط به مدیریت نسخه و کش موسیقی
         const MUSIC_URL = "https://raw.githubusercontent.com/abolfazl140122/mafia/main/dark-music-249503.mp3";
         const MUSIC_CACHE_NAME = 'mafia-music-cache-v1';
         const MUSIC_VERSION_KEY = 'mafia-music-version';
 
-        // **** تغییر جدید: متغیر برای کنترل وضعیت پخش و تابع پخش پس از تعامل کاربر ****
         let isMusicPlaying = false;
         
         const playMusicAfterUserInteraction = () => {
@@ -285,13 +282,11 @@
                     .then(() => {
                         isMusicPlaying = true;
                         console.log("موسیقی پس از تعامل کاربر با موفقیت پخش شد.");
-                        // Listener را حذف می‌کنیم تا فقط یک بار اجرا شود
                         document.body.removeEventListener('click', playMusicAfterUserInteraction, true);
                         document.body.removeEventListener('keydown', playMusicAfterUserInteraction, true);
                     })
                     .catch(e => console.error("خطا در پخش موسیقی حتی پس از تعامل کاربر.", e));
             } else {
-                // اگر موسیقی در حال پخش بود یا منبع نداشت، listener را حذف می‌کنیم
                 document.body.removeEventListener('click', playMusicAfterUserInteraction, true);
                 document.body.removeEventListener('keydown', playMusicAfterUserInteraction, true);
             }
@@ -323,7 +318,6 @@
             }
         }
 
-        // **** تغییر یافته: تابع پخش موسیقی با مدیریت خطای پخش خودکار ****
         function playMusicFromBlob(blob) {
             const objectUrl = URL.createObjectURL(blob);
             backgroundMusic.src = objectUrl;
@@ -333,21 +327,17 @@
 
             if (playPromise !== undefined) {
                 playPromise.then(() => {
-                    // پخش خودکار موفقیت‌آمیز بود
                     isMusicPlaying = true;
                     console.log("پخش خودکار موسیقی موفقیت آمیز بود.");
                 }).catch(error => {
-                    // پخش خودکار مسدود شد، منتظر تعامل کاربر می‌مانیم
                     console.warn("پخش خودکار موسیقی مسدود شد. منتظر تعامل کاربر هستیم...", error);
                     isMusicPlaying = false;
-                    // یک listener برای اولین تعامل کاربر اضافه می‌کنیم
                     document.body.addEventListener('click', playMusicAfterUserInteraction, true);
                     document.body.addEventListener('keydown', playMusicAfterUserInteraction, true);
                 });
             }
         }
 
-        // تابع دانلود موسیقی با نمایش پیشرفت (بدون تغییر)
         function downloadAndCacheMusic() {
             return new Promise((resolve, reject) => {
                 musicDownloadOverlay.classList.add('visible');
@@ -393,12 +383,10 @@
             });
         }
 
-        // تابع اصلی برای مدیریت موسیقی (بدون تغییر)
         async function handleBackgroundMusic() {
             const cachedVersion = localStorage.getItem(MUSIC_VERSION_KEY);
 
             if (cachedVersion === MUSIC_URL) {
-                console.log('موسیقی از کش بارگذاری می‌شود.');
                 try {
                     const cache = await caches.open(MUSIC_CACHE_NAME);
                     const cachedResponse = await cache.match(MUSIC_URL);
@@ -406,17 +394,14 @@
                         const musicBlob = await cachedResponse.blob();
                         playMusicFromBlob(musicBlob);
                     } else {
-                        console.warn('نسخه در localStorage موجود بود ولی فایل در کش یافت نشد. دانلود مجدد...');
                         const musicBlob = await downloadAndCacheMusic();
                         playMusicFromBlob(musicBlob);
                     }
                 } catch (error) {
-                    console.error('خطا در خواندن موسیقی از کش:', error);
                     const musicBlob = await downloadAndCacheMusic();
                     playMusicFromBlob(musicBlob);
                 }
             } else {
-                console.log('نسخه جدید موسیقی یافت شد یا اولین بازدید است. شروع دانلود...');
                 try {
                     const musicBlob = await downloadAndCacheMusic();
                     playMusicFromBlob(musicBlob);
@@ -436,6 +421,27 @@
                         const userData = userDocSnap.data();
                         userDisplayName.textContent = userData.displayName || "کاربر ناشناس";
                         userAvatar.src = userData.avatarUrl || 'https://i.imgur.com/T2bT1tG.png';
+                        
+                        // ===== START: کد جدید برای بررسی دسترسی ادمین =====
+                        if (userData.isAdmin === true) {
+                            const menuButtonsContainer = document.querySelector('.menu-buttons');
+                            
+                            const adminPanelButton = document.createElement('button');
+                            adminPanelButton.textContent = 'پنل مدیریت';
+                            adminPanelButton.classList.add('menu-button');
+                            
+                            adminPanelButton.addEventListener('click', () => {
+                                checkMaintenanceAndProceed(() => {
+                                    // در اینجا می‌توانید کاربر را به صفحه پنل مدیریت منتقل کنید
+                                    // window.location.href = './admin.html'; 
+                                    showCustomAlert('شما به پنل مدیریت دسترسی دارید.', () => {});
+                                });
+                            });
+                            
+                            menuButtonsContainer.appendChild(adminPanelButton);
+                        }
+                        // ===== END: کد جدید برای بررسی دسترسی ادمین =====
+
                     } else {
                         userDisplayName.textContent = user.displayName || "کاربر ناشناس";
                         userAvatar.src = 'https://i.imgur.com/T2bT1tG.png';
@@ -443,7 +449,6 @@
 
                     document.body.classList.add('loaded');
 
-                    // شروع فرایند مدیریت موسیقی پس از بارگذاری صفحه
                     await handleBackgroundMusic();
 
                     const maintenanceDocRef = doc(db, 'settings', 'maintenance');
@@ -467,7 +472,6 @@
             }
         });
 
-        // Event Listeners (بدون تغییر)
         userAvatar.addEventListener('click', () => {
             checkMaintenanceAndProceed(() => {
                 window.location.href = './Avatar shop.html';
