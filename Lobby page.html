@@ -51,14 +51,13 @@
             background-position: center center;
             filter: blur(8px) brightness(0.6);
             z-index: -1;
-            animation: subtle-pan 60s infinite alternate ease-in-out;
+            /* 
+               بهینه‌سازی ۱: انیمیشن پس‌زمینه حذف شد.
+               انیمیشن background-position بسیار سنگین و پرهزینه است و باعث لگ شدید، به خصوص در موبایل می‌شود.
+               با حذف آن، بار پردازشی GPU به شدت کاهش می‌یابد.
+            */
         }
-
-        @keyframes subtle-pan {
-            from { background-position: 10% 10%; }
-            to { background-position: 90% 90%; }
-        }
-
+        
         /* --- لودینگ حرفه‌ای --- */
         #loading-overlay {
             position: fixed;
@@ -66,8 +65,11 @@
             left: 0;
             width: 100%;
             height: 100%;
+            /* 
+               بهینه‌سازی ۲: backdrop-filter حذف شد.
+               این فیلتر از نظر پردازشی بسیار سنگین است. استفاده از یک پس‌زمینه نیمه‌شفاف ساده عملکرد بسیار بهتری دارد.
+            */
             background-color: rgba(0, 0, 0, 0.9);
-            backdrop-filter: blur(5px);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -213,6 +215,12 @@
             transform: translateY(20px);
             animation: slideInUp 0.5s forwards;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            /* 
+               بهینه‌سازی ۳: افزودن will-change
+               این پراپرتی به مرورگر اطلاع می‌دهد که قصد تغییر transform این عنصر را داریم.
+               مرورگر می‌تواند با قرار دادن عنصر در یک لایه جداگانه، انیمیشن‌ها را بسیار روان‌تر اجرا کند.
+            */
+            will-change: transform;
         }
 
         .lobby-card:hover {
@@ -318,7 +326,8 @@
         /* --- پنل‌های مودال (Modal) --- */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px);
+            /* بهینه‌سازی ۲ (بخش دوم): backdrop-filter از اینجا هم حذف شد */
+            background-color: rgba(0, 0, 0, 0.8); 
             display: flex; justify-content: center; align-items: center;
             z-index: 1000; opacity: 0; visibility: hidden;
             transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -428,7 +437,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, query, where, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, query, where, getDocs, deleteDoc, doc, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
@@ -487,7 +496,7 @@
             const card = document.createElement('div');
             card.className = 'lobby-card';
             card.dataset.id = lobbyData.id;
-            card.style.animationDelay = `${index * 0.07}s`; // تاخیر انیمیشن برای ورود زیبا
+            card.style.animationDelay = `${index * 0.07}s`;
 
             const isOwner = currentUser && currentUser.uid === lobbyData.creatorId;
 
@@ -530,27 +539,68 @@
             if (user) {
                 currentUser = user;
                 const lobbiesRef = collection(db, 'Lobbys list');
-                
-                onSnapshot(query(lobbiesRef), (snapshot) => {
-                    lobbyList.innerHTML = '';
-                    if (snapshot.empty) {
-                        lobbyList.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">هیچ لابی فعالی وجود ندارد. اولین لابی را شما بسازید!</p>';
-                    } else {
-                        let index = 0;
-                        snapshot.forEach((doc) => {
-                            const lobbyData = { id: doc.id, ...doc.data() };
-                            const cardElement = renderLobbyCard(lobbyData, index++);
-                            lobbyList.appendChild(cardElement);
-                        });
-                        filterLobbies(); // برای حفظ فیلتر بعد از رفرش لیست
+                const q = query(lobbiesRef, orderBy("createdAt", "desc"));
+
+                /*
+                   بهینه‌سازی ۴: مدیریت هوشمند لیست لابی‌ها
+                   به جای بازسازی کل لیست با هر تغییر کوچک، فقط تغییرات (لابی جدید، آپدیت یا حذف شده) را پردازش می‌کنیم.
+                   این کار از reflow (محاسبه مجدد چیدمان) کل صفحه جلوگیری کرده و عملکرد را به شدت بهبود می‌بخشد.
+                */
+                onSnapshot(q, (snapshot) => {
+                    snapshot.docChanges().forEach((change) => {
+                        const lobbyData = { id: change.doc.id, ...change.doc.data() };
+                        
+                        if (change.type === "added") {
+                            const cardElement = renderLobbyCard(lobbyData, lobbyList.children.length);
+                            // برای حفظ ترتیب، لابی‌های جدیدتر را در ابتدا اضافه می‌کنیم
+                            lobbyList.prepend(cardElement);
+                        }
+                        if (change.type === "modified") {
+                            const existingCard = lobbyList.querySelector(`.lobby-card[data-id="${lobbyData.id}"]`);
+                            if (existingCard) {
+                                const index = Array.from(lobbyList.children).indexOf(existingCard);
+                                const updatedCard = renderLobbyCard(lobbyData, index);
+                                existingCard.replaceWith(updatedCard);
+                            }
+                        }
+                        if (change.type === "removed") {
+                            const cardToRemove = lobbyList.querySelector(`.lobby-card[data-id="${lobbyData.id}"]`);
+                            if (cardToRemove) {
+                                cardToRemove.remove();
+                            }
+                        }
+                    });
+
+                    updateLobbyListState();
+                    filterLobbies();
+
+                    // مخفی کردن صفحه لودینگ فقط پس از دریافت اولین داده‌ها
+                    if (loadingOverlay.style.display !== 'none') {
+                        loadingOverlay.style.opacity = '0';
+                        setTimeout(() => loadingOverlay.style.display = 'none', 500);
                     }
-                    loadingOverlay.style.opacity = '0';
-                    setTimeout(() => loadingOverlay.style.display = 'none', 500);
                 });
+
             } else {
                 window.location.href = './login.html';
             }
         });
+        
+        function updateLobbyListState() {
+            const noLobbyMsg = lobbyList.querySelector('.no-lobby-message');
+            if (lobbyList.querySelectorAll('.lobby-card').length === 0) {
+                 if (!noLobbyMsg) {
+                    const msgElement = document.createElement('p');
+                    msgElement.className = 'no-lobby-message';
+                    msgElement.style.textAlign = 'center';
+                    msgElement.style.color = 'var(--text-secondary)';
+                    msgElement.textContent = 'هیچ لابی فعالی وجود ندارد. اولین لابی را شما بسازید!';
+                    lobbyList.appendChild(msgElement);
+                }
+            } else if (noLobbyMsg) {
+                noLobbyMsg.remove();
+            }
+        }
 
         async function createLobby() {
             const lobbyName = lobbyNameInput.value.trim();
@@ -622,9 +672,8 @@
                 }
             });
 
-            // نمایش پیام "موردی یافت نشد"
             let noResultMsg = lobbyList.querySelector('.no-result-message');
-            if (!found && cards.length > 0) {
+            if (!found && cards.length > 0 && searchTerm) {
                 if (!noResultMsg) {
                     noResultMsg = document.createElement('p');
                     noResultMsg.className = 'no-result-message';
@@ -638,11 +687,27 @@
             }
         }
 
+        /*
+           بهینه‌سازی ۵: Debounce کردن تابع جستجو
+           این تابع کمک می‌کند تا فانکشن filterLobbies با هر بار تایپ کاربر اجرا نشود،
+           بلکه فقط زمانی اجرا شود که کاربر برای مدت کوتاهی (مثلا ۲۵۰ میلی‌ثانیه) تایپ را متوقف کند.
+           این کار از اجرای مکرر و غیرضروری تابع فیلتر جلوگیری کرده و تجربه جستجو را بسیار روان می‌کند.
+        */
+        function debounce(func, delay) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), delay);
+            };
+        }
+
         // --- Event Listeners ---
         createLobbyFab.addEventListener('click', () => showModal(createLobbyModal));
         createLobbyCancelBtn.addEventListener('click', () => hideModal(createLobbyModal));
         createLobbyConfirmBtn.addEventListener('click', createLobby);
-        searchInput.addEventListener('input', filterLobbies);
+        
+        // رویداد جستجو اکنون از تابع debounce استفاده می‌کند
+        searchInput.addEventListener('input', debounce(filterLobbies, 250));
 
         [createLobbyModal, customAlertModal].forEach(modal => {
              modal.addEventListener('click', (e) => {
