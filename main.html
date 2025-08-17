@@ -355,7 +355,8 @@
                 </div>
                  <div class="profile-stat-item">
                     <span class="stat-label">💎 تعداد الماس:</span>
-                    <span id="profile-stat-games" class="stat-value"></span>
+                    <!--  [تغییر] ID برای خوانایی بهتر اصلاح شد -->
+                    <span id="profile-stat-diamonds" class="stat-value"></span>
                 </div>
                 <div class="profile-stat-item">
                     <span class="stat-label">📧 ایمیل:</span>
@@ -417,7 +418,8 @@
         const profileStatDate = document.getElementById('profile-stat-date');
         const profileStatAge = document.getElementById('profile-stat-age');
         const profileStatAvatars = document.getElementById('profile-stat-avatars');
-        const profileStatGames = document.getElementById('profile-stat-games');
+        // [تغییر] انتخاب‌گر برای ID جدید به‌روزرسانی شد
+        const profileStatDiamonds = document.getElementById('profile-stat-diamonds');
         const profileStatEmail = document.getElementById('profile-stat-email');
 
         // متغیرها
@@ -476,7 +478,8 @@
             profileModalName.textContent = currentUserData.displayName || "کاربر ناشناس";
             profileStatAge.textContent = currentUserData.old || "نامشخص";
             profileStatAvatars.textContent = (currentUserData.ownedAvatars?.length || 0) + " عدد";
-            profileStatGames.textContent = currentUserData.game || 0;
+            // [تغییر اصلی] مقدار فیلد game از دیتابیس خوانده و نمایش داده می‌شود
+            profileStatDiamonds.textContent = currentUserData.game || 0;
             profileStatEmail.textContent = currentUserData.email || "ثبت نشده";
 
             // تبدیل Timestamp فایربیس به تاریخ خوانا
