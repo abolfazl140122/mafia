@@ -3,357 +3,235 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>پروفایل کاربر</title>
+    <title>پروفایل کاربری مافیا</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
+        /* --- Reset & Basic Styles --- */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        html, body {
-            height: 100%;
-            width: 100%;
-            overflow: hidden;
-        }
-
         body {
             font-family: 'Vazirmatn', sans-serif;
-            background-color: transparent; /* پس‌زمینه شفاف برای استفاده به عنوان پنل */
-            color: #f0e6d2;
+            background: #1a1a1a url('https://www.transparenttextures.com/patterns/dark-denim-3.png'); /* A subtle background texture */
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            min-height: 100vh;
+            color: #f0f0f0;
         }
 
-        /* --- پنل بارگذاری --- */
-        #loading-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(8px);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 10;
-            transition: opacity 0.5s ease;
-        }
-
-        .loader {
-            border: 5px solid #f3f3f330;
-            border-top: 5px solid #ffc947;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1.5s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* --- کانتینر اصلی پنل پروفایل --- */
-        .profile-card-container {
-            width: 90%;
-            max-width: 380px;
-            background: linear-gradient(145deg, #ffc947, #8c4843);
-            padding: 3px;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(255, 201, 71, 0.2);
-            animation: fadeInScaleUp 0.6s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
-            opacity: 0;
-            transform: scale(0.9);
-            visibility: hidden; /* در ابتدا مخفی است */
-        }
-
-        @keyframes fadeInScaleUp {
-            from {
-                opacity: 0;
-                transform: scale(0.9) translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
-        }
-        
-        .profile-card-container.visible {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        /* --- پنل داخلی (محتوا) --- */
+        /* --- Profile Card Container --- */
         .profile-card {
-            background-color: rgba(20, 15, 10, 0.9);
-            backdrop-filter: blur(10px);
-            padding: 25px;
-            border-radius: 18px;
+            width: 90%;
+            max-width: 400px;
+            background: rgba(30, 30, 30, 0.7);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            padding: 30px;
+            text-align: center;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+
+        .profile-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5);
+        }
+
+        /* --- Avatar --- */
+        .avatar-container {
+            margin-bottom: 20px;
+        }
+
+        .avatar {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%; /* This makes the image a circle */
+            border: 4px solid rgba(255, 255, 255, 0.5);
+            object-fit: cover; /* Prevents image stretching */
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .avatar:hover {
+            transform: scale(1.05);
+        }
+
+        /* --- User Info --- */
+        .user-info h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 5px;
+        }
+
+        .user-info p {
+            font-size: 1rem;
+            color: #b0b0b0;
+            margin-bottom: 25px;
+        }
+
+        /* --- Stats Section --- */
+        .stats-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .stat-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 20px;
         }
 
-        .profile-header {
-            text-align: center;
-            margin-bottom: 10px;
+        .stat-item .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #4a90e2; /* A highlight color */
         }
 
-        .profile-avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            border: 4px solid #ffc947;
-            object-fit: cover;
-            margin-bottom: 15px;
-            box-shadow: 0 0 15px rgba(255, 201, 71, 0.5);
-            transition: all 0.3s ease;
-        }
-        
-        .profile-avatar:hover {
-            transform: scale(1.08);
-            box-shadow: 0 0 25px rgba(255, 201, 71, 0.8);
-        }
-
-        #display-name {
-            font-size: 1.8rem;
-            font-weight: 900;
-            color: #ffffff;
-            text-shadow: 0 2px 5px rgba(0,0,0,0.7);
-        }
-
-        #user-email {
-            font-size: 0.9rem;
-            font-weight: 400;
-            color: #ffc947;
-            opacity: 0.8;
+        .stat-item .label {
+            font-size: 0.8rem;
+            color: #a0a0a0;
             margin-top: 5px;
         }
-
-        .profile-stats {
-            width: 100%;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            background-color: rgba(0, 0, 0, 0.2);
-            padding: 15px 10px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 201, 71, 0.2);
-        }
-
-        .stat-item { text-align: center; }
-        .stat-value { display: block; font-size: 1.5rem; font-weight: 700; color: #ffffff; }
-        .stat-label { font-size: 0.8rem; color: #c5a687; }
-
-        .xp-section {
-            width: 100%;
-            text-align: center;
-        }
-        .level-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 0 5px; font-size: 0.9rem; font-weight: 700; }
-        #level-number { color: #ffc947; background-color: rgba(255, 201, 71, 0.1); padding: 2px 8px; border-radius: 5px; }
-        .progress-bar-container { width: 100%; height: 12px; background-color: rgba(0, 0, 0, 0.4); border: 1px solid #5c4a3a; border-radius: 6px; overflow: hidden; box-shadow: inset 0 2px 5px rgba(0,0,0,0.5); }
-        #progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #8c4843, #ffc947); border-radius: 6px; transition: width 0.8s ease-out; box-shadow: 0 0 10px rgba(255, 201, 71, 0.4); }
-        #xp-text { margin-top: 8px; font-size: 0.85rem; color: #e0dacc; }
-
-        .profile-actions {
-            width: 100%;
-            display: flex;
-            gap: 12px;
-            margin-top: 10px;
-        }
-
-        .action-button {
-            flex: 1;
-            padding: 12px;
-            font-size: 1rem;
-            font-weight: 700;
-            font-family: 'Vazirmatn', sans-serif;
-            border-radius: 10px;
-            cursor: pointer;
-            border: none;
-            transition: all 0.3s ease;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
-        }
         
-        .primary-button { color: #ffffff; background: linear-gradient(145deg, #8c4843, #5a2c2a); border: 1px solid #ffc947; }
-        .primary-button:hover { background: linear-gradient(145deg, #a1534d, #6b3431); transform: translateY(-3px); box-shadow: 0 6px 12px rgba(255, 201, 71, 0.2); }
-        
-        #back-button { color: #e0dacc; background: transparent; border: 1px solid #c5a687; }
-        #back-button:hover { background-color: rgba(197, 166, 135, 0.1); border-color: #ffc947; color: #ffc947; }
-
+        /* --- Footer --- */
+        .profile-footer {
+            font-size: 0.9rem;
+            color: #888;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 15px;
+            margin-top: 15px;
+        }
     </style>
 </head>
 <body>
 
-    <div id="loading-container">
-        <div class="loader"></div>
-    </div>
+    <div class="profile-card">
+        <div class="avatar-container">
+            <!-- آواتار کاربر اینجا قرار می گیرد -->
+            <img id="user-avatar" src="" alt="آواتار کاربر" class="avatar">
+        </div>
 
-    <div id="profile-card" class="profile-card-container">
-        <div class="profile-card">
+        <div class="user-info">
+            <!-- نام نمایشی کاربر -->
+            <h1 id="display-name"></h1>
+            <!-- ایمیل کاربر -->
+            <p id="user-email"></p>
+        </div>
 
-            <div class="profile-header">
-                <img id="profile-avatar" src="" alt="آواتار کاربر">
-                <h2 id="display-name"></h2>
-                <p id="user-email"></p>
+        <div class="stats-container">
+            <div class="stat-item">
+                <!-- تعداد کل بازی ها -->
+                <span id="games-played" class="value"></span>
+                <span class="label">تعداد بازی</span>
             </div>
-
-            <div class="profile-stats">
-                <div class="stat-item">
-                    <span id="games-played" class="stat-value"></span>
-                    <span class="stat-label">بازی‌ها</span>
-                </div>
-                <div class="stat-item">
-                    <span id="win-rate" class="stat-value"></span>
-                    <span class="stat-label">درصد برد</span>
-                </div>
-                <div class="stat-item">
-                    <span id="user-rank" class="stat-value"></span>
-                    <span class="stat-label">رتبه</span>
-                </div>
+            <div class="stat-item">
+                <!-- تعداد بردها (فرض کردیم old تعداد بردهاست) -->
+                <span id="wins" class="value"></span>
+                <span class="label">بردها</span>
             </div>
-
-            <div class="xp-section">
-                <div class="level-info">
-                    <span>سطح</span>
-                    <span id="level-number"></span>
-                </div>
-                <div class="progress-bar-container">
-                    <div id="progress-bar"></div>
-                </div>
-                <p id="xp-text"></p>
+            <div class="stat-item">
+                <!-- سطح یا مرحله کاربر -->
+                <span id="user-level" class="value"></span>
+                <span class="label">سطح</span>
             </div>
-
-            <div class="profile-actions">
-                <button class="action-button primary-button">تغییر نام</button>
-                <button id="back-button" class="action-button">بازگشت</button>
-            </div>
-
+        </div>
+        
+        <div class="profile-footer">
+            <!-- تاریخ عضویت -->
+            <p>عضو از: <span id="member-since"></span></p>
         </div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-        // --- Firebase Configuration ---
-        const firebaseConfig = {
-          apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
-          authDomain: "mafia-9fcbf.firebaseapp.com",
-          projectId: "mafia-9fcbf",
-          storageBucket: "mafia-9fcbf.appspot.com",
-          messagingSenderId: "471627157488",
-          appId: "1:471627157488:web:92f008548a5596619a5735",
-          measurementId: "G-0PDHDWC6NV"
-        };
-
-        // --- Initialize Firebase ---
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        // --- DOM Elements ---
-        const loadingContainer = document.getElementById('loading-container');
-        const profileCard = document.getElementById('profile-card');
-        const backButton = document.getElementById('back-button');
-
-        // --- Helper function to calculate level from XP ---
-        // این یک تابع نمونه است، می‌توانید فرمول را پیچیده‌تر کنید
-        function calculateLevelInfo(xp = 0) {
-            const xpPerLevel = 1000; // هر سطح ۱۰۰۰ امتیاز نیاز دارد
-            const level = Math.floor(xp / xpPerLevel) + 1;
-            const xpForCurrentLevel = (level - 1) * xpPerLevel;
-            const xpForNextLevel = level * xpPerLevel;
-            const currentLevelProgressXp = xp - xpForCurrentLevel;
-            const progressPercentage = (currentLevelProgressXp / xpPerLevel) * 100;
-            return {
-                level,
-                xpText: `${currentLevelProgressXp} / ${xpPerLevel} XP`,
-                progressPercentage
+    <script>
+        // این تابع زمانی اجرا می شود که کل صفحه بارگذاری شده باشد
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // --- شبیه سازی دریافت داده از Firebase ---
+            // در یک برنامه واقعی، شما این داده ها را از Firestore دریافت می کنید
+            // من دقیقا همان داده های تصویر شما را اینجا قرار دادم
+            const userData = {
+                avatarUrl: "https://up.20script.ir/file/bd57-IMG-20250815-022057-323.jpg",
+                createdAt: "August 17, 2025 at 9:46:57 AM UTC+3:30", // Firestore تاریخ را به این شکل می دهد
+                currentStage: 1,
+                displayName: "Abolix",
+                email: "mesoh47447@ofacer.com",
+                game: 25,
+                old: 20, // فرض می کنیم این فیلد تعداد بردها باشد
+                uid: "tOhXS0tui1c13e0V26Gcf4d601E3"
             };
+
+            // تابع برای نمایش اطلاعات در صفحه
+            function renderProfile(data) {
+                // پیدا کردن عناصر HTML با استفاده از ID آنها
+                const avatarElement = document.getElementById('user-avatar');
+                const displayNameElement = document.getElementById('display-name');
+                const emailElement = document.getElementById('user-email');
+                const gamesPlayedElement = document.getElementById('games-played');
+                const winsElement = document.getElementById('wins');
+                const levelElement = document.getElementById('user-level');
+                const memberSinceElement = document.getElementById('member-since');
+
+                // قرار دادن داده ها در عناصر HTML
+                avatarElement.src = data.avatarUrl;
+                displayNameElement.textContent = data.displayName;
+                emailElement.textContent = data.email;
+                gamesPlayedElement.textContent = data.game;
+                winsElement.textContent = data.old; // نمایش تعداد بردها
+                levelElement.textContent = data.currentStage;
+                
+                // فرمت کردن تاریخ برای نمایش بهتر
+                // createdAt یک رشته است، ما آن را به یک شی Date تبدیل می کنیم
+                const creationDate = new Date(data.createdAt.replace(' UTC+3:30', ''));
+                // نمایش تاریخ به فرمت محلی (مثلا: ۸/۱۷/۲۰۲۵)
+                memberSinceElement.textContent = creationDate.toLocaleDateString('fa-IR');
+            }
+
+            // فراخوانی تابع برای نمایش اطلاعات کاربر
+            renderProfile(userData);
+        });
+
+        /*
+        //  --- نمونه کد واقعی برای دریافت داده از Firebase ---
+        // برای استفاده از این کد، باید Firebase SDK را به پروژه خود اضافه کنید
+
+        import { getFirestore, doc, getDoc } from "firebase/firestore";
+
+        const db = getFirestore();
+        const userId = "tOhXS0tui1c13e0V26Gcf4d601E3"; // یا ID کاربر فعلی
+
+        async function fetchUserData(userId) {
+            const docRef = doc(db, "users", userId);
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+                console.log("Document data:", docSnap.data());
+                const userData = docSnap.data();
+                // تبدیل Timestamp فایربیس به تاریخ قابل خواندن
+                userData.createdAt = userData.createdAt.toDate().toString();
+                renderProfile(userData); // نمایش اطلاعات دریافت شده
+            } else {
+                console.log("No such document!");
+                // اینجا می توانید کاربر را به صفحه خطا هدایت کنید
+            }
         }
         
-        // --- Function to display user data in the UI ---
-        function displayUserData(data) {
-            document.getElementById('profile-avatar').src = data.avatarUrl || 'https://i.imgur.com/T2bT1tG.png';
-            document.getElementById('display-name').textContent = data.displayName || 'کاربر ناشناس';
-            document.getElementById('user-email').textContent = data.email || 'ایمیل ثبت نشده';
-
-            const gamesPlayed = data.gamesPlayed || 0;
-            const wins = data.wins || 0;
-            const winPercentage = gamesPlayed > 0 ? Math.round((wins / gamesPlayed) * 100) : 0;
-            
-            document.getElementById('games-played').textContent = gamesPlayed;
-            document.getElementById('win-rate').textContent = `${winPercentage}%`;
-            document.getElementById('user-rank').textContent = data.rank || 'تازه وارد';
-
-            const levelInfo = calculateLevelInfo(data.xp || 0);
-            document.getElementById('level-number').textContent = levelInfo.level;
-            document.getElementById('xp-text').textContent = levelInfo.xpText;
-            
-            // Set a timeout to animate the progress bar after the card is visible
-            setTimeout(() => {
-                document.getElementById('progress-bar').style.width = `${levelInfo.progressPercentage}%`;
-            }, 300);
-        }
-
-        // --- Main Logic ---
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                try {
-                    const userDocRef = doc(db, 'users', user.uid);
-                    const docSnap = await getDoc(userDocRef);
-
-                    if (docSnap.exists()) {
-                        // در دیتابیس شما فیلد game وجود داشت، آن را به gamesPlayed تغییر نام دادم
-                        const userData = {
-                            ...docSnap.data(),
-                            gamesPlayed: docSnap.data().game || 0 // سازگاری با فیلد قبلی
-                        };
-                        displayUserData(userData);
-                    } else {
-                        console.warn("سند کاربر در دیتابیس یافت نشد. نمایش اطلاعات پیش‌فرض.");
-                        // نمایش اطلاعات پیش‌فرض برای کاربری که داکیومنت ندارد
-                        displayUserData({
-                            displayName: user.displayName,
-                            email: user.email,
-                            avatarUrl: user.photoURL
-                        });
-                    }
-                } catch (error) {
-                    console.error("خطا در دریافت اطلاعات کاربر:", error);
-                    // در صورت خطا، یک پیام مناسب نمایش دهید
-                    document.getElementById('display-name').textContent = 'خطا در بارگذاری';
-                } finally {
-                    // پس از اتمام کار، لودینگ را مخفی و پروفایل را نمایش بده
-                    loadingContainer.style.opacity = '0';
-                    profileCard.classList.add('visible');
-                    setTimeout(() => {
-                        loadingContainer.style.display = 'none';
-                    }, 500);
-                }
-            } else {
-                // اگر کاربر وارد نشده بود، به صفحه لاگین هدایت شود
-                window.location.href = './login.html';
-            }
-        });
-
-        backButton.addEventListener('click', () => {
-            // به صفحه قبلی بازمی‌گردد یا به لابی اصلی
-            window.location.href = './main.html';
-        });
-
+        // fetchUserData(userId); // این تابع را به جای داده های شبیه سازی شده فراخوانی کنید
+        */
     </script>
+
 </body>
 </html>
