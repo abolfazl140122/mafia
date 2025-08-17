@@ -184,38 +184,41 @@
         .modal-message { font-size: 1rem; line-height: 1.6; margin-bottom: 25px; }
         .modal-button { width: 100%; padding: 12px; font-size: 1rem; font-weight: 700; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; color: #ffffff; background: linear-gradient(145deg, #8c4843, #5a2c2a); border: 1px solid #ffc947; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
         .modal-button:hover { background: linear-gradient(145deg, #a1534d, #6b3431); }
-        
-        /* --- *** استایل‌های جدید برای پنل پروفایل *** --- */
-        .profile-modal-buttons {
+
+        /* --- (جدید) استایل‌های پنل منوی پروفایل --- */
+        #profile-menu-modal .modal-content {
+            padding: 20px;
+            max-width: 300px;
+        }
+        .profile-menu-buttons {
             display: flex;
             flex-direction: column;
             gap: 15px;
-            margin-top: 25px;
             width: 100%;
         }
-
-        .profile-modal-button {
-            width: 100%;
-            padding: 13px;
+        .profile-menu-button {
+            padding: 15px;
             font-size: 1.1rem;
             font-weight: 700;
+            color: #ffffff;
+            background: linear-gradient(145deg, #503230, #382120);
+            border: 2px solid #c5a687;
             border-radius: 10px;
             cursor: pointer;
             transition: all 0.3s ease;
-            color: #e0dacc;
-            background: linear-gradient(145deg, rgba(80, 50, 48, 0.8), rgba(56, 33, 32, 0.9));
-            border: 1px solid #c5a687;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+        }
+        .profile-menu-button:hover {
+            border-color: #ffc947;
+            background: linear-gradient(145deg, #643f3d, #4a2a28);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 6px 15px rgba(255, 201, 71, 0.2);
+        }
+        .profile-menu-button:active {
+            transform: translateY(0) scale(0.98);
         }
 
-        .profile-modal-button:hover {
-            background: linear-gradient(145deg, rgba(100, 65, 63, 0.9), rgba(74, 44, 42, 1));
-            border-color: #ffc947;
-            transform: translateY(-3px);
-            box-shadow: 0 5px 12px rgba(0,0,0,0.4);
-        }
-        
     </style>
 </head>
 <body>
@@ -259,6 +262,7 @@
     
     <audio id="background-music" loop></audio>
 
+    <!-- مودال هشدار عمومی -->
     <div id="custom-alert-overlay" class="modal-overlay">
         <div class="modal-content">
             <h2 class="modal-title">توجه!</h2>
@@ -266,14 +270,14 @@
             <button id="custom-alert-confirm-btn" class="modal-button">تایید</button>
         </div>
     </div>
-    
-    <!-- *** پنل جدید پروفایل که با کلیک روی آواتار باز می‌شود *** -->
-    <div id="profile-modal-overlay" class="modal-overlay">
+
+    <!-- (جدید) مودال منوی پروفایل -->
+    <div id="profile-menu-modal" class="modal-overlay">
         <div class="modal-content">
-            <h2 class="modal-title">منوی کاربری</h2>
-            <div class="profile-modal-buttons">
-                 <button id="profile-modal-profile-btn" class="profile-modal-button">پروفایل</button>
-                 <button id="profile-modal-shop-btn" class="profile-modal-button">فروشگاه</button>
+            <h2 class="modal-title">منوی کاربر</h2>
+            <div class="profile-menu-buttons">
+                <button id="profile-button" class="profile-menu-button">پروفایل</button>
+                <button id="shop-button" class="profile-menu-button">فروشگاه</button>
             </div>
         </div>
     </div>
@@ -309,12 +313,12 @@
         const loadingOverlay = document.getElementById('loading-overlay');
         const loaderSpinner = loadingOverlay.querySelector('.loader');
         const loadingText = document.getElementById('loading-text');
-        const adminPanelButton = document.getElementById('admin-panel-button');
+        const adminPanelButton = document.getElementById('admin-panel-button'); 
 
-        // *** المان‌های جدید برای پنل پروفایل ***
-        const profileModalOverlay = document.getElementById('profile-modal-overlay');
-        const profileModalProfileBtn = document.getElementById('profile-modal-profile-btn');
-        const profileModalShopBtn = document.getElementById('profile-modal-shop-btn');
+        // (جدید) المان‌های مودال پروفایل
+        const profileMenuModal = document.getElementById('profile-menu-modal');
+        const profileButton = document.getElementById('profile-button');
+        const shopButton = document.getElementById('shop-button');
 
         // المان‌های مربوط به موسیقی و دانلود آن
         const backgroundMusic = document.getElementById('background-music');
@@ -329,175 +333,39 @@
 
         let isMusicPlaying = false;
         
-        const playMusicAfterUserInteraction = () => {
-            if (!isMusicPlaying && backgroundMusic.src && backgroundMusic.paused) {
-                backgroundMusic.play()
-                    .then(() => {
-                        isMusicPlaying = true;
-                        console.log("موسیقی پس از تعامل کاربر با موفقیت پخش شد.");
-                        document.body.removeEventListener('click', playMusicAfterUserInteraction, true);
-                        document.body.removeEventListener('keydown', playMusicAfterUserInteraction, true);
-                    })
-                    .catch(e => console.error("خطا در پخش موسیقی حتی پس از تعامل کاربر.", e));
-            } else {
-                document.body.removeEventListener('click', playMusicAfterUserInteraction, true);
-                document.body.removeEventListener('keydown', playMusicAfterUserInteraction, true);
-            }
-        };
+        // ... (توابع موسیقی و هشدار بدون تغییر باقی می‌مانند) ...
+        const playMusicAfterUserInteraction = () => { if (!isMusicPlaying && backgroundMusic.src && backgroundMusic.paused) { backgroundMusic.play().then(() => { isMusicPlaying = true; console.log("موسیقی پس از تعامل کاربر با موفقیت پخش شد."); document.body.removeEventListener('click', playMusicAfterUserInteraction, true); document.body.removeEventListener('keydown', playMusicAfterUserInteraction, true); }).catch(e => console.error("خطا در پخش موسیقی حتی پس از تعامل کاربر.", e)); } else { document.body.removeEventListener('click', playMusicAfterUserInteraction, true); document.body.removeEventListener('keydown', playMusicAfterUserInteraction, true); } };
+        function showCustomAlert(message, onConfirm) { customAlertMessage.textContent = message; customAlertOverlay.classList.add('visible'); customAlertConfirmBtn.onclick = () => { customAlertOverlay.classList.remove('visible'); if (onConfirm) onConfirm(); }; }
+        async function checkMaintenanceAndProceed(actionCallback) { const maintenanceDocRef = doc(db, 'settings', 'maintenance'); try { const docSnap = await getDoc(maintenanceDocRef); if (docSnap.exists() && docSnap.data().enabled === true) { showCustomAlert("سرور در حالت بروزرسانی قرار دارد. شما به صفحه اصلی منتقل می‌شوید.", () => { window.location.href = './index.html'; }); } else { actionCallback(); } } catch (error) { console.error("خطا در بررسی وضعیت بروزرسانی:", error); showCustomAlert("خطا در ارتباط با سرور. لطفا اتصال اینترنت خود را بررسی کرده و مجددا تلاش کنید.", () => {}); } }
+        function playMusicFromBlob(blob) { const objectUrl = URL.createObjectURL(blob); backgroundMusic.src = objectUrl; backgroundMusic.volume = 0.4; const playPromise = backgroundMusic.play(); if (playPromise !== undefined) { playPromise.then(() => { isMusicPlaying = true; console.log("پخش خودکار موسیقی موفقیت آمیز بود."); }).catch(error => { console.warn("پخش خودکار موسیقی مسدود شد. منتظر تعامل کاربر هستیم...", error); isMusicPlaying = false; document.body.addEventListener('click', playMusicAfterUserInteraction, true); document.body.addEventListener('keydown', playMusicAfterUserInteraction, true); }); } }
+        function downloadAndCacheMusic() { return new Promise((resolve, reject) => { musicDownloadOverlay.classList.add('visible'); const xhr = new XMLHttpRequest(); xhr.open('GET', MUSIC_URL, true); xhr.responseType = 'blob'; xhr.onprogress = (event) => { if (event.lengthComputable) { const percentComplete = Math.round((event.loaded / event.total) * 100); progressBar.style.width = percentComplete + '%'; progressText.textContent = `در حال دانلود... ${percentComplete}%`; } }; xhr.onload = async () => { if (xhr.status === 200) { const musicBlob = xhr.response; try { const cache = await caches.open(MUSIC_CACHE_NAME); await cache.put(MUSIC_URL, new Response(musicBlob)); localStorage.setItem(MUSIC_VERSION_KEY, MUSIC_URL); console.log('موسیقی با موفقیت دانلود و کش شد.'); musicDownloadOverlay.classList.remove('visible'); resolve(musicBlob); } catch (cacheError) { console.error('خطا در ذخیره سازی موسیقی در کش:', cacheError); reject(cacheError); } } else { reject(new Error(`خطای شبکه: ${xhr.statusText}`)); } }; xhr.onerror = () => { console.error('خطا در دانلود موسیقی.'); musicDownloadOverlay.classList.remove('visible'); showCustomAlert("دانلود موسیقی پس‌زمینه با خطا مواجه شد. لطفاً اتصال اینترنت خود را بررسی کنید.", () => {}); reject(new Error('خطای شبکه در دانلود موسیقی.')); }; xhr.send(); }); }
+        async function handleBackgroundMusic() { const cachedVersion = localStorage.getItem(MUSIC_VERSION_KEY); if (cachedVersion === MUSIC_URL) { console.log('موسیقی از کش بارگذاری می‌شود.'); try { const cache = await caches.open(MUSIC_CACHE_NAME); const cachedResponse = await cache.match(MUSIC_URL); if (cachedResponse) { const musicBlob = await cachedResponse.blob(); playMusicFromBlob(musicBlob); } else { console.warn('نسخه در localStorage موجود بود ولی فایل در کش یافت نشد. دانلود مجدد...'); const musicBlob = await downloadAndCacheMusic(); playMusicFromBlob(musicBlob); } } catch (error) { console.error('خطا در خواندن موسیقی از کش:', error); const musicBlob = await downloadAndCacheMusic(); playMusicFromBlob(musicBlob); } } else { console.log('نسخه جدید موسیقی یافت شد یا اولین بازدید است. شروع دانلود...'); try { const musicBlob = await downloadAndCacheMusic(); playMusicFromBlob(musicBlob); } catch (error) { console.error('فرایند دانلود و پخش موسیقی با خطا مواجه شد:', error); } } }
 
-        function showCustomAlert(message, onConfirm) {
-            customAlertMessage.textContent = message;
-            customAlertOverlay.classList.add('visible');
-            customAlertConfirmBtn.onclick = () => {
-                customAlertOverlay.classList.remove('visible');
-                if (onConfirm) onConfirm();
-            };
-        }
-
-        async function checkMaintenanceAndProceed(actionCallback) {
-            const maintenanceDocRef = doc(db, 'settings', 'maintenance');
-            try {
-                const docSnap = await getDoc(maintenanceDocRef);
-                if (docSnap.exists() && docSnap.data().enabled === true) {
-                    showCustomAlert("سرور در حالت بروزرسانی قرار دارد. شما به صفحه اصلی منتقل می‌شوید.", () => {
-                        window.location.href = './index.html';
-                    });
-                } else {
-                    actionCallback();
-                }
-            } catch (error) {
-                console.error("خطا در بررسی وضعیت بروزرسانی:", error);
-                showCustomAlert("خطا در ارتباط با سرور. لطفا اتصال اینترنت خود را بررسی کرده و مجددا تلاش کنید.", () => {});
-            }
-        }
-
-        function playMusicFromBlob(blob) {
-            const objectUrl = URL.createObjectURL(blob);
-            backgroundMusic.src = objectUrl;
-            backgroundMusic.volume = 0.4;
-            
-            const playPromise = backgroundMusic.play();
-
-            if (playPromise !== undefined) {
-                playPromise.then(() => {
-                    isMusicPlaying = true;
-                    console.log("پخش خودکار موسیقی موفقیت آمیز بود.");
-                }).catch(error => {
-                    console.warn("پخش خودکار موسیقی مسدود شد. منتظر تعامل کاربر هستیم...", error);
-                    isMusicPlaying = false;
-                    document.body.addEventListener('click', playMusicAfterUserInteraction, true);
-                    document.body.addEventListener('keydown', playMusicAfterUserInteraction, true);
-                });
-            }
-        }
-
-        function downloadAndCacheMusic() {
-            return new Promise((resolve, reject) => {
-                musicDownloadOverlay.classList.add('visible');
-                const xhr = new XMLHttpRequest();
-                xhr.open('GET', MUSIC_URL, true);
-                xhr.responseType = 'blob';
-
-                xhr.onprogress = (event) => {
-                    if (event.lengthComputable) {
-                        const percentComplete = Math.round((event.loaded / event.total) * 100);
-                        progressBar.style.width = percentComplete + '%';
-                        progressText.textContent = `در حال دانلود... ${percentComplete}%`;
-                    }
-                };
-
-                xhr.onload = async () => {
-                    if (xhr.status === 200) {
-                        const musicBlob = xhr.response;
-                        try {
-                            const cache = await caches.open(MUSIC_CACHE_NAME);
-                            await cache.put(MUSIC_URL, new Response(musicBlob));
-                            localStorage.setItem(MUSIC_VERSION_KEY, MUSIC_URL);
-                            console.log('موسیقی با موفقیت دانلود و کش شد.');
-                            musicDownloadOverlay.classList.remove('visible');
-                            resolve(musicBlob);
-                        } catch (cacheError) {
-                            console.error('خطا در ذخیره سازی موسیقی در کش:', cacheError);
-                            reject(cacheError);
-                        }
-                    } else {
-                        reject(new Error(`خطای شبکه: ${xhr.statusText}`));
-                    }
-                };
-
-                xhr.onerror = () => {
-                    console.error('خطا در دانلود موسیقی.');
-                    musicDownloadOverlay.classList.remove('visible');
-                    showCustomAlert("دانلود موسیقی پس‌زمینه با خطا مواجه شد. لطفاً اتصال اینترنت خود را بررسی کنید.", () => {});
-                    reject(new Error('خطای شبکه در دانلود موسیقی.'));
-                };
-
-                xhr.send();
-            });
-        }
-
-        async function handleBackgroundMusic() {
-            const cachedVersion = localStorage.getItem(MUSIC_VERSION_KEY);
-
-            if (cachedVersion === MUSIC_URL) {
-                console.log('موسیقی از کش بارگذاری می‌شود.');
-                try {
-                    const cache = await caches.open(MUSIC_CACHE_NAME);
-                    const cachedResponse = await cache.match(MUSIC_URL);
-                    if (cachedResponse) {
-                        const musicBlob = await cachedResponse.blob();
-                        playMusicFromBlob(musicBlob);
-                    } else {
-                        console.warn('نسخه در localStorage موجود بود ولی فایل در کش یافت نشد. دانلود مجدد...');
-                        const musicBlob = await downloadAndCacheMusic();
-                        playMusicFromBlob(musicBlob);
-                    }
-                } catch (error) {
-                    console.error('خطا در خواندن موسیقی از کش:', error);
-                    const musicBlob = await downloadAndCacheMusic();
-                    playMusicFromBlob(musicBlob);
-                }
-            } else {
-                console.log('نسخه جدید موسیقی یافت شد یا اولین بازدید است. شروع دانلود...');
-                try {
-                    const musicBlob = await downloadAndCacheMusic();
-                    playMusicFromBlob(musicBlob);
-                } catch (error) {
-                    console.error('فرایند دانلود و پخش موسیقی با خطا مواجه شد:', error);
-                }
-            }
-        }
-
-        let isInitialLoad = true; 
+        let isInitialLoad = true;
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 const userDocRef = doc(db, 'users', user.uid);
-
                 const unsubscribe = onSnapshot(userDocRef, (userDocSnap) => {
                     if (userDocSnap.exists()) {
                         const userData = userDocSnap.data();
                         userDisplayName.textContent = userData.displayName || "کاربر ناشناس";
                         userAvatar.src = userData.avatarUrl || 'https://i.imgur.com/T2bT1tG.png';
-                        
                         if (userData.isAdmin === true) {
                             adminPanelButton.style.display = 'block';
                         } else {
                             adminPanelButton.style.display = 'none';
                         }
-
                     } else {
                         userDisplayName.textContent = user.displayName || "کاربر ناشناس";
                         userAvatar.src = 'https://i.imgur.com/T2bT1tG.png';
                         adminPanelButton.style.display = 'none';
                     }
-                    
                     if (isInitialLoad) {
                         document.body.classList.add('loaded');
                         handleBackgroundMusic();
                         isInitialLoad = false;
                     }
-
                 }, (error) => {
                     console.error("خطا در گوش دادن به اطلاعات کاربر:", error);
                     loaderSpinner.style.display = 'none';
@@ -507,48 +375,42 @@
                 const maintenanceDocRef = doc(db, 'settings', 'maintenance');
                 onSnapshot(maintenanceDocRef, (docSnap) => {
                     if (docSnap.exists() && docSnap.data().enabled === true) {
-                        showCustomAlert(
-                            "سرور در حالت بروزرسانی قرار گرفت. شما به صفحه اصلی منتقل می‌شوید.",
-                            () => { window.location.href = './index.html'; }
-                        );
+                        showCustomAlert("سرور در حالت بروزرسانی قرار گرفت. شما به صفحه اصلی منتقل می‌شوید.", () => { window.location.href = './index.html'; });
                     }
                 });
-
             } else {
                 window.location.href = './login.html';
             }
         });
 
-
-        // --- Event Listeners ---
-
-        // *** ویرایش رویداد کلیک روی آواتار برای باز کردن پنل جدید ***
+        // --- (تغییر یافته) Event Listeners ---
+        
+        // باز کردن پنل منوی پروفایل با کلیک روی آواتار
         userAvatar.addEventListener('click', () => {
-            profileModalOverlay.classList.add('visible');
+            profileMenuModal.classList.add('visible');
         });
 
-        // رویداد برای بستن پنل با کلیک روی پس‌زمینه
-        profileModalOverlay.addEventListener('click', (event) => {
-            if (event.target === profileModalOverlay) {
-                profileModalOverlay.classList.remove('visible');
+        // بستن پنل با کلیک روی پس‌زمینه تار
+        profileMenuModal.addEventListener('click', (event) => {
+            if (event.target === profileMenuModal) {
+                profileMenuModal.classList.remove('visible');
             }
         });
 
-        // رویداد کلیک دکمه "پروفایل" در پنل
-        profileModalProfileBtn.addEventListener('click', () => {
+        // رویداد کلیک برای دکمه "پروفایل"
+        profileButton.addEventListener('click', () => {
             checkMaintenanceAndProceed(() => {
                 window.location.href = './profile user.html';
             });
         });
 
-        // رویداد کلیک دکمه "فروشگاه" در پنل
-        profileModalShopBtn.addEventListener('click', () => {
+        // رویداد کلیک برای دکمه "فروشگاه"
+        shopButton.addEventListener('click', () => {
             checkMaintenanceAndProceed(() => {
-                // این همان آدرس قبلی است که با کلیک روی آواتار اجرا می‌شد
                 window.location.href = './Avatar shop.html';
             });
         });
-
+        
         startGameButton.addEventListener('click', () => {
             checkMaintenanceAndProceed(() => {
                 window.location.href = './users search.html';
