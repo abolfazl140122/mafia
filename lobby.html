@@ -2,23 +2,22 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
-    <title>لابی بازی</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>لابی بازی - شهر مافیا</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-gold: #ffc947;
-            --dark-red: #8c4843;
-            --darker-red: #5a2c2a;
-            --citizen-blue: #2980b9;
-            --mafia-red: #c0392b;
+            --bg-dark: #1a140e;
+            --card-bg: #2b2118;
+            --border-color: #5c4a3a;
             --text-light: #f0e6d2;
             --text-secondary: #c5a687;
-            --bg-dark: #1a140e;
-            --bg-light-dark: #2c231a;
-            --border-color: #5c4a3a;
+            --fascist-red: #8c4843;
+            --liberal-blue: #4a6d8a;
+            --gold: #ffc947;
+            --crown-gold: #ffd700;
         }
 
         * {
@@ -41,17 +40,25 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            align-items: center;
             padding: 10px;
             background-image: url('https://up.20script.ir/file/6195-file-000000001500622f9419de6c322df297-1-.jpg');
             background-size: cover;
-            background-position: center center;
+            background-position: center;
             background-attachment: fixed;
+        }
+        
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(26, 20, 14, 0.85);
+            z-index: 0;
         }
 
         .game-container {
+            position: relative;
+            z-index: 1;
             width: 100%;
-            max-width: 500px; /* محدود کردن عرض برای نمایش بهتر در دسکتاپ */
             height: 100%;
             display: flex;
             flex-direction: column;
@@ -59,147 +66,167 @@
             gap: 10px;
         }
 
-        /* --- بخش بازیکنان --- */
-        .players-row {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 5px;
-            padding: 5px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 12px;
+        /* --- Player Rows --- */
+        .player-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
         }
 
         .player-card {
-            aspect-ratio: 3 / 4;
-            background: var(--bg-light-dark);
+            background-color: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
+            border-radius: 12px;
+            width: 15vw; /* Responsive width */
+            max-width: 80px; /* Max size for larger screens */
+            aspect-ratio: 3 / 4;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             padding: 5px;
-            transition: all 0.3s ease;
+            position: relative;
+            transition: transform 0.3s, box-shadow 0.3s;
         }
         
-        .player-card.taken {
-            border-color: var(--primary-gold);
-            box-shadow: 0 0 10px rgba(255, 201, 71, 0.3);
+        .player-card.creator::before {
+            content: '👑';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.2rem;
+            color: var(--crown-gold);
+            text-shadow: 0 0 5px black;
         }
 
         .player-avatar {
             width: 70%;
             aspect-ratio: 1 / 1;
-            background-color: #1a140e;
             border-radius: 50%;
-            border: 2px solid var(--border-color);
-            margin-bottom: 5px;
+            background-color: #443a2e;
+            margin-bottom: 8px;
             display: flex;
             justify-content: center;
             align-items: center;
             overflow: hidden;
         }
-
+        
         .player-avatar img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
+        
+        .player-avatar.empty {
+             border: 2px dashed var(--border-color);
+             background: transparent;
+        }
 
         .player-name {
-            font-size: clamp(0.6rem, 2.5vw, 0.8rem);
+            font-size: clamp(0.6rem, 2.5vw, 0.8rem); /* Responsive font size */
             font-weight: 700;
             color: var(--text-secondary);
-            text-align: center;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             width: 100%;
-        }
-        
-        .player-card.taken .player-name {
-            color: var(--text-light);
+            text-align: center;
         }
 
-        /* --- بخش قوانین --- */
-        .policies-section {
+        /* --- Center Board --- */
+        .board-center {
+            width: 100%;
             display: flex;
             flex-direction: column;
             gap: 10px;
             padding: 10px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 12px;
-            position: relative;
+            background-color: rgba(0,0,0,0.3);
+            border-radius: 15px;
         }
 
-        .policy-board {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 8px;
-            padding: 15px;
+        .policy-track {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            padding: 10px;
             border-radius: 10px;
+            border: 2px solid;
             position: relative;
         }
-
-        .policy-board.citizen {
-            background-color: rgba(41, 128, 185, 0.8);
-            border: 2px solid var(--citizen-blue);
-        }
-
-        .policy-board.mafia {
-            background-color: rgba(192, 57, 43, 0.8);
-            border: 2px solid var(--mafia-red);
-        }
-
-        .policy-board::before {
+        
+        .policy-track::after {
             content: attr(data-title);
             position: absolute;
-            right: -8px;
+            left: -5px;
             top: 50%;
-            transform: translateY(-50%) rotate(90deg);
-            transform-origin: bottom right;
-            color: var(--text-light);
+            transform: translateY(-50%) rotate(180deg);
+            writing-mode: vertical-rl;
             font-weight: 900;
-            font-size: 1.1rem;
-            padding: 0 10px;
+            font-size: 1rem;
+            padding: 8px 4px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .track-liberal {
+            background-color: rgba(74, 109, 138, 0.5);
+            border-color: var(--liberal-blue);
+        }
+        .track-liberal::after {
+            content: 'شهروند';
+            background-color: var(--liberal-blue);
+        }
+        
+        .track-fascist {
+            background-color: rgba(140, 72, 67, 0.5);
+            border-color: var(--fascist-red);
+        }
+        .track-fascist::after {
+             content: 'مافیا';
+             background-color: var(--fascist-red);
         }
 
         .policy-slot {
-            aspect-ratio: 5 / 3;
-            background-color: rgba(0, 0, 0, 0.2);
-            border: 2px dashed rgba(255, 255, 255, 0.3);
+            flex-grow: 1;
+            height: 40px;
+            background-color: rgba(0,0,0,0.4);
+            border: 2px dashed var(--border-color);
             border-radius: 6px;
         }
 
-        /* --- بخش دکمه‌های کنترل --- */
-        .controls-toolbar {
+        /* --- Bottom Controls --- */
+        .controls {
             display: flex;
             justify-content: space-around;
             align-items: center;
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 12px;
-            border-top: 2px solid var(--border-color);
+            padding: 8px;
+            background-color: rgba(0,0,0,0.4);
+            border-radius: 50px;
+            width: 80%;
+            max-width: 400px;
+            margin: 0 auto;
         }
 
         .control-btn {
-            width: 50px;
-            height: 50px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
             border-radius: 50%;
-            border: 2px solid var(--border-color);
-            background: linear-gradient(145deg, #443a2e, #2a2118);
-            color: var(--text-light);
+            width: 45px;
+            height: 45px;
             font-size: 1.5rem;
+            color: var(--text-light);
             cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
-            transition: all 0.2s ease;
+            transition: background-color 0.2s;
         }
 
         .control-btn:hover {
-            border-color: var(--primary-gold);
-            transform: translateY(-2px);
+            background-color: #443a2e;
         }
 
     </style>
@@ -207,21 +234,22 @@
 <body>
 
     <div class="game-container">
-        <!-- ردیف بالای بازیکنان -->
-        <div class="players-row" id="top-players">
-            <!-- 6 جایگاه بازیکن به صورت داینامیک اضافه می‌شود -->
+        <!-- 6 Players on Top -->
+        <div class="player-row" id="top-row">
+            <!-- Player cards will be generated by JS -->
         </div>
 
-        <!-- بخش میانی برای قوانین -->
-        <div class="policies-section">
-            <div class="policy-board citizen" data-title="شهروند">
+        <!-- Center Board -->
+        <div class="board-center">
+            <div class="policy-track track-liberal" data-title="شهروند">
                 <div class="policy-slot"></div>
                 <div class="policy-slot"></div>
                 <div class="policy-slot"></div>
                 <div class="policy-slot"></div>
                 <div class="policy-slot"></div>
             </div>
-            <div class="policy-board mafia" data-title="مافیا">
+            <div class="policy-track track-fascist" data-title="مافیا">
+                <div class="policy-slot"></div>
                 <div class="policy-slot"></div>
                 <div class="policy-slot"></div>
                 <div class="policy-slot"></div>
@@ -230,142 +258,138 @@
             </div>
         </div>
 
-        <!-- ردیف پایین بازیکنان -->
-        <div class="players-row" id="bottom-players">
-            <!-- 6 جایگاه بازیکن به صورت داینامیک اضافه می‌شود -->
+        <!-- 6 Players on Bottom -->
+        <div class="player-row" id="bottom-row">
+            <!-- Player cards will be generated by JS -->
         </div>
 
-        <!-- نوار ابزار پایین -->
-        <div class="controls-toolbar">
+        <!-- Controls -->
+        <div class="controls">
             <button class="control-btn" title="خروج">🚪</button>
-            <button class="control-btn" title="تنظیمات">⚙️</button>
             <button class="control-btn" title="چت">💬</button>
-            <button class="control-btn" title="بی‌صدا کردن">🎤</button>
+            <button class="control-btn" title="تنظیمات">⚙️</button>
         </div>
     </div>
 
     <script type="module">
-        // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, collection, onSnapshot, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // Your web app's Firebase configuration
         const firebaseConfig = {
-            apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
-            authDomain: "mafia-9fcbf.firebaseapp.com",
-            projectId: "mafia-9fcbf",
-            storageBucket: "mafia-9fcbf.appspot.com",
-            messagingSenderId: "471627157488",
-            appId: "1:471627157488:web:92f008548a5596619a5735",
-            measurementId: "G-0PDHDWC6NV"
+          apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
+          authDomain: "mafia-9fcbf.firebaseapp.com",
+          projectId: "mafia-9fcbf",
+          storageBucket: "mafia-9fcbf.appspot.com",
+          messagingSenderId: "471627157488",
+          appId: "1:471627157488:web:92f008548a5596619a5735",
+          measurementId: "G-0PDHDWC6NV"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // --- DOM Elements ---
-        const topPlayersContainer = document.getElementById('top-players');
-        const bottomPlayersContainer = document.getElementById('bottom-players');
+        const topRow = document.getElementById('top-row');
+        const bottomRow = document.getElementById('bottom-row');
 
         let currentUser = null;
-        
-        // --- Functions ---
-        
-        /**
-         * از URL پارامتر آیدی لابی را استخراج می‌کند
-         * @returns {string|null} The lobby ID or null if not found.
-         */
-        function getLobbyIdFromUrl() {
-            const params = new URLSearchParams(window.location.search);
-            return params.get('id'); 
-        }
+        let lobbyId = null;
+        let lobbyCreatorId = null;
 
-        /**
-         * یک کارت بازیکن را ایجاد و برمی‌گرداند
-         * @param {object|null} playerData - اطلاعات بازیکن یا null برای جایگاه خالی
-         */
-        function createPlayerCard(playerData = null) {
-            const card = document.createElement('div');
-            card.className = 'player-card';
-
-            const avatarUrl = playerData?.photoURL || ''; // آدرس عکس پروفایل کاربر
-            const displayName = playerData?.displayName || 'کاربر';
+        // --- Render Player Cards ---
+        function renderPlayerSlots(players = []) {
+            topRow.innerHTML = '';
+            bottomRow.innerHTML = '';
             
-            card.innerHTML = `
-                <div class="player-avatar">
-                    ${avatarUrl ? `<img src="${avatarUrl}" alt="Avatar">` : ''}
-                </div>
-                <span class="player-name">${playerData ? displayName : 'جایگاه خالی'}</span>
-            `;
-
-            if (playerData) {
-                card.classList.add('taken');
-                card.dataset.uid = playerData.uid;
-            }
+            const totalSlots = 12;
             
-            return card;
-        }
+            for (let i = 0; i < totalSlots; i++) {
+                const player = players[i];
+                const card = document.createElement('div');
+                card.className = 'player-card';
 
-        /**
-         * رابط کاربری را بر اساس داده‌های لابی به‌روزرسانی می‌کند
-         * @param {object} lobbyData - داده‌های لایو از فایربیس
-         */
-        function renderLobby(lobbyData) {
-            // پاک کردن جایگاه‌های فعلی
-            topPlayersContainer.innerHTML = '';
-            bottomPlayersContainer.innerHTML = '';
+                let avatarHTML = '<div class="player-avatar empty"></div>';
+                let nameHTML = '<p class="player-name">جایگاه خالی</p>';
 
-            const players = lobbyData.players || [];
-            
-            // ایجاد ۱۲ جایگاه
-            for (let i = 0; i < 12; i++) {
-                const playerData = players[i] || null;
-                const card = createPlayerCard(playerData);
+                if (player) {
+                    // Check if this player is the creator
+                    if (player.uid === lobbyCreatorId) {
+                        card.classList.add('creator');
+                    }
+                    const avatarSrc = player.photoURL || 'https://via.placeholder.com/50'; // Default avatar
+                    avatarHTML = `<div class="player-avatar"><img src="${avatarSrc}" alt="Avatar"></div>`;
+                    nameHTML = `<p class="player-name">${player.displayName || 'کاربر'}</p>`;
+                }
+                
+                card.innerHTML = avatarHTML + nameHTML;
 
                 if (i < 6) {
-                    topPlayersContainer.appendChild(card);
+                    topRow.appendChild(card);
                 } else {
-                    bottomPlayersContainer.appendChild(card);
+                    bottomRow.appendChild(card);
                 }
             }
         }
-
+        
         // --- Main Logic ---
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
-                const lobbyId = getLobbyIdFromUrl();
+                const params = new URLSearchParams(window.location.search);
+                lobbyId = params.get('id');
 
                 if (!lobbyId) {
-                    alert("خطا: آیدی لابی مشخص نشده است!");
-                    window.location.href = './Lobby page.html'; // بازگشت به لیست لابی‌ها
+                    alert('شناسه لابی نامعتبر است. بازگشت به لیست لابی‌ها...');
+                    window.location.href = './lobby-list.html'; // Or your lobby list page name
                     return;
                 }
 
-                // گوش دادن به تغییرات سند لابی در فایربیس
-                const lobbyDocRef = doc(db, 'Lobbys list', lobbyId);
+                const lobbyRef = doc(db, 'Lobbys list', lobbyId);
+                const playersRef = collection(db, 'Lobbys list', lobbyId, 'players');
                 
-                onSnapshot(lobbyDocRef, (docSnap) => {
-                    if (docSnap.exists()) {
-                        const lobbyData = docSnap.data();
-                        console.log("Lobby data updated:", lobbyData);
-                        renderLobby(lobbyData);
-                    } else {
-                        console.error("Lobby not found!");
-                        alert("لابی مورد نظر یافت نشد یا حذف شده است.");
-                        window.location.href = './Lobby page.html';
+                // Get lobby info once to find the creator
+                const lobbySnap = await getDoc(lobbyRef);
+                if (lobbySnap.exists()) {
+                    lobbyCreatorId = lobbySnap.data().creatorId;
+                } else {
+                     alert('این لابی دیگر وجود ندارد.');
+                     window.location.href = './lobby-list.html';
+                     return;
+                }
+
+
+                // Add user to the lobby if not already in
+                const playerDocRef = doc(playersRef, currentUser.uid);
+                const playerDocSnap = await getDoc(playerDocRef);
+
+                if (!playerDocSnap.exists()) {
+                    try {
+                        await setDoc(playerDocRef, {
+                            uid: currentUser.uid,
+                            displayName: currentUser.displayName,
+                            photoURL: currentUser.photoURL,
+                            joinedAt: serverTimestamp()
+                        });
+                    } catch (error) {
+                        console.error("Failed to join lobby:", error);
+                        alert("خطا در ورود به لابی.");
                     }
-                }, (error) => {
-                    console.error("Error listening to lobby changes:", error);
-                    alert("خطا در برقراری ارتباط با سرور.");
+                }
+
+                // Listen for real-time updates on players
+                onSnapshot(playersRef, (snapshot) => {
+                    const players = [];
+                    snapshot.forEach(doc => {
+                        players.push(doc.data());
+                    });
+                    // Simple sort to have a consistent order, e.g., by join time
+                    players.sort((a, b) => a.joinedAt?.seconds - b.joinedAt?.seconds);
+                    renderPlayerSlots(players);
                 });
 
             } else {
-                // اگر کاربر وارد نشده بود، به صفحه لاگین هدایت شود
-                console.log("User not logged in. Redirecting...");
+                alert('برای ورود به لابی، ابتدا باید وارد حساب کاربری خود شوید.');
                 window.location.href = './login.html';
             }
         });
