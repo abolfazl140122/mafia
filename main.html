@@ -33,26 +33,6 @@
             align-items: center;
             padding: 20px;
         }
-        
-        /* --- پنل تار کننده پس‌زمینه --- */
-        #page-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(5px);
-            z-index: 998; /* پایین‌تر از مودال‌ها */
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.4s ease;
-        }
-
-        #page-overlay.visible {
-            opacity: 1;
-            visibility: visible;
-        }
 
         /* --- پنل بارگذاری اولیه --- */
         #loading-overlay {
@@ -67,7 +47,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 1002;
+            z-index: 1002; /* بالاتر از همه */
             transition: opacity 0.5s ease;
         }
         
@@ -85,23 +65,102 @@
             100% { transform: rotate(360deg); }
         }
 
-        #loading-text { margin-top: 20px; font-size: 1.1rem; font-weight: 700; color: #f0e6d2; text-shadow: 1px 1px 3px #000; }
-        .main-content { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; align-items: center; opacity: 0; visibility: hidden; transition: opacity 0.5s ease, visibility 0.5s ease; }
-        body.loaded .main-content { opacity: 1; visibility: visible; }
-        body.loaded #loading-overlay { opacity: 0; visibility: hidden; }
-        
-        /* **** پنل دانلود موسیقی **** */
-        #music-download-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.9); backdrop-filter: blur(10px); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1001; opacity: 0; visibility: hidden; transition: all 0.5s ease; }
-        #music-download-overlay.visible { opacity: 1; visibility: visible; }
-        .download-panel { width: 90%; max-width: 350px; text-align: center; }
-        .download-title { font-size: 1.4rem; font-weight: 900; color: #ffc947; margin-bottom: 20px; text-shadow: 0 2px 4px rgba(0,0,0,0.7); }
-        .progress-bar-container { width: 100%; height: 20px; background-color: rgba(0, 0, 0, 0.4); border: 1px solid #5c4a3a; border-radius: 10px; overflow: hidden; box-shadow: inset 0 2px 5px rgba(0,0,0,0.5); }
-        #progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #8c4843, #ffc947); border-radius: 10px; transition: width 0.3s ease-out; }
-        #progress-text { margin-top: 15px; font-size: 1rem; font-weight: 700; color: #e0dacc; }
+        #loading-text {
+            margin-top: 20px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #f0e6d2;
+            text-shadow: 1px 1px 3px #000;
+        }
 
-        /* --- استایل‌های اصلی --- */
+        .main-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        body.loaded .main-content {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        body.loaded #loading-overlay {
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        /* **** استایل‌های پنل دانلود موسیقی **** */
+        #music-download-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            display: flex; /* در حالت عادی مخفی است */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease;
+        }
+
+        #music-download-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .download-panel {
+            width: 90%;
+            max-width: 350px;
+            text-align: center;
+        }
+
+        .download-title {
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: #ffc947;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.7);
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 20px;
+            background-color: rgba(0, 0, 0, 0.4);
+            border: 1px solid #5c4a3a;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+        }
+        
+        #progress-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #8c4843, #ffc947);
+            border-radius: 10px;
+            transition: width 0.3s ease-out;
+        }
+
+        #progress-text {
+            margin-top: 15px;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #e0dacc;
+        }
+
+        /* --- سایر استایل‌ها --- */
         .top-right-container { width: 100%; display: flex; justify-content: flex-end; align-items: flex-start; }
-        .profile-and-menu-wrapper { position: relative; display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
+        .profile-and-menu-wrapper { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
         .profile-section { display: flex; align-items: center; background-color: rgba(0, 0, 0, 0.5); padding: 10px 15px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 3px 8px rgba(0,0,0,0.3); }
         .avatar-container { display: flex; align-items: center; gap: 12px; }
         #user-avatar { width: 50px; height: 50px; border-radius: 50%; border: 2px solid #c5a687; object-fit: cover; cursor: pointer; transition: all 0.2s ease-in-out; }
@@ -115,52 +174,6 @@
         #start-game-button { padding: 15px 40px; font-size: 1.3rem; font-weight: 900; color: #ffffff; background: linear-gradient(145deg, #8c4843, #5a2c2a); border: 2px solid #ffc947; border-radius: 15px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5), inset 0 -2px 5px rgba(0,0,0,0.3); text-shadow: 0 2px 4px rgba(0,0,0,0.7); }
         #start-game-button:hover { background: linear-gradient(145deg, #a1534d, #6b3431); box-shadow: 0 8px 20px rgba(255, 201, 71, 0.3), inset 0 -2px 5px rgba(0,0,0,0.3); }
         #start-game-button:active { transform: scale(0.96); }
-        
-        /* --- منوی کشویی پروفایل --- */
-        #profile-dropdown {
-            position: absolute;
-            top: 75px; /* زیر بخش پروفایل */
-            left: 0;
-            width: 180px;
-            background: rgba(30, 23, 15, 0.9);
-            border: 1px solid #5c4a3a;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-            backdrop-filter: blur(8px);
-            padding: 8px;
-            z-index: 999;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-10px) scale(0.95);
-            transform-origin: top right;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
-        #profile-dropdown.visible {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0) scale(1);
-        }
-        .dropdown-button {
-            display: block;
-            width: 100%;
-            padding: 12px 10px;
-            background: transparent;
-            border: none;
-            color: #e0dacc;
-            font-family: 'Vazirmatn', sans-serif;
-            font-size: 1rem;
-            font-weight: 700;
-            text-align: right;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.2s ease, color 0.2s ease;
-        }
-        .dropdown-button:hover {
-            background-color: rgba(255, 201, 71, 0.15);
-            color: #ffc947;
-        }
-
-        /* --- مودال‌ها --- */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
         .modal-overlay.visible { opacity: 1; visibility: visible; }
         .modal-content { background: linear-gradient(145deg, #3c3022, #1e170f); border: 2px solid #5c4a3a; border-radius: 16px; padding: 25px 30px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); transform: scale(0.9); transition: all 0.3s ease; }
@@ -170,110 +183,98 @@
         .modal-button { width: 100%; padding: 12px; font-size: 1rem; font-weight: 700; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; color: #ffffff; background: linear-gradient(145deg, #8c4843, #5a2c2a); border: 1px solid #ffc947; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
         .modal-button:hover { background: linear-gradient(145deg, #a1534d, #6b3431); }
 
-        /* --- استایل پنل پروفایل کاربری --- */
-        .profile-modal-content {
-            position: relative;
+        /* --- استایل‌های پنل منوی آواتار --- */
+        #avatar-menu-content {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding: 30px;
+        }
+
+        /* --- استایل‌های پنل پروفایل کاربری (جدید و خفن!) --- */
+        #profile-modal-content {
             background: linear-gradient(160deg, #2a2118, #1a140e);
-            border: 2px solid #7a6049;
-            width: 90%;
+            border: 2px solid #7a5c43;
             max-width: 400px;
             padding: 0;
-            border-radius: 20px;
-            box-shadow: 0 0 40px rgba(0, 0, 0, 0.7);
             overflow: hidden;
         }
+
+        .profile-header {
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://www.transparenttextures.com/patterns/dark-matter.png');
+            padding: 25px;
+            text-align: center;
+            border-bottom: 2px solid #5c4a3a;
+            position: relative;
+        }
+
         #profile-modal-close-btn {
             position: absolute;
-            top: 15px;
+            top: 10px;
             left: 15px;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid #7a6049;
-            color: #f0e6d2;
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            font-size: 1.5rem;
-            font-weight: bold;
+            font-size: 2rem;
+            color: #c5a687;
             cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
+            line-height: 1;
         }
         #profile-modal-close-btn:hover {
-            background: #ffc947;
-            color: #1a140e;
-            transform: rotate(90deg);
+            color: #ffc947;
+            transform: scale(1.2);
         }
-        .profile-header {
-            padding: 30px 20px;
-            text-align: center;
-            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.6)), url('https://www.transparenttextures.com/patterns/wood-pattern.png');
-            border-bottom: 2px solid #7a6049;
-        }
-        .profile-avatar-wrapper {
+
+        #profile-modal-avatar {
             width: 120px;
             height: 120px;
             border-radius: 50%;
             border: 4px solid #ffc947;
-            margin: 0 auto 15px;
-            padding: 5px;
-            background: linear-gradient(145deg, #8c4843, #5a2c2a);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-        }
-        #profile-modal-avatar {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(255, 201, 71, 0.4);
+            margin-bottom: 15px;
             object-fit: cover;
         }
+        
         #profile-modal-name {
             font-size: 1.8rem;
             font-weight: 900;
-            color: #ffc947;
-            text-shadow: 0 2px 5px #000;
+            color: #f0e6d2;
+            text-shadow: 0 3px 6px rgba(0,0,0,0.6);
         }
+
         .profile-body {
             padding: 25px 30px;
-        }
-        .profile-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+            display: flex;
+            flex-direction: column;
             gap: 20px;
         }
-        .stat-item {
-            background-color: rgba(0, 0, 0, 0.25);
-            border: 1px solid #4a3c2f;
-            border-radius: 10px;
-            padding: 15px;
-            text-align: center;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.4);
+
+        .profile-stat-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 1rem;
+            border-bottom: 1px solid rgba(92, 74, 58, 0.5);
+            padding-bottom: 12px;
         }
-        .stat-value {
-            font-size: 1.5rem;
-            font-weight: 900;
-            color: #f0e6d2;
-            margin-bottom: 5px;
+
+        .profile-stat-item:last-child {
+            border-bottom: none;
         }
+
         .stat-label {
-            font-size: 0.9rem;
-            font-weight: 400;
+            font-weight: 700;
             color: #c5a687;
         }
-        .profile-footer {
-            padding: 15px 30px;
-            font-size: 0.85rem;
-            text-align: center;
-            color: #9a8a78;
-            background-color: rgba(0,0,0,0.3);
-            border-top: 1px solid #4a3c2f;
+
+        .stat-value {
+            font-weight: 400;
+            color: #e0dacc;
+            direction: ltr; /* برای نمایش صحیح تاریخ و اعداد */
+            text-align: right;
         }
 
     </style>
 </head>
 <body>
-
-    <div id="page-overlay"></div>
 
     <div id="loading-overlay">
         <div class="loader"></div>
@@ -299,11 +300,6 @@
                         <span id="user-display-name"></span>
                     </div>
                 </div>
-                <!-- منوی کشویی پروفایل -->
-                <div id="profile-dropdown">
-                    <button id="dropdown-profile-btn" class="dropdown-button">پروفایل</button>
-                    <button id="dropdown-shop-btn" class="dropdown-button">فروشگاه</button>
-                </div>
                 <div class="menu-buttons">
                     <button class="menu-button">سازندگان</button>
                     <button class="menu-button">رده بندی</button>
@@ -319,7 +315,7 @@
     
     <audio id="background-music" loop></audio>
 
-    <!-- مودال هشدار -->
+    <!-- پنل Alert عمومی -->
     <div id="custom-alert-overlay" class="modal-overlay">
         <div class="modal-content">
             <h2 class="modal-title">توجه!</h2>
@@ -327,40 +323,45 @@
             <button id="custom-alert-confirm-btn" class="modal-button">تایید</button>
         </div>
     </div>
-    
-    <!-- مودال پروفایل کاربری -->
+
+    <!-- پنل جدید: منوی آواتار -->
+    <div id="avatar-menu-overlay" class="modal-overlay">
+        <div id="avatar-menu-content" class="modal-content">
+            <button id="avatar-menu-profile-btn" class="modal-button">پروفایل</button>
+            <button id="avatar-menu-shop-btn" class="modal-button">فروشگاه</button>
+        </div>
+    </div>
+
+    <!-- پنل جدید: پروفایل کاربر -->
     <div id="profile-modal-overlay" class="modal-overlay">
-        <div class="modal-content profile-modal-content">
-             <button id="profile-modal-close-btn">&times;</button>
-             <div class="profile-header">
-                 <div class="profile-avatar-wrapper">
-                     <img id="profile-modal-avatar" src="" alt="آواتار">
-                 </div>
-                 <h2 id="profile-modal-name">نام کاربر</h2>
-             </div>
-             <div class="profile-body">
-                 <div class="profile-stats">
-                     <div class="stat-item">
-                         <p id="profile-modal-diamonds" class="stat-value">0</p>
-                         <p class="stat-label">💎 الماس</p>
-                     </div>
-                     <div class="stat-item">
-                         <p id="profile-modal-age" class="stat-value">0</p>
-                         <p class="stat-label">🎂 سن</p>
-                     </div>
-                     <div class="stat-item">
-                         <p id="profile-modal-owned-avatars" class="stat-value">0</p>
-                         <p class="stat-label">🎭 آواتارهای من</p>
-                     </div>
-                     <div class="stat-item">
-                        <p id="profile-modal-current-stage" class="stat-value">0</p>
-                        <p class="stat-label">🏆 مرحله</p>
-                    </div>
-                 </div>
-             </div>
-             <div class="profile-footer">
-                <p>عضویت از: <span id="profile-modal-created-at">-</span></p>
-             </div>
+        <div id="profile-modal-content" class="modal-content">
+            <div class="profile-header">
+                <span id="profile-modal-close-btn">&times;</span>
+                <img id="profile-modal-avatar" src="" alt="آواتار پروفایل">
+                <h2 id="profile-modal-name"></h2>
+            </div>
+            <div class="profile-body">
+                <div class="profile-stat-item">
+                    <span class="stat-label">📜 تاریخ ثبت نام:</span>
+                    <span id="profile-stat-date" class="stat-value"></span>
+                </div>
+                <div class="profile-stat-item">
+                    <span class="stat-label">🎂 سن:</span>
+                    <span id="profile-stat-age" class="stat-value"></span>
+                </div>
+                <div class="profile-stat-item">
+                    <span class="stat-label">🎭 تعداد آواتارها:</span>
+                    <span id="profile-stat-avatars" class="stat-value"></span>
+                </div>
+                 <div class="profile-stat-item">
+                    <span class="stat-label">💎 تعداد الماس:</span>
+                    <span id="profile-stat-games" class="stat-value"></span>
+                </div>
+                <div class="profile-stat-item">
+                    <span class="stat-label">📧 ایمیل:</span>
+                    <span id="profile-stat-email" class="stat-value"></span>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -384,58 +385,66 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // --- متغیرهای سراسری و انتخابگرهای DOM ---
-        let isInitialLoad = true;
-        let isMusicPlaying = false;
-        let currentUserData = null; // برای ذخیره اطلاعات کاربر
-
-        const loadingOverlay = document.getElementById('loading-overlay');
-        const loaderSpinner = loadingOverlay.querySelector('.loader');
-        const loadingText = document.getElementById('loading-text');
-        
+        // --- DOM Elements ---
         const userDisplayName = document.getElementById('user-display-name');
         const userAvatar = document.getElementById('user-avatar');
         const startGameButton = document.getElementById('start-game-button');
-        const adminPanelButton = document.getElementById('admin-panel-button');
         const menuButtons = document.querySelectorAll('.menu-button');
-        
-        const pageOverlay = document.getElementById('page-overlay');
-        const profileDropdown = document.getElementById('profile-dropdown');
-        const dropdownProfileBtn = document.getElementById('dropdown-profile-btn');
-        const dropdownShopBtn = document.getElementById('dropdown-shop-btn');
-        
         const customAlertOverlay = document.getElementById('custom-alert-overlay');
         const customAlertMessage = document.getElementById('custom-alert-message');
         const customAlertConfirmBtn = document.getElementById('custom-alert-confirm-btn');
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const loaderSpinner = loadingOverlay.querySelector('.loader');
+        const loadingText = document.getElementById('loading-text');
+        const adminPanelButton = document.getElementById('admin-panel-button');
 
-        const profileModalOverlay = document.getElementById('profile-modal-overlay');
-        const profileModalCloseBtn = document.getElementById('profile-modal-close-btn');
-
+        // المان‌های موسیقی و دانلود
         const backgroundMusic = document.getElementById('background-music');
         const musicDownloadOverlay = document.getElementById('music-download-overlay');
         const progressBar = document.getElementById('progress-bar');
         const progressText = document.getElementById('progress-text');
 
+        // المان‌های پنل‌های جدید
+        const avatarMenuOverlay = document.getElementById('avatar-menu-overlay');
+        const avatarMenuProfileBtn = document.getElementById('avatar-menu-profile-btn');
+        const avatarMenuShopBtn = document.getElementById('avatar-menu-shop-btn');
+        const profileModalOverlay = document.getElementById('profile-modal-overlay');
+        const profileModalCloseBtn = document.getElementById('profile-modal-close-btn');
+
+        // المان‌های داخل پنل پروفایل
+        const profileModalAvatar = document.getElementById('profile-modal-avatar');
+        const profileModalName = document.getElementById('profile-modal-name');
+        const profileStatDate = document.getElementById('profile-stat-date');
+        const profileStatAge = document.getElementById('profile-stat-age');
+        const profileStatAvatars = document.getElementById('profile-stat-avatars');
+        const profileStatGames = document.getElementById('profile-stat-games');
+        const profileStatEmail = document.getElementById('profile-stat-email');
+
+        // متغیرها
         const MUSIC_URL = "https://raw.githubusercontent.com/abolfazl140122/mafia/main/dark-music-249503.mp3";
         const MUSIC_CACHE_NAME = 'mafia-music-cache-v1';
         const MUSIC_VERSION_KEY = 'mafia-music-version';
+        let isMusicPlaying = false;
+        let isInitialLoad = true;
+        let currentUserData = null; // برای نگهداری اطلاعات کاربر
 
-        // --- توابع اصلی ---
+        // --- توابع عمومی ---
+
+        function showModal(modalElement) {
+            modalElement.classList.add('visible');
+        }
+
+        function hideModal(modalElement) {
+            modalElement.classList.remove('visible');
+        }
 
         function showCustomAlert(message, onConfirm) {
-            hideAllPopups();
             customAlertMessage.textContent = message;
-            customAlertOverlay.classList.add('visible');
+            showModal(customAlertOverlay);
             customAlertConfirmBtn.onclick = () => {
-                customAlertOverlay.classList.remove('visible');
+                hideModal(customAlertOverlay);
                 if (onConfirm) onConfirm();
             };
-        }
-        
-        function hideAllPopups() {
-            profileDropdown.classList.remove('visible');
-            profileModalOverlay.classList.remove('visible');
-            pageOverlay.classList.remove('visible');
         }
 
         async function checkMaintenanceAndProceed(actionCallback) {
@@ -454,90 +463,69 @@
                 showCustomAlert("خطا در ارتباط با سرور. لطفا اتصال اینترنت خود را بررسی کرده و مجددا تلاش کنید.", () => {});
             }
         }
-
-        // --- منطق پروفایل کاربری ---
         
-        function toggleProfileDropdown(show) {
-            if (show) {
-                profileDropdown.classList.add('visible');
-                pageOverlay.classList.add('visible');
-            } else {
-                profileDropdown.classList.remove('visible');
-                pageOverlay.classList.remove('visible');
-            }
-        }
+        // --- توابع مربوط به پروفایل کاربر ---
 
-        function formatDate(timestamp) {
-            if (!timestamp || !timestamp.toDate) return 'نامشخص';
-            return timestamp.toDate().toLocaleDateString('fa-IR', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
-        }
-
-        function showProfileModal() {
+        function populateProfileModal() {
             if (!currentUserData) {
-                showCustomAlert("اطلاعات کاربر هنوز بارگذاری نشده است.");
+                console.error("اطلاعات کاربر برای نمایش پروفایل در دسترس نیست.");
                 return;
             }
-            
-            // پر کردن اطلاعات مودال
-            document.getElementById('profile-modal-avatar').src = currentUserData.avatarUrl || 'https://i.imgur.com/T2bT1tG.png';
-            document.getElementById('profile-modal-name').textContent = currentUserData.displayName || 'کاربر ناشناس';
-            document.getElementById('profile-modal-diamonds').textContent = currentUserData.game || 0; // استفاده از game به عنوان الماس
-            document.getElementById('profile-modal-age').textContent = currentUserData.old || 'ثبت نشده';
-            document.getElementById('profile-modal-owned-avatars').textContent = currentUserData.ownedAvatars ? currentUserData.ownedAvatars.length : 0;
-            document.getElementById('profile-modal-current-stage').textContent = currentUserData.currentStage || 1;
-            document.getElementById('profile-modal-created-at').textContent = formatDate(currentUserData.createdAt);
 
-            // نمایش مودال
-            hideAllPopups();
-            profileModalOverlay.classList.add('visible');
-            pageOverlay.classList.add('visible');
+            profileModalAvatar.src = currentUserData.avatarUrl || 'https://i.imgur.com/T2bT1tG.png';
+            profileModalName.textContent = currentUserData.displayName || "کاربر ناشناس";
+            profileStatAge.textContent = currentUserData.old || "نامشخص";
+            profileStatAvatars.textContent = (currentUserData.ownedAvatars?.length || 0) + " عدد";
+            profileStatGames.textContent = currentUserData.game || 0;
+            profileStatEmail.textContent = currentUserData.email || "ثبت نشده";
+
+            // تبدیل Timestamp فایربیس به تاریخ خوانا
+            if (currentUserData.createdAt && typeof currentUserData.createdAt.toDate === 'function') {
+                const date = currentUserData.createdAt.toDate();
+                profileStatDate.textContent = new Intl.DateTimeFormat('fa-IR', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                }).format(date);
+            } else {
+                profileStatDate.textContent = "نامشخص";
+            }
         }
 
 
-        // --- منطق موسیقی ---
-
-        const playMusicAfterUserInteraction = () => { /* ... (بدون تغییر) ... */ };
-        function playMusicFromBlob(blob) { /* ... (بدون تغییر) ... */ }
-        function downloadAndCacheMusic() { /* ... (بدون تغییر) ... */ }
-        async function handleBackgroundMusic() { /* ... (بدون تغییر) ... */ }
-        
-        // --- کد تکراری توابع موسیقی برای کامل بودن ---
-        const playMusicAfterUserInteractionImpl = () => {
+        // --- توابع موسیقی ---
+        const playMusicAfterUserInteraction = () => {
             if (!isMusicPlaying && backgroundMusic.src && backgroundMusic.paused) {
                 backgroundMusic.play()
                     .then(() => {
                         isMusicPlaying = true;
-                        document.body.removeEventListener('click', playMusicAfterUserInteractionImpl, true);
-                        document.body.removeEventListener('keydown', playMusicAfterUserInteractionImpl, true);
+                        document.body.removeEventListener('click', playMusicAfterUserInteraction, true);
+                        document.body.removeEventListener('keydown', playMusicAfterUserInteraction, true);
                     })
                     .catch(e => console.error("خطا در پخش موسیقی حتی پس از تعامل کاربر.", e));
             } else {
-                document.body.removeEventListener('click', playMusicAfterUserInteractionImpl, true);
-                document.body.removeEventListener('keydown', playMusicAfterUserInteractionImpl, true);
+                document.body.removeEventListener('click', playMusicAfterUserInteraction, true);
+                document.body.removeEventListener('keydown', playMusicAfterUserInteraction, true);
             }
         };
-        Object.assign(playMusicAfterUserInteraction, playMusicAfterUserInteractionImpl);
 
-        function playMusicFromBlobImpl(blob) {
+        function playMusicFromBlob(blob) {
             const objectUrl = URL.createObjectURL(blob);
             backgroundMusic.src = objectUrl;
             backgroundMusic.volume = 0.4;
             const playPromise = backgroundMusic.play();
             if (playPromise !== undefined) {
-                playPromise.then(() => { isMusicPlaying = true; }).catch(error => {
+                playPromise.then(() => { isMusicPlaying = true; })
+                .catch(error => {
+                    console.warn("پخش خودکار موسیقی مسدود شد. منتظر تعامل کاربر هستیم...", error);
                     isMusicPlaying = false;
                     document.body.addEventListener('click', playMusicAfterUserInteraction, true);
                     document.body.addEventListener('keydown', playMusicAfterUserInteraction, true);
                 });
             }
         }
-        Object.assign(playMusicFromBlob, playMusicFromBlobImpl);
 
-        function downloadAndCacheMusicImpl() {
+        function downloadAndCacheMusic() {
             return new Promise((resolve, reject) => {
                 musicDownloadOverlay.classList.add('visible');
                 const xhr = new XMLHttpRequest();
@@ -564,18 +552,17 @@
                 };
                 xhr.onerror = () => {
                     musicDownloadOverlay.classList.remove('visible');
-                    showCustomAlert("دانلود موسیقی پس‌زمینه با خطا مواجه شد. لطفاً اتصال اینترنت خود را بررسی کنید.", () => {});
+                    showCustomAlert("دانلود موسیقی پس‌زمینه با خطا مواجه شد.", () => {});
                     reject(new Error('خطای شبکه در دانلود موسیقی.'));
                 };
                 xhr.send();
             });
         }
-        Object.assign(downloadAndCacheMusic, downloadAndCacheMusicImpl);
 
-        async function handleBackgroundMusicImpl() {
+        async function handleBackgroundMusic() {
             const cachedVersion = localStorage.getItem(MUSIC_VERSION_KEY);
-            try {
-                if (cachedVersion === MUSIC_URL) {
+            if (cachedVersion === MUSIC_URL) {
+                try {
                     const cache = await caches.open(MUSIC_CACHE_NAME);
                     const cachedResponse = await cache.match(MUSIC_URL);
                     if (cachedResponse) {
@@ -583,25 +570,26 @@
                     } else {
                         playMusicFromBlob(await downloadAndCacheMusic());
                     }
-                } else {
+                } catch (error) {
                     playMusicFromBlob(await downloadAndCacheMusic());
                 }
-            } catch (error) {
-                console.error('فرایند دانلود و پخش موسیقی با خطا مواجه شد:', error);
+            } else {
+                try {
+                    playMusicFromBlob(await downloadAndCacheMusic());
+                } catch (error) { console.error('فرایند دانلود و پخش موسیقی با خطا مواجه شد:', error); }
             }
         }
-        Object.assign(handleBackgroundMusic, handleBackgroundMusicImpl);
 
 
-        // --- راه‌اندازی اصلی برنامه ---
+        // --- منطق اصلی و احراز هویت ---
+
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 const userDocRef = doc(db, 'users', user.uid);
-
-                onSnapshot(userDocRef, (userDocSnap) => {
+                const unsubscribe = onSnapshot(userDocRef, (userDocSnap) => {
                     if (userDocSnap.exists()) {
                         const userData = userDocSnap.data();
-                        currentUserData = userData; // ذخیره اطلاعات کاربر در متغیر سراسری
+                        currentUserData = userData; // ذخیره اطلاعات کاربر در متغیر
                         
                         userDisplayName.textContent = userData.displayName || "کاربر ناشناس";
                         userAvatar.src = userData.avatarUrl || 'https://i.imgur.com/T2bT1tG.png';
@@ -626,7 +614,7 @@
                 }, (error) => {
                     console.error("خطا در گوش دادن به اطلاعات کاربر:", error);
                     loaderSpinner.style.display = 'none';
-                    loadingText.textContent = 'خطا در اتصال به سرور.';
+                    loadingText.textContent = 'خطا در اتصال به سرور. لطفا اینترنت خود را بررسی کنید.';
                 });
 
                 const maintenanceDocRef = doc(db, 'settings', 'maintenance');
@@ -646,40 +634,58 @@
 
 
         // --- Event Listeners ---
-        
-        // کلیک روی آواتار برای باز کردن منوی کشویی
-        userAvatar.addEventListener('click', (e) => {
-            e.stopPropagation(); // جلوگیری از بسته شدن فوری منو توسط pageOverlay
-            const isVisible = profileDropdown.classList.contains('visible');
-            toggleProfileDropdown(!isVisible);
-        });
 
-        // کلیک روی گزینه پروفایل در منو
-        dropdownProfileBtn.addEventListener('click', () => {
-            checkMaintenanceAndProceed(() => {
-                showProfileModal();
+        // کلیک روی آواتار کاربر برای باز کردن منو
+        userAvatar.addEventListener('click', () => {
+             checkMaintenanceAndProceed(() => {
+                showModal(avatarMenuOverlay);
             });
         });
+        
+        // بستن منوی آواتار با کلیک روی پس‌زمینه
+        avatarMenuOverlay.addEventListener('click', (e) => {
+            if (e.target === avatarMenuOverlay) {
+                hideModal(avatarMenuOverlay);
+            }
+        });
 
-        // کلیک روی گزینه فروشگاه در منو
-        dropdownShopBtn.addEventListener('click', () => {
+        // دکمه فروشگاه در منوی آواتار
+        avatarMenuShopBtn.addEventListener('click', () => {
             checkMaintenanceAndProceed(() => {
                 window.location.href = './Avatar shop.html';
             });
         });
 
-        // کلیک روی overlay برای بستن همه چیز
-        pageOverlay.addEventListener('click', hideAllPopups);
-
-        // کلیک روی دکمه بستن مودال پروفایل
-        profileModalCloseBtn.addEventListener('click', hideAllPopups);
+        // دکمه پروفایل در منوی آواتار
+        avatarMenuProfileBtn.addEventListener('click', () => {
+            hideModal(avatarMenuOverlay);
+            populateProfileModal();
+            showModal(profileModalOverlay);
+        });
         
+        // بستن پنل پروفایل با دکمه ضربدر
+        profileModalCloseBtn.addEventListener('click', () => {
+            hideModal(profileModalOverlay);
+        });
+
+        // بستن پنل پروفایل با کلیک روی پس‌زمینه
+        profileModalOverlay.addEventListener('click', (e) => {
+            if (e.target === profileModalOverlay) {
+                hideModal(profileModalOverlay);
+            }
+        });
+
+        // سایر دکمه‌ها
         startGameButton.addEventListener('click', () => {
-            checkMaintenanceAndProceed(() => { window.location.href = './users search.html'; });
+            checkMaintenanceAndProceed(() => {
+                window.location.href = './users search.html';
+            });
         });
         
         adminPanelButton.addEventListener('click', () => {
-            checkMaintenanceAndProceed(() => { showCustomAlert('شما به پنل مدیریت دسترسی دارید.', () => {}); });
+            checkMaintenanceAndProceed(() => {
+                showCustomAlert('شما به پنل مدیریت دسترسی دارید.', () => {});
+            });
         });
 
         menuButtons.forEach(button => {
