@@ -2,150 +2,151 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>شهر مافیا - لیست لابی‌ها</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        /* --- استایل‌های پایه و کلی --- */
+        /* --- تنظیمات اولیه و فونت --- */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent; /* حذف هایلایت آبی در موبایل */
         }
 
         html, body {
             height: 100%;
-            overflow: hidden; /* جلوگیری از اسکرول کلی صفحه */
-        }
-
-        body {
+            overflow: hidden; /* جلوگیری از اسکرول کل صفحه */
             font-family: 'Vazirmatn', sans-serif;
             color: #f0e6d2;
-            background-color: #0c0a09; /* رنگ پایه در صورت عدم بارگذاری عکس */
-            position: relative;
-            display: flex;
-            flex-direction: column;
+            background-color: #120c0a;
         }
 
-        /* --- پس‌زمینه متحرک و تار --- */
-        body::before {
-            content: '';
+        /* --- پس‌زمینه متحرک --- */
+        #particles-js {
             position: fixed;
-            top: -5%;
-            left: -5%;
-            width: 110%;
-            height: 110%;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
             background-image: url('https://up.20script.ir/file/6195-file-000000001500622f9419de6c322df297-1-.jpg');
             background-size: cover;
             background-position: center center;
-            filter: blur(8px) brightness(0.6);
-            z-index: -1;
-            animation: subtle-pan 60s infinite alternate ease-in-out;
         }
-
-        @keyframes subtle-pan {
-            0% { transform: scale(1) translate(2%, -2%); }
-            100% { transform: scale(1.1) translate(-2%, 2%); }
-        }
-
-        /* --- پنل بارگذاری --- */
-        #loading-overlay {
-            position: fixed;
+        #particles-js::after {
+            content: '';
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.85);
+            background-color: rgba(10, 5, 3, 0.7);
             backdrop-filter: blur(5px);
+        }
+
+        /* --- ساختار اصلی صفحه --- */
+        .page-container {
             display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1002;
-            transition: opacity 0.5s ease;
+            flex-direction: column;
+            height: 100%;
+            padding: 15px;
+            padding-top: 75px; /* فضا برای هدر ثابت */
         }
         
-        .loader {
-            border: 5px solid #f3f3f330;
-            border-top: 5px solid #ffc947;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1.5s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* --- هدر و نوار جستجو --- */
-        .header {
+        .page-header {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            display: flex;
+            align-items: center;
             padding: 15px;
-            background: linear-gradient(to bottom, rgba(18, 14, 11, 0.9), rgba(18, 14, 11, 0.7));
-            backdrop-filter: blur(5px);
-            border-bottom: 2px solid #5c4a3a;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            background: linear-gradient(to bottom, rgba(18, 12, 10, 0.9), rgba(18, 12, 10, 0));
             z-index: 100;
         }
 
-        .search-container {
-            display: flex;
-            align-items: center;
-            background-color: rgba(0, 0, 0, 0.4);
-            border: 1px solid #5c4a3a;
-            border-radius: 25px;
-            padding: 5px 15px;
-        }
-
-        #search-input {
-            width: 100%;
-            background: transparent;
+        .back-button {
+            font-size: 2rem;
+            color: #ffc947;
+            background: none;
             border: none;
-            outline: none;
-            color: #e0dacc;
-            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-left: 15px;
+        }
+        .back-button:hover {
+            transform: scale(1.1);
+        }
+        
+        .search-bar {
+            flex-grow: 1;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 12px 45px 12px 15px;
+            border-radius: 25px;
+            border: 2px solid #5c4a3a;
+            background-color: rgba(0, 0, 0, 0.4);
+            color: #f0e6d2;
             font-family: 'Vazirmatn', sans-serif;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
         }
-        #search-input::placeholder {
-            color: #9e8a77;
+        .search-bar input:focus {
+            outline: none;
+            border-color: #ffc947;
+            box-shadow: 0 0 10px rgba(255, 201, 71, 0.3);
         }
-        .search-icon {
-            font-size: 1.2rem;
+
+        .search-bar .search-icon {
+            position: absolute;
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
             color: #c5a687;
-            margin-right: 10px; /* آیکون در سمت راست متن */
+            font-size: 1.2rem;
         }
-
-
+        
         /* --- لیست لابی‌ها --- */
         #lobby-list-container {
             flex-grow: 1;
-            overflow-y: auto; /* فقط این بخش اسکرول می‌شود */
-            padding: 20px 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
+            overflow-y: auto; /* فقط این قسمت اسکرول می‌خورد */
+            padding-right: 5px; /* برای زیبایی اسکرول‌بار */
         }
-        #lobby-list-container::-webkit-scrollbar { width: 5px; }
-        #lobby-list-container::-webkit-scrollbar-track { background: transparent; }
-        #lobby-list-container::-webkit-scrollbar-thumb { background: #5c4a3a; border-radius: 5px; }
 
+        /* استایل اسکرول‌بار */
+        #lobby-list-container::-webkit-scrollbar { width: 6px; }
+        #lobby-list-container::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 3px;}
+        #lobby-list-container::-webkit-scrollbar-thumb { background: #5c4a3a; border-radius: 3px; }
+        #lobby-list-container::-webkit-scrollbar-thumb:hover { background: #ffc947; }
+        
         .lobby-card {
-            background: linear-gradient(145deg, #3a2e24, #211a14);
+            background: linear-gradient(145deg, rgba(40, 30, 25, 0.8), rgba(25, 20, 15, 0.9));
             border: 1px solid #5c4a3a;
-            border-radius: 16px;
+            border-radius: 12px;
+            margin-bottom: 15px;
             padding: 15px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
             display: flex;
             flex-direction: column;
             gap: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
             transition: all 0.3s ease;
+            animation: fadeIn 0.5s ease-out forwards;
         }
+        
         .lobby-card:hover {
-            transform: translateY(-5px);
             border-color: #ffc947;
-            box-shadow: 0 8px 25px rgba(255, 201, 71, 0.2);
+            transform: translateY(-3px);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .lobby-header {
@@ -153,49 +154,93 @@
             justify-content: space-between;
             align-items: center;
         }
+        
         .lobby-name {
-            font-size: 1.3rem;
-            font-weight: 900;
+            font-size: 1.2rem;
+            font-weight: 700;
             color: #ffc947;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            text-shadow: 0 1px 3px rgba(0,0,0,0.7);
         }
-        .lobby-players { font-size: 1rem; font-weight: 700; background-color: rgba(0,0,0,0.3); padding: 5px 10px; border-radius: 8px; }
-
-        .lobby-scenario, .lobby-creator {
-            font-size: 0.95rem;
+        
+        .lobby-scenario {
+            font-size: 0.8rem;
             color: #c5a687;
         }
-        .lobby-creator { text-align: left; }
+
+        .lobby-body {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .creator-info {
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .player-count-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+        }
+        .player-count-bar {
+            width: 60px;
+            height: 10px;
+            background-color: rgba(0,0,0,0.5);
+            border-radius: 5px;
+            border: 1px solid #5c4a3a;
+            overflow: hidden;
+        }
+        .player-count-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #8c4843, #ffc947);
+            border-radius: 5px;
+            transition: width 0.5s ease-in-out;
+        }
 
         .lobby-actions {
             display: flex;
-            justify-content: flex-start;
             gap: 10px;
-            margin-top: 10px;
         }
 
-        .lobby-button {
-            padding: 8px 25px;
-            font-size: 1rem;
-            font-weight: 700;
+        .lobby-btn {
+            padding: 8px 20px;
+            border: none;
             border-radius: 8px;
+            font-family: 'Vazirmatn', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
             cursor: pointer;
             transition: all 0.2s ease;
-            border: none;
-            color: #ffffff;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.4);
         }
+
         .join-btn {
             background: linear-gradient(145deg, #8c4843, #5a2c2a);
+            color: white;
             border: 1px solid #ffc947;
         }
-        .join-btn:hover { background: linear-gradient(145deg, #a1534d, #6b3431); }
-        .delete-btn {
-            background: linear-gradient(145deg, #6c2b2b, #401a1a);
-            border: 1px solid #b86262;
+        .join-btn:hover {
+            background: linear-gradient(145deg, #a1534d, #6b3431);
         }
-        .delete-btn:hover { background: linear-gradient(145deg, #813333, #522121); }
 
+        .delete-btn {
+            background: linear-gradient(145deg, #444, #222);
+            color: #ff8a80;
+            border: 1px solid #777;
+        }
+        .delete-btn:hover {
+            background: linear-gradient(145deg, #555, #333);
+            border-color: #ff8a80;
+        }
+
+        #no-lobbies-message {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.1rem;
+            color: #c5a687;
+        }
 
         /* --- دکمه شناور ساخت لابی --- */
         #create-lobby-fab {
@@ -204,26 +249,31 @@
             left: 25px;
             width: 60px;
             height: 60px;
-            background: linear-gradient(145deg, #ffc947, #e8a634);
-            color: #2c1d10;
+            background: linear-gradient(145deg, #ffc947, #b98c3b);
+            color: #1e170f;
             border-radius: 50%;
             border: 2px solid #fff;
             font-size: 2.5rem;
-            font-weight: bold;
+            font-weight: 700;
             display: flex;
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 5px 15px rgba(255, 201, 71, 0.4);
             transition: all 0.3s ease;
-            z-index: 999;
+            animation: pulse 2s infinite;
         }
         #create-lobby-fab:hover {
-            transform: scale(1.1) rotate(90deg);
-            box-shadow: 0 8px 20px rgba(255, 201, 71, 0.4);
+            transform: scale(1.1);
+            animation-play-state: paused;
         }
-
-        /* --- استایل‌های مودال‌ها (ساخت و حذف) --- */
+        @keyframes pulse {
+            0% { box-shadow: 0 5px 15px rgba(255, 201, 71, 0.4); }
+            50% { box-shadow: 0 5px 25px rgba(255, 201, 71, 0.7); }
+            100% { box-shadow: 0 5px 15px rgba(255, 201, 71, 0.4); }
+        }
+        
+        /* --- استایل مودال‌ها (پنل‌ها) --- */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -231,328 +281,407 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(5px);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 1000;
             opacity: 0;
             visibility: hidden;
-            transition: all 0.4s ease;
+            transition: all 0.3s ease;
         }
         .modal-overlay.visible {
             opacity: 1;
             visibility: visible;
         }
-        
         .modal-content {
-            background: linear-gradient(160deg, #2a2118, #1a140e);
-            border: 2px solid #7a5c43;
+            background: linear-gradient(145deg, #3c3022, #1e170f);
+            border: 2px solid #5c4a3a;
             border-radius: 16px;
             padding: 25px 30px;
             width: 90%;
             max-width: 380px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
-            transform: scale(0.9) translateY(20px);
-            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transform: scale(0.9);
+            transition: all 0.3s ease;
         }
         .modal-overlay.visible .modal-content {
-            transform: scale(1) translateY(0);
+            transform: scale(1);
         }
-        
         .modal-title {
             font-size: 1.5rem;
             font-weight: 900;
             color: #ffc947;
-            margin-bottom: 20px;
-            text-align: center;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
-
+        .modal-message {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
         .modal-input {
             width: 100%;
             padding: 12px;
-            background-color: rgba(0, 0, 0, 0.3);
-            border: 1px solid #5c4a3a;
-            border-radius: 8px;
-            color: #e0dacc;
-            font-size: 1rem;
             margin-bottom: 20px;
+            border-radius: 8px;
+            border: 2px solid #5c4a3a;
+            background-color: rgba(0,0,0,0.3);
+            color: #f0e6d2;
+            font-family: 'Vazirmatn', sans-serif;
         }
-
-        .modal-button-group {
+        .modal-input:focus {
+            outline: none;
+            border-color: #ffc947;
+        }
+        .modal-actions {
             display: flex;
-            gap: 10px;
-            margin-top: 15px;
+            gap: 15px;
+            justify-content: center;
         }
-        
         .modal-button {
-            flex-grow: 1;
+            flex: 1;
             padding: 12px;
             font-size: 1rem;
             font-weight: 700;
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.2s ease;
-            border: 1px solid;
-            color: #ffffff;
+            border: none;
         }
+        .confirm-btn {
+            color: #ffffff;
+            background: linear-gradient(145deg, #8c4843, #5a2c2a);
+            border: 1px solid #ffc947;
+        }
+        .confirm-btn:hover { background: linear-gradient(145deg, #a1534d, #6b3431); }
+        .cancel-btn {
+            color: #e0dacc;
+            background: linear-gradient(145deg, #444, #222);
+            border: 1px solid #777;
+        }
+        .cancel-btn:hover { background: linear-gradient(145deg, #555, #333); }
 
-        .confirm-btn { background: #8c4843; border-color: #ffc947; }
-        .confirm-btn:hover { background: #a1534d; }
-        .cancel-btn { background: #504234; border-color: #7a5c43; }
-        .cancel-btn:hover { background: #695745; }
-
-        /* [جدید] استایل دکمه حذف در مودال تایید */
-        .modal-message { font-size: 1.1rem; line-height: 1.7; text-align: center; margin-bottom: 25px; }
-        .destructive-btn { background: #8a2c2c; border-color: #d47e7e; }
-        .destructive-btn:hover { background: #a13333; }
-
+        /* --- لودر --- */
+        #loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #120c0a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            transition: opacity 0.5s ease;
+        }
+        .loader {
+            border: 6px solid #f3f3f330;
+            border-top: 6px solid #ffc947;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1.5s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
-    <div id="loading-overlay">
+    <!-- پس‌زمینه متحرک -->
+    <div id="particles-js"></div>
+
+    <!-- لودر اولیه -->
+    <div id="loader-overlay">
         <div class="loader"></div>
     </div>
 
-    <header class="header">
-        <div class="search-container">
-            <span class="search-icon">🔍</span>
-            <input type="text" id="search-input" placeholder="جستجوی نام لابی، سازنده یا سناریو...">
-        </div>
-    </header>
+    <div class="page-container">
+        <header class="page-header">
+            <button class="back-button" onclick="window.location.href='./main.html'">&rsaquo;</button>
+            <div class="search-bar">
+                 <input type="text" id="search-input" placeholder="جستجوی نام لابی، سازنده یا سناریو...">
+                 <span class="search-icon">&#128269;</span>
+            </div>
+        </header>
 
-    <main id="lobby-list-container">
-        <!-- کارت‌های لابی به صورت داینامیک اینجا اضافه می‌شوند -->
-    </main>
+        <main id="lobby-list-container">
+            <!-- لابی‌ها به صورت داینامیک اینجا اضافه می‌شوند -->
+        </main>
+    </div>
 
+    <!-- دکمه ساخت لابی -->
     <button id="create-lobby-fab">+</button>
 
-    <!-- مودال ساخت لابی -->
+    <!-- مودال ساخت لابی جدید -->
     <div id="create-lobby-modal" class="modal-overlay">
         <div class="modal-content">
             <h2 class="modal-title">ساخت لابی جدید</h2>
-            <input type="text" id="lobby-name-input" class="modal-input" placeholder="نام لابی را وارد کنید" maxlength="25">
-            <div class="modal-button-group">
-                <button id="confirm-create-lobby-btn" class="modal-button confirm-btn">ساختن</button>
-                <button id="cancel-create-lobby-btn" class="modal-button cancel-btn">انصراف</button>
+            <input type="text" id="lobby-name-input" class="modal-input" placeholder="نام لابی خود را وارد کنید..." maxlength="30">
+            <div class="modal-actions">
+                <button id="create-lobby-confirm-btn" class="modal-button confirm-btn">ساختن</button>
+                <button class="modal-button cancel-btn" onclick="hideModal(document.getElementById('create-lobby-modal'))">انصراف</button>
             </div>
         </div>
     </div>
 
-    <!-- [جدید] مودال تایید حذف لابی -->
-    <div id="delete-confirm-modal" class="modal-overlay">
+    <!-- مودال هشدار عمومی -->
+    <div id="custom-alert-modal" class="modal-overlay">
         <div class="modal-content">
-            <h2 class="modal-title">تایید حذف</h2>
-            <p class="modal-message">آیا از حذف لابی خود مطمئن هستید؟ این عمل غیرقابل بازگشت است.</p>
-            <div class="modal-button-group">
-                <button id="confirm-delete-btn" class="modal-button destructive-btn">بله، حذف کن</button>
-                <button id="cancel-delete-btn" class="modal-button cancel-btn">انصراف</button>
+            <h2 id="custom-alert-title" class="modal-title">توجه!</h2>
+            <p id="custom-alert-message" class="modal-message"></p>
+            <div class="modal-actions">
+                <button id="custom-alert-confirm-btn" class="modal-button confirm-btn" style="flex: 0.5;">تایید</button>
             </div>
         </div>
     </div>
+    
+    <!-- مودال تایید (برای حذف) -->
+    <div id="custom-confirm-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 id="custom-confirm-title" class="modal-title">تایید عملیات</h2>
+            <p id="custom-confirm-message" class="modal-message"></p>
+            <div class="modal-actions">
+                <button id="custom-confirm-yes-btn" class="modal-button confirm-btn">بله</button>
+                <button id="custom-confirm-no-btn" class="modal-button cancel-btn">خیر</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- کتابخانه ذرات متحرک -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 
     <script type="module">
+        // --- Firebase SDK Imports ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, query, where, getDocs, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, addDoc, doc, deleteDoc, query, where, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+        // --- Firebase Config ---
         const firebaseConfig = {
-          apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
-          authDomain: "mafia-9fcbf.firebaseapp.com",
-          projectId: "mafia-9fcbf",
-          storageBucket: "mafia-9fcbf.appspot.com",
-          messagingSenderId: "471627157488",
-          appId: "1:471627157488:web:92f008548a5596619a5735",
-          measurementId: "G-0PDHDWC6NV"
+            apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
+            authDomain: "mafia-9fcbf.firebaseapp.com",
+            projectId: "mafia-9fcbf",
+            storageBucket: "mafia-9fcbf.appspot.com",
+            messagingSenderId: "471627157488",
+            appId: "1:471627157488:web:92f008548a5596619a5735",
+            measurementId: "G-0PDHDWC6NV"
         };
         
+        // --- Initialize Firebase ---
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
         // --- DOM Elements ---
-        const loadingOverlay = document.getElementById('loading-overlay');
+        const loaderOverlay = document.getElementById('loader-overlay');
         const lobbyListContainer = document.getElementById('lobby-list-container');
         const createLobbyFab = document.getElementById('create-lobby-fab');
-        const createLobbyModal = document.getElementById('create-lobby-modal');
-        const confirmCreateBtn = document.getElementById('confirm-create-lobby-btn');
-        const cancelCreateBtn = document.getElementById('cancel-create-lobby-btn');
-        const lobbyNameInput = document.getElementById('lobby-name-input');
         const searchInput = document.getElementById('search-input');
-        // [جدید] المان‌های مودال حذف
-        const deleteConfirmModal = document.getElementById('delete-confirm-modal');
-        const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
-        const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
-
-
-        let currentUser = null;
-        let unsubscribeLobbies = null; // برای قطع کردن شنونده قبلی
-
-        // --- توابع مودال‌ها ---
-        function showModal(modal) { modal.classList.add('visible'); }
-        function hideModal(modal) { modal.classList.remove('visible'); }
         
-        // [جدید] تابع نمایش مودال تایید حذف
-        function showDeleteConfirmModal(lobbyId) {
-            confirmDeleteBtn.dataset.lobbyId = lobbyId; // ذخیره آیدی لابی برای استفاده در زمان کلیک
-            showModal(deleteConfirmModal);
+        // Modals
+        const createLobbyModal = document.getElementById('create-lobby-modal');
+        const customAlertModal = document.getElementById('custom-alert-modal');
+        const customConfirmModal = document.getElementById('custom-confirm-modal');
+        
+        // Modal Internals
+        const lobbyNameInput = document.getElementById('lobby-name-input');
+        const createLobbyConfirmBtn = document.getElementById('create-lobby-confirm-btn');
+        const alertMessage = document.getElementById('custom-alert-message');
+        const alertConfirmBtn = document.getElementById('custom-alert-confirm-btn');
+        const confirmMessage = document.getElementById('custom-confirm-message');
+        const confirmYesBtn = document.getElementById('custom-confirm-yes-btn');
+        const confirmNoBtn = document.getElementById('custom-confirm-no-btn');
+        
+        let currentUser = null;
+
+        // --- Modal Helper Functions ---
+        function showModal(modalElement) {
+            modalElement.classList.add('visible');
+        }
+        function hideModal(modalElement) {
+            modalElement.classList.remove('visible');
         }
 
-        // --- رندر کردن کارت لابی ---
-        function renderLobbyCard(lobby) {
-            const isOwner = currentUser && lobby.creatorUid === currentUser.uid;
+        function showCustomAlert(message) {
+            alertMessage.textContent = message;
+            showModal(customAlertModal);
+            alertConfirmBtn.onclick = () => hideModal(customAlertModal);
+        }
+
+        function showCustomConfirm(message, onConfirm) {
+            confirmMessage.textContent = message;
+            showModal(customConfirmModal);
+            confirmYesBtn.onclick = () => {
+                hideModal(customConfirmModal);
+                onConfirm();
+            };
+            confirmNoBtn.onclick = () => hideModal(customConfirmModal);
+        }
+
+        // --- Lobby Logic ---
+        function createLobbyCard(lobbyData, lobbyId) {
+            const isOwner = currentUser && lobbyData.creatorUid === currentUser.uid;
             const card = document.createElement('div');
             card.className = 'lobby-card';
-            card.dataset.id = lobby.id;
+            card.dataset.docId = lobbyId;
+            card.dataset.lobbyName = lobbyData.lobbyName.toLowerCase();
+            card.dataset.creatorName = lobbyData.creatorName.toLowerCase();
 
-            // دکمه حذف فقط برای صاحب لابی نمایش داده می‌شود
-            const actionsHtml = `
-                <div class="lobby-actions">
-                    <button class="lobby-button join-btn">پیوستن</button>
-                    ${isOwner ? '<button class="lobby-button delete-btn">حذف لابی</button>' : ''}
-                </div>
-            `;
+            const playerCount = lobbyData.playerCount || 1;
+            const maxPlayers = 12; // ثابت
+            const fillPercentage = (playerCount / maxPlayers) * 100;
 
             card.innerHTML = `
                 <div class="lobby-header">
-                    <span class="lobby-name">${lobby.name}</span>
-                    <span class="lobby-players">👥 ۱/۱۰</span>
+                    <div>
+                        <h3 class="lobby-name">${lobbyData.lobbyName}</h3>
+                        <p class="lobby-scenario">سناریو: جنگ ستارگان (مثال)</p>
+                    </div>
+                    <div class="player-count-container">
+                        <span>${playerCount}/${maxPlayers}</span>
+                        <div class="player-count-bar">
+                            <div class="player-count-fill" style="width: ${fillPercentage}%;"></div>
+                        </div>
+                    </div>
                 </div>
-                <div class="lobby-scenario">📜 سناریو: جنگ ستارگان (مثال)</div>
-                <div class="lobby-creator">👑 سازنده: ${lobby.creatorName}</div>
-                ${actionsHtml}
+                <div class="lobby-body">
+                    <span class="creator-info">سازنده: ${lobbyData.creatorName}</span>
+                    <div class="lobby-actions">
+                        <button class="lobby-btn join-btn">پیوستن</button>
+                        ${isOwner ? '<button class="lobby-btn delete-btn" data-doc-id="' + lobbyId + '">حذف لابی</button>' : ''}
+                    </div>
+                </div>
             `;
-
-            // افزودن Event Listener برای دکمه حذف (در صورت وجود)
-            if (isOwner) {
-                card.querySelector('.delete-btn').addEventListener('click', (e) => {
-                    e.stopPropagation(); // جلوگیری از رویدادهای دیگر
-                    showDeleteConfirmModal(lobby.id);
-                });
-            }
-            
             return card;
         }
 
-        // --- توابع Firestore ---
-        function fetchAndDisplayLobbies() {
-            if (unsubscribeLobbies) unsubscribeLobbies(); // قطع شنونده قبلی
-
-            const lobbiesRef = collection(db, 'Lobbys list');
-            unsubscribeLobbies = onSnapshot(lobbiesRef, (snapshot) => {
-                const lobbies = [];
-                snapshot.forEach(doc => {
-                    lobbies.push({ id: doc.id, ...doc.data() });
-                });
-                
-                lobbyListContainer.innerHTML = ''; // پاک کردن لیست فعلی
+        function renderLobbies(lobbies) {
+            lobbyListContainer.innerHTML = ''; // Clear previous list
+            if (lobbies.length === 0) {
+                lobbyListContainer.innerHTML = `<p id="no-lobbies-message">در حال حاضر هیچ لابی فعالی وجود ندارد.<br>اولین لابی را شما بسازید!</p>`;
+            } else {
                 lobbies.forEach(lobby => {
-                    const card = renderLobbyCard(lobby);
+                    const card = createLobbyCard(lobby.data(), lobby.id);
                     lobbyListContainer.appendChild(card);
                 });
-
-                loadingOverlay.style.display = 'none';
-            }, (error) => {
-                console.error("خطا در دریافت لیست لابی‌ها:", error);
-                alert("خطا در ارتباط با سرور!");
-            });
-        }
-        
-        async function createLobby(lobbyName) {
-            if (!lobbyName.trim()) {
-                alert("نام لابی نمی‌تواند خالی باشد.");
-                return;
-            }
-            if (!currentUser) {
-                alert("خطا: اطلاعات کاربر یافت نشد.");
-                return;
-            }
-
-            // بررسی اینکه آیا کاربر قبلاً لابی ساخته است یا نه
-            const lobbiesRef = collection(db, 'Lobbys list');
-            const q = query(lobbiesRef, where("creatorUid", "==", currentUser.uid));
-            const querySnapshot = await getDocs(q);
-
-            if (!querySnapshot.empty) {
-                alert("شما قبلاً یک لابی ایجاد کرده‌اید. برای ساخت لابی جدید، ابتدا لابی قبلی خود را حذف کنید.");
-                return;
-            }
-
-            // اگر لابی نداشت، یکی جدید می‌سازد
-            try {
-                await addDoc(lobbiesRef, {
-                    name: lobbyName,
-                    creatorName: currentUser.displayName || "کاربر ناشناس",
-                    creatorUid: currentUser.uid,
-                    createdAt: serverTimestamp(),
-                    players: [currentUser.uid], // آرایه‌ای از بازیکنان
-                    playerCount: 1,
-                    maxPlayers: 10
-                });
-                hideModal(createLobbyModal);
-                lobbyNameInput.value = '';
-            } catch (error) {
-                console.error("خطا در ساخت لابی: ", error);
-                alert("مشکلی در ساخت لابی پیش آمد.");
             }
         }
 
-        async function deleteLobby(lobbyId) {
-            if (!lobbyId) return;
-            try {
-                const lobbyDocRef = doc(db, 'Lobbys list', lobbyId);
-                await deleteDoc(lobbyDocRef);
-                hideModal(deleteConfirmModal);
-            } catch (error) {
-                console.error("خطا در حذف لابی: ", error);
-                alert("مشکلی در حذف لابی پیش آمد.");
-            }
-        }
-
-        // --- احراز هویت ---
+        // --- Firebase Auth & Firestore Listener ---
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUser = user;
-                fetchAndDisplayLobbies();
+                const lobbiesRef = collection(db, "Lobbys list");
+                onSnapshot(lobbiesRef, (snapshot) => {
+                    renderLobbies(snapshot.docs);
+                    if(loaderOverlay.style.opacity !== "0"){
+                        loaderOverlay.style.opacity = '0';
+                        setTimeout(() => loaderOverlay.style.display = 'none', 500);
+                    }
+                }, (error) => {
+                    console.error("Error fetching lobbies: ", error);
+                    showCustomAlert("خطا در دریافت لیست لابی‌ها. لطفا اتصال اینترنت خود را بررسی کنید.");
+                });
             } else {
-                // اگر کاربر وارد نشده بود، به صفحه لاگین هدایت شود
                 window.location.href = './login.html';
             }
         });
 
         // --- Event Listeners ---
-        createLobbyFab.addEventListener('click', () => showModal(createLobbyModal));
-        cancelCreateBtn.addEventListener('click', () => hideModal(createLobbyModal));
-        createLobbyModal.addEventListener('click', (e) => {
-            if (e.target === createLobbyModal) hideModal(createLobbyModal);
-        });
-
-        confirmCreateBtn.addEventListener('click', () => {
-            createLobby(lobbyNameInput.value);
-        });
-
-        // [جدید] Event Listeners برای مودال تایید حذف
-        cancelDeleteBtn.addEventListener('click', () => hideModal(deleteConfirmModal));
-        deleteConfirmModal.addEventListener('click', (e) => {
-             if (e.target === deleteConfirmModal) hideModal(deleteConfirmModal);
-        });
-        confirmDeleteBtn.addEventListener('click', () => {
-            const lobbyId = confirmDeleteBtn.dataset.lobbyId;
-            deleteLobby(lobbyId);
-        });
         
-        // رویداد جستجو
+        // Create Lobby FAB
+        createLobbyFab.addEventListener('click', async () => {
+            if (!currentUser) return;
+
+            const lobbiesRef = collection(db, "Lobbys list");
+            const q = query(lobbiesRef, where("creatorUid", "==", currentUser.uid));
+            
+            try {
+                const querySnapshot = await getDocs(q);
+                if (!querySnapshot.empty) {
+                    showCustomAlert("شما قبلاً یک لابی ایجاد کرده‌اید. برای ساخت لابی جدید، ابتدا لابی قبلی خود را حذف کنید.");
+                } else {
+                    lobbyNameInput.value = ''; // Clear input
+                    showModal(createLobbyModal);
+                }
+            } catch (error) {
+                console.error("Error checking for existing lobbies: ", error);
+                showCustomAlert("خطا در بررسی لابی‌های موجود. لطفا دوباره تلاش کنید.");
+            }
+        });
+
+        // Confirm Create Lobby
+        createLobbyConfirmBtn.addEventListener('click', async () => {
+            const lobbyName = lobbyNameInput.value.trim();
+            if (lobbyName.length < 3) {
+                showCustomAlert("نام لابی باید حداقل ۳ حرف داشته باشد.");
+                return;
+            }
+
+            try {
+                await addDoc(collection(db, "Lobbys list"), {
+                    lobbyName: lobbyName,
+                    creatorUid: currentUser.uid,
+                    creatorName: currentUser.displayName || "کاربر ناشناس",
+                    createdAt: serverTimestamp(),
+                    playerCount: 1,
+                    maxPlayers: 12
+                });
+                hideModal(createLobbyModal);
+            } catch (error) {
+                console.error("Error creating lobby: ", error);
+                showCustomAlert("خطا در ساخت لابی. لطفا دوباره تلاش کنید.");
+            }
+        });
+
+        // Delete Lobby (using event delegation)
+        lobbyListContainer.addEventListener('click', async (e) => {
+            if (e.target && e.target.classList.contains('delete-btn')) {
+                const lobbyId = e.target.dataset.docId;
+                showCustomConfirm("آیا از حذف لابی خود مطمئن هستید؟", async () => {
+                    try {
+                        await deleteDoc(doc(db, "Lobbys list", lobbyId));
+                    } catch (error) {
+                        console.error("Error deleting lobby: ", error);
+                        showCustomAlert("خطا در حذف لابی. لطفا دوباره تلاش کنید.");
+                    }
+                });
+            }
+        });
+
+        // Search functionality
         searchInput.addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase();
             const allLobbies = lobbyListContainer.querySelectorAll('.lobby-card');
-            allLobbies.forEach(card => {
-                const lobbyText = card.textContent.toLowerCase();
-                if (lobbyText.includes(searchTerm)) {
-                    card.style.display = 'flex';
+            allLobbies.forEach(lobby => {
+                const lobbyName = lobby.dataset.lobbyName;
+                const creatorName = lobby.dataset.creatorName;
+                if (lobbyName.includes(searchTerm) || creatorName.includes(searchTerm)) {
+                    lobby.style.display = 'flex';
                 } else {
-                    card.style.display = 'none';
+                    lobby.style.display = 'none';
                 }
             });
+        });
+        
+        // --- Particles.js Background Initialization ---
+        particlesJS("particles-js", {
+            "particles": {
+                "number": { "value": 60, "density": { "enable": true, "value_area": 800 } },
+                "color": { "value": "#ffc947" },
+                "shape": { "type": "circle", "stroke": { "width": 0, "color": "#000000" } },
+                "opacity": { "value": 0.5, "random": true, "anim": { "enable": true, "speed": 1, "opacity_min": 0.1, "sync": false } },
+                "size": { "value": 3, "random": true, "anim": { "enable": false } },
+                "line_linked": { "enable": false },
+                "move": { "enable": true, "speed": 1, "direction": "none", "random": true, "straight": false, "out_mode": "out", "bounce": false }
+            },
+            "interactivity": { "detect_on": "canvas", "events": { "onhover": { "enable": false }, "onclick": { "enable": false } }, "modes": {} },
+            "retina_detect": true
         });
 
     </script>
