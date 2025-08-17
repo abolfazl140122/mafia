@@ -8,7 +8,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        /* --- تنظیمات کلی و پس‌زمینه برای نمایش --- */
         * {
             margin: 0;
             padding: 0;
@@ -18,16 +17,12 @@
         html, body {
             height: 100%;
             width: 100%;
-            overflow: hidden; /* جلوگیری از اسکرول */
+            overflow: hidden;
         }
 
         body {
             font-family: 'Vazirmatn', sans-serif;
-            /* این پس‌زمینه فقط برای نمایش بهتر پنل است و جزئی از خود پنل نیست */
-            background-image: url('https://up.20script.ir/file/6195-file-000000001500622f9419de6c322df297-1-.jpg');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
+            background-color: transparent; /* پس‌زمینه شفاف برای استفاده به عنوان پنل */
             color: #f0e6d2;
             display: flex;
             justify-content: center;
@@ -35,19 +30,49 @@
             padding: 20px;
         }
 
+        /* --- پنل بارگذاری --- */
+        #loading-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            transition: opacity 0.5s ease;
+        }
+
+        .loader {
+            border: 5px solid #f3f3f330;
+            border-top: 5px solid #ffc947;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1.5s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         /* --- کانتینر اصلی پنل پروفایل --- */
         .profile-card-container {
             width: 90%;
             max-width: 380px;
-            /* تکنیک ایجاد قاب گرادینت */
             background: linear-gradient(145deg, #ffc947, #8c4843);
-            padding: 3px; /* ضخامت قاب */
+            padding: 3px;
             border-radius: 20px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(255, 201, 71, 0.2);
-            /* انیمیشن ورود */
             animation: fadeInScaleUp 0.6s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
             opacity: 0;
             transform: scale(0.9);
+            visibility: hidden; /* در ابتدا مخفی است */
         }
 
         @keyframes fadeInScaleUp {
@@ -59,6 +84,11 @@
                 opacity: 1;
                 transform: scale(1) translateY(0);
             }
+        }
+        
+        .profile-card-container.visible {
+            opacity: 1;
+            visibility: visible;
         }
 
         /* --- پنل داخلی (محتوا) --- */
@@ -73,7 +103,6 @@
             gap: 20px;
         }
 
-        /* --- بخش هدر: آواتار و نام کاربری --- */
         .profile-header {
             text-align: center;
             margin-bottom: 10px;
@@ -86,24 +115,13 @@
             border: 4px solid #ffc947;
             object-fit: cover;
             margin-bottom: 15px;
-            box-shadow: 0 0 15px rgba(255, 201, 71, 0.5), 0 0 25px rgba(255, 201, 71, 0.3);
+            box-shadow: 0 0 15px rgba(255, 201, 71, 0.5);
             transition: all 0.3s ease;
         }
         
-        /* افکت درخشش و بزرگ شدن روی هاور آواتار */
         .profile-avatar:hover {
             transform: scale(1.08);
-            box-shadow: 0 0 25px rgba(255, 201, 71, 0.8), 0 0 40px rgba(255, 201, 71, 0.5);
-            animation: pulseGlow 1.5s infinite;
-        }
-        
-        @keyframes pulseGlow {
-            0%, 100% {
-                box-shadow: 0 0 15px rgba(255, 201, 71, 0.5), 0 0 25px rgba(255, 201, 71, 0.3);
-            }
-            50% {
-                 box-shadow: 0 0 25px rgba(255, 201, 71, 0.8), 0 0 40px rgba(255, 201, 71, 0.5);
-            }
+            box-shadow: 0 0 25px rgba(255, 201, 71, 0.8);
         }
 
         #display-name {
@@ -113,99 +131,48 @@
             text-shadow: 0 2px 5px rgba(0,0,0,0.7);
         }
 
-        #user-tag {
-            font-size: 1rem;
+        #user-email {
+            font-size: 0.9rem;
             font-weight: 400;
             color: #ffc947;
-            opacity: 0.9;
+            opacity: 0.8;
+            margin-top: 5px;
         }
 
-        /* --- بخش آمار --- */
         .profile-stats {
             width: 100%;
-            display: flex;
-            justify-content: space-around;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
             background-color: rgba(0, 0, 0, 0.2);
             padding: 15px 10px;
             border-radius: 12px;
             border: 1px solid rgba(255, 201, 71, 0.2);
         }
 
-        .stat-item {
-            text-align: center;
-        }
+        .stat-item { text-align: center; }
+        .stat-value { display: block; font-size: 1.5rem; font-weight: 700; color: #ffffff; }
+        .stat-label { font-size: 0.8rem; color: #c5a687; }
 
-        .stat-value {
-            display: block;
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #ffffff;
-        }
-
-        .stat-label {
-            font-size: 0.8rem;
-            color: #c5a687;
-        }
-
-        /* --- بخش سطح و تجربه (XP) --- */
         .xp-section {
             width: 100%;
             text-align: center;
         }
+        .level-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 0 5px; font-size: 0.9rem; font-weight: 700; }
+        #level-number { color: #ffc947; background-color: rgba(255, 201, 71, 0.1); padding: 2px 8px; border-radius: 5px; }
+        .progress-bar-container { width: 100%; height: 12px; background-color: rgba(0, 0, 0, 0.4); border: 1px solid #5c4a3a; border-radius: 6px; overflow: hidden; box-shadow: inset 0 2px 5px rgba(0,0,0,0.5); }
+        #progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #8c4843, #ffc947); border-radius: 6px; transition: width 0.8s ease-out; box-shadow: 0 0 10px rgba(255, 201, 71, 0.4); }
+        #xp-text { margin-top: 8px; font-size: 0.85rem; color: #e0dacc; }
 
-        .level-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-            padding: 0 5px;
-            font-size: 0.9rem;
-            font-weight: 700;
-        }
-
-        #level-number {
-            color: #ffc947;
-            background-color: rgba(255, 201, 71, 0.1);
-            padding: 2px 8px;
-            border-radius: 5px;
-        }
-        
-        .progress-bar-container {
-            width: 100%;
-            height: 12px;
-            background-color: rgba(0, 0, 0, 0.4);
-            border: 1px solid #5c4a3a;
-            border-radius: 6px;
-            overflow: hidden;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
-        }
-        
-        #progress-bar {
-            width: 0%; /* با جاوااسکریپت پر می‌شود */
-            height: 100%;
-            background: linear-gradient(90deg, #8c4843, #ffc947);
-            border-radius: 6px;
-            transition: width 0.8s ease-out;
-            box-shadow: 0 0 10px rgba(255, 201, 71, 0.4);
-        }
-        
-        #xp-text {
-            margin-top: 8px;
-            font-size: 0.85rem;
-            color: #e0dacc;
-        }
-
-        /* --- بخش دکمه‌ها (عملیات) --- */
         .profile-actions {
             width: 100%;
             display: flex;
-            flex-direction: column;
             gap: 12px;
             margin-top: 10px;
         }
 
         .action-button {
-            width: 100%;
+            flex: 1;
             padding: 12px;
             font-size: 1rem;
             font-weight: 700;
@@ -218,41 +185,27 @@
             box-shadow: 0 3px 8px rgba(0,0,0,0.3);
         }
         
-        /* دکمه اصلی */
-        .primary-button {
-            color: #ffffff;
-            background: linear-gradient(145deg, #8c4843, #5a2c2a);
-            border: 1px solid #ffc947;
-        }
-        .primary-button:hover {
-            background: linear-gradient(145deg, #a1534d, #6b3431);
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(255, 201, 71, 0.2);
-        }
-
-        /* دکمه ثانویه */
-        .secondary-button {
-            color: #e0dacc;
-            background: transparent;
-            border: 1px solid #c5a687;
-        }
-        .secondary-button:hover {
-            background-color: rgba(197, 166, 135, 0.1);
-            border-color: #ffc947;
-            color: #ffc947;
-        }
+        .primary-button { color: #ffffff; background: linear-gradient(145deg, #8c4843, #5a2c2a); border: 1px solid #ffc947; }
+        .primary-button:hover { background: linear-gradient(145deg, #a1534d, #6b3431); transform: translateY(-3px); box-shadow: 0 6px 12px rgba(255, 201, 71, 0.2); }
+        
+        #back-button { color: #e0dacc; background: transparent; border: 1px solid #c5a687; }
+        #back-button:hover { background-color: rgba(197, 166, 135, 0.1); border-color: #ffc947; color: #ffc947; }
 
     </style>
 </head>
 <body>
 
-    <div class="profile-card-container">
+    <div id="loading-container">
+        <div class="loader"></div>
+    </div>
+
+    <div id="profile-card" class="profile-card-container">
         <div class="profile-card">
 
             <div class="profile-header">
                 <img id="profile-avatar" src="" alt="آواتار کاربر">
                 <h2 id="display-name"></h2>
-                <p id="user-tag"></p>
+                <p id="user-email"></p>
             </div>
 
             <div class="profile-stats">
@@ -282,64 +235,125 @@
             </div>
 
             <div class="profile-actions">
-                <button class="action-button primary-button">افزودن به دوستان</button>
-                <button class="action-button secondary-button">گزارش تخلف</button>
+                <button class="action-button primary-button">تغییر نام</button>
+                <button id="back-button" class="action-button">بازگشت</button>
             </div>
 
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // این یک آبجکت نمونه برای نمایش اطلاعات است
-            // در پروژه واقعی، این اطلاعات از سرور یا دیتابیس دریافت می‌شود
-            const userData = {
-                avatarUrl: 'https://i.imgur.com/T2bT1tG.png', // یک آواتار پیش‌فرض
-                displayName: 'کاربر حرفه‌ای',
-                userTag: '@mafia_king_123',
-                gamesPlayed: 248,
-                wins: 160,
-                rank: 'گاد فادر',
-                level: 27,
-                currentXP: 1850,
-                nextLevelXP: 2500
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        // --- Firebase Configuration ---
+        const firebaseConfig = {
+          apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
+          authDomain: "mafia-9fcbf.firebaseapp.com",
+          projectId: "mafia-9fcbf",
+          storageBucket: "mafia-9fcbf.appspot.com",
+          messagingSenderId: "471627157488",
+          appId: "1:471627157488:web:92f008548a5596619a5735",
+          measurementId: "G-0PDHDWC6NV"
+        };
+
+        // --- Initialize Firebase ---
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // --- DOM Elements ---
+        const loadingContainer = document.getElementById('loading-container');
+        const profileCard = document.getElementById('profile-card');
+        const backButton = document.getElementById('back-button');
+
+        // --- Helper function to calculate level from XP ---
+        // این یک تابع نمونه است، می‌توانید فرمول را پیچیده‌تر کنید
+        function calculateLevelInfo(xp = 0) {
+            const xpPerLevel = 1000; // هر سطح ۱۰۰۰ امتیاز نیاز دارد
+            const level = Math.floor(xp / xpPerLevel) + 1;
+            const xpForCurrentLevel = (level - 1) * xpPerLevel;
+            const xpForNextLevel = level * xpPerLevel;
+            const currentLevelProgressXp = xp - xpForCurrentLevel;
+            const progressPercentage = (currentLevelProgressXp / xpPerLevel) * 100;
+            return {
+                level,
+                xpText: `${currentLevelProgressXp} / ${xpPerLevel} XP`,
+                progressPercentage
             };
+        }
+        
+        // --- Function to display user data in the UI ---
+        function displayUserData(data) {
+            document.getElementById('profile-avatar').src = data.avatarUrl || 'https://i.imgur.com/T2bT1tG.png';
+            document.getElementById('display-name').textContent = data.displayName || 'کاربر ناشناس';
+            document.getElementById('user-email').textContent = data.email || 'ایمیل ثبت نشده';
 
-            // تابعی برای پر کردن اطلاعات در پنل
-            function populateProfile(data) {
-                document.getElementById('profile-avatar').src = data.avatarUrl;
-                document.getElementById('display-name').textContent = data.displayName;
-                document.getElementById('user-tag').textContent = data.userTag;
-                document.getElementById('games-played').textContent = data.gamesPlayed;
-                
-                // محاسبه درصد برد
-                const winPercentage = Math.round((data.wins / data.gamesPlayed) * 100);
-                document.getElementById('win-rate').textContent = `%${winPercentage}`;
-                
-                document.getElementById('user-rank').textContent = data.rank;
-                document.getElementById('level-number').textContent = data.level;
-                document.getElementById('xp-text').textContent = `${data.currentXP} / ${data.nextLevelXP} XP`;
-                
-                // محاسبه و تنظیم نوار پیشرفت (XP)
-                const xpPercentage = (data.currentXP / data.nextLevelXP) * 100;
-                // یک تأخیر کوچک برای دیدن انیمیشن پر شدن
-                setTimeout(() => {
-                    document.getElementById('progress-bar').style.width = `${xpPercentage}%`;
-                }, 300);
+            const gamesPlayed = data.gamesPlayed || 0;
+            const wins = data.wins || 0;
+            const winPercentage = gamesPlayed > 0 ? Math.round((wins / gamesPlayed) * 100) : 0;
+            
+            document.getElementById('games-played').textContent = gamesPlayed;
+            document.getElementById('win-rate').textContent = `${winPercentage}%`;
+            document.getElementById('user-rank').textContent = data.rank || 'تازه وارد';
+
+            const levelInfo = calculateLevelInfo(data.xp || 0);
+            document.getElementById('level-number').textContent = levelInfo.level;
+            document.getElementById('xp-text').textContent = levelInfo.xpText;
+            
+            // Set a timeout to animate the progress bar after the card is visible
+            setTimeout(() => {
+                document.getElementById('progress-bar').style.width = `${levelInfo.progressPercentage}%`;
+            }, 300);
+        }
+
+        // --- Main Logic ---
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                try {
+                    const userDocRef = doc(db, 'users', user.uid);
+                    const docSnap = await getDoc(userDocRef);
+
+                    if (docSnap.exists()) {
+                        // در دیتابیس شما فیلد game وجود داشت، آن را به gamesPlayed تغییر نام دادم
+                        const userData = {
+                            ...docSnap.data(),
+                            gamesPlayed: docSnap.data().game || 0 // سازگاری با فیلد قبلی
+                        };
+                        displayUserData(userData);
+                    } else {
+                        console.warn("سند کاربر در دیتابیس یافت نشد. نمایش اطلاعات پیش‌فرض.");
+                        // نمایش اطلاعات پیش‌فرض برای کاربری که داکیومنت ندارد
+                        displayUserData({
+                            displayName: user.displayName,
+                            email: user.email,
+                            avatarUrl: user.photoURL
+                        });
+                    }
+                } catch (error) {
+                    console.error("خطا در دریافت اطلاعات کاربر:", error);
+                    // در صورت خطا، یک پیام مناسب نمایش دهید
+                    document.getElementById('display-name').textContent = 'خطا در بارگذاری';
+                } finally {
+                    // پس از اتمام کار، لودینگ را مخفی و پروفایل را نمایش بده
+                    loadingContainer.style.opacity = '0';
+                    profileCard.classList.add('visible');
+                    setTimeout(() => {
+                        loadingContainer.style.display = 'none';
+                    }, 500);
+                }
+            } else {
+                // اگر کاربر وارد نشده بود، به صفحه لاگین هدایت شود
+                window.location.href = './login.html';
             }
-
-            // فراخوانی تابع برای نمایش اطلاعات
-            populateProfile(userData);
-
-            // افزودن رویداد کلیک برای دکمه‌ها (نمونه)
-            const actionButtons = document.querySelectorAll('.action-button');
-            actionButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    alert(`شما روی دکمه "${button.textContent}" کلیک کردید.`);
-                });
-            });
         });
-    </script>
 
+        backButton.addEventListener('click', () => {
+            // به صفحه قبلی بازمی‌گردد یا به لابی اصلی
+            window.location.href = './main.html';
+        });
+
+    </script>
 </body>
 </html>
