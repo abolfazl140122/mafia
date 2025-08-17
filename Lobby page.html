@@ -1,1 +1,499 @@
-.
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>شهر مافیا - لیست لابی‌ها</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* --- استایل‌های پایه و عمومی --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            color: #f0e6d2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        /* --- پس‌زمینه تار شده --- */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://up.20script.ir/file/6195-file-000000001500622f9419de6c322df297-1-.jpg');
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            filter: blur(8px) brightness(0.6); /* اعمال افکت تار و کمی تاریک */
+            z-index: -1;
+        }
+
+        /* --- پنل بارگذاری --- */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1002;
+            transition: opacity 0.5s ease;
+        }
+        
+        .loader {
+            border: 6px solid #f3f3f330;
+            border-top: 6px solid #ffc947;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1.5s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #loading-text {
+            margin-top: 20px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #f0e6d2;
+            text-shadow: 1px 1px 3px #000;
+        }
+        
+        /* --- پنل اصلی لابی --- */
+        .lobby-container {
+            width: 95%;
+            max-width: 600px;
+            height: 85vh;
+            background: linear-gradient(160deg, rgba(42, 33, 24, 0.9), rgba(26, 20, 14, 0.95));
+            border: 2px solid #7a5c43;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+            padding: 25px 30px;
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        
+        body.loaded .lobby-container {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        body.loaded #loading-overlay {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .lobby-header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #5c4a3a;
+            padding-bottom: 15px;
+        }
+        
+        .lobby-title {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #ffc947;
+            text-shadow: 0 3px 6px rgba(0,0,0,0.6);
+        }
+
+        /* --- لیست لابی‌ها --- */
+        #lobby-list-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 10px;
+            margin: 0 -10px;
+        }
+
+        /* استایل اسکرول بار سفارشی */
+        #lobby-list-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        #lobby-list-container::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+        #lobby-list-container::-webkit-scrollbar-thumb {
+            background-color: #7a5c43;
+            border-radius: 10px;
+            border: 2px solid #1a140e;
+        }
+        #lobby-list-container::-webkit-scrollbar-thumb:hover {
+            background-color: #c5a687;
+        }
+
+        .lobby-item {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #5c4a3a;
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .lobby-item:hover {
+            background: rgba(0, 0, 0, 0.5);
+            border-color: #ffc947;
+            transform: scale(1.02);
+        }
+
+        .lobby-info .lobby-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #e0dacc;
+        }
+
+        .lobby-info .creator-name {
+            font-size: 0.85rem;
+            color: #c5a687;
+        }
+
+        .lobby-status .player-count {
+            font-size: 1.1rem;
+            font-weight: 700;
+            direction: ltr;
+        }
+
+        #no-lobbies-message {
+            text-align: center;
+            color: #999;
+            margin-top: 50px;
+            font-size: 1.1rem;
+        }
+
+        /* --- بخش ساخت لابی --- */
+        .create-lobby-section {
+            padding-top: 20px;
+            margin-top: 15px;
+            border-top: 2px solid #5c4a3a;
+            display: flex;
+            gap: 15px;
+        }
+
+        #lobby-name-input {
+            flex-grow: 1;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 2px solid #5c4a3a;
+            background-color: #1a140e;
+            color: #f0e6d2;
+            font-family: 'Vazirmatn', sans-serif;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+        
+        #lobby-name-input:focus {
+            outline: none;
+            border-color: #ffc947;
+            box-shadow: 0 0 10px rgba(255, 201, 71, 0.3);
+        }
+
+        #create-lobby-btn {
+            padding: 12px 25px;
+            font-size: 1rem;
+            font-weight: 900;
+            color: #ffffff;
+            background: linear-gradient(145deg, #8c4843, #5a2c2a);
+            border: 1px solid #ffc947;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+        }
+        
+        #create-lobby-btn:hover {
+            background: linear-gradient(145deg, #a1534d, #6b3431);
+        }
+
+        #create-lobby-btn:disabled {
+            background: #555;
+            border-color: #777;
+            cursor: not-allowed;
+        }
+
+        /* --- دکمه بازگشت --- */
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(145deg, rgba(80, 50, 48, 0.8), rgba(56, 33, 32, 0.9));
+            color: #e0dacc;
+            border: 1px solid #c5a687;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        
+        .back-button:hover {
+            border-color: #ffc947;
+            transform: scale(1.1);
+        }
+
+        /* --- استایل‌های مودال عمومی --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
+        .modal-overlay.visible { opacity: 1; visibility: visible; }
+        .modal-content { background: linear-gradient(145deg, #3c3022, #1e170f); border: 2px solid #5c4a3a; border-radius: 16px; padding: 25px 30px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); transform: scale(0.9); transition: all 0.3s ease; }
+        .modal-overlay.visible .modal-content { transform: scale(1); }
+        .modal-title { font-size: 1.5rem; font-weight: 900; color: #ffc947; margin-bottom: 15px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .modal-message { font-size: 1rem; line-height: 1.6; margin-bottom: 25px; }
+        .modal-button { width: 100%; padding: 12px; font-size: 1rem; font-weight: 700; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; color: #ffffff; background: linear-gradient(145deg, #8c4843, #5a2c2a); border: 1px solid #ffc947; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+        .modal-button:hover { background: linear-gradient(145deg, #a1534d, #6b3431); }
+    </style>
+</head>
+<body>
+
+    <div id="loading-overlay">
+        <div class="loader"></div>
+        <p id="loading-text">در حال بارگذاری لابی‌ها...</p>
+    </div>
+    
+    <a href="./main.html" class="back-button" title="بازگشت به منوی اصلی">&#8678;</a>
+
+    <div class="lobby-container">
+        <div class="lobby-header">
+            <h1 class="lobby-title">لابی‌های بازی</h1>
+        </div>
+        
+        <div id="lobby-list-container">
+            <!-- لابی‌ها به صورت داینامیک اینجا اضافه می‌شوند -->
+            <p id="no-lobbies-message" style="display: none;">در حال حاضر هیچ لابی فعالی وجود ندارد. اولین لابی را شما بسازید!</p>
+        </div>
+
+        <div class="create-lobby-section">
+            <input type="text" id="lobby-name-input" placeholder="نام لابی خود را وارد کنید..." maxlength="25">
+            <button id="create-lobby-btn">ایجاد لابی</button>
+        </div>
+    </div>
+    
+    <!-- پنل Alert عمومی -->
+    <div id="custom-alert-overlay" class="modal-overlay">
+        <div class="modal-content">
+            <h2 class="modal-title">توجه!</h2>
+            <p id="custom-alert-message" class="modal-message"></p>
+            <button id="custom-alert-confirm-btn" class="modal-button">تایید</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, doc, getDoc, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        // --- کانفیگ فایربیس (همانند صفحه اصلی) ---
+        const firebaseConfig = {
+          apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
+          authDomain: "mafia-9fcbf.firebaseapp.com",
+          projectId: "mafia-9fcbf",
+          storageBucket: "mafia-9fcbf.appspot.com",
+          messagingSenderId: "471627157488",
+          appId: "1:471627157488:web:92f008548a5596619a5735",
+          measurementId: "G-0PDHDWC6NV"
+        };
+        
+        // --- مقداردهی اولیه ---
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // --- المان‌های DOM ---
+        const lobbyListContainer = document.getElementById('lobby-list-container');
+        const noLobbiesMessage = document.getElementById('no-lobbies-message');
+        const lobbyNameInput = document.getElementById('lobby-name-input');
+        const createLobbyBtn = document.getElementById('create-lobby-btn');
+        const customAlertOverlay = document.getElementById('custom-alert-overlay');
+        const customAlertMessage = document.getElementById('custom-alert-message');
+        const customAlertConfirmBtn = document.getElementById('custom-alert-confirm-btn');
+        
+        let currentUserData = null; // برای نگهداری اطلاعات کاربر لاگین کرده
+
+        // --- توابع عمومی ---
+        function showModal(modalElement) {
+            modalElement.classList.add('visible');
+        }
+
+        function hideModal(modalElement) {
+            modalElement.classList.remove('visible');
+        }
+
+        function showCustomAlert(message) {
+            customAlertMessage.textContent = message;
+            showModal(customAlertOverlay);
+            customAlertConfirmBtn.onclick = () => hideModal(customAlertOverlay);
+        }
+
+        // --- توابع اصلی لابی ---
+
+        // تابع برای رندر کردن یک آیتم لابی در لیست
+        function renderLobbyItem(lobbyData) {
+            const lobbyItem = document.createElement('div');
+            lobbyItem.className = 'lobby-item';
+            
+            lobbyItem.innerHTML = `
+                <div class="lobby-info">
+                    <div class="lobby-name">${lobbyData.lobbyName}</div>
+                    <div class="creator-name">سازنده: ${lobbyData.creatorName}</div>
+                </div>
+                <div class="lobby-status">
+                    <span class="player-count">${lobbyData.playerCount || 1}/${lobbyData.maxPlayers || 10}</span>
+                </div>
+            `;
+            
+            // در آینده می‌توانید عملکرد ورود به لابی را به اینجا اضافه کنید
+            lobbyItem.addEventListener('click', () => {
+                showCustomAlert(`شما روی لابی "${lobbyData.lobbyName}" کلیک کردید. عملکرد ورود هنوز پیاده‌سازی نشده است.`);
+            });
+
+            return lobbyItem;
+        }
+
+        // تابع برای گوش دادن به تغییرات در لیست لابی‌ها و نمایش آن‌ها
+        function listenForLobbies() {
+            const lobbiesRef = collection(db, 'Lobbys list');
+            const q = query(lobbiesRef, orderBy('createdAt', 'desc'));
+
+            onSnapshot(q, (snapshot) => {
+                lobbyListContainer.innerHTML = ''; // پاک کردن لیست قبلی
+                if (snapshot.empty) {
+                    noLobbiesMessage.style.display = 'block';
+                } else {
+                    noLobbiesMessage.style.display = 'none';
+                    snapshot.forEach((doc) => {
+                        const lobbyData = doc.data();
+                        const lobbyElement = renderLobbyItem(lobbyData);
+                        lobbyListContainer.appendChild(lobbyElement);
+                    });
+                }
+            }, (error) => {
+                console.error("خطا در دریافت لیست لابی‌ها:", error);
+                showCustomAlert("خطا در ارتباط با سرور برای دریافت لیست لابی‌ها.");
+            });
+        }
+        
+        // تابع برای ساخت لابی جدید
+        async function createLobby() {
+            const lobbyName = lobbyNameInput.value.trim();
+
+            if (!lobbyName) {
+                showCustomAlert("نام لابی نمی‌تواند خالی باشد.");
+                return;
+            }
+            if (!currentUserData) {
+                showCustomAlert("اطلاعات کاربر یافت نشد. لطفا دوباره وارد شوید.");
+                return;
+            }
+
+            createLobbyBtn.disabled = true;
+            createLobbyBtn.textContent = 'در حال ساخت...';
+
+            try {
+                // ساخت داکیومنت جدید در کالکشن Lobbys list
+                // اگر کالکشن وجود نداشته باشد، فایربیس خودکار آن را میسازد
+                const lobbiesCollectionRef = collection(db, 'Lobbys list');
+                await addDoc(lobbiesCollectionRef, {
+                    lobbyName: lobbyName,
+                    creatorId: auth.currentUser.uid,
+                    creatorName: currentUserData.displayName || "کاربر ناشناس",
+                    players: [{ // لیست بازیکنان، شروع با سازنده
+                        uid: auth.currentUser.uid,
+                        displayName: currentUserData.displayName || "کاربر ناشناس",
+                        avatarUrl: currentUserData.avatarUrl || ''
+                    }],
+                    playerCount: 1,
+                    maxPlayers: 10,
+                    status: 'waiting', // وضعیت لابی: waiting, playing, finished
+                    createdAt: serverTimestamp() // برای مرتب‌سازی بر اساس زمان ساخت
+                });
+
+                lobbyNameInput.value = ''; // پاک کردن اینپوت پس از ساخت موفق
+                
+            } catch (error) {
+                console.error("خطا در ساخت لابی: ", error);
+                showCustomAlert("مشکلی در ساخت لابی پیش آمد. لطفا دوباره تلاش کنید.");
+            } finally {
+                createLobbyBtn.disabled = false;
+                createLobbyBtn.textContent = 'ایجاد لابی';
+            }
+        }
+
+
+        // --- منطق اصلی و احراز هویت ---
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // کاربر لاگین کرده است، اطلاعات او را از کالکشن users بگیریم
+                const userDocRef = doc(db, 'users', user.uid);
+                getDoc(userDocRef).then(docSnap => {
+                    if (docSnap.exists()) {
+                        currentUserData = docSnap.data();
+                    } else {
+                        // اگر پروفایل کاربر در دیتابیس نبود، یک حالت پیشفرض در نظر میگیریم
+                        currentUserData = { displayName: user.displayName || "کاربر ناشناس" };
+                    }
+                    // پس از دریافت اطلاعات کاربر، لابی‌ها را نمایش بده
+                    listenForLobbies();
+                    document.body.classList.add('loaded'); // نمایش محتوای اصلی
+                }).catch(error => {
+                    console.error("خطا در دریافت اطلاعات کاربر:", error);
+                    showCustomAlert("خطا در دریافت اطلاعات شما از سرور.", () => {
+                         window.location.href = './main.html';
+                    });
+                });
+            } else {
+                // کاربر لاگین نکرده، او را به صفحه لاگین هدایت کن
+                window.location.href = './login.html';
+            }
+        });
+
+        // --- Event Listeners ---
+        createLobbyBtn.addEventListener('click', createLobby);
+        // اجازه ساخت لابی با زدن دکمه Enter
+        lobbyNameInput.addEventListener('keyup', (event) => {
+            if (event.key === 'Enter') {
+                createLobby();
+            }
+        });
+
+    </script>
+</body>
+</html>
