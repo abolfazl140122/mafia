@@ -184,6 +184,9 @@
         .modal-button:hover { background: linear-gradient(145deg, #a1534d, #6b3431); }
         .modal-button:disabled { background: linear-gradient(145deg, #555, #333); border-color: #666; color: #999; cursor: not-allowed; opacity: 0.7; }
         .modal-button:disabled:hover { background: linear-gradient(145deg, #555, #333); }
+        .cancel-button { background: linear-gradient(145deg, #616161, #3a3a3a); border-color: #777; }
+        .cancel-button:hover { background: linear-gradient(145deg, #757575, #4f4f4f); }
+
 
         /* --- استایل‌های پنل منوی آواتار --- */
         #avatar-menu-content { display: flex; flex-direction: column; gap: 15px; padding: 30px; }
@@ -375,6 +378,19 @@
             background: linear-gradient(145deg, #757575, #4f4f4f);
         }
 
+        /* --- استایل‌های جدید پنل مدیریت ورودی بازی --- */
+        .settings-container { display: flex; flex-direction: column; gap: 20px; margin-bottom: 25px; }
+        .toggle-switch-container { display: flex; justify-content: space-between; align-items: center; padding: 15px; background-color: rgba(0,0,0,0.2); border-radius: 8px; border: 1px solid #5c4a3a; }
+        .toggle-label { font-size: 1.1rem; font-weight: 700; color: #e0dacc; }
+        .toggle-switch { position: relative; display: inline-block; width: 60px; height: 34px; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #5a2c2a; transition: .4s; border-radius: 34px; border: 1px solid #c5a687;}
+        .slider:before { position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 3px; background-color: #f0e6d2; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #8c4843; }
+        input:focus + .slider { box-shadow: 0 0 1px #ffc947; }
+        input:checked + .slider:before { transform: translateX(26px); }
+        input:disabled + .slider { opacity: 0.5; cursor: not-allowed; }
+        .buttons-group { display: flex; gap: 10px; }
     </style>
 </head>
 <body>
@@ -489,6 +505,7 @@
         <div id="admin-panel-content" class="modal-content">
             <h2 class="modal-title">پنل مدیریت</h2>
             <button id="manage-users-btn" class="modal-button">مدیریت کاربران</button>
+            <button id="manage-game-modes-btn" class="modal-button">مدیریت ورودی بازی</button>
             <button id="manage-lobbies-btn" class="modal-button" disabled>مدیریت لابی‌ها (غیرفعال)</button>
         </div>
     </div>
@@ -530,8 +547,35 @@
                     <input type="number" id="edit-user-diamonds" class="form-input" required>
                 </div>
                 <button type="submit" id="save-user-changes-btn" class="modal-button">ذخیره تغییرات</button>
-                <button type="button" id="edit-user-cancel-btn" class="modal-button">انصراف</button>
+                <button type="button" id="edit-user-cancel-btn" class="modal-button cancel-button">انصراف</button>
             </form>
+        </div>
+    </div>
+    
+    <!-- پنل مدیریت ورودی بازی -->
+    <div id="game-modes-panel-overlay" class="modal-overlay">
+        <div id="game-modes-panel-content" class="modal-content">
+            <h2 class="modal-title">مدیریت ورودی بازی</h2>
+            <div class="settings-container">
+                <div class="toggle-switch-container">
+                    <span class="toggle-label">بازی دوستانه</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="friendly-mode-toggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="toggle-switch-container">
+                    <span class="toggle-label">بازی امتیازی</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="ranked-mode-toggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="buttons-group">
+                 <button id="game-modes-cancel-btn" class="modal-button cancel-button" style="width: 50%;">انصراف</button>
+                 <button id="game-modes-save-btn" class="modal-button" style="width: 50%;">ذخیره</button>
+            </div>
         </div>
     </div>
 
@@ -587,7 +631,7 @@
         const profileStatDiamonds = document.getElementById('profile-stat-diamonds');
         const profileStatEmail = document.getElementById('profile-stat-email');
 
-        // --- المان‌های جدید پنل مدیریت ---
+        // --- المان‌های پنل مدیریت ---
         const adminPanelOverlay = document.getElementById('admin-panel-overlay');
         const manageUsersBtn = document.getElementById('manage-users-btn');
         const userListModalOverlay = document.getElementById('user-list-modal-overlay');
@@ -606,6 +650,14 @@
         const editUserDiamonds = document.getElementById('edit-user-diamonds');
         const saveUserChangesBtn = document.getElementById('save-user-changes-btn');
         const editUserCancelBtn = document.getElementById('edit-user-cancel-btn');
+        
+        // --- المان‌های جدید پنل مدیریت ورودی ---
+        const manageGameModesBtn = document.getElementById('manage-game-modes-btn');
+        const gameModesPanelOverlay = document.getElementById('game-modes-panel-overlay');
+        const friendlyModeToggle = document.getElementById('friendly-mode-toggle');
+        const rankedModeToggle = document.getElementById('ranked-mode-toggle');
+        const gameModesSaveBtn = document.getElementById('game-modes-save-btn');
+        const gameModesCancelBtn = document.getElementById('game-modes-cancel-btn');
 
 
         // متغیرها
@@ -621,6 +673,12 @@
         // --- توابع عمومی ---
         function showModal(modalElement) { modalElement.classList.add('visible'); }
         function hideModal(modalElement) { modalElement.classList.remove('visible'); }
+        function hideAllAdminModals() {
+            hideModal(adminPanelOverlay);
+            hideModal(userListModalOverlay);
+            hideModal(editUserModalOverlay);
+            hideModal(gameModesPanelOverlay);
+        }
         function showCustomAlert(message, onConfirm) {
             customAlertMessage.textContent = message;
             showModal(customAlertOverlay);
@@ -644,6 +702,32 @@
             }
         }
         
+        // --- تابع جدید و مهم: بررسی لحظه‌ای دسترسی ادمین ---
+        async function verifyAdminStatus() {
+            const user = auth.currentUser;
+            if (!user) {
+                return false; // اگر کاربری لاگین نیست، قطعا ادمین نیست
+            }
+
+            try {
+                const userDocRef = doc(db, 'users', user.uid);
+                const docSnap = await getDoc(userDocRef);
+
+                if (docSnap.exists() && docSnap.data().isAdmin === true) {
+                    return true; // کاربر هنوز ادمین است
+                } else {
+                    // کاربر دیگر ادمین نیست
+                    showCustomAlert("دسترسی شما به پنل مدیریت قطع شده است.", hideAllAdminModals);
+                    return false;
+                }
+            } catch (error) {
+                console.error("خطا در بررسی وضعیت ادمین:", error);
+                showCustomAlert("خطا در ارتباط با سرور برای تایید دسترسی.", hideAllAdminModals);
+                return false;
+            }
+        }
+
+
         // --- توابع پروفایل کاربر ---
         function populateProfileModal() {
             if (!currentUserData) return;
@@ -665,10 +749,12 @@
         function downloadAndCacheMusic() { return new Promise((resolve, reject) => { musicDownloadOverlay.classList.add('visible'); const xhr = new XMLHttpRequest(); xhr.open('GET', MUSIC_URL, true); xhr.responseType = 'blob'; xhr.onprogress = (event) => { if (event.lengthComputable) { const percentComplete = Math.round((event.loaded / event.total) * 100); progressBar.style.width = percentComplete + '%'; progressText.textContent = `در حال دانلود... ${percentComplete}%`; } }; xhr.onload = async () => { if (xhr.status === 200) { const musicBlob = xhr.response; try { const cache = await caches.open(MUSIC_CACHE_NAME); await cache.put(MUSIC_URL, new Response(musicBlob)); localStorage.setItem(MUSIC_VERSION_KEY, MUSIC_URL); musicDownloadOverlay.classList.remove('visible'); resolve(musicBlob); } catch (cacheError) { reject(cacheError); } } else { reject(new Error(`خطای شبکه: ${xhr.statusText}`)); } }; xhr.onerror = () => { musicDownloadOverlay.classList.remove('visible'); showCustomAlert("دانلود موسیقی پس‌زمینه با خطا مواجه شد.", () => {}); reject(new Error('خطای شبکه در دانلود موسیقی.')); }; xhr.send(); }); }
         async function handleBackgroundMusic() { const cachedVersion = localStorage.getItem(MUSIC_VERSION_KEY); if (cachedVersion === MUSIC_URL) { try { const cache = await caches.open(MUSIC_CACHE_NAME); const cachedResponse = await cache.match(MUSIC_URL); if (cachedResponse) { playMusicFromBlob(await cachedResponse.blob()); } else { playMusicFromBlob(await downloadAndCacheMusic()); } } catch (error) { playMusicFromBlob(await downloadAndCacheMusic()); } } else { try { playMusicFromBlob(await downloadAndCacheMusic()); } catch (error) { console.error('فرایند دانلود و پخش موسیقی با خطا مواجه شد:', error); } } }
 
-        // --- توابع جدید پنل مدیریت ---
+        // --- توابع پنل مدیریت ---
         async function loadAndShowUserList() {
+            if (!(await verifyAdminStatus())) return;
+
             userListContainer.innerHTML = '<p style="padding: 20px;">در حال بارگذاری لیست کاربران...</p>';
-            userSearchInput.value = ''; // ریست کردن جستجو
+            userSearchInput.value = ''; 
             hideModal(adminPanelOverlay);
             showModal(userListModalOverlay);
             
@@ -707,6 +793,8 @@
         }
 
         async function openEditModalForUser(uid) {
+            if (!(await verifyAdminStatus())) return;
+
             try {
                 const userDocRef = doc(db, 'users', uid);
                 const docSnap = await getDoc(userDocRef);
@@ -733,6 +821,8 @@
         
         async function handleSaveChanges(e) {
             e.preventDefault();
+            if (!(await verifyAdminStatus())) return;
+
             const uid = editUserUid.value;
             const newDisplayName = editDisplayName.value;
             const newAge = parseInt(editUserAge.value, 10);
@@ -754,7 +844,7 @@
                 
                 hideModal(editUserModalOverlay);
                 showCustomAlert("تغییرات با موفقیت ذخیره شد.", async () => {
-                    await loadAndShowUserList(); // لیست را رفرش کن
+                    await loadAndShowUserList();
                 });
 
             } catch (error) {
@@ -781,6 +871,65 @@
                 }
             });
         }
+        
+        // --- توابع جدید پنل مدیریت ورودی بازی ---
+        async function openGameModesPanel() {
+            if (!(await verifyAdminStatus())) return;
+
+            hideModal(adminPanelOverlay);
+            showModal(gameModesPanelOverlay);
+            
+            friendlyModeToggle.disabled = true;
+            rankedModeToggle.disabled = true;
+            gameModesSaveBtn.disabled = true;
+            
+            try {
+                const gameModesDocRef = doc(db, 'settings', 'gameModes');
+                const docSnap = await getDoc(gameModesDocRef);
+                
+                if (docSnap.exists()) {
+                    const modes = docSnap.data();
+                    friendlyModeToggle.checked = modes.friendlyEnabled || false;
+                    rankedModeToggle.checked = modes.rankedEnabled || false;
+                }
+            } catch (error) {
+                console.error("خطا در خواندن تنظیمات ورودی بازی: ", error);
+                showCustomAlert("خطا در دریافت اطلاعات. لطفا دوباره تلاش کنید.", () => {
+                    hideModal(gameModesPanelOverlay);
+                    showModal(adminPanelOverlay);
+                });
+            } finally {
+                friendlyModeToggle.disabled = false;
+                rankedModeToggle.disabled = false;
+                gameModesSaveBtn.disabled = false;
+            }
+        }
+        
+        async function handleSaveGameModes() {
+            if (!(await verifyAdminStatus())) return;
+
+            gameModesSaveBtn.disabled = true;
+            gameModesSaveBtn.textContent = 'در حال ذخیره...';
+
+            const newSettings = {
+                friendlyEnabled: friendlyModeToggle.checked,
+                rankedEnabled: rankedModeToggle.checked
+            };
+
+            try {
+                const gameModesDocRef = doc(db, 'settings', 'gameModes');
+                await updateDoc(gameModesDocRef, newSettings);
+                showCustomAlert("تنظیمات ورودی بازی با موفقیت ذخیره شد.");
+                hideModal(gameModesPanelOverlay);
+            } catch (error) {
+                console.error("خطا در ذخیره تنظیمات ورودی بازی: ", error);
+                showCustomAlert("خطا در ذخیره تغییرات. لطفا دوباره تلاش کنید.");
+            } finally {
+                gameModesSaveBtn.disabled = false;
+                gameModesSaveBtn.textContent = 'ذخیره';
+            }
+        }
+
 
         // --- منطق اصلی و احراز هویت ---
         onAuthStateChanged(auth, (user) => {
@@ -850,17 +999,17 @@
             }
         });
 
-        // --- رویدادهای جدید پنل مدیریت ---
-        adminPanelButton.addEventListener('click', () => checkMaintenanceAndProceed(() => showModal(adminPanelOverlay)));
+        // --- رویدادهای پنل مدیریت ---
+        adminPanelButton.addEventListener('click', () => checkMaintenanceAndProceed(async () => {
+             if (await verifyAdminStatus()) showModal(adminPanelOverlay);
+        }));
+        adminPanelOverlay.addEventListener('click', (e) => { if (e.target === adminPanelOverlay) hideModal(adminPanelOverlay); });
+
+        // مدیریت کاربران
         manageUsersBtn.addEventListener('click', loadAndShowUserList);
+        userListModalOverlay.addEventListener('click', (e) => { if (e.target === userListModalOverlay) hideModal(userListModalOverlay); });
         userListCloseBtn.addEventListener('click', () => { hideModal(userListModalOverlay); showModal(adminPanelOverlay); });
         userSearchInput.addEventListener('input', filterUserList);
-        
-        adminPanelOverlay.addEventListener('click', (e) => { if (e.target === adminPanelOverlay) hideModal(adminPanelOverlay); });
-        userListModalOverlay.addEventListener('click', (e) => { if (e.target === userListModalOverlay) hideModal(userListModalOverlay); });
-        editUserModalOverlay.addEventListener('click', (e) => { if (e.target === editUserModalOverlay) hideModal(editUserModalOverlay); });
-
-
         userListContainer.addEventListener('click', (e) => {
             const editButton = e.target.closest('.edit-user-icon');
             if (editButton) {
@@ -870,9 +1019,17 @@
                 }
             }
         });
-
+        
+        // ویرایش کاربر
+        editUserModalOverlay.addEventListener('click', (e) => { if (e.target === editUserModalOverlay) hideModal(editUserModalOverlay); });
         editUserForm.addEventListener('submit', handleSaveChanges);
         editUserCancelBtn.addEventListener('click', () => { hideModal(editUserModalOverlay); showModal(userListModalOverlay); });
+
+        // مدیریت ورودی بازی
+        manageGameModesBtn.addEventListener('click', openGameModesPanel);
+        gameModesPanelOverlay.addEventListener('click', (e) => { if (e.target === gameModesPanelOverlay) hideModal(gameModesPanelOverlay); });
+        gameModesSaveBtn.addEventListener('click', handleSaveGameModes);
+        gameModesCancelBtn.addEventListener('click', () => { hideModal(gameModesPanelOverlay); showModal(adminPanelOverlay); });
 
     </script>
 </body>
