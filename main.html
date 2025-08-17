@@ -215,23 +215,45 @@
         .stat-label span:first-child { font-size: 1.4rem; line-height: 1; }
         .stat-value { font-weight: 400; color: #e0dacc; direction: ltr; text-align: right; font-size: 1.1rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
         
-        /* --- استایل‌های جدید پنل مدیریت --- */
-        #admin-panel-content .modal-button, #user-list-modal-content .modal-button {
-            margin-top: 10px;
+        /* --- استایل‌های جدید و بهبود یافته پنل مدیریت --- */
+        #admin-panel-content .modal-button { margin-top: 10px; }
+
+        /* استایل نوار جستجو */
+        .search-bar-container {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        #user-search-input {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: rgba(0,0,0,0.3);
+            border: 1px solid #5c4a3a;
+            border-radius: 8px;
+            color: #f0e6d2;
+            font-family: 'Vazirmatn', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        #user-search-input:focus {
+            outline: none;
+            border-color: #ffc947;
+            box-shadow: 0 0 10px rgba(255, 201, 71, 0.3);
+        }
+        #user-search-input::placeholder {
+            color: #c5a687;
+            opacity: 0.7;
         }
 
         #user-list-container {
             width: 100%;
-            max-height: 50vh; /* ارتفاع حداکثر برای فعال شدن اسکرول */
+            max-height: 55vh; /* ارتفاع کمی بیشتر برای نمایش بهتر */
             overflow-y: auto;
-            margin-top: 20px;
-            padding: 5px;
             border: 1px solid #5c4a3a;
             border-radius: 8px;
             background-color: rgba(0,0,0,0.2);
+            padding: 5px;
         }
         
-        /* استایل اسکرول بار */
         #user-list-container::-webkit-scrollbar { width: 8px; }
         #user-list-container::-webkit-scrollbar-track { background: #1e170f; border-radius: 10px; }
         #user-list-container::-webkit-scrollbar-thumb { background: #8c4843; border-radius: 10px; }
@@ -241,17 +263,89 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 15px;
+            padding: 10px 15px;
             background-color: rgba(255, 255, 255, 0.05);
             border-bottom: 1px solid #5c4a3a;
             color: #e0dacc;
+            transition: background-color 0.2s ease;
+        }
+        .user-list-item:hover {
+            background-color: rgba(255, 201, 71, 0.1);
         }
         .user-list-item:last-child { border-bottom: none; }
-        .user-list-item span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .edit-user-icon { font-size: 1.4rem; cursor: pointer; transition: transform 0.2s ease; }
-        .edit-user-icon:hover { transform: scale(1.2); color: #ffc947; }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            overflow: hidden;
+        }
+        .user-info img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #5c4a3a;
+        }
+        .user-details {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            text-align: right;
+        }
+        .user-details .name {
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .user-details .email {
+            font-size: 0.8rem;
+            color: #c5a687;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .edit-user-icon {
+            cursor: pointer;
+            padding: 5px; /* فضای کلیک بزرگتر */
+        }
+        .edit-user-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: #c5a687;
+            transition: all 0.2s ease;
+        }
+        .edit-user-icon:hover svg {
+            fill: #ffc947;
+            transform: scale(1.2) rotate(15deg);
+        }
+        
+        /* استایل‌های بهبود یافته پنل ویرایش کاربر */
+        #edit-user-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #5c4a3a;
+        }
+        #edit-user-avatar-preview {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #a47d54;
+        }
+        #edit-user-name-preview {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #e0dacc;
+        }
 
-        #edit-user-form { display: flex; flex-direction: column; gap: 15px; text-align: right; margin-top: 20px; }
+        #edit-user-form { display: flex; flex-direction: column; gap: 15px; text-align: right; }
         .form-group { display: flex; flex-direction: column; gap: 5px; }
         .form-label { font-weight: 700; color: #c5a687; font-size: 0.9rem; }
         .form-input {
@@ -263,10 +357,23 @@
             color: #f0e6d2;
             font-family: 'Vazirmatn', sans-serif;
             font-size: 1rem;
-            direction: ltr; /* برای اعداد و ایمیل */
+            direction: ltr;
             text-align: right;
+            transition: all 0.3s ease;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: #ffc947;
+            box-shadow: 0 0 12px rgba(255, 201, 71, 0.3);
         }
         #edit-user-form .modal-button { margin-top: 15px; }
+        #edit-user-cancel-btn {
+            background: linear-gradient(145deg, #616161, #3a3a3a);
+            border-color: #777;
+        }
+        #edit-user-cancel-btn:hover {
+            background: linear-gradient(145deg, #757575, #4f4f4f);
+        }
 
     </style>
 </head>
@@ -388,19 +495,26 @@
 
     <!-- پنل لیست کاربران -->
     <div id="user-list-modal-overlay" class="modal-overlay">
-        <div id="user-list-modal-content" class="modal-content" style="max-width: 450px;">
+        <div id="user-list-modal-content" class="modal-content" style="max-width: 480px;">
             <h2 class="modal-title">مدیریت کاربران</h2>
+            <div class="search-bar-container">
+                <input type="text" id="user-search-input" placeholder="جستجوی کاربر بر اساس نام یا ایمیل...">
+            </div>
             <div id="user-list-container">
                 <!-- لیست کاربران به صورت پویا اینجا قرار می‌گیرد -->
             </div>
-            <button id="user-list-close-btn" class="modal-button">بازگشت</button>
+            <button id="user-list-close-btn" class="modal-button" style="margin-top: 20px;">بازگشت</button>
         </div>
     </div>
 
     <!-- پنل ویرایش کاربر -->
     <div id="edit-user-modal-overlay" class="modal-overlay">
         <div id="edit-user-modal-content" class="modal-content">
-            <h2 id="edit-user-title" class="modal-title">ویرایش کاربر</h2>
+            <div id="edit-user-header">
+                <img id="edit-user-avatar-preview" src="" alt="آواتار کاربر">
+                <h3 id="edit-user-name-preview"></h3>
+            </div>
+            <h2 id="edit-user-title" class="modal-title">ویرایش اطلاعات</h2>
             <form id="edit-user-form">
                 <input type="hidden" id="edit-user-uid">
                 <div class="form-group">
@@ -416,7 +530,7 @@
                     <input type="number" id="edit-user-diamonds" class="form-input" required>
                 </div>
                 <button type="submit" id="save-user-changes-btn" class="modal-button">ذخیره تغییرات</button>
-                <button type="button" id="edit-user-cancel-btn" class="modal-button" style="background: #555;">انصراف</button>
+                <button type="button" id="edit-user-cancel-btn" class="modal-button">انصراف</button>
             </form>
         </div>
     </div>
@@ -477,10 +591,14 @@
         const adminPanelOverlay = document.getElementById('admin-panel-overlay');
         const manageUsersBtn = document.getElementById('manage-users-btn');
         const userListModalOverlay = document.getElementById('user-list-modal-overlay');
+        const userSearchInput = document.getElementById('user-search-input');
         const userListContainer = document.getElementById('user-list-container');
         const userListCloseBtn = document.getElementById('user-list-close-btn');
         const editUserModalOverlay = document.getElementById('edit-user-modal-overlay');
         const editUserTitle = document.getElementById('edit-user-title');
+        const editUserHeader = document.getElementById('edit-user-header');
+        const editUserAvatarPreview = document.getElementById('edit-user-avatar-preview');
+        const editUserNamePreview = document.getElementById('edit-user-name-preview');
         const editUserForm = document.getElementById('edit-user-form');
         const editUserUid = document.getElementById('edit-user-uid');
         const editDisplayName = document.getElementById('edit-display-name');
@@ -494,6 +612,8 @@
         const MUSIC_URL = "https://raw.githubusercontent.com/abolfazl140122/mafia/main/dark-music-249503.mp3";
         const MUSIC_CACHE_NAME = 'mafia-music-cache-v1';
         const MUSIC_VERSION_KEY = 'mafia-music-version';
+        const DEFAULT_AVATAR = 'https://i.imgur.com/T2bT1tG.png';
+        const EDIT_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19.14,12.94a1.72,1.72,0,0,0-2.28,0l-.63.63a1.72,1.72,0,0,0,0,2.28l.63.63a1.72,1.72,0,0,0,2.28,0l1.47-1.47A3.39,3.39,0,0,0,19.14,12.94Zm-4.88,2.28a3.39,3.39,0,0,0,0-4.56l-2-2a3.39,3.39,0,0,0-4.56,0l-.63.63a3.39,3.39,0,0,0,0,4.56l2,2A3.39,3.39,0,0,0,14.26,15.22Z" opacity="0"/><path d="M12,2A10,10,0,1,0,22,12,10,10,0,0,0,12,2Zm3.71,12.29-2,2a1.72,1.72,0,0,1-2.28,0l-.63-.63a1.72,1.72,0,0,1,0-2.28l.63-.63a1.72,1.72,0,0,1,2.28,0l1.47,1.47A1.72,1.72,0,0,1,15.71,14.29ZM8.29,9.71a1.72,1.72,0,0,1,2.28,0l.63.63a1.72,1.72,0,0,1,0,2.28l-2,2a1.72,1.72,0,0,1-2.28,0l-1.47-1.47a1.72,1.72,0,0,1,0-2.28Z"/></svg>`;
         let isMusicPlaying = false;
         let isInitialLoad = true;
         let currentUserData = null;
@@ -527,7 +647,7 @@
         // --- توابع پروفایل کاربر ---
         function populateProfileModal() {
             if (!currentUserData) return;
-            profileModalAvatar.src = currentUserData.avatarUrl || 'https://i.imgur.com/T2bT1tG.png';
+            profileModalAvatar.src = currentUserData.avatarUrl || DEFAULT_AVATAR;
             profileModalName.textContent = currentUserData.displayName || "کاربر ناشناس";
             profileStatAge.textContent = currentUserData.old || "نامشخص";
             profileStatAvatars.textContent = (currentUserData.ownedAvatars?.length || 0) + " عدد";
@@ -547,7 +667,8 @@
 
         // --- توابع جدید پنل مدیریت ---
         async function loadAndShowUserList() {
-            userListContainer.innerHTML = '<p>در حال بارگذاری لیست کاربران...</p>';
+            userListContainer.innerHTML = '<p style="padding: 20px;">در حال بارگذاری لیست کاربران...</p>';
+            userSearchInput.value = ''; // ریست کردن جستجو
             hideModal(adminPanelOverlay);
             showModal(userListModalOverlay);
             
@@ -555,9 +676,9 @@
                 const usersCollection = collection(db, "users");
                 const querySnapshot = await getDocs(usersCollection);
                 
-                userListContainer.innerHTML = ''; // پاک کردن پیام بارگذاری
+                userListContainer.innerHTML = ''; 
                 if (querySnapshot.empty) {
-                    userListContainer.innerHTML = '<p>هیچ کاربری یافت نشد.</p>';
+                    userListContainer.innerHTML = '<p style="padding: 20px;">هیچ کاربری یافت نشد.</p>';
                     return;
                 }
 
@@ -567,15 +688,21 @@
                     userElement.classList.add('user-list-item');
                     userElement.dataset.uid = doc.id;
                     userElement.innerHTML = `
-                        <span>${userData.displayName || 'بدون نام'} (${userData.email || 'بدون ایمیل'})</span>
-                        <span class="edit-user-icon">✏️</span>
+                        <div class="user-info">
+                            <img src="${userData.avatarUrl || DEFAULT_AVATAR}" alt="avatar">
+                            <div class="user-details">
+                                <span class="name">${userData.displayName || 'بدون نام'}</span>
+                                <span class="email">${userData.email || 'بدون ایمیل'}</span>
+                            </div>
+                        </div>
+                        <span class="edit-user-icon">${EDIT_ICON_SVG}</span>
                     `;
                     userListContainer.appendChild(userElement);
                 });
 
             } catch (error) {
                 console.error("خطا در دریافت لیست کاربران: ", error);
-                userListContainer.innerHTML = '<p>خطا در بارگذاری اطلاعات. لطفا دوباره تلاش کنید.</p>';
+                userListContainer.innerHTML = '<p style="padding: 20px;">خطا در بارگذاری اطلاعات. لطفا دوباره تلاش کنید.</p>';
             }
         }
 
@@ -586,7 +713,8 @@
 
                 if (docSnap.exists()) {
                     const userData = docSnap.data();
-                    editUserTitle.textContent = `ویرایش ${userData.displayName || 'کاربر'}`;
+                    editUserNamePreview.textContent = userData.displayName || 'کاربر';
+                    editUserAvatarPreview.src = userData.avatarUrl || DEFAULT_AVATAR;
                     editUserUid.value = uid;
                     editDisplayName.value = userData.displayName || '';
                     editUserAge.value = userData.old || '';
@@ -610,14 +738,8 @@
             const newAge = parseInt(editUserAge.value, 10);
             const newDiamonds = parseInt(editUserDiamonds.value, 10);
 
-            if (!uid) {
-                showCustomAlert("خطای سیستمی: شناسه کاربر موجود نیست.");
-                return;
-            }
-            if (isNaN(newAge) || isNaN(newDiamonds)) {
-                showCustomAlert("لطفا مقادیر معتبر برای سن و الماس وارد کنید.");
-                return;
-            }
+            if (!uid) { showCustomAlert("خطای سیستمی: شناسه کاربر موجود نیست."); return; }
+            if (isNaN(newAge) || isNaN(newDiamonds)) { showCustomAlert("لطفا مقادیر معتبر برای سن و الماس وارد کنید."); return; }
 
             saveUserChangesBtn.disabled = true;
             saveUserChangesBtn.textContent = 'در حال ذخیره...';
@@ -643,6 +765,22 @@
                 saveUserChangesBtn.textContent = 'ذخیره تغییرات';
             }
         }
+        
+        function filterUserList() {
+            const searchTerm = userSearchInput.value.toLowerCase();
+            const allUsers = userListContainer.querySelectorAll('.user-list-item');
+            
+            allUsers.forEach(userItem => {
+                const name = userItem.querySelector('.user-details .name')?.textContent.toLowerCase() || '';
+                const email = userItem.querySelector('.user-details .email')?.textContent.toLowerCase() || '';
+                
+                if (name.includes(searchTerm) || email.includes(searchTerm)) {
+                    userItem.style.display = 'flex';
+                } else {
+                    userItem.style.display = 'none';
+                }
+            });
+        }
 
         // --- منطق اصلی و احراز هویت ---
         onAuthStateChanged(auth, (user) => {
@@ -652,11 +790,11 @@
                     if (userDocSnap.exists()) {
                         currentUserData = userDocSnap.data();
                         userDisplayName.textContent = currentUserData.displayName || "کاربر ناشناس";
-                        userAvatar.src = currentUserData.avatarUrl || 'https://i.imgur.com/T2bT1tG.png';
+                        userAvatar.src = currentUserData.avatarUrl || DEFAULT_AVATAR;
                         adminPanelButton.style.display = currentUserData.isAdmin === true ? 'block' : 'none';
                     } else {
                         userDisplayName.textContent = user.displayName || "کاربر ناشناس";
-                        userAvatar.src = 'https://i.imgur.com/T2bT1tG.png';
+                        userAvatar.src = DEFAULT_AVATAR;
                         adminPanelButton.style.display = 'none';
                     }
                     if (isInitialLoad) {
@@ -713,42 +851,28 @@
         });
 
         // --- رویدادهای جدید پنل مدیریت ---
-        adminPanelButton.addEventListener('click', () => {
-            checkMaintenanceAndProceed(() => {
-                showModal(adminPanelOverlay);
-            });
-        });
-
+        adminPanelButton.addEventListener('click', () => checkMaintenanceAndProceed(() => showModal(adminPanelOverlay)));
         manageUsersBtn.addEventListener('click', loadAndShowUserList);
-
-        userListCloseBtn.addEventListener('click', () => {
-            hideModal(userListModalOverlay);
-            showModal(adminPanelOverlay);
-        });
+        userListCloseBtn.addEventListener('click', () => { hideModal(userListModalOverlay); showModal(adminPanelOverlay); });
+        userSearchInput.addEventListener('input', filterUserList);
         
-        // بستن پنل‌ها با کلیک روی پس‌زمینه
         adminPanelOverlay.addEventListener('click', (e) => { if (e.target === adminPanelOverlay) hideModal(adminPanelOverlay); });
         userListModalOverlay.addEventListener('click', (e) => { if (e.target === userListModalOverlay) hideModal(userListModalOverlay); });
         editUserModalOverlay.addEventListener('click', (e) => { if (e.target === editUserModalOverlay) hideModal(editUserModalOverlay); });
 
 
-        // Event Delegation برای دکمه‌های ویرایش
         userListContainer.addEventListener('click', (e) => {
-            if (e.target.classList.contains('edit-user-icon')) {
-                const userItem = e.target.closest('.user-list-item');
+            const editButton = e.target.closest('.edit-user-icon');
+            if (editButton) {
+                const userItem = editButton.closest('.user-list-item');
                 if (userItem && userItem.dataset.uid) {
-                    const uid = userItem.dataset.uid;
-                    openEditModalForUser(uid);
+                    openEditModalForUser(userItem.dataset.uid);
                 }
             }
         });
 
         editUserForm.addEventListener('submit', handleSaveChanges);
-
-        editUserCancelBtn.addEventListener('click', () => {
-            hideModal(editUserModalOverlay);
-            showModal(userListModalOverlay);
-        });
+        editUserCancelBtn.addEventListener('click', () => { hideModal(editUserModalOverlay); showModal(userListModalOverlay); });
 
     </script>
 </body>
