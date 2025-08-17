@@ -182,6 +182,8 @@
         .modal-message { font-size: 1rem; line-height: 1.6; margin-bottom: 25px; }
         .modal-button { width: 100%; padding: 12px; font-size: 1rem; font-weight: 700; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; color: #ffffff; background: linear-gradient(145deg, #8c4843, #5a2c2a); border: 1px solid #ffc947; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
         .modal-button:hover { background: linear-gradient(145deg, #a1534d, #6b3431); }
+        .modal-button:disabled { background: linear-gradient(145deg, #555, #333); border-color: #666; color: #999; cursor: not-allowed; opacity: 0.7; }
+        .modal-button:disabled:hover { background: linear-gradient(145deg, #555, #333); }
 
         /* --- استایل‌های پنل منوی آواتار --- */
         #avatar-menu-content {
@@ -189,6 +191,22 @@
             flex-direction: column;
             gap: 15px;
             padding: 30px;
+        }
+        
+        /* --- استایل‌های پنل انتخاب نوع بازی --- */
+        #game-mode-modal-content {
+            display: flex;
+            flex-direction: column;
+        }
+        .game-mode-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+        }
+        .game-mode-button {
+            padding: 15px;
+            font-size: 1.1rem;
         }
 
         /* --- استایل‌های جدید و بهبودیافته پنل پروفایل --- */
@@ -391,15 +409,27 @@
         </div>
     </div>
 
-    <!-- پنل جدید: منوی آواتار -->
+    <!-- پنل منوی آواتار -->
     <div id="avatar-menu-overlay" class="modal-overlay">
         <div id="avatar-menu-content" class="modal-content">
             <button id="avatar-menu-profile-btn" class="modal-button">پروفایل</button>
             <button id="avatar-menu-shop-btn" class="modal-button">فروشگاه</button>
         </div>
     </div>
+    
+    <!-- *** پنل جدید: انتخاب نوع بازی *** -->
+    <div id="game-mode-modal-overlay" class="modal-overlay">
+        <div id="game-mode-modal-content" class="modal-content">
+            <h2 class="modal-title">انتخاب نوع بازی</h2>
+            <p class="modal-message">لطفا یکی از حالت‌های زیر را برای شروع انتخاب کنید.</p>
+            <div class="game-mode-buttons">
+                <button id="friendly-game-btn" class="modal-button game-mode-button">بازی دوستانه</button>
+                <button id="ranked-game-btn" class="modal-button game-mode-button">بازی امتیازی</button>
+            </div>
+        </div>
+    </div>
 
-    <!-- پنل جدید و خفن: پروفایل کاربر -->
+    <!-- پنل پروفایل کاربر -->
     <div id="profile-modal-overlay" class="modal-overlay">
         <div id="profile-modal-content" class="modal-content">
             <div class="profile-header">
@@ -473,12 +503,18 @@
         const progressBar = document.getElementById('progress-bar');
         const progressText = document.getElementById('progress-text');
 
-        // المان‌های پنل‌های جدید
+        // المان‌های پنل‌های مودال
         const avatarMenuOverlay = document.getElementById('avatar-menu-overlay');
         const avatarMenuProfileBtn = document.getElementById('avatar-menu-profile-btn');
         const avatarMenuShopBtn = document.getElementById('avatar-menu-shop-btn');
         const profileModalOverlay = document.getElementById('profile-modal-overlay');
         const profileModalCloseBtn = document.getElementById('profile-modal-close-btn');
+        
+        // **المان‌های پنل جدید انتخاب بازی**
+        const gameModeModalOverlay = document.getElementById('game-mode-modal-overlay');
+        const friendlyGameBtn = document.getElementById('friendly-game-btn');
+        const rankedGameBtn = document.getElementById('ranked-game-btn');
+
 
         // المان‌های داخل پنل پروفایل
         const profileModalAvatar = document.getElementById('profile-modal-avatar');
@@ -655,7 +691,7 @@
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 const userDocRef = doc(db, 'users', user.uid);
-                const unsubscribe = onSnapshot(userDocRef, (userDocSnap) => {
+                onSnapshot(userDocRef, (userDocSnap) => {
                     if (userDocSnap.exists()) {
                         const userData = userDocSnap.data();
                         currentUserData = userData; // ذخیره اطلاعات کاربر در متغیر
@@ -693,6 +729,40 @@
                             "سرور در حالت بروزرسانی قرار گرفت. شما به صفحه اصلی منتقل می‌شوید.",
                             () => { window.location.href = './index.html'; }
                         );
+                    }
+                });
+                
+                // **شنود لحظه‌ای برای وضعیت دکمه‌های بازی**
+                const gameModesDocRef = doc(db, 'settings', 'gameModes');
+                onSnapshot(gameModesDocRef, (docSnap) => {
+                    if (docSnap.exists()) {
+                        const modes = docSnap.data();
+                        
+                        // کنترل دکمه بازی دوستانه
+                        if (modes.friendlyEnabled) {
+                            friendlyGameBtn.disabled = false;
+                            friendlyGameBtn.textContent = "بازی دوستانه";
+                        } else {
+                            friendlyGameBtn.disabled = true;
+                            friendlyGameBtn.textContent = "بازی دوستانه (بزودی)";
+                        }
+
+                        // کنترل دکمه بازی امتیازی
+                        if (modes.rankedEnabled) {
+                            rankedGameBtn.disabled = false;
+                            rankedGameBtn.textContent = "بازی امتیازی";
+                        } else {
+                            rankedGameBtn.disabled = true;
+                            rankedGameBtn.textContent = "بازی امتیازی (غیرفعال)";
+                        }
+
+                    } else {
+                        // اگر داکیومنت موجود نبود، هر دو دکمه را غیرفعال کن
+                        console.warn("داکیومنت 'gameModes' در کالکشن 'settings' یافت نشد.");
+                        friendlyGameBtn.disabled = true;
+                        friendlyGameBtn.textContent = "بازی دوستانه (ناموجود)";
+                        rankedGameBtn.disabled = true;
+                        rankedGameBtn.textContent = "بازی امتیازی (ناموجود)";
                     }
                 });
 
@@ -744,13 +814,33 @@
             }
         });
 
-        // سایر دکمه‌ها
+        // **رویدادهای جدید برای پنل انتخاب بازی**
         startGameButton.addEventListener('click', () => {
+            checkMaintenanceAndProceed(() => {
+                showModal(gameModeModalOverlay);
+            });
+        });
+        
+        gameModeModalOverlay.addEventListener('click', (e) => {
+            if(e.target === gameModeModalOverlay) {
+                hideModal(gameModeModalOverlay);
+            }
+        });
+
+        friendlyGameBtn.addEventListener('click', () => {
+            checkMaintenanceAndProceed(() => {
+                window.location.href = './Lobby page.html';
+            });
+        });
+
+        rankedGameBtn.addEventListener('click', () => {
             checkMaintenanceAndProceed(() => {
                 window.location.href = './users search.html';
             });
         });
-        
+
+
+        // سایر دکمه‌ها
         adminPanelButton.addEventListener('click', () => {
             checkMaintenanceAndProceed(() => {
                 showCustomAlert('شما به پنل مدیریت دسترسی دارید.', () => {});
