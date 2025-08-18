@@ -36,8 +36,7 @@
         #background-blurry {
             position: fixed; top: -20px; left: -20px; width: calc(100% + 40px); height: calc(100% + 40px);
             background-image: url('https://up.20script.ir/file/6195-file-000000001500622f9419de6c322df297-1-.jpg');
-            background-size: cover; background-position: center center; filter: blur(8px) brightness(0.6) saturate(1.2); 
-            z-index: -1; transform: scale(1.1);
+            background-size: cover; background-position: center center; filter: blur(8px) brightness(0.6); z-index: -1;
         }
         
         #loading-overlay {
@@ -52,61 +51,48 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         #loading-text { margin-top: 20px; font-size: 1.1rem; font-weight: 700; }
 
-        /* --- CHANGE START: New Layout Structure --- */
         .lobby-container {
-            width: 100%;
-            height: 100dvh; /* Dynamic viewport height */
-            display: grid;
-            grid-template-rows: auto 1fr auto; /* Header, Main (stretches), Footer */
-            padding: 10px;
-            gap: 10px;
-            max-width: 1400px; /* Max width for ultra-wide screens */
-            margin: 0 auto;
+            width: 100%; height: 100%; display: flex; flex-direction: column;
+            padding: 10px; gap: 10px;
         }
 
         .lobby-header { 
             flex-shrink: 0;
             display: flex; justify-content: space-between; align-items: center;
-            background-color: rgba(0,0,0,0.4); padding: 8px 15px; border-radius: 12px; border: 1px solid var(--border-color);
+            background-color: rgba(0,0,0,0.4); padding: 8px 12px; border-radius: 12px; border: 1px solid var(--border-color);
         }
-        #lobby-name { font-size: 1.4rem; font-weight: 900; color: var(--primary-gold); text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        #lobby-name { font-size: 1.3rem; font-weight: 900; color: var(--primary-gold); text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
         .leave-button {
             background: linear-gradient(145deg, #a13d3d, #7c1f1f); border: 1px solid #ff8f8f;
-            color: white; padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.2s ease;
+            color: white; padding: 6px 12px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: all 0.2s ease;
         }
         .leave-button:hover { transform: scale(1.05); box-shadow: 0 2px 10px rgba(0,0,0,0.4); }
 
+        /* --- NEW LAYOUT: Player Area --- */
         .players-area { 
-            overflow-y: auto;
-            padding: 10px 5px;
-        }
-        
-        /* The magic for responsive grid */
-        .players-grid {
+            flex-grow: 1; 
             display: grid;
-            /* This line is key: creates a responsive grid that adjusts columns based on container width */
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 15px;
-            justify-content: center;
+            /* Mobile Layout: 2 vertical columns, as requested */
+            grid-template-rows: repeat(6, 1fr);
+            grid-template-columns: repeat(2, 1fr);
+            grid-auto-flow: column; /* Fills columns first */
+            gap: 8px;
+            overflow: hidden; /* No scroll on mobile */
         }
-        /* --- CHANGE END: New Layout Structure --- */
 
         @keyframes slot-fade-in { 
-            from { opacity: 0; transform: translateY(20px) scale(0.95); } 
+            from { opacity: 0; transform: translateY(15px) scale(0.9); } 
             to { opacity: 1; transform: translateY(0) scale(1); } 
         }
 
-        /* --- CHANGE START: Revamped Player Slot --- */
         .player-slot {
-            aspect-ratio: 4 / 5; /* A bit wider, like a playing card */
             border-radius: 12px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding: 10px 5px; text-align: center; 
+            padding: 5px; text-align: center; 
             transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
             position: relative; overflow: hidden;
             animation: slot-fade-in 0.6s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
-            background-origin: border-box;
-            background-clip: padding-box, border-box;
+            min-height: 0; /* Fix for grid item overflow */
         }
         .player-slot.empty {
             background: rgba(0,0,0,0.2); 
@@ -121,41 +107,38 @@
         .player-slot.filled {
             background: var(--slot-bg); 
             border: 2px solid var(--border-color);
-            box-shadow: 0 5px 20px rgba(0,0,0,0.6), inset 0 0 15px rgba(0,0,0,0.4);
-        }
-        .player-slot.filled:hover {
-            transform: translateY(-5px) scale(1.03);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.7), inset 0 0 15px rgba(0,0,0,0.4);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5), inset 0 0 10px rgba(0,0,0,0.3);
         }
         
         .player-avatar {
-            width: 65%; aspect-ratio: 1/1; border-radius: 50%; object-fit: cover;
-            border: 3px solid var(--text-secondary); margin-bottom: 10px; transition: all 0.3s ease;
+            width: 60%; 
+            max-width: 70px; /* Prevents avatar from getting too big */
+            aspect-ratio: 1/1; border-radius: 50%; object-fit: cover;
+            border: 3px solid var(--text-secondary); margin-bottom: 5px; transition: all 0.3s ease;
             box-shadow: 0 3px 8px rgba(0,0,0,0.5);
         }
         .player-name { 
-            font-size: clamp(0.75rem, 3vw, 0.9rem); 
+            font-size: clamp(0.65rem, 2.4vw, 0.8rem); 
             font-weight: 700; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 4px;
             text-shadow: 0 1px 3px #000;
         }
         .empty-text { 
-            font-size: clamp(0.7rem, 2.5vw, 0.8rem);
+            font-size: clamp(0.65rem, 2.4vw, 0.8rem);
             color: var(--text-secondary); font-weight: 700;
         }
         
         .host-crown {
-            position: absolute; top: -1px; right: -1px; width: 30px; height: 30px;
+            position: absolute; top: 0px; right: 0px; width: 28px; height: 28px;
             background-color: var(--primary-gold); color: var(--darker-red);
             border-radius: 0 10px 0 12px; display: flex; align-items: center; justify-content: center;
-            font-size: 1.1rem; font-weight: 900; box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-            transform: rotate(5deg);
+            font-size: 1rem; font-weight: 900; box-shadow: 0 2px 5px rgba(0,0,0,0.5);
         }
         
         .ready-indicator {
-            position: absolute; bottom: 5px; right: 5px; width: 22px; height: 22px;
+            position: absolute; bottom: 5px; right: 5px; width: 20px; height: 20px;
             background-color: var(--green-ready); border-radius: 50%; border: 2px solid var(--bg-dark);
             display: flex; align-items: center; justify-content: center; color: white;
-            font-weight: 900; font-size: 1rem; transform: scale(0); 
+            font-weight: 900; font-size: 0.9rem; transform: scale(0); 
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             text-shadow: 0 1px 2px rgba(0,0,0,0.4);
         }
@@ -164,22 +147,24 @@
         .player-slot.ready {
             border-color: var(--green-ready);
             box-shadow: 0 0 15px rgba(46, 204, 113, 0.7), 0 0 25px rgba(46, 204, 113, 0.4), inset 0 0 10px rgba(0,0,0,0.3);
+            transform: scale(1.02);
         }
         
         .player-slot.filled.kickable::after {
             content: 'اخراج';
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(231, 76, 60, 0.85); color: white;
-            font-size: 1.2rem; font-weight: 900;
+            font-size: 1.1rem; font-weight: 900;
             opacity: 0; visibility: hidden; transition: all 0.3s ease;
-            display: flex; align-items: center; justify-content: center; border-radius: 10px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; border-radius: 10px;
         }
-        .player-slot.filled.kickable:hover::after { opacity: 1; visibility: visible; }
-        /* --- CHANGE END: Revamped Player Slot --- */
-        
-        .lobby-actions { padding-top: 5px; flex-shrink: 0; }
+        .player-slot.filled.kickable:hover::after {
+            opacity: 1; visibility: visible;
+        }
+
+        .lobby-actions { padding-top: 10px; flex-shrink: 0; }
         .action-button {
-            width: 100%; padding: 15px; font-size: 1.3rem; font-weight: 900;
+            width: 100%; padding: 14px; font-size: 1.2rem; font-weight: 900;
             border-radius: 12px; border: none; cursor: pointer; transition: all 0.3s ease;
             color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.5);
             position: relative; overflow: hidden;
@@ -203,7 +188,8 @@
             100% { box-shadow: 0 0 0 0 rgba(255, 201, 71, 0); }
         }
         
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.85); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease; backdrop-filter: blur(5px); }
+        /* Modal Styles */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.85); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease; }
         .modal-overlay.visible { opacity: 1; visibility: visible; }
         .modal-content { 
             background: linear-gradient(145deg, #3c3022, var(--bg-dark)); 
@@ -217,10 +203,30 @@
         .modal-title { font-size: 1.5rem; font-weight: 900; color: var(--primary-gold); margin-bottom: 20px; }
         .modal-message { font-size: 1rem; line-height: 1.6; margin-bottom: 25px; }
         .modal-buttons { display: flex; gap: 15px; }
-        .modal-button { flex-grow: 1; padding: 12px; font-size: 1rem; font-weight: 700; border-radius: 8px; cursor: pointer; border: 1px solid; transition: transform 0.2s ease; }
-        .modal-button:hover { transform: scale(1.05); }
+        .modal-button { flex-grow: 1; padding: 12px; font-size: 1rem; font-weight: 700; border-radius: 8px; cursor: pointer; border: 1px solid; }
         .modal-button.primary { color: white; background: linear-gradient(145deg, var(--dark-red), var(--darker-red)); border-color: var(--primary-gold); }
         .modal-button.secondary { color: var(--text-light); background: linear-gradient(145deg, #504436, #332a20); border-color: var(--border-color); }
+        
+        /* --- NEW LAYOUT: Responsive for Desktop --- */
+        @media (min-width: 768px) {
+            .players-area {
+                /* Desktop Layout: A wider grid */
+                grid-template-rows: repeat(2, 1fr);
+                grid-template-columns: repeat(6, 1fr);
+                grid-auto-flow: row; /* Fills rows first */
+                gap: 15px;
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 10px;
+                overflow: hidden;
+            }
+            .player-slot {
+                padding: 15px 10px;
+            }
+            .player-name {
+                font-size: 0.9rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -237,11 +243,9 @@
             <button id="leave-lobby-btn" class="leave-button">خروج</button>
         </header>
 
-        <!-- --- CHANGE: Simplified players area --- -->
-        <main class="players-area">
-            <div id="players-grid" class="players-grid">
-                <!-- Player slots will be generated by JS here -->
-            </div>
+        <!-- --- MODIFIED HTML STRUCTURE --- -->
+        <main id="players-grid" class="players-area">
+            <!-- Player slots will be dynamically generated here -->
         </main>
 
         <footer class="lobby-actions">
@@ -289,10 +293,7 @@
         const loadingOverlay = document.getElementById('loading-overlay');
         const lobbyContainer = document.querySelector('.lobby-container');
         const lobbyNameEl = document.getElementById('lobby-name');
-        
-        // --- CHANGE: Single grid element ---
-        const playersGridEl = document.getElementById('players-grid');
-
+        const playersGridEl = document.getElementById('players-grid'); // MODIFIED: Single grid container
         const actionBtn = document.getElementById('action-btn');
         const leaveLobbyBtn = document.getElementById('leave-lobby-btn');
         
@@ -372,7 +373,7 @@
                     loadingOverlay.style.opacity = '0';
                     setTimeout(() => {
                         loadingOverlay.style.display = 'none';
-                        lobbyContainer.style.display = 'grid';
+                        lobbyContainer.style.display = 'flex';
                     }, 500);
                 }
             }, (error) => {
@@ -382,14 +383,12 @@
             });
         }
 
-        // --- CHANGE: Simplified render function ---
         function renderLobby(data) {
             lobbyNameEl.textContent = data.lobbyName;
             const players = data.players || [];
             isHost = currentUser.uid === data.creatorId;
-            playersGridEl.innerHTML = ''; // Clear the single grid
+            playersGridEl.innerHTML = ''; // MODIFIED: Clear the single container
             
-            // A single loop to render all players and empty slots
             for (let i = 0; i < MAX_PLAYERS; i++) {
                 const player = players[i];
                 const slot = document.createElement('div');
@@ -411,17 +410,13 @@
                     if (isHost && player.uid !== currentUser.uid) {
                         slot.classList.add('kickable');
                         slot.title = `برای اخراج ${player.displayName} کلیک کنید`;
-                        slot.onclick = (e) => {
-                            // Prevent click event from bubbling up if needed
-                            e.stopPropagation(); 
-                            showKickConfirm(player.displayName, player.uid);
-                        };
+                        slot.onclick = () => showKickConfirm(player.displayName, player.uid);
                     }
                 } else {
                     slot.classList.add('empty');
                     slot.innerHTML = `<span class="empty-text">جایگاه خالی</span>`;
                 }
-                playersGridEl.appendChild(slot); // Append all to the same grid
+                playersGridEl.appendChild(slot); // MODIFIED: Append all slots to the single grid
             }
             
             const self = players.find(p => p.uid === currentUser.uid);
@@ -440,9 +435,7 @@
         }
 
         async function handleActionClick() {
-            this.style.transform = 'scale(0.95)';
-            setTimeout(() => this.style.transform = 'scale(1)', 150);
-
+            actionBtn.disabled = true; // Prevent double clicks
             if (isHost) {
                 alert("شروع بازی! (در حال حاضر شما به صفحه اصلی منتقل می‌شوید)");
                 window.location.href = './main.html';
@@ -450,6 +443,7 @@
                 await toggleReadyStatus();
                 playSound('sound-ready');
             }
+            setTimeout(() => { if (actionBtn) actionBtn.disabled = false; }, 500); // Re-enable after a short delay
         }
         
         async function toggleReadyStatus() {
@@ -498,8 +492,12 @@
         function setupEventListeners() {
             actionBtn.addEventListener('click', handleActionClick);
             leaveLobbyBtn.addEventListener('click', showLeaveConfirm);
-            // A more reliable way to handle leaving the page
-            window.addEventListener('pagehide', () => { if (currentUser) handleLeaveLobby(); });
+            // A more robust way to handle leaving the page
+            window.addEventListener('pagehide', (event) => {
+                if (currentUser && !event.persisted) {
+                    handleLeaveLobby();
+                }
+            });
         }
         
         function showLeaveConfirm() {
@@ -516,30 +514,24 @@
             document.getElementById('confirm-modal-message').textContent = message;
             const yesBtn = document.getElementById('confirm-modal-yes-btn');
             
-            // This is a cleaner way to handle event listeners on modals
+            // Clone and replace to remove old event listeners
             const newYesBtn = yesBtn.cloneNode(true);
             yesBtn.parentNode.replaceChild(newYesBtn, yesBtn);
             
-            const confirmAction = () => {
+            const confirmAndClose = () => {
                 modal.classList.remove('visible');
                 onConfirm();
-                // Clean up listeners
-                newYesBtn.removeEventListener('click', confirmAction);
-                modal.removeEventListener('click', closeModal);
             };
 
-            const closeModal = (e) => {
-                 if (e.target === modal || e.target.id === 'confirm-modal-no-btn') {
-                    modal.classList.remove('visible');
-                    // Clean up listeners
-                    newYesBtn.removeEventListener('click', confirmAction);
-                    modal.removeEventListener('click', closeModal);
-                 }
-            }
+            const cancelAndClose = () => {
+                modal.classList.remove('visible');
+            };
 
-            newYesBtn.addEventListener('click', confirmAction);
-            document.getElementById('confirm-modal-no-btn').onclick = closeModal;
-            modal.addEventListener('click', closeModal);
+            newYesBtn.addEventListener('click', confirmAndClose);
+            document.getElementById('confirm-modal-no-btn').addEventListener('click', cancelAndClose);
+            modal.addEventListener('click', (e) => { 
+                if (e.target === modal) cancelAndClose(); 
+            }, { once: true }); // Use once to avoid multiple listeners
 
             modal.classList.add('visible');
         }
