@@ -79,7 +79,7 @@
         .player-slot {
             flex: 1; border-radius: 12px; display: flex; flex-direction: column;
             align-items: center; justify-content: center; padding: 5px; text-align: center; 
-            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease-in-out, border-color 0.3s ease-in-out; /* CHANGE: Added transition for speaking indicator */
             position: relative; overflow: hidden; animation: slot-fade-in 0.6s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
             min-height: 0;
         }
@@ -102,35 +102,12 @@
         .empty-text { font-size: clamp(0.7rem, 2.5vw, 0.8rem); color: var(--text-secondary); font-weight: 700; }
         .host-crown { position: absolute; top: -1px; right: -1px; width: 28px; height: 28px; background-color: var(--primary-gold); color: var(--darker-red); border-radius: 0 10px 0 10px; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 900; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
         
-        .speaking-indicator {
-            position: absolute; top: 4px; left: 4px; width: 18px; height: 18px;
-            border-radius: 50%; border: 2px solid var(--bg-dark);
-            background-color: rgba(0,0,0,0.3);
-            transition: all 0.2s ease-in-out;
-            box-shadow: 0 0 0 0 rgba(76, 175, 80, 1);
-            transform: scale(0);
-        }
-
-        /* --- START: کد جدید برای نمایش کادر طلایی --- */
-        .player-slot.speaking .speaking-indicator {
-            transform: scale(1);
-            background-color: #4CAF50;
-            animation: pulse-speaking 1.5s infinite;
-        }
-
+        /* --- CHANGE START: Removed old speaking indicator and added new style for glowing border --- */
         .player-slot.speaking {
             border-color: var(--primary-gold);
-            animation: pulse-gold-border 1.5s infinite;
+            box-shadow: 0 0 15px rgba(255, 201, 71, 0.8), 0 0 25px rgba(255, 201, 71, 0.5), inset 0 0 10px rgba(0,0,0,0.3);
         }
-
-        @keyframes pulse-speaking { 0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7); } 70% { box-shadow: 0 0 0 8px rgba(76, 175, 80, 0); } 100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); } }
-        
-        @keyframes pulse-gold-border {
-            0% { box-shadow: 0 0 8px var(--primary-gold), inset 0 0 10px rgba(0,0,0,0.3); }
-            50% { box-shadow: 0 0 20px var(--primary-gold), 0 0 30px rgba(255, 201, 71, 0.6), inset 0 0 10px rgba(0,0,0,0.3); }
-            100% { box-shadow: 0 0 8px var(--primary-gold), inset 0 0 10px rgba(0,0,0,0.3); }
-        }
-        /* --- END: کد جدید برای نمایش کادر طلایی --- */
+        /* --- CHANGE END --- */
 
         .ready-indicator {
             position: absolute; bottom: 4px; right: 4px; width: 18px; height: 18px;
@@ -334,8 +311,10 @@
                 
                 for (const player of players) {
                     if (player.uid !== myId && !connectedPeerIds.has(player.uid)) {
+                        console.log(`New player detected: ${player.displayName}. Creating peer connection.`);
                         peerConnections[player.uid] = createPeerConnection(player.uid);
                         if (myId < player.uid) {
+                            console.log(`My ID is smaller. Sending offer to ${player.displayName}.`);
                             await sendOffer(player.uid);
                         }
                     }
@@ -353,8 +332,8 @@
                     setTimeout(() => { loadingOverlay.style.display = 'none'; lobbyContainer.style.display = 'flex'; }, 500);
                 }
             }, (error) => {
-                console.error("Lobby snapshot error:", error);
-                showNotificationModal("خطای ارتباط", "ارتباط با لابی قطع شد.", () => window.location.href = './Lobby page.html');
+                console.error("Firestore listen error:", error);
+                showNotificationModal("خطای ارتباط", "ارتباط با لابی قطع شد. لطفاً از اتصال اینترنت خود اطمینان حاصل کرده و صفحه را رفرش کنید.", () => window.location.reload());
             });
 
             listenToSignals();
@@ -383,7 +362,6 @@
                         <img src="${player.avatarUrl || 'https://i.imgur.com/T2bT1tG.png'}" alt="avatar" class="player-avatar">
                         <p class="player-name">${player.displayName}</p>
                         <div class="ready-indicator">✔</div>
-                        <div class="speaking-indicator"></div>
                     `;
                     if (isHost && player.uid !== currentUser.uid) {
                         slot.classList.add('kickable');
@@ -437,8 +415,9 @@
             }
         }
         
+        // --- توابع چت صوتی (با منطق جدید و بهبود یافته) ---
         async function handleMicClick() {
-            if (!localStream) {
+            if (isMuted) { // Only try to get stream if muted/not started
                 try {
                     const audioConstraints = {
                         audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
@@ -447,17 +426,32 @@
                     const stream = await navigator.mediaDevices.getUserMedia(audioConstraints);
                     localStream = stream;
                     
+                    // Add tracks to all existing peer connections
                     Object.values(peerConnections).forEach(pc => {
                         stream.getTracks().forEach(track => pc.addTrack(track, stream));
                     });
+                    
+                    // Since adding tracks requires renegotiation, the offerer should send a new offer
+                    const players = (await getDoc(doc(db, "Lobbys_list", lobbyId))).data().players;
+                    for(const player of players) {
+                        if(player.uid !== myId && myId < player.uid) {
+                            await sendOffer(player.uid);
+                        }
+                    }
 
-                    toggleMute(false); // فعال کردن صدا بلافاصله پس از دریافت دسترسی
+                    toggleMute(false);
                 } catch (err) {
                     console.error("Mic access error:", err);
-                    showNotificationModal("خطای دسترسی", "برای استفاده از چت صوتی، لطفاً دسترسی به میکروفون را بدهید. اگر دسترسی ندادید، صفحه را رفرش کرده و مجدداً تلاش کنید.", ()=>{});
+                    let message = "برای استفاده از چت صوتی، لطفاً دسترسی به میکروفون را بدهید.";
+                    if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+                        message = "شما دسترسی به میکروفون را نداده‌اید. لطفاً در تنظیمات مرورگر یا اپلیکیشن، دسترسی را فعال کنید.";
+                    } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+                        message = "هیچ میکروفونی یافت نشد. لطفاً از اتصال صحیح میکروفون خود اطمینان حاصل کنید.";
+                    }
+                    showNotificationModal("خطای دسترسی به میکروفون", message, ()=>{});
                 }
             } else {
-                toggleMute(!isMuted);
+                toggleMute(true);
             }
         }
         
@@ -466,31 +460,12 @@
             if (localStream) {
                 localStream.getAudioTracks().forEach(track => track.enabled = !isMuted);
             }
-            // --- START: اصلاح منطق نمایش آیکون میکروفون ---
-            micIcon.innerHTML = isMuted ? MIC_MUTED_SVG : MIC_ON_SVG;
+            micIcon.innerHTML = isMuted ? MIC_ON_SVG : MIC_MUTED_SVG; // Corrected logic
             voiceChatBtn.title = isMuted ? "وصل کردن صدا" : "قطع کردن صدا";
-            // --- END: اصلاح منطق نمایش آیکون میکروفون ---
             voiceChatBtn.classList.toggle('mic-on', !isMuted);
         }
         
-        function setAudioQuality(sdpObject) {
-            let sdp = sdpObject.sdp;
-            const opusParams = 'useinbandfec=1;stereo=1;sprop-stereo=1;usedtx=0;maxaveragebitrate=128000;maxplaybackrate=48000';
-            const opusRegex = /a=rtpmap:(\d+) opus\/48000\/2/i;
-            const match = sdp.match(opusRegex);
-            if (match) {
-                const payloadType = match[1];
-                const fmtpRegex = new RegExp(`a=fmtp:${payloadType} .*`, 'i');
-                const newFmtpLine = `a=fmtp:${payloadType} ${opusParams}`;
-                if (sdp.match(fmtpRegex)) {
-                    sdp = sdp.replace(fmtpRegex, newFmtpLine);
-                } else {
-                    sdp = sdp.replace(match[0], `${match[0]}\r\n${newFmtpLine}`);
-                }
-            }
-            return { type: sdpObject.type, sdp };
-        }
-
+        // --- CHANGE START: New function for speaking indicator ---
         function setupAudioVisualizer(stream, remoteId) {
             try {
                 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -502,28 +477,35 @@
                 const dataArray = new Uint8Array(bufferLength);
                 
                 if (peerConnections[remoteId]) {
+                    // Store visualizer components for cleanup
                     peerConnections[remoteId].visualizer = { audioContext, animationFrameId: null };
                 }
 
                 const draw = () => {
+                    // Check if connection still exists before continuing
                     if (!peerConnections[remoteId] || !peerConnections[remoteId].visualizer) return;
                     
                     const userSlot = document.querySelector(`.player-slot[data-uid="${remoteId}"]`);
                     if (!userSlot) {
+                        // If user slot is gone, stop the animation loop
                         cancelAnimationFrame(peerConnections[remoteId].visualizer.animationFrameId);
                         return;
                     }
+
                     analyser.getByteFrequencyData(dataArray);
                     let average = dataArray.reduce((a, b) => a + b, 0) / bufferLength;
-                    // این خط هم نقطه سبز و هم کادر طلایی را کنترل می‌کند
+                    
+                    // Toggle 'speaking' class based on volume threshold (15 is a good starting point)
                     userSlot.classList.toggle('speaking', average > 15);
+                    
                     peerConnections[remoteId].visualizer.animationFrameId = requestAnimationFrame(draw);
                 };
                 draw();
             } catch (e) {
-                console.error("Visualizer failed:", e);
+                console.error("Audio visualizer failed to initialize:", e);
             }
         }
+        // --- CHANGE END ---
 
         function createPeerConnection(remoteId) {
             const pc = new RTCPeerConnection(servers);
@@ -531,16 +513,18 @@
             pc.onicecandidate = e => e.candidate && sendSignal(remoteId, { iceCandidate: e.candidate.toJSON() });
             
             pc.ontrack = event => {
-                let remoteAudio = document.getElementById(`audio-${remoteId}`);
-                if (!remoteAudio) {
-                    remoteAudio = document.createElement('audio');
-                    remoteAudio.id = `audio-${remoteId}`;
-                    remoteAudio.autoplay = true;
-                    remoteAudio.playsInline = true;
-                    audioContainer.appendChild(remoteAudio);
-                }
-                if (remoteAudio.srcObject !== event.streams[0]) {
+                if (event.streams && event.streams[0]) {
+                    let remoteAudio = document.getElementById(`audio-${remoteId}`);
+                    if (!remoteAudio) {
+                        remoteAudio = document.createElement('audio');
+                        remoteAudio.id = `audio-${remoteId}`;
+                        remoteAudio.autoplay = true;
+                        remoteAudio.playsInline = true; // Important for mobile browsers
+                        audioContainer.appendChild(remoteAudio);
+                    }
                     remoteAudio.srcObject = event.streams[0];
+                    
+                    // --- CHANGE: Setup the visualizer when track is received ---
                     setupAudioVisualizer(event.streams[0], remoteId);
                 }
             };
@@ -548,6 +532,7 @@
             if (localStream) { 
                 localStream.getTracks().forEach(track => pc.addTrack(track, localStream)); 
             }
+            
             return pc;
         }
 
@@ -556,9 +541,8 @@
             if (!pc) return;
             try {
                 const offer = await pc.createOffer();
-                const hqOffer = setAudioQuality(offer);
-                await pc.setLocalDescription(hqOffer);
-                await sendSignal(remoteId, { offer: hqOffer });
+                await pc.setLocalDescription(offer);
+                await sendSignal(remoteId, { offer: pc.localDescription.toJSON() });
             } catch (err) { console.error(`Offer Error to ${remoteId}:`, err); }
         }
         
@@ -575,15 +559,14 @@
                      if (!pc) { batch.delete(document.ref); continue; }
 
                      try {
-                         if (signalData.offer && pc.signalingState === 'stable') {
+                         if (signalData.offer) {
                              await pc.setRemoteDescription(new RTCSessionDescription(signalData.offer));
                              const answer = await pc.createAnswer();
-                             const hqAnswer = setAudioQuality(answer);
-                             await pc.setLocalDescription(hqAnswer);
-                             await sendSignal(remoteId, { answer: hqAnswer });
-                         } else if (signalData.answer && pc.signalingState === 'have-local-offer') {
+                             await pc.setLocalDescription(answer);
+                             await sendSignal(remoteId, { answer: pc.localDescription.toJSON() });
+                         } else if (signalData.answer) {
                              await pc.setRemoteDescription(new RTCSessionDescription(signalData.answer));
-                         } else if (signalData.iceCandidate && pc.remoteDescription) {
+                         } else if (signalData.iceCandidate) {
                              await pc.addIceCandidate(new RTCIceCandidate(signalData.iceCandidate));
                          }
                      } catch (err) { console.error(`Signal Processing Error from ${remoteId}:`, err, signalData); }
@@ -601,7 +584,15 @@
         function closeConnection(remoteId) {
             const pcData = peerConnections[remoteId];
             if (pcData) {
-                if (pcData.visualizer) { cancelAnimationFrame(pcData.visualizer.animationFrameId); pcData.visualizer.audioContext.close().catch(()=>{}); }
+                // --- CHANGE START: Cleanup for visualizer ---
+                if (pcData.visualizer) {
+                    cancelAnimationFrame(pcData.visualizer.animationFrameId);
+                    // Safely close audio context
+                    if (pcData.visualizer.audioContext.state !== 'closed') {
+                        pcData.visualizer.audioContext.close().catch(e => console.warn("Error closing audio context", e));
+                    }
+                }
+                // --- CHANGE END ---
                 pcData.close();
                 delete peerConnections[remoteId];
             }
@@ -615,12 +606,16 @@
             Object.keys(peerConnections).forEach(id => closeConnection(id));
             peerConnections = {}; localStream = null;
 
-            const signalsCol = collection(db, `Lobbys_list/${lobbyId}/signals`);
-            const q = query(signalsCol, where("to", "==", myId));
-            const snapshot = await getDocs(q);
-            const batch = writeBatch(db);
-            snapshot.forEach(doc => batch.delete(doc.ref));
-            await batch.commit().catch(e => console.warn("Failed to clean up signals on exit:", e));
+            try {
+                const signalsCol = collection(db, `Lobbys_list/${lobbyId}/signals`);
+                const q = query(signalsCol, where("to", "==", myId));
+                const snapshot = await getDocs(q);
+                const batch = writeBatch(db);
+                snapshot.forEach(doc => batch.delete(doc.ref));
+                await batch.commit();
+            } catch (e) {
+                console.warn("Failed to clean up signals on exit:", e);
+            }
         }
 
         function setupEventListeners() { actionBtn.addEventListener('click', handleActionClick); leaveLobbyBtn.addEventListener('click', showLeaveConfirm); voiceChatBtn.addEventListener('click', handleMicClick); window.addEventListener('beforeunload', handleLeaveLobby); }
