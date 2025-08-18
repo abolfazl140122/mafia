@@ -54,6 +54,7 @@
             z-index: -1;
         }
         
+        /* --- لودینگ حرفه‌ای و جدید --- */
         #loading-overlay {
             position: fixed;
             top: 0;
@@ -71,8 +72,8 @@
 
         .loader-logo-wrapper {
             position: relative;
-            width: 180px;
-            height: 180px;
+            width: 180px; /* اندازه بزرگتر */
+            height: 180px; /* اندازه بزرگتر */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -91,7 +92,7 @@
         }
         
         .loader-logo {
-            width: 120px;
+            width: 120px; /* اندازه بزرگتر */
             height: auto;
             animation: fadeIn 2s forwards;
             opacity: 0;
@@ -112,6 +113,7 @@
             text-shadow: 1px 1px 3px #000;
         }
         
+        /* --- محتوای اصلی --- */
         .main-container {
             width: 100%;
             height: 100%;
@@ -152,6 +154,7 @@
             line-height: 1; transform: scaleX(-1);
         }
 
+        /* --- لیست لابی‌ها --- */
         #lobby-list {
             flex-grow: 1; overflow-y: auto; display: flex;
             flex-direction: column; gap: 15px; padding-right: 5px;
@@ -169,7 +172,7 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.4); opacity: 0;
             transform: translateY(20px); animation: slideInUp 0.5s forwards;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-            will-change: transform;
+            will-change: transform; /* بهینه‌سازی انیمیشن */
         }
         .lobby-card:hover {
             transform: translateY(-5px);
@@ -209,12 +212,8 @@
             color: white; background: linear-gradient(145deg, var(--dark-red), var(--darker-red));
             border: 1px solid var(--primary-gold);
         }
-        .btn-join:hover:not(:disabled) {
+        .btn-join:hover {
             background: linear-gradient(145deg, #a1534d, #6b3431); transform: translateY(-2px);
-        }
-        .btn-join:disabled {
-            background: linear-gradient(145deg, #555, #333); border-color: #666;
-            color: #999; cursor: not-allowed; opacity: 0.7;
         }
         .btn-delete {
             background: linear-gradient(145deg, #616161, #3a3a3a); color: var(--text-light);
@@ -223,6 +222,7 @@
         .btn-delete:hover {
              background: linear-gradient(145deg, #7a7a7a, #4f4f4f); transform: translateY(-2px);
         }
+        /* استایل جدید دکمه ادمین */
         .btn-admin-delete {
             background: linear-gradient(145deg, var(--admin-red), #962d22);
             color: white; border: 1px solid #ff7961;
@@ -232,6 +232,7 @@
             transform: translateY(-2px);
         }
 
+        /* --- دکمه شناور --- */
         #create-lobby-fab {
             position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
             width: 60px; height: 60px;
@@ -247,6 +248,7 @@
         }
         #create-lobby-fab:active { transform: translateX(-50%) scale(0.95); }
 
+        /* --- پنل‌های مودال (Modal) --- */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(0, 0, 0, 0.85); 
@@ -318,11 +320,13 @@
         </header>
 
         <div id="lobby-list">
+            <!-- لابی‌ها به صورت داینامیک اینجا اضافه می‌شوند -->
         </div>
     </div>
     
     <button id="create-lobby-fab" title="ساخت لابی جدید">+</button>
 
+    <!-- Modal برای ساخت لابی جدید -->
     <div id="create-lobby-modal" class="modal-overlay">
         <div class="modal-content">
             <h2 class="modal-title">ساخت لابی جدید</h2>
@@ -342,6 +346,7 @@
         </div>
     </div>
 
+    <!-- Modal سفارشی برای هشدارها و تاییدها -->
     <div id="custom-alert-modal" class="modal-overlay">
         <div class="modal-content">
             <h2 id="custom-alert-title" class="modal-title">توجه!</h2>
@@ -362,6 +367,7 @@
           storageBucket: "mafia-9fcbf.appspot.com",
           messagingSenderId: "471627157488",
           appId: "1:471627157488:web:92f008548a5596619a5735",
+          measurementId: "G-0PDHDWC6NV"
         };
         
         const app = initializeApp(firebaseConfig);
@@ -383,9 +389,11 @@
         const customAlertMessage = document.getElementById('custom-alert-message');
         const customAlertButtons = document.getElementById('custom-alert-buttons');
 
+        // --- State Variables ---
         let currentUser = null;
         let currentUserIsAdmin = false;
 
+        // --- Utility Functions ---
         function showModal(modalElement) { modalElement.classList.add('visible'); }
         function hideModal(modalElement) { modalElement.classList.remove('visible'); }
 
@@ -414,6 +422,7 @@
             };
         }
 
+        // --- Core Functions ---
         function renderLobbyCard(lobbyData, index) {
             const card = document.createElement('div');
             card.className = 'lobby-card';
@@ -422,9 +431,6 @@
 
             const isOwner = currentUser && currentUser.uid === lobbyData.creatorId;
             const canAdminDelete = currentUserIsAdmin && !isOwner;
-            // *** CHANGE: Check if lobby is full ***
-            const maxPlayers = lobbyData.maxPlayers || 12;
-            const isFull = (lobbyData.playerCount || 0) >= maxPlayers;
 
             let actionButtonsHTML = '';
             if (isOwner) {
@@ -432,9 +438,7 @@
             } else if (canAdminDelete) {
                 actionButtonsHTML += `<button class="lobby-btn btn-admin-delete" data-action="admin-delete">بستن لابی</button>`;
             }
-
-            // *** CHANGE: Add disabled attribute and change text if full ***
-            actionButtonsHTML += `<button class="lobby-btn btn-join" data-action="join" ${isFull ? 'disabled' : ''}>${isFull ? 'لابی پر است' : 'پیوستن'}</button>`;
+            actionButtonsHTML += `<button class="lobby-btn btn-join" data-action="join">پیوستن</button>`;
 
             card.innerHTML = `
                 <div class="lobby-card-header">
@@ -443,7 +447,7 @@
                         <span class="lobby-scenario">${lobbyData.scenario || 'کلاسیک'}</span>
                     </div>
                     <div class="player-count">
-                        <span>👤</span> ${lobbyData.playerCount || 0}/${maxPlayers}
+                        <span>👤</span> ${lobbyData.playerCount || 1}/${lobbyData.maxPlayers || 12}
                     </div>
                 </div>
                 <div class="lobby-card-footer">
@@ -452,11 +456,11 @@
                 </div>
             `;
             
-            // *** CHANGE: The join button now navigates to the lobby page ***
+            // Event Listeners for buttons
             card.querySelector('[data-action="join"]')?.addEventListener('click', () => {
-                if (!isFull) {
-                    window.location.href = `./Lobby.html?id=${lobbyData.id}`;
-                }
+                showCustomAlert('به زودی...', 'قابلیت پیوستن به لابی‌ها در بروزرسانی‌های بعدی اضافه خواهد شد.', [
+                    { text: 'باشه', class: 'primary' }
+                ]);
             });
 
             const deleteAction = (title, message) => {
@@ -469,6 +473,7 @@
             card.querySelector('[data-action="delete"]')?.addEventListener('click', () => {
                 deleteAction('تایید حذف', 'آیا از حذف لابی خود مطمئن هستید؟');
             });
+
             card.querySelector('[data-action="admin-delete"]')?.addEventListener('click', () => {
                 deleteAction('تایید ادمین', `آیا از بستن لابی "${lobbyData.lobbyName}" مطمئن هستید؟`);
             });
@@ -476,15 +481,19 @@
             return card;
         }
         
-        // No changes needed below this line for the integration
         function updateAllCardsForAdminStatus() {
-            lobbyList.querySelectorAll('.lobby-card').forEach(card => {
+            const allCards = lobbyList.querySelectorAll('.lobby-card');
+            allCards.forEach(card => {
                 const lobbyId = card.dataset.id;
+                // This is a simplified approach. A more robust way would be to re-render.
                 const actionsContainer = card.querySelector('.lobby-actions');
-                const creatorId = actionsContainer.querySelector('.btn-delete') ? currentUser.uid : null;
+                const creatorId = actionsContainer.querySelector('.btn-delete') ? currentUser.uid : null; // A bit of a hack to guess owner
                 const isOwner = currentUser && currentUser.uid === creatorId;
+                
+                // Remove existing admin button if it exists
                 const existingAdminBtn = actionsContainer.querySelector('.btn-admin-delete');
                 if(existingAdminBtn) existingAdminBtn.remove();
+
                 if (currentUserIsAdmin && !isOwner) {
                     const adminBtn = document.createElement('button');
                     adminBtn.className = 'lobby-btn btn-admin-delete';
@@ -495,6 +504,7 @@
                             { text: 'خیر', class: 'secondary' }
                         ]);
                     };
+                    // Insert before the join button
                     actionsContainer.insertBefore(adminBtn, actionsContainer.querySelector('.btn-join'));
                 }
             });
@@ -503,20 +513,26 @@
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUser = user;
+                
+                // Listener 1: For User's Admin Status (Real-time)
                 const userDocRef = doc(db, 'users', user.uid);
                 onSnapshot(userDocRef, (docSnap) => {
                     const userData = docSnap.data();
                     const newAdminStatus = userData && userData.isAdmin === true;
                     if (newAdminStatus !== currentUserIsAdmin) {
                         currentUserIsAdmin = newAdminStatus;
-                        updateAllCardsForAdminStatus();
+                        updateAllCardsForAdminStatus(); // Update UI instantly
                     }
                 });
+
+                // Listener 2: For Lobbies List (Optimized with docChanges)
                 const lobbiesRef = collection(db, 'Lobbys list');
                 const q = query(lobbiesRef, orderBy("createdAt", "desc"));
+
                 onSnapshot(q, (snapshot) => {
                     snapshot.docChanges().forEach((change) => {
                         const lobbyData = { id: change.doc.id, ...change.doc.data() };
+                        
                         if (change.type === "added") {
                             const cardElement = renderLobbyCard(lobbyData, lobbyList.children.length);
                             lobbyList.prepend(cardElement);
@@ -534,8 +550,10 @@
                             if (cardToRemove) cardToRemove.remove();
                         }
                     });
+
                     updateLobbyListState();
                     filterLobbies();
+
                     if (loadingOverlay.style.opacity !== '0') {
                         loadingOverlay.style.opacity = '0';
                         setTimeout(() => loadingOverlay.style.display = 'none', 500);
@@ -544,6 +562,7 @@
                     console.error("Error fetching lobbies:", error);
                     showCustomAlert('خطای شبکه', 'دریافت لیست لابی‌ها با مشکل مواجه شد.', [{text:'باشه', class:'primary'}]);
                 });
+
             } else {
                 window.location.href = './login.html';
             }
@@ -552,11 +571,13 @@
         function updateLobbyListState() {
             const hasCards = lobbyList.querySelector('.lobby-card');
             let msgElement = lobbyList.querySelector('.info-message');
+
             if (!hasCards) {
                 if (!msgElement) {
                     msgElement = document.createElement('p');
                     msgElement.className = 'info-message';
-                    msgElement.style.cssText = 'text-align:center; color: var(--text-secondary);';
+                    msgElement.style.textAlign = 'center';
+                    msgElement.style.color = 'var(--text-secondary)';
                     lobbyList.appendChild(msgElement);
                 }
                 msgElement.textContent = 'هیچ لابی فعالی وجود ندارد. اولین لابی را شما بسازید!';
@@ -573,78 +594,92 @@
                 showCustomAlert('خطا', 'نام لابی نمی‌تواند خالی باشد.', [{ text: 'باشه', class: 'primary' }]);
                 return;
             }
+
             if (!currentUser) return;
+
             const lobbiesRef = collection(db, 'Lobbys list');
             const q = query(lobbiesRef, where("creatorId", "==", currentUser.uid));
             const querySnapshot = await getDocs(q);
+
             if (!querySnapshot.empty) {
                 hideModal(createLobbyModal);
-                showCustomAlert('خطا', 'شما قبلاً یک لابی ساخته‌اید. برای ساخت لابی جدید، ابتدا قبلی را حذف کنید.', [
+                showCustomAlert('خطا', 'شما قبلاً یک لابی ایجاد کرده‌اید. برای ساخت لابی جدید، ابتدا لابی قبلی خود را حذف کنید.', [
                     { text: 'باشه', class: 'primary' }
                 ]);
                 return;
             }
+            
             try {
-                // *** CHANGE: Added `players` array on creation ***
-                const initialPlayer = {
-                    uid: currentUser.uid,
-                    displayName: currentUser.displayName || 'کاربر ناشناس',
-                    avatarUrl: (await getDoc(doc(db, 'users', currentUser.uid))).data().avatarUrl || "https://i.imgur.com/T2bT1tG.png",
-                    isReady: false
-                };
                 await addDoc(lobbiesRef, {
                     lobbyName: lobbyName, scenario: scenario,
                     creatorId: currentUser.uid, creatorName: currentUser.displayName || 'کاربر ناشناس',
-                    createdAt: serverTimestamp(), playerCount: 1, maxPlayers: 12,
-                    players: [initialPlayer] // Add the creator to the players list
+                    createdAt: serverTimestamp(), playerCount: 1, maxPlayers: 12
                 });
                 hideModal(createLobbyModal);
                 lobbyNameInput.value = '';
                 showCustomAlert('موفقیت!', 'لابی شما با موفقیت ساخته شد.', [{ text: 'عالی', class: 'primary' }]);
             } catch (error) {
-                console.error(error);
                 showCustomAlert('خطای سرور', 'مشکلی در ساخت لابی پیش آمد.', [{ text: 'باشه', class: 'primary' }]);
             }
         }
 
         async function deleteLobby(lobbyId) {
-            try { await deleteDoc(doc(db, "Lobbys list", lobbyId)); }
-            catch (error) { showCustomAlert('خطای سرور', 'مشکلی در حذف لابی پیش آمد.', [{ text: 'باشه', class: 'primary' }]); }
+            try {
+                await deleteDoc(doc(db, "Lobbys list", lobbyId));
+            } catch (error) {
+                showCustomAlert('خطای سرور', 'مشکلی در حذف لابی پیش آمد.', [{ text: 'باشه', class: 'primary' }]);
+            }
         }
 
         function filterLobbies() {
             const searchTerm = searchInput.value.toLowerCase().trim();
             const cards = lobbyList.querySelectorAll('.lobby-card');
             let visibleCount = 0;
+
             cards.forEach(card => {
                 const lobbyName = card.querySelector('.lobby-name')?.textContent.toLowerCase() || '';
                 const creatorName = card.querySelector('.lobby-creator')?.textContent.toLowerCase() || '';
                 const scenario = card.querySelector('.lobby-scenario')?.textContent.toLowerCase() || '';
+
                 if (lobbyName.includes(searchTerm) || creatorName.includes(searchTerm) || scenario.includes(searchTerm)) {
                     card.style.display = 'flex';
                     visibleCount++;
-                } else { card.style.display = 'none'; }
+                } else {
+                    card.style.display = 'none';
+                }
             });
+
             let msgElement = lobbyList.querySelector('.info-message');
             if (!msgElement) {
                 msgElement = document.createElement('p');
                 msgElement.className = 'info-message';
-                msgElement.style.cssText = 'text-align:center; color: var(--text-secondary);';
+                msgElement.style.textAlign = 'center';
+                msgElement.style.color = 'var(--text-secondary)';
                 lobbyList.appendChild(msgElement);
             }
+
             if (visibleCount === 0 && cards.length > 0) {
                 msgElement.textContent = 'هیچ لابی با این مشخصات یافت نشد.';
                 msgElement.style.display = 'block';
-            } else if (cards.length > 0) { msgElement.style.display = 'none'; }
+            } else if (cards.length > 0) {
+                 msgElement.style.display = 'none';
+            }
         }
 
+
+        // --- Event Listeners ---
         createLobbyFab.addEventListener('click', () => showModal(createLobbyModal));
         createLobbyCancelBtn.addEventListener('click', () => hideModal(createLobbyModal));
         createLobbyConfirmBtn.addEventListener('click', createLobby);
+        
         searchInput.addEventListener('input', debounce(filterLobbies, 250));
+
         [createLobbyModal, customAlertModal].forEach(modal => {
-             modal.addEventListener('click', (e) => { if (e.target === modal) hideModal(modal); });
+             modal.addEventListener('click', (e) => {
+                if (e.target === modal) hideModal(modal);
+            });
         });
+
     </script>
 </body>
 </html>
