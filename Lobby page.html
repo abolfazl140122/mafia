@@ -215,6 +215,15 @@
         .btn-join:hover {
             background: linear-gradient(145deg, #a1534d, #6b3431); transform: translateY(-2px);
         }
+        .btn-join:disabled {
+            background: linear-gradient(145deg, #616161, #3a3a3a);
+            border-color: #888;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        .btn-join:disabled:hover {
+            transform: none;
+        }
         .btn-delete {
             background: linear-gradient(145deg, #616161, #3a3a3a); color: var(--text-light);
             border: 1px solid #888;
@@ -431,6 +440,7 @@
 
             const isOwner = currentUser && currentUser.uid === lobbyData.creatorId;
             const canAdminDelete = currentUserIsAdmin && !isOwner;
+            const isLobbyFull = (lobbyData.playerCount || 1) >= (lobbyData.maxPlayers || 12);
 
             let actionButtonsHTML = '';
             if (isOwner) {
@@ -438,7 +448,13 @@
             } else if (canAdminDelete) {
                 actionButtonsHTML += `<button class="lobby-btn btn-admin-delete" data-action="admin-delete">بستن لابی</button>`;
             }
-            actionButtonsHTML += `<button class="lobby-btn btn-join" data-action="join">پیوستن</button>`;
+            
+            // --- NEW: Logic for the join button ---
+            if (isLobbyFull) {
+                actionButtonsHTML += `<button class="lobby-btn btn-join" data-action="join" disabled>لابی پر است</button>`;
+            } else {
+                actionButtonsHTML += `<button class="lobby-btn btn-join" data-action="join">پیوستن</button>`;
+            }
 
             card.innerHTML = `
                 <div class="lobby-card-header">
@@ -456,19 +472,19 @@
                 </div>
             `;
             
-            // Event Listeners for buttons
+            // --- NEW: Event Listener for join button ---
             card.querySelector('[data-action="join"]')?.addEventListener('click', () => {
-                const maxPlayers = lobbyData.maxPlayers || 12;
-                if ((lobbyData.playerCount || 1) >= maxPlayers) {
-                    showCustomAlert('لابی پر است', 'ظرفیت این لابی تکمیل شده و نمی‌توانید وارد شوید.', [
+                if ((lobbyData.playerCount || 1) >= (lobbyData.maxPlayers || 12)) {
+                    showCustomAlert('لابی پر است', 'ظرفیت این لابی تکمیل شده است و نمی‌توانید به آن بپیوندید.', [
                         { text: 'باشه', class: 'primary' }
                     ]);
-                } else {
-                    // تغییر اصلی اینجاست: هدایت کاربر به صفحه لابی با ID صحیح
-                    window.location.href = `./Lobby.html?id=${lobbyData.id}`;
+                    return;
                 }
+                // Redirect to the lobby page with the correct ID
+                window.location.href = `./lobby.html?id=${lobbyData.id}`;
             });
 
+            // Event Listeners for delete buttons
             const deleteAction = (title, message) => {
                  showCustomAlert(title, message, [
                     { text: 'بله، حذف کن', class: 'primary', action: () => deleteLobby(lobbyData.id) },
