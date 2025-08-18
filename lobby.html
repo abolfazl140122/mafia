@@ -102,18 +102,17 @@
         .empty-text { font-size: clamp(0.7rem, 2.5vw, 0.8rem); color: var(--text-secondary); font-weight: 700; }
         .host-crown { position: absolute; top: -1px; right: -1px; width: 28px; height: 28px; background-color: var(--primary-gold); color: var(--darker-red); border-radius: 0 10px 0 10px; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 900; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
         
-        /* --- استایل‌های جدید نشانگر صحبت کردن --- */
         .speaking-indicator {
             position: absolute; top: 4px; left: 4px; width: 18px; height: 18px;
             border-radius: 50%; border: 2px solid var(--bg-dark);
-            background-color: rgba(0,0,0,0.3); /* حالت خاموش */
+            background-color: rgba(0,0,0,0.3);
             transition: all 0.2s ease-in-out;
             box-shadow: 0 0 0 0 rgba(76, 175, 80, 1);
             transform: scale(0);
         }
         .player-slot.speaking .speaking-indicator {
             transform: scale(1);
-            background-color: #4CAF50; /* سبز هنگام صحبت */
+            background-color: #4CAF50;
             animation: pulse-speaking 1.5s infinite;
         }
         @keyframes pulse-speaking { 0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7); } 70% { box-shadow: 0 0 0 8px rgba(76, 175, 80, 0); } 100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); } }
@@ -133,7 +132,6 @@
         .player-slot.filled.kickable::after { content: 'اخراج'; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(231, 76, 60, 0.85); color: white; font-size: 1.1rem; font-weight: 900; opacity: 0; visibility: hidden; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; border-radius: 10px; }
         .player-slot.filled.kickable:hover::after { opacity: 1; visibility: visible; }
         
-        /* --- فوتر و دکمه‌های جدید --- */
         .lobby-footer { flex-shrink: 0; display: flex; gap: 10px; align-items: center; padding-top: 10px; }
         .action-button {
             flex-grow: 1; padding: 14px; font-size: 1.2rem; font-weight: 900;
@@ -191,7 +189,6 @@
             <div id="right-players" class="players-column"></div>
         </main>
         
-        <!-- *** تغییر ۱: ساختار فوتر تغییر کرد تا دکمه میکروفون را در خود جای دهد *** -->
         <footer class="lobby-footer">
             <button id="voice-chat-btn" title="فعال کردن صدا">
                 <svg id="mic-icon" viewBox="0 0 24 24"><path d="M12,14a2,2,0,0,0,2-2V6a2,2,0,0,0-4,0v6A2,2,0,0,0,12,14Zm5-2V6a5,5,0,0,0-10,0v6a5,5,0,0,0,10,0Z"/><path d="M19,11a1,1,0,0,0-2,0,5,5,0,0,1-10,0,1,1,0,0,0-2,0,7,7,0,0,0,6,6.92V21H9a1,1,0,0,0,0,2h6a1,1,0,0,0,0-2H13V17.92A7,7,0,0,0,19,11Z"/></svg>
@@ -207,13 +204,12 @@
     <audio id="sound-player-leave" src="https://assets.mixkit.co/sfx/preview/mixkit-player-losing-or-failing-2042.mp3" preload="auto"></audio>
     <audio id="sound-ready" src="https://assets.mixkit.co/sfx/preview/mixkit-quick-positive-video-game-notification-interface-265.mp3" preload="auto"></audio>
     
-    <!-- *** تغییر ۲: یک کانتینر برای تگ‌های صوتی که به صورت خودکار ساخته می‌شوند *** -->
     <div id="audio-container" style="display: none;"></div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, runTransaction, getDoc, collection, where, query, addDoc, writeBatch, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, runTransaction, getDoc, collection, where, query, getDocs, addDoc, writeBatch, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         // --- Config & Elements ---
         const MAX_PLAYERS = 12;
@@ -253,7 +249,7 @@
         let isReady = false;
         let lastPlayerCount = 0;
 
-        // --- متغیرهای چت صوتی ---
+        // --- Voice Chat Variables ---
         const servers = { iceServers: [{ urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'] }] };
         let localStream = null;
         let isMuted = true;
@@ -324,12 +320,14 @@
                 
                 for (const player of players) {
                     if (player.uid !== myId && !connectedPeerIds.has(player.uid)) {
+                        console.log(`Creating peer connection to: ${player.displayName} (${player.uid})`);
                         peerConnections[player.uid] = createPeerConnection(player.uid);
                     }
                 }
 
                 for (const peerId of connectedPeerIds) {
                     if (!currentPlayerIds.has(peerId)) {
+                         console.log(`Closing peer connection to: ${peerId}`);
                          closeConnection(peerId);
                     }
                 }
@@ -423,7 +421,7 @@
             }
         }
         
-        // --- توابع چت صوتی ---
+        // --- Voice Chat Functions ---
         async function handleMicClick() {
             if (!localStream) {
                 try {
@@ -437,6 +435,7 @@
                     toggleMute(false); // Unmute on first click
                 } catch (err) {
                     showNotificationModal("خطای دسترسی", "برای استفاده از چت صوتی، لطفاً دسترسی به میکروفون را بدهید.", ()=>{});
+                    console.error("Mic access error:", err);
                 }
             } else {
                 toggleMute(!isMuted);
@@ -448,6 +447,7 @@
             if (localStream) {
                 localStream.getAudioTracks().forEach(track => track.enabled = !isMuted);
             }
+            // *** FIX: Correct icon logic ***
             micIcon.innerHTML = isMuted ? MIC_ON_SVG : MIC_MUTED_SVG;
             voiceChatBtn.title = isMuted ? "وصل کردن صدا" : "قطع کردن صدا";
             voiceChatBtn.classList.toggle('mic-on', !isMuted);
@@ -503,15 +503,25 @@
                 remoteAudio.srcObject = event.streams[0];
                 setupAudioVisualizer(event.streams[0], remoteId);
             };
+            
+            // For debugging
+            pc.onconnectionstatechange = () => {
+                console.log(`Connection state with ${remoteId} is now: ${pc.connectionState}`);
+            };
 
-            // *** رفع باگ اصلی: اضافه کردن مذاکره مجدد ***
+            // *** FIX: Removed 'myId < remoteId' condition to prevent negotiation deadlock ***
+            // This is the main fix for the voice chat issue.
             pc.onnegotiationneeded = async () => {
                 try {
-                    if (pc.signalingState === 'stable' && myId < remoteId) { // فقط برای جلوگیری از ارسال همزمان در شروع
+                    // We only need to check if the connection is stable before creating an offer.
+                    if (pc.signalingState === 'stable') {
+                        console.log(`Negotiation needed for ${remoteId}, sending offer...`);
                         await sendOffer(remoteId);
+                    } else {
+                        console.log(`Negotiation needed for ${remoteId}, but signaling state is ${pc.signalingState}. Skipping.`);
                     }
                 } catch(err) {
-                    console.error("Negotiation error:", err);
+                    console.error(`Negotiation error for ${remoteId}:`, err);
                 }
             };
             
@@ -580,13 +590,21 @@
             Object.keys(peerConnections).forEach(id => closeConnection(id));
             peerConnections = {}; localStream = null;
 
-            // پاک کردن سیگنال‌های باقی‌مانده (اختیاری)
-            const signalsCol = collection(db, `Lobbys_list/${lobbyId}/signals`);
-            const q = query(signalsCol, where("to", "==", myId));
-            const snapshot = await getDocs(q);
-            const batch = writeBatch(db);
-            snapshot.forEach(doc => batch.delete(doc.ref));
-            await batch.commit();
+            try {
+                const signalsCol = collection(db, `Lobbys_list/${lobbyId}/signals`);
+                const q = query(signalsCol);
+                const snapshot = await getDocs(q);
+                const batch = writeBatch(db);
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.from === myId || data.to === myId) {
+                        batch.delete(doc.ref);
+                    }
+                });
+                await batch.commit();
+            } catch (err) {
+                console.error("Error cleaning up signals:", err);
+            }
         }
 
         function setupEventListeners() { actionBtn.addEventListener('click', handleActionClick); leaveLobbyBtn.addEventListener('click', showLeaveConfirm); voiceChatBtn.addEventListener('click', handleMicClick); window.addEventListener('beforeunload', handleLeaveLobby); }
