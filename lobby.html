@@ -190,7 +190,8 @@
             <div id="left-players" class="players-column"></div>
             <div id="right-players" class="players-column"></div>
         </main>
-
+        
+        <!-- *** تغییر ۱: ساختار فوتر تغییر کرد تا دکمه میکروفون را در خود جای دهد *** -->
         <footer class="lobby-footer">
             <button id="voice-chat-btn" title="فعال کردن صدا">
                 <svg id="mic-icon" viewBox="0 0 24 24"><path d="M12,14a2,2,0,0,0,2-2V6a2,2,0,0,0-4,0v6A2,2,0,0,0,12,14Zm5-2V6a5,5,0,0,0-10,0v6a5,5,0,0,0,10,0Z"/><path d="M19,11a1,1,0,0,0-2,0,5,5,0,0,1-10,0,1,1,0,0,0-2,0,7,7,0,0,0,6,6.92V21H9a1,1,0,0,0,0,2h6a1,1,0,0,0,0-2H13V17.92A7,7,0,0,0,19,11Z"/></svg>
@@ -206,12 +207,13 @@
     <audio id="sound-player-leave" src="https://assets.mixkit.co/sfx/preview/mixkit-player-losing-or-failing-2042.mp3" preload="auto"></audio>
     <audio id="sound-ready" src="https://assets.mixkit.co/sfx/preview/mixkit-quick-positive-video-game-notification-interface-265.mp3" preload="auto"></audio>
     
+    <!-- *** تغییر ۲: یک کانتینر برای تگ‌های صوتی که به صورت خودکار ساخته می‌شوند *** -->
     <div id="audio-container" style="display: none;"></div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, runTransaction, getDoc, collection, where, query, addDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, runTransaction, getDoc, collection, where, query, addDoc, writeBatch, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         // --- Config & Elements ---
         const MAX_PLAYERS = 12;
@@ -317,23 +319,17 @@
                 else if(players.length < lastPlayerCount) playSound('sound-player-leave');
                 lastPlayerCount = players.length;
                 
-                // --- مدیریت اتصال و قطع اتصال WebRTC بر اساس لیست بازیکنان ---
                 const currentPlayerIds = new Set(players.map(p => p.uid));
                 const connectedPeerIds = new Set(Object.keys(peerConnections));
                 
-                // اتصال به بازیکنان جدید
                 for (const player of players) {
                     if (player.uid !== myId && !connectedPeerIds.has(player.uid)) {
-                        console.log(`Connecting to new player: ${player.uid}`);
                         peerConnections[player.uid] = createPeerConnection(player.uid);
-                        if(myId < player.uid) sendOffer(player.uid);
                     }
                 }
 
-                // قطع اتصال از بازیکنان خارج شده
                 for (const peerId of connectedPeerIds) {
                     if (!currentPlayerIds.has(peerId)) {
-                         console.log(`Disconnecting from player: ${peerId}`);
                          closeConnection(peerId);
                     }
                 }
@@ -347,7 +343,6 @@
                 showNotificationModal("خطای ارتباط", "ارتباط با لابی قطع شد.", () => window.location.href = './Lobby page.html');
             });
 
-            // شروع گوش دادن به سیگنال‌های WebRTC
             listenToSignals();
         }
 
@@ -366,7 +361,7 @@
                 
                 if (player) {
                     slot.classList.add('filled');
-                    slot.dataset.uid = player.uid; // افزودن شناسه کاربر برای نشانگر صحبت
+                    slot.dataset.uid = player.uid; 
                     if (player.isReady) slot.classList.add('ready');
                     const hostCrown = player.uid === data.creatorId ? `<div class="host-crown">👑</div>` : '';
                     slot.innerHTML = `
@@ -409,7 +404,7 @@
         
         async function handleLeaveLobby() {
             if (unsubscribeLobby) unsubscribeLobby();
-            await hangupVoiceChat(); // قطع کامل چت صوتی قبل از خروج
+            await hangupVoiceChat(); 
 
             const lobbyDocRef = doc(db, "Lobbys_list", lobbyId);
             try {
@@ -432,49 +427,70 @@
         async function handleMicClick() {
             if (!localStream) {
                 try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true }, video: false });
                     localStream = stream;
-                    isMuted = false;
-                    Object.values(peerConnections).forEach(pc => stream.getTracks().forEach(track => pc.addTrack(track, stream)));
-                    voiceChatBtn.classList.add('mic-on');
-                    micIcon.innerHTML = MIC_MUTED_SVG;
-                    voiceChatBtn.title = "قطع کردن صدا";
+                    
+                    Object.values(peerConnections).forEach(pc => {
+                        stream.getTracks().forEach(track => pc.addTrack(track, stream));
+                    });
+
+                    toggleMute(false); // Unmute on first click
                 } catch (err) {
                     showNotificationModal("خطای دسترسی", "برای استفاده از چت صوتی، لطفاً دسترسی به میکروفون را بدهید.", ()=>{});
                 }
             } else {
-                isMuted = !isMuted;
-                localStream.getAudioTracks().forEach(track => track.enabled = !isMuted);
-                micIcon.innerHTML = isMuted ? MIC_ON_SVG : MIC_MUTED_SVG;
-                voiceChatBtn.title = isMuted ? "وصل کردن صدا" : "قطع کردن صدا";
+                toggleMute(!isMuted);
             }
         }
         
+        function toggleMute(muteState) {
+            isMuted = muteState;
+            if (localStream) {
+                localStream.getAudioTracks().forEach(track => track.enabled = !isMuted);
+            }
+            micIcon.innerHTML = isMuted ? MIC_ON_SVG : MIC_MUTED_SVG;
+            voiceChatBtn.title = isMuted ? "وصل کردن صدا" : "قطع کردن صدا";
+            voiceChatBtn.classList.toggle('mic-on', !isMuted);
+        }
+        
         function setupAudioVisualizer(stream, remoteId) {
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const analyser = audioContext.createAnalyser();
-            const source = audioContext.createMediaStreamSource(stream);
-            source.connect(analyser);
-            analyser.fftSize = 256;
-            const bufferLength = analyser.frequencyBinCount;
-            const dataArray = new Uint8Array(bufferLength);
-            
-            peerConnections[remoteId].visualizer = { audioContext, animationFrameId: null };
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const analyser = audioContext.createAnalyser();
+                const source = audioContext.createMediaStreamSource(stream);
+                source.connect(analyser);
+                analyser.fftSize = 256;
+                const bufferLength = analyser.frequencyBinCount;
+                const dataArray = new Uint8Array(bufferLength);
+                
+                if (peerConnections[remoteId]) {
+                    peerConnections[remoteId].visualizer = { audioContext, animationFrameId: null };
+                }
 
-            const draw = () => {
-                const userSlot = document.querySelector(`.player-slot[data-uid="${remoteId}"]`);
-                if (!userSlot) { cancelAnimationFrame(peerConnections[remoteId].visualizer.animationFrameId); return; }
-                analyser.getByteFrequencyData(dataArray);
-                let average = dataArray.reduce((a, b) => a + b, 0) / bufferLength;
-                userSlot.classList.toggle('speaking', average > 15); // آستانه حساسیت
-                peerConnections[remoteId].visualizer.animationFrameId = requestAnimationFrame(draw);
-            };
-            draw();
+                const draw = () => {
+                    if (!peerConnections[remoteId] || !peerConnections[remoteId].visualizer) return;
+                    
+                    const userSlot = document.querySelector(`.player-slot[data-uid="${remoteId}"]`);
+                    if (!userSlot) {
+                        cancelAnimationFrame(peerConnections[remoteId].visualizer.animationFrameId);
+                        return;
+                    }
+                    analyser.getByteFrequencyData(dataArray);
+                    let average = dataArray.reduce((a, b) => a + b, 0) / bufferLength;
+                    userSlot.classList.toggle('speaking', average > 15);
+                    peerConnections[remoteId].visualizer.animationFrameId = requestAnimationFrame(draw);
+                };
+                draw();
+            } catch (e) {
+                console.error("Visualizer failed:", e);
+            }
         }
 
         function createPeerConnection(remoteId) {
             const pc = new RTCPeerConnection(servers);
+            
             pc.onicecandidate = e => e.candidate && sendSignal(remoteId, { iceCandidate: e.candidate.toJSON() });
+            
             pc.ontrack = event => {
                 let remoteAudio = document.getElementById(`audio-${remoteId}`);
                 if (!remoteAudio) {
@@ -483,11 +499,25 @@
                     remoteAudio.autoplay = true;
                     remoteAudio.playsInline = true;
                     audioContainer.appendChild(remoteAudio);
-                    remoteAudio.srcObject = event.streams[0];
-                    setupAudioVisualizer(event.streams[0], remoteId);
+                }
+                remoteAudio.srcObject = event.streams[0];
+                setupAudioVisualizer(event.streams[0], remoteId);
+            };
+
+            // *** رفع باگ اصلی: اضافه کردن مذاکره مجدد ***
+            pc.onnegotiationneeded = async () => {
+                try {
+                    if (pc.signalingState === 'stable' && myId < remoteId) { // فقط برای جلوگیری از ارسال همزمان در شروع
+                        await sendOffer(remoteId);
+                    }
+                } catch(err) {
+                    console.error("Negotiation error:", err);
                 }
             };
-            if (localStream) { localStream.getTracks().forEach(track => pc.addTrack(track, localStream)); }
+            
+            if (localStream) { 
+                localStream.getTracks().forEach(track => pc.addTrack(track, localStream)); 
+            }
             return pc;
         }
 
@@ -498,7 +528,7 @@
                 const offer = await pc.createOffer();
                 await pc.setLocalDescription(offer);
                 await sendSignal(remoteId, { offer });
-            } catch (err) { console.error("Offer Error:", err); }
+            } catch (err) { console.error(`Offer Error to ${remoteId}:`, err); }
         }
         
         function listenToSignals() {
@@ -512,20 +542,20 @@
                      const pc = peerConnections[remoteId];
                      if (!pc) { batch.delete(document.ref); continue; }
                      try {
-                         if (signalData.offer && pc.signalingState === 'stable') {
+                         if (signalData.offer && pc.signalingState !== 'have-local-offer') {
                              await pc.setRemoteDescription(new RTCSessionDescription(signalData.offer));
                              const answer = await pc.createAnswer();
                              await pc.setLocalDescription(answer);
                              await sendSignal(remoteId, { answer });
-                         } else if (signalData.answer && pc.signalingState === 'have-local-offer') {
+                         } else if (signalData.answer) {
                              await pc.setRemoteDescription(new RTCSessionDescription(signalData.answer));
                          } else if (signalData.iceCandidate && pc.remoteDescription) {
                              await pc.addIceCandidate(new RTCIceCandidate(signalData.iceCandidate));
                          }
-                     } catch (err) { console.error("Signal Processing Error:", err); }
+                     } catch (err) { console.error(`Signal Processing Error from ${remoteId}:`, err, signalData); }
                      batch.delete(document.ref);
                  }
-                 await batch.commit();
+                 if (!snapshot.empty) await batch.commit();
             });
         }
 
@@ -537,7 +567,7 @@
         function closeConnection(remoteId) {
             const pcData = peerConnections[remoteId];
             if (pcData) {
-                if (pcData.visualizer) { cancelAnimationFrame(pcData.visualizer.animationFrameId); pcData.visualizer.audioContext.close(); }
+                if (pcData.visualizer) { cancelAnimationFrame(pcData.visualizer.animationFrameId); pcData.visualizer.audioContext.close().catch(()=>{}); }
                 pcData.close();
                 delete peerConnections[remoteId];
             }
@@ -549,6 +579,14 @@
             if (localStream) localStream.getTracks().forEach(track => track.stop());
             Object.keys(peerConnections).forEach(id => closeConnection(id));
             peerConnections = {}; localStream = null;
+
+            // پاک کردن سیگنال‌های باقی‌مانده (اختیاری)
+            const signalsCol = collection(db, `Lobbys_list/${lobbyId}/signals`);
+            const q = query(signalsCol, where("to", "==", myId));
+            const snapshot = await getDocs(q);
+            const batch = writeBatch(db);
+            snapshot.forEach(doc => batch.delete(doc.ref));
+            await batch.commit();
         }
 
         function setupEventListeners() { actionBtn.addEventListener('click', handleActionClick); leaveLobbyBtn.addEventListener('click', showLeaveConfirm); voiceChatBtn.addEventListener('click', handleMicClick); window.addEventListener('beforeunload', handleLeaveLobby); }
