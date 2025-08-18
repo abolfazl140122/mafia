@@ -335,7 +335,8 @@
         }
 
         async function joinLobby() {
-            const lobbyDocRef = doc(db, "Lobbys list", lobbyId);
+            // **** FIX: Changed collection name to 'Lobbys_list' ****
+            const lobbyDocRef = doc(db, "Lobbys_list", lobbyId);
             try {
                 await runTransaction(db, async (transaction) => {
                     const lobbyDoc = await transaction.get(lobbyDocRef);
@@ -359,7 +360,8 @@
         }
 
         function listenToLobbyChanges() {
-            const lobbyDocRef = doc(db, "Lobbys list", lobbyId);
+            // **** FIX: Changed collection name to 'Lobbys_list' ****
+            const lobbyDocRef = doc(db, "Lobbys_list", lobbyId);
             unsubscribeLobby = onSnapshot(lobbyDocRef, (docSnap) => {
                 if (!docSnap.exists()) {
                     showNotificationModal("لابی حذف شد", "این لابی توسط سازنده یا مدیر حذف شده است. شما به لیست لابی‌ها منتقل می‌شوید.", () => window.location.href = './Lobby page.html');
@@ -444,7 +446,8 @@
         }
         
         async function toggleReadyStatus() {
-            const lobbyDocRef = doc(db, "Lobbys list", lobbyId);
+            // **** FIX: Changed collection name to 'Lobbys_list' ****
+            const lobbyDocRef = doc(db, "Lobbys_list", lobbyId);
             await runTransaction(db, async (transaction) => {
                 const lobbyDoc = await transaction.get(lobbyDocRef);
                 if (!lobbyDoc.exists()) throw new Error("لابی یافت نشد!");
@@ -458,7 +461,8 @@
         }
 
         async function handleLeaveLobby() {
-            const lobbyDocRef = doc(db, "Lobbys list", lobbyId);
+            // **** FIX: Changed collection name to 'Lobbys_list' ****
+            const lobbyDocRef = doc(db, "Lobbys_list", lobbyId);
             try {
                 await runTransaction(db, async (transaction) => {
                     const lobbyDoc = await transaction.get(lobbyDocRef);
@@ -477,7 +481,8 @@
         }
         
         async function kickPlayer(uidToKick) {
-             const lobbyDocRef = doc(db, "Lobbys list", lobbyId);
+             // **** FIX: Changed collection name to 'Lobbys_list' ****
+             const lobbyDocRef = doc(db, "Lobbys_list", lobbyId);
              await runTransaction(db, async (transaction) => {
                 const lobbyDoc = await transaction.get(lobbyDocRef);
                 if (!lobbyDoc.exists()) return;
