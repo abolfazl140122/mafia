@@ -456,12 +456,23 @@
                 </div>
             `;
             
-            // Event Listeners for buttons
+            // =======================>>>>> CHANGE START <<<<<========================
+            // Event Listener for the Join button
             card.querySelector('[data-action="join"]')?.addEventListener('click', () => {
-                showCustomAlert('به زودی...', 'قابلیت پیوستن به لابی‌ها در بروزرسانی‌های بعدی اضافه خواهد شد.', [
-                    { text: 'باشه', class: 'primary' }
-                ]);
+                // Check if the lobby is full before redirecting
+                if ((lobbyData.playerCount || 0) >= (lobbyData.maxPlayers || 12)) {
+                     showCustomAlert('لابی پر است', 'ظرفیت این لابی تکمیل شده است و نمی‌توانید وارد شوید.', [
+                        { text: 'باشه', class: 'primary' }
+                    ]);
+                    return; // Stop execution
+                }
+
+                // Redirect to the Lobby.html page, passing the lobby's document ID in the URL.
+                // Make sure your lobby file is named "Lobby.html".
+                window.location.href = `./Lobby.html?id=${lobbyData.id}`;
             });
+            // =======================>>>>> CHANGE END <<<<<==========================
+
 
             const deleteAction = (title, message) => {
                  showCustomAlert(title, message, [
