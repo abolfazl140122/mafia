@@ -548,7 +548,8 @@
                 });
 
                 // Listener 2: For Lobbies List (Optimized with docChanges)
-                const lobbiesRef = collection(db, 'Lobbys list');
+                // **** FIX: Changed collection name to 'Lobbys_list' ****
+                const lobbiesRef = collection(db, 'Lobbys_list');
                 const q = query(lobbiesRef, orderBy("createdAt", "desc"));
 
                 onSnapshot(q, (snapshot) => {
@@ -619,7 +620,8 @@
 
             if (!currentUser) return;
 
-            const lobbiesRef = collection(db, 'Lobbys list');
+            // **** FIX: Changed collection name to 'Lobbys_list' ****
+            const lobbiesRef = collection(db, 'Lobbys_list');
             const q = query(lobbiesRef, where("creatorId", "==", currentUser.uid));
             const querySnapshot = await getDocs(q);
 
@@ -647,7 +649,8 @@
 
         async function deleteLobby(lobbyId) {
             try {
-                await deleteDoc(doc(db, "Lobbys list", lobbyId));
+                // **** FIX: Changed collection name to 'Lobbys_list' ****
+                await deleteDoc(doc(db, "Lobbys_list", lobbyId));
             } catch (error) {
                 showCustomAlert('خطای سرور', 'مشکلی در حذف لابی پیش آمد.', [{ text: 'باشه', class: 'primary' }]);
             }
