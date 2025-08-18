@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>لابی بازی</title>
+    <title>لابی بازی - شهر مافیا</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
@@ -18,6 +18,7 @@
             --border-color: #5c4a3a;
             --green-ready: #2ecc71;
             --red-kick: #e74c3c;
+            --slot-bg: linear-gradient(160deg, #2a2118, var(--bg-dark));
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -38,7 +39,6 @@
             background-size: cover; background-position: center center; filter: blur(8px) brightness(0.6); z-index: -1;
         }
         
-        /* --- Loading Overlay --- */
         #loading-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(0, 0, 0, 0.9); display: flex; flex-direction: column;
@@ -51,66 +51,85 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         #loading-text { margin-top: 20px; font-size: 1.1rem; font-weight: 700; }
 
-        /* --- Main Layout --- */
         .lobby-container {
             width: 100%; height: 100%; display: flex; flex-direction: column;
             padding: 15px; justify-content: space-between;
         }
 
-        .lobby-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        #lobby-name { font-size: 1.5rem; font-weight: 900; color: var(--primary-gold); }
+        .lobby-header { 
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
+            background-color: rgba(0,0,0,0.4); padding: 10px 15px; border-radius: 12px; border: 1px solid var(--border-color);
+        }
+        #lobby-name { font-size: 1.5rem; font-weight: 900; color: var(--primary-gold); text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
         .leave-button {
             background: linear-gradient(145deg, #a13d3d, #7c1f1f); border: 1px solid #ff8f8f;
-            color: white; padding: 8px 15px; border-radius: 8px; font-weight: 700; cursor: pointer;
+            color: white; padding: 8px 15px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: all 0.2s ease;
         }
+        .leave-button:hover { transform: scale(1.05); }
 
-        .players-area { display: flex; flex-direction: column; justify-content: space-between; flex-grow: 1; gap: 15px; }
+        .players-area { display: flex; flex-direction: column; justify-content: space-between; flex-grow: 1; gap: 15px; padding: 10px 0; }
         .players-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
 
+        @keyframes slot-fade-in { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+
         .player-slot {
-            aspect-ratio: 3 / 4; background-color: rgba(0,0,0,0.3);
-            border: 2px solid var(--border-color); border-radius: 12px;
+            aspect-ratio: 3 / 4.5; border-radius: 12px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             padding: 5px; text-align: center; transition: all 0.3s ease;
-            position: relative; overflow: hidden;
+            position: relative; overflow: hidden; animation: slot-fade-in 0.5s ease forwards;
         }
-        .player-slot.empty { border-style: dashed; opacity: 0.6; }
-        .player-slot.filled { background: linear-gradient(160deg, #2a2118, var(--bg-dark)); }
+        .player-slot.empty {
+            background-color: rgba(0,0,0,0.3); border: 2px dashed var(--border-color); opacity: 0.6;
+        }
+        .player-slot.filled {
+            background: var(--slot-bg); border: 2px solid var(--border-color);
+        }
         
         .player-avatar {
-            width: 60%; aspect-ratio: 1/1; border-radius: 50%;
-            object-fit: cover; border: 2px solid var(--text-secondary); margin-bottom: 5px;
+            width: 65%; aspect-ratio: 1/1; border-radius: 50%; object-fit: cover;
+            border: 3px solid var(--text-secondary); margin-bottom: 5px; transition: all 0.3s ease;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.5);
         }
-        .player-name { font-size: 0.8rem; font-weight: 700; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .empty-text { font-size: 0.8rem; color: var(--text-secondary); }
-
-        .host-crown { position: absolute; top: 2px; right: 4px; font-size: 1.1rem; color: var(--primary-gold); text-shadow: 0 0 5px black; }
+        .player-name { font-size: 0.8rem; font-weight: 700; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 2px; }
+        .empty-text { font-size: 0.8rem; color: var(--text-secondary); font-weight: 700; }
+        
+        .host-crown {
+            position: absolute; top: 0px; right: 0px; width: 24px; height: 24px;
+            background-color: var(--primary-gold); color: var(--bg-dark);
+            border-radius: 0 10px 0 10px; display: flex; align-items: center; justify-content: center;
+            font-size: 1rem; font-weight: 900; box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
         
         .ready-indicator {
-            position: absolute; bottom: 0; left: 0; width: 100%; background-color: rgba(0,0,0,0.7);
-            color: var(--green-ready); font-weight: 900; font-size: 0.8rem;
-            padding: 3px 0; transform: translateY(100%); transition: transform 0.3s ease;
+            position: absolute; bottom: 4px; right: 4px; width: 22px; height: 22px;
+            background-color: var(--green-ready); border-radius: 50%; border: 2px solid var(--bg-dark);
+            display: flex; align-items: center; justify-content: center; color: white;
+            font-weight: 900; font-size: 1rem; transform: scale(0); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .player-slot.ready .ready-indicator { transform: translateY(0); }
-        .player-slot.ready { border-color: var(--green-ready); box-shadow: 0 0 10px var(--green-ready); }
+        .player-slot.ready .ready-indicator { transform: scale(1); }
+        .player-slot.ready .player-avatar { border-color: var(--green-ready); }
+        .player-slot.ready { box-shadow: 0 0 15px rgba(46, 204, 113, 0.6); border-color: var(--green-ready); }
         
         .kick-button {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(231, 76, 60, 0.8); color: white; border: none;
-            font-size: 1rem; font-weight: 900; cursor: pointer;
-            opacity: 0; transition: opacity 0.3s ease; display: flex; align-items: center; justify-content: center;
+            background-color: rgba(231, 76, 60, 0.85); color: white; border: none;
+            font-size: 1.1rem; font-weight: 900; cursor: pointer;
+            opacity: 0; visibility: hidden; transition: all 0.3s ease;
+            display: flex; align-items: center; justify-content: center; border-radius: 10px;
         }
-        .player-slot:hover .kick-button { opacity: 1; }
+        .player-slot.filled:hover .kick-button { opacity: 1; visibility: visible; } /* For desktop */
 
-        .lobby-actions { padding-top: 15px; }
+        .lobby-actions { padding-top: 10px; }
         .action-button {
-            width: 100%; padding: 15px; font-size: 1.2rem; font-weight: 900;
+            width: 100%; padding: 15px; font-size: 1.3rem; font-weight: 900;
             border-radius: 12px; border: none; cursor: pointer; transition: all 0.3s ease;
-            color: white;
+            color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
-        .action-button.ready-btn { background: linear-gradient(145deg, #27ae60, #229954); border: 1px solid #58d68d; }
-        .action-button.start-btn { background: linear-gradient(145deg, var(--dark-red), var(--darker-red)); border: 1px solid var(--primary-gold); }
-        .action-button:disabled { background: #555; border-color: #777; cursor: not-allowed; opacity: 0.7; }
+        .action-button.ready-btn { background: linear-gradient(145deg, #27ae60, #229954); border: 2px solid #58d68d; }
+        .action-button.unready-btn { background: linear-gradient(145deg, #c0392b, #a93226); border: 2px solid #e67e22; }
+        .action-button.start-btn { background: linear-gradient(145deg, var(--dark-red), var(--darker-red)); border: 2px solid var(--primary-gold); }
+        .action-button:disabled { background: linear-gradient(145deg, #7f8c8d, #626567); border-color: #95a5a6; cursor: not-allowed; opacity: 0.6; }
+        .action-button:not(:disabled):hover { transform: translateY(-3px); }
         
         /* Modal Styles */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.85); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease; }
@@ -148,7 +167,6 @@
         </footer>
     </div>
     
-    <!-- Modal for confirmations -->
     <div id="confirm-modal" class="modal-overlay">
         <div class="modal-content">
             <h2 id="confirm-modal-title" class="modal-title"></h2>
@@ -159,14 +177,20 @@
             </div>
         </div>
     </div>
-    
+
+    <!-- Audio Elements -->
+    <audio id="sound-player-join" src="https://assets.mixkit.co/sfx/preview/mixkit-unlock-game-notification-253.mp3" preload="auto"></audio>
+    <audio id="sound-player-leave" src="https://assets.mixkit.co/sfx/preview/mixkit-player-losing-or-failing-2042.mp3" preload="auto"></audio>
+    <audio id="sound-ready" src="https://assets.mixkit.co/sfx/preview/mixkit-quick-positive-video-game-notification-interface-265.mp3" preload="auto"></audio>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, runTransaction, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, runTransaction, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         // --- Config & Elements ---
         const MAX_PLAYERS = 12;
+        const MIN_PLAYERS_TO_START = 2; // حداقل بازیکن برای شروع
         const firebaseConfig = {
           apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
           authDomain: "mafia-9fcbf.firebaseapp.com",
@@ -194,12 +218,12 @@
         let unsubscribeLobby = null;
         let isHost = false;
         let isReady = false;
+        let lastPlayerCount = 0;
 
-        // --- Main Logic ---
+        function playSound(soundId) { try { document.getElementById(soundId).play(); } catch(e) { console.warn("Sound play failed", e); } }
+
         function main() {
-            const urlParams = new URLSearchParams(window.location.search);
-            lobbyId = urlParams.get('id');
-
+            lobbyId = new URLSearchParams(window.location.search).get('id');
             if (!lobbyId) {
                 alert("شناسه لابی نامعتبر است.");
                 window.location.href = './Lobby page.html';
@@ -209,12 +233,9 @@
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
                     currentUser = user;
-                    // Get user data from 'users' collection
                     const userDocRef = doc(db, 'users', user.uid);
-                    const userDocSnap = await onSnapshot(userDocRef, (docSnap) => {
-                        currentUserData = docSnap.exists() ? docSnap.data() : { displayName: user.displayName, avatarUrl: user.photoURL };
-                    });
-
+                    const userDocSnap = await getDoc(userDocRef);
+                    currentUserData = userDocSnap.exists() ? userDocSnap.data() : { displayName: user.displayName, avatarUrl: user.photoURL };
                     await joinLobby();
                     listenToLobbyChanges();
                     setupEventListeners();
@@ -230,20 +251,16 @@
                 await runTransaction(db, async (transaction) => {
                     const lobbyDoc = await transaction.get(lobbyDocRef);
                     if (!lobbyDoc.exists()) throw new Error("لابی یافت نشد!");
-
                     let players = lobbyDoc.data().players || [];
                     const playerExists = players.some(p => p.uid === currentUser.uid);
-
                     if (!playerExists) {
                         if (players.length >= MAX_PLAYERS) throw new Error("لابی پر است!");
-                        
                         players.push({
                             uid: currentUser.uid,
                             displayName: currentUserData.displayName || "بازیکن",
                             avatarUrl: currentUserData.avatarUrl || "https://i.imgur.com/T2bT1tG.png",
                             isReady: false
                         });
-
                         transaction.update(lobbyDocRef, { players: players, playerCount: players.length });
                     }
                 });
@@ -257,15 +274,16 @@
             const lobbyDocRef = doc(db, "Lobbys list", lobbyId);
             unsubscribeLobby = onSnapshot(lobbyDocRef, (docSnap) => {
                 if (!docSnap.exists()) {
-                    // Lobby was deleted
                     alert("این لابی توسط سازنده یا مدیر حذف شد.");
                     window.location.href = './Lobby page.html';
                     return;
                 }
-                
                 const lobbyData = docSnap.data();
-                renderLobby(lobbyData);
+                if(lobbyData.players.length > lastPlayerCount) playSound('sound-player-join');
+                else if(lobbyData.players.length < lastPlayerCount) playSound('sound-player-leave');
+                lastPlayerCount = lobbyData.players.length;
                 
+                renderLobby(lobbyData);
                 if (loadingOverlay.style.display !== 'none') {
                     loadingOverlay.style.display = 'none';
                     lobbyContainer.style.display = 'flex';
@@ -281,8 +299,6 @@
             lobbyNameEl.textContent = data.lobbyName;
             const players = data.players || [];
             isHost = currentUser.uid === data.creatorId;
-
-            // Clear previous slots
             topPlayersEl.innerHTML = '';
             bottomPlayersEl.innerHTML = '';
             
@@ -290,62 +306,51 @@
                 const player = players[i];
                 const slot = document.createElement('div');
                 slot.className = 'player-slot';
+                slot.style.animationDelay = `${i * 50}ms`;
                 
                 if (player) {
                     slot.classList.add('filled');
                     if (player.isReady) slot.classList.add('ready');
-                    
-                    let hostCrown = player.uid === data.creatorId ? `<div class="host-crown">👑</div>` : '';
-                    let kickButton = isHost && player.uid !== currentUser.uid ? `<button class="kick-button" data-uid="${player.uid}">اخراج</button>` : '';
-
+                    const hostCrown = player.uid === data.creatorId ? `<div class="host-crown">👑</div>` : '';
+                    const kickButton = isHost && player.uid !== currentUser.uid ? `<button class="kick-button" data-uid="${player.uid}">اخراج</button>` : '';
                     slot.innerHTML = `
                         ${hostCrown}
                         <img src="${player.avatarUrl || 'https://i.imgur.com/T2bT1tG.png'}" alt="avatar" class="player-avatar">
                         <p class="player-name">${player.displayName}</p>
-                        <div class="ready-indicator">آماده</div>
+                        <div class="ready-indicator">✔</div>
                         ${kickButton}
                     `;
-                    
                     const kickBtnEl = slot.querySelector('.kick-button');
-                    if (kickBtnEl) {
-                        kickBtnEl.onclick = () => showKickConfirm(player.displayName, player.uid);
-                    }
+                    if (kickBtnEl) kickBtnEl.onclick = () => showKickConfirm(player.displayName, player.uid);
                 } else {
                     slot.classList.add('empty');
                     slot.innerHTML = `<span class="empty-text">جایگاه خالی</span>`;
                 }
-                
-                if (i < 6) {
-                    topPlayersEl.appendChild(slot);
-                } else {
-                    bottomPlayersEl.appendChild(slot);
-                }
+                if (i < 6) topPlayersEl.appendChild(slot); else bottomPlayersEl.appendChild(slot);
             }
             
-            // Update action button
             const self = players.find(p => p.uid === currentUser.uid);
             isReady = self ? self.isReady : false;
 
             if (isHost) {
-                const allReady = players.length > 1 && players.every(p => p.isReady);
+                const allReady = players.length >= MIN_PLAYERS_TO_START && players.every(p => p.uid === currentUser.uid || p.isReady);
                 actionBtn.textContent = 'شروع بازی';
                 actionBtn.className = 'action-button start-btn';
                 actionBtn.disabled = !allReady;
             } else {
                 actionBtn.textContent = isReady ? 'لغو آمادگی' : 'آماده';
-                actionBtn.className = 'action-button ready-btn';
+                actionBtn.className = `action-button ${isReady ? 'unready-btn' : 'ready-btn'}`;
                 actionBtn.disabled = false;
             }
         }
 
         async function handleActionClick() {
             if (isHost) {
-                // Start game logic
                 alert("شروع بازی! (در حال حاضر شما به صفحه اصلی منتقل می‌شوید)");
                 window.location.href = './main.html';
             } else {
-                // Toggle ready status
                 await toggleReadyStatus();
+                playSound('sound-ready');
             }
         }
         
@@ -368,16 +373,12 @@
             try {
                 await runTransaction(db, async (transaction) => {
                     const lobbyDoc = await transaction.get(lobbyDocRef);
-                    if (!lobbyDoc.exists()) return; // Lobby already gone
-
+                    if (!lobbyDoc.exists()) return;
                     if (isHost) {
-                        // If host leaves, delete the lobby
                         transaction.delete(lobbyDocRef);
                     } else {
-                        // If player leaves, remove them from the list
-                        let players = lobbyDoc.data().players || [];
-                        const updatedPlayers = players.filter(p => p.uid !== currentUser.uid);
-                        transaction.update(lobbyDocRef, { players: updatedPlayers, playerCount: updatedPlayers.length });
+                        let players = lobbyDoc.data().players.filter(p => p.uid !== currentUser.uid);
+                        transaction.update(lobbyDocRef, { players: players, playerCount: players.length });
                     }
                 });
             } finally {
@@ -391,36 +392,23 @@
              await runTransaction(db, async (transaction) => {
                 const lobbyDoc = await transaction.get(lobbyDocRef);
                 if (!lobbyDoc.exists()) return;
-                let players = lobbyDoc.data().players || [];
-                const updatedPlayers = players.filter(p => p.uid !== uidToKick);
-                transaction.update(lobbyDocRef, { players: updatedPlayers, playerCount: updatedPlayers.length });
+                let players = lobbyDoc.data().players.filter(p => p.uid !== uidToKick);
+                transaction.update(lobbyDocRef, { players: players, playerCount: players.length });
             });
         }
         
-        // --- Event Listeners & Modals ---
         function setupEventListeners() {
             actionBtn.addEventListener('click', handleActionClick);
             leaveLobbyBtn.addEventListener('click', showLeaveConfirm);
-            window.addEventListener('beforeunload', () => {
-                // A simplified cleanup. For robustness, use Firestore functions.
-                if (currentUser) handleLeaveLobby();
-            });
+            window.addEventListener('beforeunload', () => { if (currentUser) handleLeaveLobby(); });
         }
         
         function showLeaveConfirm() {
-            showConfirmModal(
-                "خروج از لابی",
-                "آیا مطمئن هستید که می‌خواهید از لابی خارج شوید؟" + (isHost ? " (چون شما سازنده هستید، لابی حذف خواهد شد)" : ""),
-                handleLeaveLobby
-            );
+            showConfirmModal("خروج از لابی", "آیا مطمئن هستید؟" + (isHost ? " (چون شما سازنده هستید، لابی حذف خواهد شد)" : ""), handleLeaveLobby);
         }
 
         function showKickConfirm(playerName, playerUid) {
-             showConfirmModal(
-                `اخراج ${playerName}`,
-                `آیا از اخراج این بازیکن مطمئن هستید؟`,
-                () => kickPlayer(playerUid)
-            );
+             showConfirmModal(`اخراج ${playerName}`, `آیا از اخراج این بازیکن مطمئن هستید؟`, () => kickPlayer(playerUid));
         }
 
         function showConfirmModal(title, message, onConfirm) {
@@ -428,21 +416,14 @@
             document.getElementById('confirm-modal-title').textContent = title;
             document.getElementById('confirm-modal-message').textContent = message;
             const yesBtn = document.getElementById('confirm-modal-yes-btn');
-            const noBtn = document.getElementById('confirm-modal-no-btn');
-
-            const newYesBtn = yesBtn.cloneNode(true); // Remove old listeners
+            const newYesBtn = yesBtn.cloneNode(true);
             yesBtn.parentNode.replaceChild(newYesBtn, yesBtn);
-            
-            newYesBtn.onclick = () => {
-                modal.classList.remove('visible');
-                onConfirm();
-            };
-            noBtn.onclick = () => modal.classList.remove('visible');
-            modal.onclick = (e) => { if(e.target === modal) modal.classList.remove('visible'); };
+            newYesBtn.onclick = () => { modal.classList.remove('visible'); onConfirm(); };
+            document.getElementById('confirm-modal-no-btn').onclick = () => modal.classList.remove('visible');
+            modal.onclick = (e) => { if (e.target === modal) modal.classList.remove('visible'); };
             modal.classList.add('visible');
         }
 
-        // --- Start the app ---
         main();
     </script>
 </body>
