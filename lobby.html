@@ -79,7 +79,6 @@
         .player-slot {
             flex: 1; border-radius: 12px; display: flex; flex-direction: column;
             align-items: center; justify-content: center; padding: 5px; text-align: center; 
-            /* CHANGE: Added transition for speaking indicator */
             transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease-in-out, border-color 0.3s ease-in-out;
             position: relative; overflow: hidden; animation: slot-fade-in 0.6s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
             min-height: 0;
@@ -103,12 +102,11 @@
         .empty-text { font-size: clamp(0.7rem, 2.5vw, 0.8rem); color: var(--text-secondary); font-weight: 700; }
         .host-crown { position: absolute; top: -1px; right: -1px; width: 28px; height: 28px; background-color: var(--primary-gold); color: var(--darker-red); border-radius: 0 10px 0 10px; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 900; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
         
-        /* --- CHANGE START: New style for glowing border when speaking --- */
+        /* --- استایل نشانگر صحبت کردن --- */
         .player-slot.speaking {
             border-color: var(--primary-gold);
             box-shadow: 0 0 15px rgba(255, 201, 71, 0.8), 0 0 25px rgba(255, 201, 71, 0.5), inset 0 0 10px rgba(0,0,0,0.3);
         }
-        /* --- CHANGE END --- */
 
         .ready-indicator {
             position: absolute; bottom: 4px; right: 4px; width: 18px; height: 18px;
@@ -245,19 +243,13 @@
         // --- متغیرهای چت صوتی ---
         const servers = { iceServers: [{ urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'] }] };
         let localStream = null;
-        let isVoiceActive = false;
+        let isMuted = true;
         let myId;
         let peerConnections = {};
         let signalsUnsubscribe;
+        let audioContextUnlocked = false; // --- CHANGE: Flag for fixing autoplay issue ---
 
-        // --- CHANGE: A flag to prevent autoplay errors ---
-        let userHasInteracted = false;
-        document.body.addEventListener('click', () => userHasInteracted = true, { once: true });
-
-        function playSound(soundId) { 
-            if (!userHasInteracted) return;
-            try { document.getElementById(soundId).play(); } catch(e) { console.warn("Sound play failed", e); } 
-        }
+        function playSound(soundId) { try { document.getElementById(soundId).play(); } catch(e) { console.warn("Sound play failed", e); } }
 
         async function main() {
             lobbyId = new URLSearchParams(window.location.search).get('id');
@@ -310,26 +302,28 @@
                 }
                 const lobbyData = docSnap.data();
                 const players = lobbyData.players || [];
-                
                 if(players.length > lastPlayerCount) playSound('sound-player-join');
                 else if(players.length < lastPlayerCount) playSound('sound-player-leave');
                 lastPlayerCount = players.length;
                 
-                // --- CHANGE: Improved peer connection management ---
                 const currentPlayerIds = new Set(players.map(p => p.uid));
+                const connectedPeerIds = new Set(Object.keys(peerConnections));
                 
-                // Add new connections
                 for (const player of players) {
-                    if (player.uid !== myId && !peerConnections[player.uid]) {
+                    if (player.uid !== myId && !connectedPeerIds.has(player.uid)) {
                         console.log(`New player detected: ${player.displayName}. Creating peer connection.`);
-                        createPeerConnection(player.uid);
+                        peerConnections[player.uid] = createPeerConnection(player.uid);
+                        // The negotiation will be triggered by the side with the lexicographically smaller UID
+                        if (myId < player.uid) {
+                             console.log(`My ID is smaller. Sending offer to ${player.displayName}.`);
+                             await sendOffer(player.uid);
+                        }
                     }
                 }
-                
-                // Remove old connections
-                for (const peerId in peerConnections) {
+
+                for (const peerId of connectedPeerIds) {
                     if (!currentPlayerIds.has(peerId)) {
-                        closeConnection(peerId);
+                         closeConnection(peerId);
                     }
                 }
 
@@ -361,7 +355,6 @@
                 
                 if (player) {
                     slot.classList.add('filled');
-                    // --- CHANGE: Added data-uid for CSS targeting ---
                     slot.dataset.uid = player.uid; 
                     if (player.isReady) slot.classList.add('ready');
                     const hostCrown = player.uid === data.creatorId ? `<div class="host-crown">👑</div>` : '';
@@ -411,18 +404,10 @@
                 await runTransaction(db, async (transaction) => {
                     const lobbyDoc = await transaction.get(lobbyDocRef);
                     if (!lobbyDoc.exists()) return;
-                    
-                    let players = lobbyDoc.data().players.filter(p => p.uid !== currentUser.uid);
-                    
-                    if (isHost && players.length > 0) {
-                        // If host leaves, make the next player the host
-                        const newHostId = players[0].uid;
-                        transaction.update(lobbyDocRef, { players: players, playerCount: players.length, creatorId: newHostId });
-                    } else if (isHost && players.length === 0) {
-                        // If host is the last one, delete the lobby
+                    if (isHost) {
                         transaction.delete(lobbyDocRef);
                     } else {
-                        // Normal player leaves
+                        let players = lobbyDoc.data().players.filter(p => p.uid !== currentUser.uid);
                         transaction.update(lobbyDocRef, { players: players, playerCount: players.length });
                     }
                 });
@@ -433,46 +418,66 @@
         
         // --- توابع چت صوتی (با منطق جدید و بهبود یافته) ---
         async function handleMicClick() {
-            userHasInteracted = true;
-            if (!isVoiceActive) {
+            // --- CHANGE START: Fix for browser autoplay policy ---
+            // On the first user interaction, try to play all audio elements.
+            // This "unlocks" the audio context for the page.
+            if (!audioContextUnlocked) {
+                document.querySelectorAll('audio').forEach(audio => {
+                    audio.play().catch(e => {
+                        // This error is expected if the audio has no source yet.
+                        if (e.name !== 'NotSupportedError') {
+                            console.warn("Audio context unlock play failed:", e);
+                        }
+                    });
+                });
+                audioContextUnlocked = true;
+            }
+            // --- CHANGE END ---
+
+            if (isMuted) {
                 try {
-                    localStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }, video: false });
+                    const audioConstraints = {
+                        audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+                        video: false,
+                    };
+                    const stream = await navigator.mediaDevices.getUserMedia(audioConstraints);
+                    localStream = stream;
                     
-                    // Add tracks to all existing peer connections and trigger renegotiation
-                    for (const peerId in peerConnections) {
-                        localStream.getTracks().forEach(track => peerConnections[peerId].pc.addTrack(track, localStream));
+                    Object.values(peerConnections).forEach(pc => {
+                        stream.getTracks().forEach(track => pc.addTrack(track, stream));
+                    });
+                    
+                    const players = (await getDoc(doc(db, "Lobbys_list", lobbyId))).data().players;
+                    for(const player of players) {
+                        if(player.uid !== myId && myId < player.uid) {
+                            await sendOffer(player.uid);
+                        }
                     }
-                    updateMicButton(true); // Voice is now active
+
+                    toggleMute(false); // Unmute
                 } catch (err) {
                     console.error("Mic access error:", err);
-                    showNotificationModal("خطای میکروفون", "دسترسی به میکروفون امکان‌پذیر نیست. لطفاً دسترسی را در مرورگر خود فعال کنید.");
+                    let message = "برای استفاده از چت صوتی، لطفاً دسترسی به میکروفون را بدهید.";
+                    if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') message = "شما دسترسی به میکروفون را نداده‌اید. لطفاً در تنظیمات مرورگر، دسترسی را فعال کنید.";
+                    else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') message = "هیچ میکروفونی یافت نشد. لطفاً از اتصال صحیح میکروفون خود اطمینان حاصل کنید.";
+                    showNotificationModal("خطای دسترسی به میکروفون", message, ()=>{});
                 }
             } else {
-                // If voice is already active, this button just toggles mute
-                const isMuted = !localStream.getAudioTracks()[0].enabled;
-                localStream.getAudioTracks().forEach(track => track.enabled = isMuted);
-                updateMicButton(true, !isMuted);
+                toggleMute(true); // Mute
             }
         }
         
-        function updateMicButton(isActive, isEnabled = true) {
-            isVoiceActive = isActive;
-            if (isActive) {
-                micIcon.innerHTML = isEnabled ? MIC_ON_SVG : MIC_MUTED_SVG;
-                voiceChatBtn.classList.toggle('mic-on', isEnabled);
-                voiceChatBtn.title = isEnabled ? "قطع کردن صدا" : "وصل کردن صدا";
-            } else {
-                micIcon.innerHTML = MIC_MUTED_SVG;
-                voiceChatBtn.classList.remove('mic-on');
-                voiceChatBtn.title = "فعال کردن صدا";
+        function toggleMute(muteState) {
+            isMuted = muteState;
+            if (localStream) {
+                localStream.getAudioTracks().forEach(track => track.enabled = !isMuted);
             }
+            micIcon.innerHTML = isMuted ? MIC_ON_SVG : MIC_MUTED_SVG;
+            voiceChatBtn.title = isMuted ? "وصل کردن صدا" : "قطع کردن صدا";
+            voiceChatBtn.classList.toggle('mic-on', !isMuted);
         }
         
-        // --- CHANGE START: New function for speaking indicator ---
         function setupAudioVisualizer(stream, remoteId) {
-            const pcData = peerConnections[remoteId];
-            if (!stream || !pcData || pcData.visualizer) return; // Already setup or no stream/pc
-
             try {
                 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 const analyser = audioContext.createAnalyser();
@@ -482,14 +487,16 @@
                 const bufferLength = analyser.frequencyBinCount;
                 const dataArray = new Uint8Array(bufferLength);
                 
-                pcData.visualizer = { audioContext, animationFrameId: null };
+                if (peerConnections[remoteId]) {
+                    peerConnections[remoteId].visualizer = { audioContext, animationFrameId: null };
+                }
 
                 const draw = () => {
                     if (!peerConnections[remoteId] || !peerConnections[remoteId].visualizer) return;
                     
                     const userSlot = document.querySelector(`.player-slot[data-uid="${remoteId}"]`);
                     if (!userSlot) {
-                        cancelAnimationFrame(pcData.visualizer.animationFrameId);
+                        cancelAnimationFrame(peerConnections[remoteId].visualizer.animationFrameId);
                         return;
                     }
 
@@ -498,50 +505,55 @@
                     
                     userSlot.classList.toggle('speaking', average > 15);
                     
-                    pcData.visualizer.animationFrameId = requestAnimationFrame(draw);
+                    peerConnections[remoteId].visualizer.animationFrameId = requestAnimationFrame(draw);
                 };
                 draw();
             } catch (e) {
                 console.error("Audio visualizer failed to initialize:", e);
             }
         }
-        // --- CHANGE END ---
 
         function createPeerConnection(remoteId) {
             const pc = new RTCPeerConnection(servers);
-            peerConnections[remoteId] = { pc, visualizer: null };
 
-            // This event is fired when renegotiation is needed
-            pc.onnegotiationneeded = async () => {
-                console.log(`Negotiation needed for ${remoteId}`);
-                try {
-                    await pc.setLocalDescription(await pc.createOffer());
-                    await sendSignal(remoteId, { sdp: pc.localDescription });
-                } catch (err) {
-                    console.error(`Offer creation error for ${remoteId}:`, err);
-                }
-            };
-
-            pc.onicecandidate = e => e.candidate && sendSignal(remoteId, { ice: e.candidate });
+            // --- CHANGE START: Add buffer for ICE candidates to prevent race conditions ---
+            pc.iceCandidateBuffer = [];
+            // --- CHANGE END ---
+            
+            pc.onicecandidate = e => e.candidate && sendSignal(remoteId, { iceCandidate: e.candidate.toJSON() });
             
             pc.ontrack = event => {
-                let remoteAudio = document.getElementById(`audio-${remoteId}`);
-                if (!remoteAudio) {
-                    remoteAudio = document.createElement('audio');
-                    remoteAudio.id = `audio-${remoteId}`;
-                    remoteAudio.autoplay = true;
-                    remoteAudio.playsInline = true;
-                    audioContainer.appendChild(remoteAudio);
+                if (event.streams && event.streams[0]) {
+                    let remoteAudio = document.getElementById(`audio-${remoteId}`);
+                    if (!remoteAudio) {
+                        remoteAudio = document.createElement('audio');
+                        remoteAudio.id = `audio-${remoteId}`;
+                        remoteAudio.autoplay = true;
+                        remoteAudio.playsInline = true;
+                        audioContainer.appendChild(remoteAudio);
+                    }
+                    remoteAudio.srcObject = event.streams[0];
+                    
+                    // --- CHANGE: Setup the visualizer when track is received ---
+                    setupAudioVisualizer(event.streams[0], remoteId);
                 }
-                remoteAudio.srcObject = event.streams[0];
-                if(userHasInteracted) remoteAudio.play().catch(e => console.warn("Remote audio play failed:", e));
-                
-                setupAudioVisualizer(event.streams[0], remoteId);
             };
             
             if (localStream) { 
                 localStream.getTracks().forEach(track => pc.addTrack(track, localStream)); 
             }
+            
+            return pc;
+        }
+
+        async function sendOffer(remoteId) {
+            const pc = peerConnections[remoteId];
+            if (!pc) return;
+            try {
+                const offer = await pc.createOffer({ offerToReceiveAudio: 1 });
+                await pc.setLocalDescription(offer);
+                await sendSignal(remoteId, { offer: pc.localDescription.toJSON() });
+            } catch (err) { console.error(`Offer Error to ${remoteId}:`, err); }
         }
         
         function listenToSignals() {
@@ -549,29 +561,40 @@
             const q = query(signalsCol, where("to", "==", myId));
             signalsUnsubscribe = onSnapshot(q, async (snapshot) => {
                  const batch = writeBatch(db);
-                 for (const docChange of snapshot.docChanges()) {
-                     if (docChange.type !== "added") continue;
-                     
-                     const document = docChange.doc;
+                 for (const document of snapshot.docs) {
                      const signalData = document.data();
                      const remoteId = signalData.from;
-                     const pcData = peerConnections[remoteId];
+                     const pc = peerConnections[remoteId];
                      
-                     if (!pcData) { batch.delete(document.ref); continue; }
-                     const pc = pcData.pc;
+                     if (!pc) { batch.delete(document.ref); continue; }
 
                      try {
-                        if (signalData.sdp) {
-                            if (signalData.sdp.type === 'offer') {
-                                await pc.setRemoteDescription(new RTCSessionDescription(signalData.sdp));
-                                await pc.setLocalDescription(await pc.createAnswer());
-                                await sendSignal(remoteId, { sdp: pc.localDescription });
-                            } else if (signalData.sdp.type === 'answer') {
-                                await pc.setRemoteDescription(new RTCSessionDescription(signalData.sdp));
+                         if (signalData.offer) {
+                             await pc.setRemoteDescription(new RTCSessionDescription(signalData.offer));
+                             const answer = await pc.createAnswer();
+                             await pc.setLocalDescription(answer);
+                             await sendSignal(remoteId, { answer: pc.localDescription.toJSON() });
+                         } else if (signalData.answer) {
+                             await pc.setRemoteDescription(new RTCSessionDescription(signalData.answer));
+                         } else if (signalData.iceCandidate) {
+                            // --- CHANGE START: Buffer ICE candidates if remote description is not set ---
+                            if (pc.remoteDescription) {
+                                await pc.addIceCandidate(new RTCIceCandidate(signalData.iceCandidate));
+                            } else {
+                                pc.iceCandidateBuffer.push(signalData.iceCandidate);
                             }
-                        } else if (signalData.ice) {
-                            await pc.addIceCandidate(new RTCIceCandidate(signalData.ice));
-                        }
+                            // --- CHANGE END ---
+                         }
+                         
+                         // --- CHANGE START: Process buffered candidates after setting description ---
+                         if ((signalData.offer || signalData.answer) && pc.iceCandidateBuffer.length > 0) {
+                            for (const candidate of pc.iceCandidateBuffer) {
+                                await pc.addIceCandidate(new RTCIceCandidate(candidate));
+                            }
+                            pc.iceCandidateBuffer = []; // Clear buffer
+                         }
+                         // --- CHANGE END ---
+
                      } catch (err) { console.error(`Signal Processing Error from ${remoteId}:`, err, signalData); }
                      batch.delete(document.ref);
                  }
@@ -587,19 +610,21 @@
         function closeConnection(remoteId) {
             const pcData = peerConnections[remoteId];
             if (pcData) {
-                // --- CHANGE START: Cleanup for visualizer ---
                 if (pcData.visualizer) {
                     cancelAnimationFrame(pcData.visualizer.animationFrameId);
                     if (pcData.visualizer.audioContext.state !== 'closed') {
                         pcData.visualizer.audioContext.close().catch(e => console.warn("Error closing audio context", e));
                     }
                 }
-                // --- CHANGE END ---
-                pcData.pc.close();
+                pcData.close();
                 delete peerConnections[remoteId];
             }
             document.getElementById(`audio-${remoteId}`)?.remove();
-            document.querySelector(`.player-slot[data-uid="${remoteId}"]`)?.classList.remove('speaking');
+            
+            // --- CHANGE: Remove speaking class when user leaves ---
+            const userSlot = document.querySelector(`.player-slot[data-uid="${remoteId}"]`);
+            if(userSlot) userSlot.classList.remove('speaking');
+            
             console.log(`Connection with ${remoteId} closed.`);
         }
 
@@ -607,11 +632,11 @@
             if (signalsUnsubscribe) signalsUnsubscribe();
             if (localStream) localStream.getTracks().forEach(track => track.stop());
             Object.keys(peerConnections).forEach(id => closeConnection(id));
-            peerConnections = {}; localStream = null; isVoiceActive = false;
+            peerConnections = {}; localStream = null;
 
             try {
                 const signalsCol = collection(db, `Lobbys_list/${lobbyId}/signals`);
-                const q = query(signalsCol, where("from", "==", myId));
+                const q = query(signalsCol, where("to", "==", myId));
                 const snapshot = await getDocs(q);
                 const batch = writeBatch(db);
                 snapshot.forEach(doc => batch.delete(doc.ref));
@@ -623,7 +648,7 @@
 
         function setupEventListeners() { actionBtn.addEventListener('click', handleActionClick); leaveLobbyBtn.addEventListener('click', showLeaveConfirm); voiceChatBtn.addEventListener('click', handleMicClick); window.addEventListener('beforeunload', handleLeaveLobby); }
         
-        function showLeaveConfirm() { showConfirmModal("خروج از لابی", "آیا مطمئن هستید؟" + (isHost ? " (چون شما سازنده هستید، بازیکن بعدی میزبان خواهد شد)" : ""), handleLeaveLobby); }
+        function showLeaveConfirm() { showConfirmModal("خروج از لابی", "آیا مطمئن هستید؟" + (isHost ? " (چون شما سازنده هستید، لابی حذف خواهد شد)" : ""), handleLeaveLobby); }
         function showKickConfirm(playerName, playerUid) { showConfirmModal(`اخراج ${playerName}`, `آیا از اخراج این بازیکن مطمئن هستید؟`, () => kickPlayer(playerUid)); }
         function showConfirmModal(title, message, onConfirm) { const modal = document.getElementById('confirm-modal'); document.getElementById('confirm-modal-title').textContent = title; document.getElementById('confirm-modal-message').textContent = message; const yesBtn = document.getElementById('confirm-modal-yes-btn'); const newYesBtn = yesBtn.cloneNode(true); yesBtn.parentNode.replaceChild(newYesBtn, yesBtn); newYesBtn.onclick = () => { modal.classList.remove('visible'); onConfirm(); }; document.getElementById('confirm-modal-no-btn').onclick = () => modal.classList.remove('visible'); modal.onclick = (e) => { if (e.target === modal) modal.classList.remove('visible'); }; modal.classList.add('visible'); }
         function showNotificationModal(title, message, onOk) { const modal = document.getElementById('notification-modal'); document.getElementById('notification-modal-title').textContent = title; document.getElementById('notification-modal-message').textContent = message; const okBtn = document.getElementById('notification-modal-ok-btn'); const newOkBtn = okBtn.cloneNode(true); okBtn.parentNode.replaceChild(newOkBtn, okBtn); const closeModal = () => { modal.classList.remove('visible'); if (onOk) onOk(); }; newOkBtn.onclick = closeModal; modal.onclick = (e) => { if (e.target === modal) closeModal(); }; modal.classList.add('visible'); }
