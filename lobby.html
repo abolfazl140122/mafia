@@ -50,36 +50,7 @@
             border-radius: 50%; width: 60px; height: 60px; animation: spin 1.5s linear infinite;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .loading-text { margin-top: 20px; font-size: 1.1rem; font-weight: 700; }
-
-        /* --- CHANGE START: New Voice Loader Styles --- */
-        #voice-loader-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.88);
-            backdrop-filter: blur(5px);
-            display: flex; justify-content: center; align-items: center; 
-            z-index: 1500;
-            opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s 0.3s;
-        }
-        #voice-loader-overlay.visible { opacity: 1; visibility: visible; transition: opacity 0.3s ease; }
-
-        .voice-loader-content {
-            display: flex; flex-direction: column; align-items: center;
-            text-align: center; padding: 20px;
-        }
-        #voice-loader-status {
-            font-size: 1.1rem; font-weight: 700; color: var(--primary-gold);
-            margin: 25px 0; min-height: 2em; line-height: 1.5;
-        }
-        #voice-retry-btn {
-            background: linear-gradient(145deg, #27ae60, #229954); border: 2px solid #58d68d;
-            color: white; padding: 12px 24px; border-radius: 10px; font-weight: 700;
-            font-size: 1rem; cursor: pointer; display: none; /* Hidden by default */
-        }
-        #voice-loader-overlay .loader {
-            width: 50px; height: 50px;
-        }
-        /* --- CHANGE END --- */
+        #loading-text { margin-top: 20px; font-size: 1.1rem; font-weight: 700; }
 
         .lobby-container {
             width: 100%; height: 100%; display: flex; flex-direction: column;
@@ -108,7 +79,7 @@
         .player-slot {
             flex: 1; border-radius: 12px; display: flex; flex-direction: column;
             align-items: center; justify-content: center; padding: 5px; text-align: center; 
-            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease-in-out, border-color 0.3s ease-in-out;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease-in-out, border-color 0.3s ease-in-out; /* CHANGE: Added transition for speaking indicator */
             position: relative; overflow: hidden; animation: slot-fade-in 0.6s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
             min-height: 0;
         }
@@ -131,10 +102,12 @@
         .empty-text { font-size: clamp(0.7rem, 2.5vw, 0.8rem); color: var(--text-secondary); font-weight: 700; }
         .host-crown { position: absolute; top: -1px; right: -1px; width: 28px; height: 28px; background-color: var(--primary-gold); color: var(--darker-red); border-radius: 0 10px 0 10px; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 900; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
         
+        /* --- CHANGE START: Removed old speaking indicator and added new style for glowing border --- */
         .player-slot.speaking {
             border-color: var(--primary-gold);
             box-shadow: 0 0 15px rgba(255, 201, 71, 0.8), 0 0 25px rgba(255, 201, 71, 0.5), inset 0 0 10px rgba(0,0,0,0.3);
         }
+        /* --- CHANGE END --- */
 
         .ready-indicator {
             position: absolute; bottom: 4px; right: 4px; width: 18px; height: 18px;
@@ -194,19 +167,8 @@
     <div id="background-blurry"></div>
     <div id="loading-overlay">
         <div class="loader"></div>
-        <p class="loading-text">در حال ورود به لابی...</p>
+        <p id="loading-text">در حال ورود به لابی...</p>
     </div>
-
-    <!-- --- CHANGE START: New Voice Loader Overlay --- -->
-    <div id="voice-loader-overlay">
-        <div class="voice-loader-content">
-            <h2 class="modal-title">سیستم صوتی</h2>
-            <div id="voice-loader-spinner" class="loader"></div>
-            <p id="voice-loader-status"></p>
-            <button id="voice-retry-btn">اتصال مجدد به سرور صوت</button>
-        </div>
-    </div>
-    <!-- --- CHANGE END --- -->
 
     <div class="lobby-container" style="display: none;">
         <header class="lobby-header">
@@ -220,7 +182,7 @@
         </main>
         
         <footer class="lobby-footer">
-            <button id="voice-chat-btn" title="وصل کردن صدا">
+            <button id="voice-chat-btn" title="فعال کردن صدا">
                 <svg id="mic-icon" viewBox="0 0 24 24"><path d="M12,14a2,2,0,0,0,2-2V6a2,2,0,0,0-4,0v6A2,2,0,0,0,12,14Zm5-2V6a5,5,0,0,0-10,0v6a5,5,0,0,0,10,0Z"/><path d="M19,11a1,1,0,0,0-2,0,5,5,0,0,1-10,0,1,1,0,0,0-2,0,7,7,0,0,0,6,6.92V21H9a1,1,0,0,0,0,2h6a1,1,0,0,0,0-2H13V17.92A7,7,0,0,0,19,11Z"/></svg>
             </button>
             <button id="action-btn" class="action-button ready-btn">آماده</button>
@@ -267,13 +229,6 @@
         const voiceChatBtn = document.getElementById('voice-chat-btn');
         const micIcon = document.getElementById('mic-icon');
         const audioContainer = document.getElementById('audio-container');
-
-        // --- CHANGE START: New Voice Loader Elements ---
-        const voiceLoaderOverlay = document.getElementById('voice-loader-overlay');
-        const voiceLoaderStatus = document.getElementById('voice-loader-status');
-        const voiceLoaderSpinner = document.getElementById('voice-loader-spinner');
-        const voiceRetryBtn = document.getElementById('voice-retry-btn');
-        // --- CHANGE END ---
         
         const MIC_ON_SVG = `<path d="M12,14a2,2,0,0,0,2-2V6a2,2,0,0,0-4,0v6A2,2,0,0,0,12,14Zm5-2V6a5,5,0,0,0-10,0v6a5,5,0,0,0,10,0Z"/><path d="M19,11a1,1,0,0,0-2,0,5,5,0,0,1-10,0,1,1,0,0,0-2,0,7,7,0,0,0,6,6.92V21H9a1,1,0,0,0,0,2h6a1,1,0,0,0,0-2H13V17.92A7,7,0,0,0,19,11Z"/>`;
         const MIC_MUTED_SVG = `<path d="M19,11a1,1,0,0,0-2,0,5,5,0,0,1-10,0,1,1,0,0,0-2,0,7,7,0,0,0,6,6.92V21H9a1,1,0,0,0,0,2h6a1,1,0,0,0,0-2H13V17.92A7,7,0,0,0,19,11Z"/><path d="M14,6a2,2,0,0,0-4,0v6a2,2,0,0,0,4,0Z" opacity=".5"/><path d="M21.29,2.71a1,1,0,0,0-1.42,0l-18,18a1,1,0,0,0,0,1.42,1,1,0,0,0,1.42,0L5,20.41V21H9a1,1,0,0,0,0,2h6a1,1,0,0,0,0-2H13v-.59l2.42-2.41a5,5,0,0,0-4.13-4.82L17,17V6a5,5,0,0,0-8.5-3.57l-1.72-1.72A7,7,0,0,1,17,6V7.41l2.87-2.88a1,1,0,0,0,1.42,0A1,1,0,0,0,21.29,2.71Z"/>`;
@@ -285,7 +240,6 @@
         let isHost = false;
         let isReady = false;
         let lastPlayerCount = 0;
-        let isFirstLobbyRender = true;
 
         // --- متغیرهای چت صوتی ---
         const servers = { iceServers: [{ urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'] }] };
@@ -294,7 +248,6 @@
         let myId;
         let peerConnections = {};
         let signalsUnsubscribe;
-        let voiceConnectionState = 'disconnected'; // 'disconnected', 'connecting', 'connected', 'failed'
 
         function playSound(soundId) { try { document.getElementById(soundId).play(); } catch(e) { console.warn("Sound play failed", e); } }
 
@@ -320,30 +273,6 @@
                 }
             });
         }
-        
-        // --- CHANGE START: New Voice Loader Helper Functions ---
-        function showVoiceLoader(show) {
-            if (show) {
-                voiceLoaderOverlay.classList.add('visible');
-            } else {
-                voiceLoaderOverlay.classList.remove('visible');
-            }
-        }
-
-        function updateVoiceLoaderStatus(status, isError = false) {
-            voiceLoaderStatus.textContent = status;
-            if (isError) {
-                voiceLoaderSpinner.style.display = 'none';
-                voiceRetryBtn.style.display = 'block';
-                voiceLoaderStatus.style.color = '#e74c3c'; // Red for error
-            } else {
-                voiceLoaderSpinner.style.display = 'block';
-                voiceRetryBtn.style.display = 'none';
-                voiceLoaderStatus.style.color = 'var(--primary-gold)';
-            }
-        }
-        // --- CHANGE END ---
-
 
         async function joinLobby() {
             const lobbyDocRef = doc(db, "Lobbys_list", lobbyId);
@@ -402,14 +331,6 @@
                     loadingOverlay.style.opacity = '0';
                     setTimeout(() => { loadingOverlay.style.display = 'none'; lobbyContainer.style.display = 'flex'; }, 500);
                 }
-                
-                // --- CHANGE START: Initialize voice chat on first lobby render ---
-                if (isFirstLobbyRender) {
-                    isFirstLobbyRender = false;
-                    initializeVoiceChat(); // Start voice connection automatically
-                }
-                // --- CHANGE END ---
-
             }, (error) => {
                 console.error("Firestore listen error:", error);
                 showNotificationModal("خطای ارتباط", "ارتباط با لابی قطع شد. لطفاً از اتصال اینترنت خود اطمینان حاصل کرده و صفحه را رفرش کنید.", () => window.location.reload());
@@ -494,67 +415,43 @@
             }
         }
         
-        // --- CHANGE START: Complete Rework of Voice Chat Logic ---
-        
-        async function initializeVoiceChat() {
-            if (voiceConnectionState === 'connecting' || voiceConnectionState === 'connected') return;
-            
-            voiceConnectionState = 'connecting';
-            showVoiceLoader(true);
-            updateVoiceLoaderStatus('در حال درخواست دسترسی به میکروفون...');
-            
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({
-                    audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
-                    video: false,
-                });
-                
-                localStream = stream;
-                updateVoiceLoaderStatus('میکروفون فعال شد، در حال اتصال به سایر بازیکنان...');
-                
-                // Add tracks to all existing peer connections and send new offers
-                const players = (await getDoc(doc(db, "Lobbys_list", lobbyId))).data().players;
-                for(const player of players) {
-                    if(player.uid !== myId) {
-                        const pc = peerConnections[player.uid];
-                        if (pc) {
-                           stream.getTracks().forEach(track => pc.addTrack(track, stream));
-                           if (myId < player.uid) { // Offer only if you are the "smaller" ID to avoid glare
-                                await sendOffer(player.uid);
-                           }
+        // --- توابع چت صوتی (با منطق جدید و بهبود یافته) ---
+        async function handleMicClick() {
+            if (isMuted) { // Only try to get stream if muted/not started
+                try {
+                    const audioConstraints = {
+                        audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+                        video: false,
+                    };
+                    const stream = await navigator.mediaDevices.getUserMedia(audioConstraints);
+                    localStream = stream;
+                    
+                    // Add tracks to all existing peer connections
+                    Object.values(peerConnections).forEach(pc => {
+                        stream.getTracks().forEach(track => pc.addTrack(track, stream));
+                    });
+                    
+                    // Since adding tracks requires renegotiation, the offerer should send a new offer
+                    const players = (await getDoc(doc(db, "Lobbys_list", lobbyId))).data().players;
+                    for(const player of players) {
+                        if(player.uid !== myId && myId < player.uid) {
+                            await sendOffer(player.uid);
                         }
                     }
-                }
-                
-                // Successfully connected, update UI and state
-                voiceConnectionState = 'connected';
-                toggleMute(true); // Start muted by default
-                
-                updateVoiceLoaderStatus('اتصال با موفقیت برقرار شد!');
-                setTimeout(() => showVoiceLoader(false), 1500); // Hide after a short delay
 
-            } catch (err) {
-                console.error("Voice chat initialization error:", err);
-                voiceConnectionState = 'failed';
-                let message = "خطای ناشناخته در اتصال به سرور صوت.";
-                if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
-                    message = "شما دسترسی به میکروفون را مسدود کرده‌اید. لطفاً در تنظیمات مرورگر دسترسی را فعال کنید.";
-                } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
-                    message = "هیچ میکروفونی یافت نشد. لطفاً از اتصال صحیح میکروفون خود اطمینان حاصل کنید.";
+                    toggleMute(false);
+                } catch (err) {
+                    console.error("Mic access error:", err);
+                    let message = "برای استفاده از چت صوتی، لطفاً دسترسی به میکروفون را بدهید.";
+                    if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+                        message = "شما دسترسی به میکروفون را نداده‌اید. لطفاً در تنظیمات مرورگر یا اپلیکیشن، دسترسی را فعال کنید.";
+                    } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+                        message = "هیچ میکروفونی یافت نشد. لطفاً از اتصال صحیح میکروفون خود اطمینان حاصل کنید.";
+                    }
+                    showNotificationModal("خطای دسترسی به میکروفون", message, ()=>{});
                 }
-                updateVoiceLoaderStatus(message, true); // Show error and retry button
-                if(localStream) { localStream.getTracks().forEach(track => track.stop()); localStream = null; }
-            }
-        }
-
-        function handleMicClick() {
-            if (voiceConnectionState === 'connected') {
-                toggleMute(!isMuted); // Toggle the current mute state
-            } else if (voiceConnectionState === 'failed') {
-                 // Do nothing, user should click the retry button on the overlay
-                 showNotificationModal("خطا", "اتصال صوتی برقرار نیست. لطفاً از طریق دکمه اتصال مجدد تلاش کنید.", ()=>{});
             } else {
-                 // Connection is in progress, do nothing
+                toggleMute(true);
             }
         }
         
@@ -563,12 +460,12 @@
             if (localStream) {
                 localStream.getAudioTracks().forEach(track => track.enabled = !isMuted);
             }
-            micIcon.innerHTML = isMuted ? MIC_MUTED_SVG : MIC_ON_SVG;
+            micIcon.innerHTML = isMuted ? MIC_ON_SVG : MIC_MUTED_SVG; // Corrected logic
             voiceChatBtn.title = isMuted ? "وصل کردن صدا" : "قطع کردن صدا";
             voiceChatBtn.classList.toggle('mic-on', !isMuted);
         }
-        // --- CHANGE END ---
-
+        
+        // --- CHANGE START: New function for speaking indicator ---
         function setupAudioVisualizer(stream, remoteId) {
             try {
                 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -580,24 +477,35 @@
                 const dataArray = new Uint8Array(bufferLength);
                 
                 if (peerConnections[remoteId]) {
+                    // Store visualizer components for cleanup
                     peerConnections[remoteId].visualizer = { audioContext, animationFrameId: null };
                 }
 
                 const draw = () => {
+                    // Check if connection still exists before continuing
                     if (!peerConnections[remoteId] || !peerConnections[remoteId].visualizer) return;
+                    
                     const userSlot = document.querySelector(`.player-slot[data-uid="${remoteId}"]`);
                     if (!userSlot) {
+                        // If user slot is gone, stop the animation loop
                         cancelAnimationFrame(peerConnections[remoteId].visualizer.animationFrameId);
                         return;
                     }
+
                     analyser.getByteFrequencyData(dataArray);
                     let average = dataArray.reduce((a, b) => a + b, 0) / bufferLength;
+                    
+                    // Toggle 'speaking' class based on volume threshold (15 is a good starting point)
                     userSlot.classList.toggle('speaking', average > 15);
+                    
                     peerConnections[remoteId].visualizer.animationFrameId = requestAnimationFrame(draw);
                 };
                 draw();
-            } catch (e) { console.error("Audio visualizer failed:", e); }
+            } catch (e) {
+                console.error("Audio visualizer failed to initialize:", e);
+            }
         }
+        // --- CHANGE END ---
 
         function createPeerConnection(remoteId) {
             const pc = new RTCPeerConnection(servers);
@@ -611,10 +519,12 @@
                         remoteAudio = document.createElement('audio');
                         remoteAudio.id = `audio-${remoteId}`;
                         remoteAudio.autoplay = true;
-                        remoteAudio.playsInline = true;
+                        remoteAudio.playsInline = true; // Important for mobile browsers
                         audioContainer.appendChild(remoteAudio);
                     }
                     remoteAudio.srcObject = event.streams[0];
+                    
+                    // --- CHANGE: Setup the visualizer when track is received ---
                     setupAudioVisualizer(event.streams[0], remoteId);
                 }
             };
@@ -630,7 +540,7 @@
             const pc = peerConnections[remoteId];
             if (!pc) return;
             try {
-                const offer = await pc.createOffer({iceRestart: true}); // Use iceRestart for re-negotiation
+                const offer = await pc.createOffer();
                 await pc.setLocalDescription(offer);
                 await sendSignal(remoteId, { offer: pc.localDescription.toJSON() });
             } catch (err) { console.error(`Offer Error to ${remoteId}:`, err); }
@@ -674,12 +584,15 @@
         function closeConnection(remoteId) {
             const pcData = peerConnections[remoteId];
             if (pcData) {
+                // --- CHANGE START: Cleanup for visualizer ---
                 if (pcData.visualizer) {
                     cancelAnimationFrame(pcData.visualizer.animationFrameId);
+                    // Safely close audio context
                     if (pcData.visualizer.audioContext.state !== 'closed') {
                         pcData.visualizer.audioContext.close().catch(e => console.warn("Error closing audio context", e));
                     }
                 }
+                // --- CHANGE END ---
                 pcData.close();
                 delete peerConnections[remoteId];
             }
@@ -692,7 +605,6 @@
             if (localStream) localStream.getTracks().forEach(track => track.stop());
             Object.keys(peerConnections).forEach(id => closeConnection(id));
             peerConnections = {}; localStream = null;
-            voiceConnectionState = 'disconnected';
 
             try {
                 const signalsCol = collection(db, `Lobbys_list/${lobbyId}/signals`);
@@ -706,13 +618,7 @@
             }
         }
 
-        function setupEventListeners() { 
-            actionBtn.addEventListener('click', handleActionClick); 
-            leaveLobbyBtn.addEventListener('click', showLeaveConfirm); 
-            voiceChatBtn.addEventListener('click', handleMicClick); 
-            voiceRetryBtn.addEventListener('click', initializeVoiceChat); // Add listener for retry button
-            window.addEventListener('beforeunload', handleLeaveLobby); 
-        }
+        function setupEventListeners() { actionBtn.addEventListener('click', handleActionClick); leaveLobbyBtn.addEventListener('click', showLeaveConfirm); voiceChatBtn.addEventListener('click', handleMicClick); window.addEventListener('beforeunload', handleLeaveLobby); }
         
         function showLeaveConfirm() { showConfirmModal("خروج از لابی", "آیا مطمئن هستید؟" + (isHost ? " (چون شما سازنده هستید، لابی حذف خواهد شد)" : ""), handleLeaveLobby); }
         function showKickConfirm(playerName, playerUid) { showConfirmModal(`اخراج ${playerName}`, `آیا از اخراج این بازیکن مطمئن هستید؟`, () => kickPlayer(playerUid)); }
