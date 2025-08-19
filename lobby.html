@@ -313,7 +313,6 @@
                     if (player.uid !== myId && !connectedPeerIds.has(player.uid)) {
                         console.log(`New player detected: ${player.displayName}. Creating peer connection.`);
                         peerConnections[player.uid] = createPeerConnection(player.uid);
-                        // The negotiation will be triggered by the side with the lexicographically smaller UID
                         if (myId < player.uid) {
                              console.log(`My ID is smaller. Sending offer to ${player.displayName}.`);
                              await sendOffer(player.uid);
@@ -419,12 +418,10 @@
         // --- توابع چت صوتی (با منطق جدید و بهبود یافته) ---
         async function handleMicClick() {
             // --- CHANGE START: Fix for browser autoplay policy ---
-            // On the first user interaction, try to play all audio elements.
-            // This "unlocks" the audio context for the page.
+            // On the first user interaction, try to play all audio elements to "unlock" the audio context.
             if (!audioContextUnlocked) {
                 document.querySelectorAll('audio').forEach(audio => {
                     audio.play().catch(e => {
-                        // This error is expected if the audio has no source yet.
                         if (e.name !== 'NotSupportedError') {
                             console.warn("Audio context unlock play failed:", e);
                         }
@@ -453,7 +450,6 @@
                             await sendOffer(player.uid);
                         }
                     }
-
                     toggleMute(false); // Unmute
                 } catch (err) {
                     console.error("Mic access error:", err);
@@ -472,7 +468,7 @@
             if (localStream) {
                 localStream.getAudioTracks().forEach(track => track.enabled = !isMuted);
             }
-            micIcon.innerHTML = isMuted ? MIC_ON_SVG : MIC_MUTED_SVG;
+            micIcon.innerHTML = isMuted ? MIC_ON_SVG : MIC_MUTED_SVG; // Corrected logic
             voiceChatBtn.title = isMuted ? "وصل کردن صدا" : "قطع کردن صدا";
             voiceChatBtn.classList.toggle('mic-on', !isMuted);
         }
@@ -533,8 +529,6 @@
                         audioContainer.appendChild(remoteAudio);
                     }
                     remoteAudio.srcObject = event.streams[0];
-                    
-                    // --- CHANGE: Setup the visualizer when track is received ---
                     setupAudioVisualizer(event.streams[0], remoteId);
                 }
             };
@@ -588,6 +582,7 @@
                          
                          // --- CHANGE START: Process buffered candidates after setting description ---
                          if ((signalData.offer || signalData.answer) && pc.iceCandidateBuffer.length > 0) {
+                            console.log(`Processing ${pc.iceCandidateBuffer.length} buffered ICE candidates for ${remoteId}.`);
                             for (const candidate of pc.iceCandidateBuffer) {
                                 await pc.addIceCandidate(new RTCIceCandidate(candidate));
                             }
