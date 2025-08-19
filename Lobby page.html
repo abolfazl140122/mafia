@@ -369,6 +369,7 @@
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, query, where, getDocs, deleteDoc, doc, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+        // پیکربندی Firebase
         const firebaseConfig = {
           apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
           authDomain: "mafia-9fcbf.firebaseapp.com",
@@ -401,6 +402,7 @@
         // --- State Variables ---
         let currentUser = null;
         let currentUserIsAdmin = false;
+        let unsubscribeLobbies = null; // برای لغو شنونده قبلی
 
         // --- Utility Functions ---
         function showModal(modalElement) { modalElement.classList.add('visible'); }
@@ -449,7 +451,6 @@
                 actionButtonsHTML += `<button class="lobby-btn btn-admin-delete" data-action="admin-delete">بستن لابی</button>`;
             }
             
-            // --- NEW: Logic for the join button ---
             if (isLobbyFull) {
                 actionButtonsHTML += `<button class="lobby-btn btn-join" data-action="join" disabled>لابی پر است</button>`;
             } else {
@@ -472,7 +473,6 @@
                 </div>
             `;
             
-            // --- NEW: Event Listener for join button ---
             card.querySelector('[data-action="join"]')?.addEventListener('click', () => {
                 if ((lobbyData.playerCount || 1) >= (lobbyData.maxPlayers || 12)) {
                     showCustomAlert('لابی پر است', 'ظرفیت این لابی تکمیل شده است و نمی‌توانید به آن بپیوندید.', [
@@ -480,11 +480,9 @@
                     ]);
                     return;
                 }
-                // Redirect to the lobby page with the correct ID
                 window.location.href = `./lobby.html?id=${lobbyData.id}`;
             });
 
-            // Event Listeners for delete buttons
             const deleteAction = (title, message) => {
                  showCustomAlert(title, message, [
                     { text: 'بله، حذف کن', class: 'primary', action: () => deleteLobby(lobbyData.id) },
@@ -497,37 +495,45 @@
             });
 
             card.querySelector('[data-action="admin-delete"]')?.addEventListener('click', () => {
-                deleteAction('تایید ادمین', `آیا از بستن لابی "${lobbyData.lobbyName}" مطمئن هستید؟`);
+                deleteAction('تایید ادمین', `آیا از بستن لابی "<b>${lobbyData.lobbyName}</b>" مطمئن هستید؟`);
             });
 
             return card;
         }
         
         function updateAllCardsForAdminStatus() {
-            const allCards = lobbyList.querySelectorAll('.lobby-card');
-            allCards.forEach(card => {
+            lobbyList.querySelectorAll('.lobby-card').forEach(card => {
+                // این یک روش ساده است. برای اطمینان کامل، می‌توان کل کارت را دوباره رندر کرد.
+                // اما این روش سریع‌تر عمل می‌کند.
                 const lobbyId = card.dataset.id;
-                // This is a simplified approach. A more robust way would be to re-render.
-                const actionsContainer = card.querySelector('.lobby-actions');
-                const creatorId = actionsContainer.querySelector('.btn-delete') ? currentUser.uid : null; // A bit of a hack to guess owner
-                const isOwner = currentUser && currentUser.uid === creatorId;
+                const creatorNameElement = card.querySelector('.lobby-creator');
                 
-                // Remove existing admin button if it exists
-                const existingAdminBtn = actionsContainer.querySelector('.btn-admin-delete');
-                if(existingAdminBtn) existingAdminBtn.remove();
+                // فرض می‌کنیم داده‌های اصلی هنوز در دسترس هستند یا باید دوباره واکشی شوند
+                // برای سادگی، فقط دکمه ادمین را اضافه/حذف می‌کنیم.
+                const actionsContainer = card.querySelector('.lobby-actions');
+                const hasOwnerDeleteButton = !!actionsContainer.querySelector('.btn-delete');
+                
+                let adminBtn = actionsContainer.querySelector('.btn-admin-delete');
 
-                if (currentUserIsAdmin && !isOwner) {
-                    const adminBtn = document.createElement('button');
-                    adminBtn.className = 'lobby-btn btn-admin-delete';
-                    adminBtn.textContent = 'بستن لابی';
-                    adminBtn.onclick = () => {
-                         showCustomAlert('تایید ادمین', `آیا از بستن این لابی مطمئن هستید؟`, [
-                            { text: 'بله، حذف کن', class: 'primary', action: () => deleteLobby(lobbyId) },
-                            { text: 'خیر', class: 'secondary' }
-                        ]);
-                    };
-                    // Insert before the join button
-                    actionsContainer.insertBefore(adminBtn, actionsContainer.querySelector('.btn-join'));
+                if (currentUserIsAdmin && !hasOwnerDeleteButton) {
+                    if (!adminBtn) {
+                        adminBtn = document.createElement('button');
+                        adminBtn.className = 'lobby-btn btn-admin-delete';
+                        adminBtn.dataset.action = 'admin-delete';
+                        adminBtn.textContent = 'بستن لابی';
+                        adminBtn.onclick = () => {
+                             showCustomAlert('تایید ادمین', `آیا از بستن این لابی مطمئن هستید؟`, [
+                                { text: 'بله، حذف کن', class: 'primary', action: () => deleteLobby(lobbyId) },
+                                { text: 'خیر', class: 'secondary' }
+                            ]);
+                        };
+                        // دکمه ادمین را قبل از دکمه پیوستن قرار می‌دهیم
+                        actionsContainer.insertBefore(adminBtn, actionsContainer.querySelector('.btn-join'));
+                    }
+                } else {
+                    if (adminBtn) {
+                        adminBtn.remove();
+                    }
                 }
             });
         }
@@ -536,35 +542,41 @@
             if (user) {
                 currentUser = user;
                 
-                // Listener 1: For User's Admin Status (Real-time)
+                // Listener 1: برای وضعیت ادمین بودن کاربر (لحظه‌ای)
                 const userDocRef = doc(db, 'users', user.uid);
                 onSnapshot(userDocRef, (docSnap) => {
                     const userData = docSnap.data();
                     const newAdminStatus = userData && userData.isAdmin === true;
                     if (newAdminStatus !== currentUserIsAdmin) {
                         currentUserIsAdmin = newAdminStatus;
-                        updateAllCardsForAdminStatus(); // Update UI instantly
+                        updateAllCardsForAdminStatus(); // آپدیت فوری UI
                     }
                 });
 
-                // Listener 2: For Lobbies List (Optimized with docChanges)
-                // **** FIX: Changed collection name to 'Lobbys_list' ****
+                // Listener 2: برای لیست لابی‌ها (بهینه‌سازی شده با docChanges)
+                if (unsubscribeLobbies) unsubscribeLobbies(); // لغو شنونده قبلی اگر وجود داشت
+
                 const lobbiesRef = collection(db, 'Lobbys_list');
                 const q = query(lobbiesRef, orderBy("createdAt", "desc"));
 
-                onSnapshot(q, (snapshot) => {
-                    snapshot.docChanges().forEach((change) => {
+                unsubscribeLobbies = onSnapshot(q, (snapshot) => {
+                    snapshot.docChanges().forEach((change, index) => {
                         const lobbyData = { id: change.doc.id, ...change.doc.data() };
                         
                         if (change.type === "added") {
-                            const cardElement = renderLobbyCard(lobbyData, lobbyList.children.length);
-                            lobbyList.prepend(cardElement);
+                            const cardElement = renderLobbyCard(lobbyData, change.newIndex);
+                            // اضافه کردن به ترتیب صحیح
+                            if (lobbyList.children[change.newIndex]) {
+                                lobbyList.insertBefore(cardElement, lobbyList.children[change.newIndex]);
+                            } else {
+                                lobbyList.appendChild(cardElement);
+                            }
                         }
                         if (change.type === "modified") {
                             const existingCard = lobbyList.querySelector(`.lobby-card[data-id="${lobbyData.id}"]`);
                             if (existingCard) {
-                                const index = Array.from(lobbyList.children).indexOf(existingCard);
-                                const updatedCard = renderLobbyCard(lobbyData, index);
+                                const cardIndex = Array.from(lobbyList.children).indexOf(existingCard);
+                                const updatedCard = renderLobbyCard(lobbyData, cardIndex);
                                 existingCard.replaceWith(updatedCard);
                             }
                         }
@@ -577,6 +589,7 @@
                     updateLobbyListState();
                     filterLobbies();
 
+                    // مخفی کردن صفحه لودینگ فقط یک بار
                     if (loadingOverlay.style.opacity !== '0') {
                         loadingOverlay.style.opacity = '0';
                         setTimeout(() => loadingOverlay.style.display = 'none', 500);
@@ -595,17 +608,19 @@
             const hasCards = lobbyList.querySelector('.lobby-card');
             let msgElement = lobbyList.querySelector('.info-message');
 
+            if (!msgElement) {
+                msgElement = document.createElement('p');
+                msgElement.className = 'info-message';
+                msgElement.style.textAlign = 'center';
+                msgElement.style.color = 'var(--text-secondary)';
+                msgElement.style.padding = '20px';
+                lobbyList.appendChild(msgElement);
+            }
+
             if (!hasCards) {
-                if (!msgElement) {
-                    msgElement = document.createElement('p');
-                    msgElement.className = 'info-message';
-                    msgElement.style.textAlign = 'center';
-                    msgElement.style.color = 'var(--text-secondary)';
-                    lobbyList.appendChild(msgElement);
-                }
                 msgElement.textContent = 'هیچ لابی فعالی وجود ندارد. اولین لابی را شما بسازید!';
                 msgElement.style.display = 'block';
-            } else if (msgElement) {
+            } else {
                 msgElement.style.display = 'none';
             }
         }
@@ -620,7 +635,6 @@
 
             if (!currentUser) return;
 
-            // **** FIX: Changed collection name to 'Lobbys_list' ****
             const lobbiesRef = collection(db, 'Lobbys_list');
             const q = query(lobbiesRef, where("creatorId", "==", currentUser.uid));
             const querySnapshot = await getDocs(q);
@@ -649,7 +663,6 @@
 
         async function deleteLobby(lobbyId) {
             try {
-                // **** FIX: Changed collection name to 'Lobbys_list' ****
                 await deleteDoc(doc(db, "Lobbys_list", lobbyId));
             } catch (error) {
                 showCustomAlert('خطای سرور', 'مشکلی در حذف لابی پیش آمد.', [{ text: 'باشه', class: 'primary' }]);
@@ -675,19 +688,13 @@
             });
 
             let msgElement = lobbyList.querySelector('.info-message');
-            if (!msgElement) {
-                msgElement = document.createElement('p');
-                msgElement.className = 'info-message';
-                msgElement.style.textAlign = 'center';
-                msgElement.style.color = 'var(--text-secondary)';
-                lobbyList.appendChild(msgElement);
-            }
-
+            updateLobbyListState(); // اول وضعیت کلی را چک کن
+            
             if (visibleCount === 0 && cards.length > 0) {
-                msgElement.textContent = 'هیچ لابی با این مشخصات یافت نشد.';
-                msgElement.style.display = 'block';
-            } else if (cards.length > 0) {
-                 msgElement.style.display = 'none';
+                 if (msgElement) {
+                    msgElement.textContent = 'هیچ لابی با این مشخصات یافت نشد.';
+                    msgElement.style.display = 'block';
+                 }
             }
         }
 
@@ -699,6 +706,7 @@
         
         searchInput.addEventListener('input', debounce(filterLobbies, 250));
 
+        // بستن مودال با کلیک روی پس‌زمینه
         [createLobbyModal, customAlertModal].forEach(modal => {
              modal.addEventListener('click', (e) => {
                 if (e.target === modal) hideModal(modal);
