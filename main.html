@@ -1,3 +1,5 @@
+--- START OF FILE main.txt ---
+
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -176,6 +178,12 @@
         #start-game-button:active { transform: scale(0.96); }
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); }
         .modal-overlay.visible { opacity: 1; visibility: visible; }
+        
+        /* *** جدید *** استایل برای قرار گرفتن پنل‌های هشدار روی بقیه پنل‌ها */
+        #custom-alert-overlay, #custom-confirm-overlay {
+            z-index: 1010;
+        }
+        
         .modal-content { background: linear-gradient(145deg, #3c3022, #1e170f); border: 2px solid #5c4a3a; border-radius: 16px; padding: 25px 30px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); transform: translateY(20px) scale(0.95); transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); }
         .modal-overlay.visible .modal-content { transform: translateY(0) scale(1); }
         .modal-title { font-size: 1.5rem; font-weight: 900; color: #ffc947; margin-bottom: 15px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
@@ -348,7 +356,7 @@
         </div>
     </div>
 
-    <!-- *** جدید *** پنل Confirm عمومی -->
+    <!-- پنل Confirm عمومی -->
     <div id="custom-confirm-overlay" class="modal-overlay">
         <div class="modal-content">
             <h2 class="modal-title">تایید عملیات</h2>
@@ -499,7 +507,7 @@
             <div id="ranking-list-container">
                 <!-- لیست رده‌بندی به صورت پویا اینجا قرار می‌گیرد -->
             </div>
-            <!-- *** جدید *** بخش کاربران حذف شده از رده بندی -->
+            <!-- بخش کاربران حذف شده از رده بندی -->
             <div class="banned-users-section admin-only-ranking-feature">
                 <h3 class="banned-users-title">کاربران حذف شده از رده‌بندی</h3>
                 <div id="banned-ranking-list-container">
@@ -642,6 +650,7 @@
         let isMusicPlaying = false;
         let isInitialLoad = true;
         let currentUserData = null;
+        let rankingListenerUnsubscribe = null; // متغیر برای نگهداری شنونده زنده رده‌بندی
 
         // --- توابع عمومی ---
         function showModal(modalElement) { modalElement.classList.add('visible'); }
@@ -743,103 +752,114 @@
         async function openGameModesPanel() { if (!(await verifyAdminStatus())) return; hideModal(adminPanelOverlay); showModal(gameModesPanelOverlay); friendlyModeToggle.disabled = true; rankedModeToggle.disabled = true; gameModesSaveBtn.disabled = true; try { const gameModesDocRef = doc(db, 'settings', 'gameModes'); const docSnap = await getDoc(gameModesDocRef); if (docSnap.exists()) { const modes = docSnap.data(); friendlyModeToggle.checked = modes.friendlyEnabled || false; rankedModeToggle.checked = modes.rankedEnabled || false; } } catch (error) { console.error("خطا در خواندن تنظیمات ورودی بازی: ", error); showCustomAlert("خطا در دریافت اطلاعات. لطفا دوباره تلاش کنید.", () => { hideModal(gameModesPanelOverlay); showModal(adminPanelOverlay); }); } finally { friendlyModeToggle.disabled = false; rankedModeToggle.disabled = false; gameModesSaveBtn.disabled = false; } }
         async function handleSaveGameModes() { if (!(await verifyAdminStatus())) return; gameModesSaveBtn.disabled = true; gameModesSaveBtn.textContent = 'در حال ذخیره...'; const newSettings = { friendlyEnabled: friendlyModeToggle.checked, rankedEnabled: rankedModeToggle.checked }; try { const gameModesDocRef = doc(db, 'settings', 'gameModes'); await updateDoc(gameModesDocRef, newSettings); showCustomAlert("تنظیمات ورودی بازی با موفقیت ذخیره شد."); hideModal(gameModesPanelOverlay); } catch (error) { console.error("خطا در ذخیره تنظیمات ورودی بازی: ", error); showCustomAlert("خطا در ذخیره تغییرات. لطفا دوباره تلاش کنید."); } finally { gameModesSaveBtn.disabled = false; gameModesSaveBtn.textContent = 'ذخیره'; } }
 
-        // *** توابع پنل رده بندی (با تغییرات اساسی) ***
-        async function fetchAndDisplayRankings() {
-            rankingListContainer.innerHTML = '<p style="padding: 20px; text-align: center;">در حال بارگذاری رده‌بندی...</p>';
-            bannedRankingListContainer.innerHTML = '';
-            rankingSearchInput.value = '';
-            
+        // *** توابع پنل رده بندی (بازنویسی شده برای حالت زنده) ***
+        
+        // تابع اصلی برای رندر کردن لیست‌ها بر اساس آرایه کاربران ورودی
+        function renderRankings(allUsers) {
             const currentUser = auth.currentUser;
             if (!currentUser) return;
             
             const isAdmin = currentUserData?.isAdmin === true;
-
             rankingAdminFeatures.forEach(el => { el.style.display = isAdmin ? 'block' : 'none' });
 
-            try {
-                // Fetch ALL users and then filter/sort client-side
-                // This is more flexible for our new logic (banned/not-banned)
-                const usersRef = collection(db, "users");
-                const querySnapshot = await getDocs(usersRef);
+            // جدا کردن کاربران به لیست‌های رده‌بندی و بن شده
+            const rankedUsers = allUsers
+                .filter(user => !user.isBannedFromRanking && user.game > 0)
+                .sort((a, b) => (b.game || 0) - (a.game || 0))
+                .slice(0, 100); // محدود به ۱۰۰ نفر برتر
 
+            const bannedUsers = allUsers.filter(user => user.isBannedFromRanking);
+
+            // --- نمایش لیست اصلی رده‌بندی ---
+            rankingListContainer.innerHTML = ''; 
+            if (rankedUsers.length === 0) {
+                rankingListContainer.innerHTML = '<p style="padding: 20px; text-align: center;">هنوز بازیکنی در رده‌بندی وجود ندارد.</p>';
+            } else {
+                rankedUsers.forEach((userData, index) => {
+                    const rank = index + 1;
+                    const userElement = document.createElement('div');
+                    userElement.classList.add('ranking-list-item');
+                    if(userData.id === currentUser.uid) userElement.classList.add('current-user-rank');
+                    
+                    const adminControlsHTML = isAdmin ? `
+                        <div class="ranking-admin-controls" data-uid="${userData.id}" data-name="${userData.displayName || 'کاربر'}" data-avatar="${userData.avatarUrl || DEFAULT_AVATAR}" data-gems="${userData.game || 0}">
+                            <button class="edit-rank-btn" title="ویرایش امتیاز">${RANK_EDIT_SVG}</button>
+                            <button class="ban-rank-btn" title="حذف از رده‌بندی">${RANK_BAN_SVG}</button>
+                        </div>
+                    ` : '';
+
+                    userElement.innerHTML = `
+                        <span class="rank-number">${rank}</span>
+                        <div class="user-info">
+                            <img src="${userData.avatarUrl || DEFAULT_AVATAR}" alt="avatar">
+                            <div class="user-details"> <span class="name">${userData.displayName || 'بدون نام'}</span> </div>
+                        </div>
+                        <div class="gems-count"> <span>${userData.game || 0}</span> </div>
+                        ${adminControlsHTML}
+                    `;
+                    rankingListContainer.appendChild(userElement);
+                });
+            }
+            
+            // --- نمایش لیست کاربران بن شده (برای ادمین) ---
+            if(isAdmin) {
+                bannedRankingListContainer.innerHTML = '';
+                if (bannedUsers.length === 0) {
+                    bannedRankingListContainer.innerHTML = '<p style="padding: 15px; text-align: center; color: #999;">لیست خالی است.</p>';
+                } else {
+                    bannedUsers.forEach(userData => {
+                        const userElement = document.createElement('div');
+                        userElement.classList.add('user-list-item');
+                        userElement.innerHTML = `
+                            <div class="user-info" style="flex-grow: 1;">
+                                <img src="${userData.avatarUrl || DEFAULT_AVATAR}" alt="avatar">
+                                <div class="user-details"> <span class="name">${userData.displayName || 'بدون نام'}</span> </div>
+                            </div>
+                            <button class="restore-rank-btn" title="بازگردانی به رده‌بندی" data-uid="${userData.id}" data-name="${userData.displayName || 'کاربر'}">
+                                ${RANK_RESTORE_SVG}
+                                <span>بازگردانی</span>
+                            </button>
+                        `;
+                        bannedRankingListContainer.appendChild(userElement);
+                    });
+                }
+            }
+        }
+        
+        // تابع برای شروع شنونده زنده
+        function startRankingListener() {
+            if (rankingListenerUnsubscribe) { // جلوگیری از ایجاد شنونده‌های تکراری
+                rankingListenerUnsubscribe();
+            }
+            const usersRef = collection(db, "users");
+            rankingListenerUnsubscribe = onSnapshot(usersRef, (querySnapshot) => {
                 let allUsers = [];
                 querySnapshot.forEach(doc => {
                     allUsers.push({ id: doc.id, ...doc.data() });
                 });
+                renderRankings(allUsers); // رندر کردن لیست با داده‌های جدید و زنده
+            }, (error) => {
+                console.error("خطا در شنونده زنده رده‌بندی:", error);
+                rankingListContainer.innerHTML = '<p style="padding: 20px; text-align: center;">خطا در دریافت اطلاعات زنده.</p>';
+                showCustomAlert("خطا در بارگذاری زنده رده‌بندی.");
+            });
+        }
 
-                // Separate users into ranked and banned lists
-                const rankedUsers = allUsers
-                    .filter(user => !user.isBannedFromRanking)
-                    .sort((a, b) => (b.game || 0) - (a.game || 0))
-                    .slice(0, 100); // Limit to top 100
-
-                const bannedUsers = allUsers.filter(user => user.isBannedFromRanking);
-
-                // --- Populate Main Ranking List ---
-                rankingListContainer.innerHTML = ''; 
-                if (rankedUsers.length === 0) {
-                    rankingListContainer.innerHTML = '<p style="padding: 20px; text-align: center;">هنوز بازیکنی در رده‌بندی وجود ندارد.</p>';
-                } else {
-                    rankedUsers.forEach((userData, index) => {
-                        const rank = index + 1;
-                        const userElement = document.createElement('div');
-                        userElement.classList.add('ranking-list-item');
-                        if(userData.id === currentUser.uid) userElement.classList.add('current-user-rank');
-                        
-                        const adminControlsHTML = isAdmin ? `
-                            <div class="ranking-admin-controls" data-uid="${userData.id}" data-name="${userData.displayName || 'کاربر'}" data-avatar="${userData.avatarUrl || DEFAULT_AVATAR}" data-gems="${userData.game || 0}">
-                                <button class="edit-rank-btn" title="ویرایش امتیاز">${RANK_EDIT_SVG}</button>
-                                <button class="ban-rank-btn" title="حذف از رده‌بندی">${RANK_BAN_SVG}</button>
-                            </div>
-                        ` : '';
-
-                        userElement.innerHTML = `
-                            <span class="rank-number">${rank}</span>
-                            <div class="user-info">
-                                <img src="${userData.avatarUrl || DEFAULT_AVATAR}" alt="avatar">
-                                <div class="user-details"> <span class="name">${userData.displayName || 'بدون نام'}</span> </div>
-                            </div>
-                            <div class="gems-count"> <span>${userData.game || 0}</span> </div>
-                            ${adminControlsHTML}
-                        `;
-                        rankingListContainer.appendChild(userElement);
-                    });
-                }
-                
-                // --- Populate Banned Users List (for Admin) ---
-                if(isAdmin) {
-                    bannedRankingListContainer.innerHTML = '';
-                    if (bannedUsers.length === 0) {
-                        bannedRankingListContainer.innerHTML = '<p style="padding: 15px; text-align: center; color: #999;">لیست خالی است.</p>';
-                    } else {
-                        bannedUsers.forEach(userData => {
-                            const userElement = document.createElement('div');
-                            userElement.classList.add('user-list-item');
-                            userElement.innerHTML = `
-                                <div class="user-info" style="flex-grow: 1;">
-                                    <img src="${userData.avatarUrl || DEFAULT_AVATAR}" alt="avatar">
-                                    <div class="user-details"> <span class="name">${userData.displayName || 'بدون نام'}</span> </div>
-                                </div>
-                                <button class="restore-rank-btn" title="بازگردانی به رده‌بندی" data-uid="${userData.id}" data-name="${userData.displayName || 'کاربر'}">
-                                    ${RANK_RESTORE_SVG}
-                                    <span>بازگردانی</span>
-                                </button>
-                            `;
-                            bannedRankingListContainer.appendChild(userElement);
-                        });
-                    }
-                }
-
-            } catch (error) {
-                console.error("خطا در دریافت لیست رده‌بندی: ", error);
-                rankingListContainer.innerHTML = '<p style="padding: 20px; text-align: center;">خطا در بارگذاری اطلاعات.</p>';
-                showCustomAlert("خطا در بارگذاری رده‌بندی.");
+        // تابع برای توقف شنونده زنده
+        function stopRankingListener() {
+            if (rankingListenerUnsubscribe) {
+                rankingListenerUnsubscribe(); // قطع ارتباط با سرور
+                rankingListenerUnsubscribe = null;
             }
         }
 
         function filterRankingList() {
             const searchTerm = rankingSearchInput.value.toLowerCase();
             rankingListContainer.querySelectorAll('.ranking-list-item').forEach(userItem => {
+                const name = userItem.querySelector('.user-details .name')?.textContent.toLowerCase() || '';
+                userItem.style.display = name.includes(searchTerm) ? 'flex' : 'none';
+            });
+            bannedRankingListContainer.querySelectorAll('.user-list-item').forEach(userItem => {
                 const name = userItem.querySelector('.user-details .name')?.textContent.toLowerCase() || '';
                 userItem.style.display = name.includes(searchTerm) ? 'flex' : 'none';
             });
@@ -864,7 +884,7 @@
             try {
                 await updateDoc(doc(db, 'users', uid), { game: newGems });
                 hideModal(editRankModalOverlay);
-                showCustomAlert("امتیاز کاربر با موفقیت ویرایش شد.", fetchAndDisplayRankings);
+                showCustomAlert("امتیاز کاربر با موفقیت ویرایش شد."); // نیازی به رفرش دستی نیست
             } catch (error) {
                 console.error("خطا در ویرایش امتیاز کاربر:", error);
                 showCustomAlert("خطا در ذخیره تغییرات.");
@@ -879,7 +899,7 @@
             showCustomConfirm(message, async () => {
                 try {
                     await updateDoc(doc(db, 'users', userData.uid), { isBannedFromRanking: true });
-                    showCustomAlert("کاربر با موفقیت از رده‌بندی حذف شد.", fetchAndDisplayRankings);
+                    showCustomAlert("کاربر با موفقیت از رده‌بندی حذف شد."); // نیازی به رفرش دستی نیست
                 } catch (error) {
                      console.error("خطا در حذف کاربر از رده بندی:", error);
                     showCustomAlert("عملیات با خطا مواجه شد.");
@@ -893,7 +913,7 @@
              showCustomConfirm(message, async () => {
                 try {
                     await updateDoc(doc(db, 'users', userData.uid), { isBannedFromRanking: false });
-                    showCustomAlert("کاربر با موفقیت به رده‌بندی بازگردانده شد.", fetchAndDisplayRankings);
+                    showCustomAlert("کاربر با موفقیت به رده‌بندی بازگردانده شد."); // نیازی به رفرش دستی نیست
                 } catch (error) {
                      console.error("خطا در بازگردانی کاربر:", error);
                     showCustomAlert("عملیات با خطا مواجه شد.");
@@ -989,12 +1009,21 @@
         gameModesCancelBtn.addEventListener('click', () => { hideModal(gameModesPanelOverlay); showModal(adminPanelOverlay); });
 
         // رویدادهای پنل رده بندی
+        const closeRankingModal = () => {
+            hideModal(rankingModalOverlay);
+            stopRankingListener(); // **مهم** توقف شنونده هنگام بستن پنل
+        };
+
         rankingButton.addEventListener('click', () => checkMaintenanceAndProceed(() => {
+            rankingListContainer.innerHTML = '<p style="padding: 20px; text-align: center;">در حال بارگذاری رده‌بندی...</p>';
+            bannedRankingListContainer.innerHTML = '';
+            rankingSearchInput.value = '';
             showModal(rankingModalOverlay);
-            fetchAndDisplayRankings();
+            startRankingListener(); // **مهم** شروع شنونده هنگام باز کردن پنل
         }));
-        rankingModalOverlay.addEventListener('click', (e) => { if(e.target === rankingModalOverlay) hideModal(rankingModalOverlay); });
-        rankingModalCloseBtn.addEventListener('click', () => hideModal(rankingModalOverlay));
+
+        rankingModalOverlay.addEventListener('click', (e) => { if(e.target === rankingModalOverlay) closeRankingModal(); });
+        rankingModalCloseBtn.addEventListener('click', closeRankingModal);
         rankingSearchInput.addEventListener('input', filterRankingList);
         
         rankingListContainer.addEventListener('click', (e) => {
