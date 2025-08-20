@@ -267,15 +267,9 @@
         input:disabled + .slider { opacity: 0.5; cursor: not-allowed; }
         .buttons-group { display: flex; gap: 10px; }
 
-        /* *** استایل‌های پنل رده بندی *** */
+        /* *** جدید *** استایل‌های پنل رده بندی */
         #ranking-modal-content { max-width: 480px; padding: 0; }
         .ranking-header { padding: 25px 30px; position: relative; border-bottom: 1px solid #5c4a3a;}
-        /* *** جدید *** استایل کنترل‌های ادمین */
-        #ranking-admin-controls { display: none; margin-top: 20px; } /* مخفی به صورت پیش‌فرض */
-        #ranking-modal-content.is-admin #ranking-admin-controls { display: block; } /* نمایش برای ادمین */
-        #ranking-search-input { width: 100%; padding: 12px 15px; background-color: rgba(0,0,0,0.3); border: 1px solid #5c4a3a; border-radius: 8px; color: #f0e6d2; font-family: 'Vazirmatn', sans-serif; font-size: 1rem; }
-        #ranking-search-input:focus { outline: none; border-color: #ffc947; box-shadow: 0 0 10px rgba(255, 201, 71, 0.3); }
-
         #ranking-list-container { width: 100%; max-height: 60vh; overflow-y: auto; padding: 10px; }
         .ranking-list-item { display: flex; align-items: center; padding: 10px 15px; margin-bottom: 5px; border-radius: 8px; background-color: rgba(255, 255, 255, 0.03); border: 1px solid #5c4a3a; transition: all 0.2s ease; }
         .ranking-list-item.current-user-rank { background-color: rgba(255, 201, 71, 0.15); border-color: #ffc947; box-shadow: 0 0 10px rgba(255, 201, 71, 0.2); }
@@ -284,19 +278,7 @@
         .gems-count { display: flex; align-items: center; gap: 8px; font-size: 1.1rem; font-weight: 700; color: #e0dacc; direction: ltr; }
         .gems-count span { text-shadow: 1px 1px 3px #000; }
         .gems-count::after { content: '💎'; font-size: 1.2rem; }
-        /* *** جدید *** استایل آیکون ویرایش */
-        .edit-rank-icon { display: none; /* مخفی به صورت پیش‌فرض */ cursor: pointer; margin-right: 15px; font-size: 1.5rem; transition: transform 0.2s ease; }
-        .edit-rank-icon:hover { transform: scale(1.2); color: #ffc947; }
-        #ranking-modal-content.is-admin .edit-rank-icon { display: block; } /* نمایش برای ادمین */
 
-        /* *** جدید *** استایل پنل ویرایش رتبه */
-        #edit-rank-modal-content { max-width: 380px; }
-        .edit-rank-header { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 25px; }
-        #edit-rank-avatar { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 3px solid #a47d54; }
-        #edit-rank-name { font-size: 1.2rem; font-weight: 700; color: #e0dacc; }
-        .edit-rank-info { font-size: 1rem; color: #c5a687; }
-        #edit-rank-form { display: flex; flex-direction: column; gap: 15px; }
-        
     </style>
 </head>
 <body>
@@ -327,6 +309,7 @@
                 </div>
                 <div class="menu-buttons">
                     <button class="menu-button">سازندگان</button>
+                    <!-- *** جدید *** آیدی برای دکمه رده بندی اضافه شد -->
                     <button id="ranking-button" class="menu-button">رده بندی</button>
                     <button id="admin-panel-button" class="menu-button" style="display: none;">پنل مدیریت</button>
                 </div>
@@ -373,6 +356,7 @@
     <div id="profile-modal-overlay" class="modal-overlay">
         <div id="profile-modal-content" class="modal-content">
             <div class="profile-header">
+                <!-- *** جدید *** کلاس عمومی برای دکمه بستن -->
                 <span id="profile-modal-close-btn" class="modal-close-btn">&times;</span>
                 <img id="profile-modal-avatar" src="" alt="آواتار پروفایل">
                 <div class="profile-name-banner">
@@ -404,7 +388,7 @@
         </div>
     </div>
     
-    <!-- پنل‌های مدیریت -->
+    <!-- *** پنل‌های مدیریت (بدون تغییر) *** -->
     <div id="admin-panel-overlay" class="modal-overlay">
         <div id="admin-panel-content" class="modal-content">
             <h2 class="modal-title">پنل مدیریت</h2>
@@ -475,16 +459,12 @@
         </div>
     </div>
     
-    <!-- پنل رده بندی بازیکنان -->
+    <!-- *** جدید *** پنل رده بندی بازیکنان -->
     <div id="ranking-modal-overlay" class="modal-overlay">
         <div id="ranking-modal-content" class="modal-content">
             <div class="ranking-header">
-                <h2 class="modal-title">رده بندی بازیکنان</h2>
-                <span id="ranking-modal-close-btn" class="modal-close-btn">&times;</span>
-                <!-- *** جدید *** کنترل‌های ادمین -->
-                <div id="ranking-admin-controls">
-                    <input type="text" id="ranking-search-input" placeholder="جستجوی کاربر بر اساس نام...">
-                </div>
+                 <h2 class="modal-title">رده بندی بازیکنان</h2>
+                 <span id="ranking-modal-close-btn" class="modal-close-btn">&times;</span>
             </div>
             <div id="ranking-list-container">
                 <!-- لیست رده‌بندی به صورت پویا اینجا قرار می‌گیرد -->
@@ -492,34 +472,11 @@
         </div>
     </div>
 
-    <!-- *** جدید *** پنل ویرایش رتبه کاربر (برای ادمین) -->
-    <div id="edit-rank-modal-overlay" class="modal-overlay">
-        <div id="edit-rank-modal-content" class="modal-content">
-            <h2 class="modal-title">ویرایش رتبه</h2>
-            <div class="edit-rank-header">
-                <img id="edit-rank-avatar" src="" alt="آواتار کاربر">
-                <h3 id="edit-rank-name"></h3>
-                <p id="edit-rank-info" class="edit-rank-info"></p>
-            </div>
-            <form id="edit-rank-form">
-                <div class="form-group">
-                    <label for="edit-rank-new-rank" class="form-label">رتبه جدید:</label>
-                    <input type="number" id="edit-rank-new-rank" class="form-input" required min="1">
-                </div>
-                <p class="modal-message" style="font-size: 0.8rem; margin-top: 10px; margin-bottom: 10px;">با تغییر رتبه، امتیاز این کاربر با امتیاز کاربر رتبه مقصد جابجا خواهد شد.</p>
-                <div class="buttons-group">
-                    <button type="button" id="edit-rank-cancel-btn" class="modal-button cancel-button" style="width: 50%;">انصراف</button>
-                    <button type="submit" id="edit-rank-save-btn" class="modal-button" style="width: 50%;">ذخیره</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, getDoc, onSnapshot, collection, getDocs, updateDoc, query, orderBy, limit, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, onSnapshot, collection, getDocs, updateDoc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
@@ -591,23 +548,11 @@
         const gameModesSaveBtn = document.getElementById('game-modes-save-btn');
         const gameModesCancelBtn = document.getElementById('game-modes-cancel-btn');
 
-        // المان‌های پنل رده‌بندی
+        // *** جدید *** المان‌های پنل رده‌بندی
         const rankingButton = document.getElementById('ranking-button');
         const rankingModalOverlay = document.getElementById('ranking-modal-overlay');
-        const rankingModalContent = document.getElementById('ranking-modal-content');
         const rankingModalCloseBtn = document.getElementById('ranking-modal-close-btn');
         const rankingListContainer = document.getElementById('ranking-list-container');
-        const rankingSearchInput = document.getElementById('ranking-search-input');
-
-        // *** جدید *** المان‌های پنل ویرایش رتبه
-        const editRankModalOverlay = document.getElementById('edit-rank-modal-overlay');
-        const editRankForm = document.getElementById('edit-rank-form');
-        const editRankAvatar = document.getElementById('edit-rank-avatar');
-        const editRankName = document.getElementById('edit-rank-name');
-        const editRankInfo = document.getElementById('edit-rank-info');
-        const editRankNewRankInput = document.getElementById('edit-rank-new-rank');
-        const editRankSaveBtn = document.getElementById('edit-rank-save-btn');
-        const editRankCancelBtn = document.getElementById('edit-rank-cancel-btn');
 
 
         // متغیرها
@@ -619,7 +564,6 @@
         let isMusicPlaying = false;
         let isInitialLoad = true;
         let currentUserData = null;
-        let currentRankingData = []; // *** جدید *** برای نگهداری اطلاعات رده‌بندی
 
         // --- توابع عمومی ---
         function showModal(modalElement) { modalElement.classList.add('visible'); }
@@ -629,7 +573,6 @@
             hideModal(userListModalOverlay);
             hideModal(editUserModalOverlay);
             hideModal(gameModesPanelOverlay);
-            hideModal(editRankModalOverlay); // *** جدید ***
         }
         function showCustomAlert(message, onConfirm) {
             customAlertMessage.textContent = message;
@@ -662,7 +605,7 @@
                 if (docSnap.exists() && docSnap.data().isAdmin === true) {
                     return true;
                 } else {
-                    showCustomAlert("دسترسی شما به این قابلیت قطع شده است.", hideAllAdminModals);
+                    showCustomAlert("دسترسی شما به پنل مدیریت قطع شده است.", hideAllAdminModals);
                     return false;
                 }
             } catch (error) {
@@ -701,62 +644,20 @@
         async function openGameModesPanel() { if (!(await verifyAdminStatus())) return; hideModal(adminPanelOverlay); showModal(gameModesPanelOverlay); friendlyModeToggle.disabled = true; rankedModeToggle.disabled = true; gameModesSaveBtn.disabled = true; try { const gameModesDocRef = doc(db, 'settings', 'gameModes'); const docSnap = await getDoc(gameModesDocRef); if (docSnap.exists()) { const modes = docSnap.data(); friendlyModeToggle.checked = modes.friendlyEnabled || false; rankedModeToggle.checked = modes.rankedEnabled || false; } } catch (error) { console.error("خطا در خواندن تنظیمات ورودی بازی: ", error); showCustomAlert("خطا در دریافت اطلاعات. لطفا دوباره تلاش کنید.", () => { hideModal(gameModesPanelOverlay); showModal(adminPanelOverlay); }); } finally { friendlyModeToggle.disabled = false; rankedModeToggle.disabled = false; gameModesSaveBtn.disabled = false; } }
         async function handleSaveGameModes() { if (!(await verifyAdminStatus())) return; gameModesSaveBtn.disabled = true; gameModesSaveBtn.textContent = 'در حال ذخیره...'; const newSettings = { friendlyEnabled: friendlyModeToggle.checked, rankedEnabled: rankedModeToggle.checked }; try { const gameModesDocRef = doc(db, 'settings', 'gameModes'); await updateDoc(gameModesDocRef, newSettings); showCustomAlert("تنظیمات ورودی بازی با موفقیت ذخیره شد."); hideModal(gameModesPanelOverlay); } catch (error) { console.error("خطا در ذخیره تنظیمات ورودی بازی: ", error); showCustomAlert("خطا در ذخیره تغییرات. لطفا دوباره تلاش کنید."); } finally { gameModesSaveBtn.disabled = false; gameModesSaveBtn.textContent = 'ذخیره'; } }
 
-        // *** توابع جدید و اصلاح شده پنل رده بندی ***
-        function renderRankingList(usersToRender) {
-            rankingListContainer.innerHTML = '';
-            const currentUser = auth.currentUser;
-            if (usersToRender.length === 0) {
-                 rankingListContainer.innerHTML = '<p style="padding: 20px; text-align: center;">هیچ کاربری با این مشخصات یافت نشد.</p>';
-                 return;
-            }
-            usersToRender.forEach(userData => {
-                const userElement = document.createElement('div');
-                userElement.classList.add('ranking-list-item');
-                if (userData.uid === currentUser?.uid) {
-                    userElement.classList.add('current-user-rank');
-                }
-                
-                const editIconHTML = currentUserData?.isAdmin 
-                    ? `<span class="edit-rank-icon" data-uid="${userData.uid}" title="ویرایش رتبه">✏️</span>` 
-                    : '';
-                
-                userElement.innerHTML = `
-                    <span class="rank-number">${userData.rank}</span>
-                    <div class="user-info">
-                        <img src="${userData.avatarUrl || DEFAULT_AVATAR}" alt="avatar">
-                        <div class="user-details">
-                            <span class="name">${userData.displayName || 'بدون نام'}</span>
-                        </div>
-                    </div>
-                    <div class="gems-count">
-                        <span>${userData.game || 0}</span>
-                    </div>
-                    ${editIconHTML}
-                `;
-                rankingListContainer.appendChild(userElement);
-            });
-        }
-
-        function filterRankingList() {
-            const searchTerm = rankingSearchInput.value.toLowerCase().trim();
-            if (!searchTerm) {
-                renderRankingList(currentRankingData);
-                return;
-            }
-            const filteredUsers = currentRankingData.filter(user => 
-                user.displayName?.toLowerCase().includes(searchTerm)
-            );
-            renderRankingList(filteredUsers);
-        }
-
+        // *** جدید *** توابع پنل رده بندی
         async function fetchAndDisplayRankings() {
             rankingListContainer.innerHTML = '<p style="padding: 20px; text-align: center;">در حال بارگذاری رده‌بندی...</p>';
-            currentRankingData = [];
+            const currentUser = auth.currentUser;
+            if (!currentUser) return;
+
             try {
+                // کوئری برای گرفتن 50 کاربر برتر بر اساس فیلد game (الماس)
                 const usersRef = collection(db, "users");
-                const q = query(usersRef, orderBy("game", "desc"), limit(100)); // افزایش محدودیت برای ویرایش راحت‌تر ادمین
+                const q = query(usersRef, orderBy("game", "desc"), limit(50));
+                
                 const querySnapshot = await getDocs(q);
 
+                rankingListContainer.innerHTML = ''; // پاک کردن محتوای قبلی
                 if (querySnapshot.empty) {
                     rankingListContainer.innerHTML = '<p style="padding: 20px; text-align: center;">هنوز بازیکنی در رده‌بندی وجود ندارد.</p>';
                     return;
@@ -764,96 +665,40 @@
                 
                 let rank = 1;
                 querySnapshot.forEach(doc => {
-                    currentRankingData.push({ 
-                        uid: doc.id, 
-                        rank: rank, 
-                        ...doc.data() 
-                    });
+                    const userData = doc.data();
+                    const userElement = document.createElement('div');
+                    userElement.classList.add('ranking-list-item');
+                    
+                    // اگر کاربر فعلی در لیست بود، آن را هایلایت کن
+                    if(doc.id === currentUser.uid) {
+                        userElement.classList.add('current-user-rank');
+                    }
+                    
+                    userElement.innerHTML = `
+                        <span class="rank-number">${rank}</span>
+                        <div class="user-info">
+                            <img src="${userData.avatarUrl || DEFAULT_AVATAR}" alt="avatar">
+                            <div class="user-details">
+                                <span class="name">${userData.displayName || 'بدون نام'}</span>
+                            </div>
+                        </div>
+                        <div class="gems-count">
+                            <span>${userData.game || 0}</span>
+                        </div>
+                    `;
+                    rankingListContainer.appendChild(userElement);
                     rank++;
                 });
-
-                renderRankingList(currentRankingData);
 
             } catch (error) {
                 console.error("خطا در دریافت لیست رده‌بندی: ", error);
                 rankingListContainer.innerHTML = '<p style="padding: 20px; text-align: center;">خطا در بارگذاری اطلاعات. لطفا دوباره تلاش کنید.</p>';
-                showCustomAlert("خطا در بارگذاری رده‌بندی. ممکن است نیاز به ساخت ایندکس در پایگاه داده باشد. (کنسول مرورگر را برای لینک ساخت ایندکس چک کنید)");
-            }
-        }
-        
-        function openEditRankModal(uid) {
-            const userToEdit = currentRankingData.find(user => user.uid === uid);
-            if (!userToEdit) {
-                showCustomAlert("کاربر مورد نظر در لیست رده‌بندی یافت نشد.");
-                return;
-            }
-            editRankAvatar.src = userToEdit.avatarUrl || DEFAULT_AVATAR;
-            editRankName.textContent = userToEdit.displayName || 'بدون نام';
-            editRankInfo.textContent = `رتبه فعلی: ${userToEdit.rank} | امتیاز: ${userToEedit.game}`;
-            editRankNewRankInput.value = userToEdit.rank;
-            editRankNewRankInput.max = currentRankingData.length;
-            
-            // ذخیره اطلاعات کاربر برای استفاده در زمان ذخیره
-            editRankForm.dataset.uid = uid;
-            editRankForm.dataset.currentRank = userToEdit.rank;
-
-            showModal(editRankModalOverlay);
-        }
-
-        async function handleSaveRankChange(e) {
-            e.preventDefault();
-            if (!(await verifyAdminStatus())) return;
-
-            const userA_uid = editRankForm.dataset.uid;
-            const newRank = parseInt(editRankNewRankInput.value, 10);
-            const oldRank = parseInt(editRankForm.dataset.currentRank, 10);
-
-            if (isNaN(newRank) || newRank < 1 || newRank > currentRankingData.length) {
-                showCustomAlert(`لطفا یک رتبه معتبر بین ۱ و ${currentRankingData.length} وارد کنید.`);
-                return;
-            }
-            if (newRank === oldRank) {
-                hideModal(editRankModalOverlay);
-                return;
-            }
-            
-            const userA = currentRankingData.find(u => u.uid === userA_uid);
-            const userB = currentRankingData.find(u => u.rank === newRank);
-
-            if (!userA || !userB) {
-                showCustomAlert("خطا: یکی از کاربران برای جابجایی یافت نشد.");
-                return;
-            }
-
-            editRankSaveBtn.disabled = true;
-            editRankSaveBtn.textContent = 'در حال ذخیره...';
-
-            try {
-                const batch = writeBatch(db);
-                const userADocRef = doc(db, "users", userA.uid);
-                const userBDocRef = doc(db, "users", userB.uid);
-
-                // امتیازها را جابجا کن
-                batch.update(userADocRef, { game: userB.game });
-                batch.update(userBDocRef, { game: userA.game });
-
-                await batch.commit();
-
-                hideModal(editRankModalOverlay);
-                showCustomAlert("رتبه با موفقیت جابجا شد.", () => {
-                    fetchAndDisplayRankings(); // رفرش لیست
-                });
-
-            } catch (error) {
-                console.error("خطا در جابجایی رتبه: ", error);
-                showCustomAlert("خطا در ذخیره تغییرات. لطفا دوباره تلاش کنید.");
-            } finally {
-                editRankSaveBtn.disabled = false;
-                editRankSaveBtn.textContent = 'ذخیره';
+                // این خطا معمولا به خاطر نبود ایندکس در فایراستور است
+                showCustomAlert("خطا در بارگذاری رده‌بندی. ممکن است نیاز به ساخت ایندکس در پایگاه داده باشد. ( کنسول را چک کنید )");
             }
         }
 
-        // --- منطق اصلی و احراز هویت ---
+        // --- منطق اصلی و احراز هویت (بدون تغییر) ---
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 const userDocRef = doc(db, 'users', user.uid);
@@ -863,24 +708,10 @@
                         userDisplayName.textContent = currentUserData.displayName || "کاربر ناشناس";
                         userAvatar.src = currentUserData.avatarUrl || DEFAULT_AVATAR;
                         adminPanelButton.style.display = currentUserData.isAdmin === true ? 'block' : 'none';
-
-                        // *** جدید *** کنترل زنده دسترسی ادمین در پنل رده‌بندی
-                        if (currentUserData.isAdmin) {
-                            rankingModalContent.classList.add('is-admin');
-                        } else {
-                            rankingModalContent.classList.remove('is-admin');
-                        }
-                        // اگر پنل باز بود، لیست را رفرش کن تا آیکون‌ها ظاهر/پنهان شوند
-                        if(rankingModalOverlay.classList.contains('visible')){
-                           renderRankingList(currentRankingData);
-                        }
-
                     } else {
-                        // کاربر در دیتابیس وجود ندارد
                         userDisplayName.textContent = user.displayName || "کاربر ناشناس";
                         userAvatar.src = DEFAULT_AVATAR;
                         adminPanelButton.style.display = 'none';
-                        rankingModalContent.classList.remove('is-admin');
                     }
                     if (isInitialLoad) {
                         document.body.classList.add('loaded');
@@ -929,6 +760,7 @@
         rankedGameBtn.addEventListener('click', () => checkMaintenanceAndProceed(() => { window.location.href = './users search.html'; }));
         
         menuButtons.forEach(button => {
+            // *** جدید *** دکمه‌های ادمین و رده‌بندی از این بخش مستثنی شدند
             if (button.id !== 'admin-panel-button' && button.id !== 'ranking-button') {
                 button.addEventListener('click', () => checkMaintenanceAndProceed(() => {
                     showCustomAlert(`عملکرد دکمه "${button.textContent}" هنوز پیاده‌سازی نشده است.`);
@@ -952,28 +784,13 @@
         gameModesSaveBtn.addEventListener('click', handleSaveGameModes);
         gameModesCancelBtn.addEventListener('click', () => { hideModal(gameModesPanelOverlay); showModal(adminPanelOverlay); });
 
-        // *** رویدادهای جدید و اصلاح شده پنل رده بندی ***
+        // *** جدید *** رویدادهای پنل رده بندی
         rankingButton.addEventListener('click', () => checkMaintenanceAndProceed(() => {
-            rankingSearchInput.value = ''; // ریست کردن جستجو
             showModal(rankingModalOverlay);
             fetchAndDisplayRankings(); // دریافت اطلاعات هنگام باز شدن پنل
         }));
         rankingModalOverlay.addEventListener('click', (e) => { if(e.target === rankingModalOverlay) hideModal(rankingModalOverlay); });
         rankingModalCloseBtn.addEventListener('click', () => hideModal(rankingModalOverlay));
-        rankingSearchInput.addEventListener('input', filterRankingList);
-        // *** جدید *** رویداد کلیک برای آیکون‌های ویرایش رتبه
-        rankingListContainer.addEventListener('click', (e) => {
-            const editButton = e.target.closest('.edit-rank-icon');
-            if (editButton && currentUserData?.isAdmin) {
-                const uid = editButton.dataset.uid;
-                openEditRankModal(uid);
-            }
-        });
-        
-        // *** جدید *** رویدادهای پنل ویرایش رتبه
-        editRankModalOverlay.addEventListener('click', (e) => { if (e.target === editRankModalOverlay) hideModal(editRankModalOverlay); });
-        editRankForm.addEventListener('submit', handleSaveRankChange);
-        editRankCancelBtn.addEventListener('click', () => hideModal(editRankModalOverlay));
 
     </script>
 </body>
