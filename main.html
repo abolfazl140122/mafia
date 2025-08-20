@@ -267,7 +267,7 @@
         input:disabled + .slider { opacity: 0.5; cursor: not-allowed; }
         .buttons-group { display: flex; gap: 10px; }
 
-        /* *** جدید *** استایل‌های پنل رده بندی */
+        /* --- استایل‌های پنل رده بندی --- */
         #ranking-modal-content { max-width: 480px; padding: 0; }
         .ranking-header { padding: 25px 30px; position: relative; border-bottom: 1px solid #5c4a3a;}
         #ranking-list-container { width: 100%; max-height: 60vh; overflow-y: auto; padding: 10px; }
@@ -278,6 +278,17 @@
         .gems-count { display: flex; align-items: center; gap: 8px; font-size: 1.1rem; font-weight: 700; color: #e0dacc; direction: ltr; }
         .gems-count span { text-shadow: 1px 1px 3px #000; }
         .gems-count::after { content: '💎'; font-size: 1.2rem; }
+
+        /* *** جدید *** استایل‌های قابلیت‌های ادمین در پنل رده بندی */
+        .ranking-admin-controls { display: none; /* مخفی به صورت پیشفرض */ padding: 0 20px 20px; border-bottom: 1px solid #5c4a3a; }
+        #ranking-search-input { width: 100%; padding: 10px 15px; background-color: rgba(0,0,0,0.3); border: 1px solid #5c4a3a; border-radius: 8px; color: #f0e6d2; font-family: 'Vazirmatn', sans-serif; font-size: 0.9rem; transition: all 0.3s ease; }
+        #ranking-search-input:focus { outline: none; border-color: #ffc947; box-shadow: 0 0 10px rgba(255, 201, 71, 0.3); }
+        #ranking-search-input::placeholder { color: #c5a687; opacity: 0.7; }
+        .edit-rank-icon { display: none; /* مخفی به صورت پیشفرض */ cursor: pointer; margin-right: 15px; flex-shrink: 0; }
+        .edit-rank-icon svg { width: 22px; height: 22px; fill: #c5a687; transition: all 0.2s ease; }
+        .edit-rank-icon:hover svg { fill: #ffc947; transform: scale(1.15); }
+        #ranking-modal-content.admin-view .ranking-admin-controls { display: block; }
+        #ranking-modal-content.admin-view .ranking-list-item .edit-rank-icon { display: block; }
 
     </style>
 </head>
@@ -309,7 +320,6 @@
                 </div>
                 <div class="menu-buttons">
                     <button class="menu-button">سازندگان</button>
-                    <!-- *** جدید *** آیدی برای دکمه رده بندی اضافه شد -->
                     <button id="ranking-button" class="menu-button">رده بندی</button>
                     <button id="admin-panel-button" class="menu-button" style="display: none;">پنل مدیریت</button>
                 </div>
@@ -356,7 +366,6 @@
     <div id="profile-modal-overlay" class="modal-overlay">
         <div id="profile-modal-content" class="modal-content">
             <div class="profile-header">
-                <!-- *** جدید *** کلاس عمومی برای دکمه بستن -->
                 <span id="profile-modal-close-btn" class="modal-close-btn">&times;</span>
                 <img id="profile-modal-avatar" src="" alt="آواتار پروفایل">
                 <div class="profile-name-banner">
@@ -388,7 +397,7 @@
         </div>
     </div>
     
-    <!-- *** پنل‌های مدیریت (بدون تغییر) *** -->
+    <!-- پنل‌های مدیریت -->
     <div id="admin-panel-overlay" class="modal-overlay">
         <div id="admin-panel-content" class="modal-content">
             <h2 class="modal-title">پنل مدیریت</h2>
@@ -459,12 +468,16 @@
         </div>
     </div>
     
-    <!-- *** جدید *** پنل رده بندی بازیکنان -->
+    <!-- پنل رده بندی بازیکنان -->
     <div id="ranking-modal-overlay" class="modal-overlay">
         <div id="ranking-modal-content" class="modal-content">
             <div class="ranking-header">
                  <h2 class="modal-title">رده بندی بازیکنان</h2>
                  <span id="ranking-modal-close-btn" class="modal-close-btn">&times;</span>
+            </div>
+            <!-- *** جدید *** بخش کنترل‌های ادمین -->
+            <div class="ranking-admin-controls">
+                <input type="text" id="ranking-search-input" placeholder="جستجوی بازیکن در رده‌بندی...">
             </div>
             <div id="ranking-list-container">
                 <!-- لیست رده‌بندی به صورت پویا اینجا قرار می‌گیرد -->
@@ -476,7 +489,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, getDoc, onSnapshot, collection, getDocs, updateDoc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, onSnapshot, collection, getDocs, updateDoc, query, orderBy, limit, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
@@ -548,12 +561,13 @@
         const gameModesSaveBtn = document.getElementById('game-modes-save-btn');
         const gameModesCancelBtn = document.getElementById('game-modes-cancel-btn');
 
-        // *** جدید *** المان‌های پنل رده‌بندی
+        // المان‌های پنل رده‌بندی
         const rankingButton = document.getElementById('ranking-button');
         const rankingModalOverlay = document.getElementById('ranking-modal-overlay');
+        const rankingModalContent = document.getElementById('ranking-modal-content'); // *** جدید
         const rankingModalCloseBtn = document.getElementById('ranking-modal-close-btn');
         const rankingListContainer = document.getElementById('ranking-list-container');
-
+        const rankingSearchInput = document.getElementById('ranking-search-input'); // *** جدید
 
         // متغیرها
         const MUSIC_URL = "https://raw.githubusercontent.com/abolfazl140122/mafia/main/dark-music-249503.mp3";
@@ -561,6 +575,7 @@
         const MUSIC_VERSION_KEY = 'mafia-music-version';
         const DEFAULT_AVATAR = 'https://i.imgur.com/T2bT1tG.png';
         const EDIT_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19.14,12.94a1.72,1.72,0,0,0-2.28,0l-.63.63a1.72,1.72,0,0,0,0,2.28l.63.63a1.72,1.72,0,0,0,2.28,0l1.47-1.47A3.39,3.39,0,0,0,19.14,12.94Zm-4.88,2.28a3.39,3.39,0,0,0,0-4.56l-2-2a3.39,3.39,0,0,0-4.56,0l-.63.63a3.39,3.39,0,0,0,0,4.56l2,2A3.39,3.39,0,0,0,14.26,15.22Z" opacity="0"/><path d="M12,2A10,10,0,1,0,22,12,10,10,0,0,0,12,2Zm3.71,12.29-2,2a1.72,1.72,0,0,1-2.28,0l-.63-.63a1.72,1.72,0,0,1,0-2.28l.63-.63a1.72,1.72,0,0,1,2.28,0l1.47,1.47A1.72,1.72,0,0,1,15.71,14.29ZM8.29,9.71a1.72,1.72,0,0,1,2.28,0l.63.63a1.72,1.72,0,0,1,0,2.28l-2,2a1.72,1.72,0,0,1-2.28,0l-1.47-1.47a1.72,1.72,0,0,1,0-2.28Z"/></svg>`;
+        const EDIT_RANK_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18.4,4.4a2.9,2.9,0,0,0-4.1,0L6.5,12.2a3.4,3.4,0,0,0-.8,1.5l-1,3.9a1,1,0,0,0,1.2,1.2l3.9-1a3.4,3.4,0,0,0,1.5-.8L18.4,8.5a2.9,2.9,0,0,0,0-4.1Zm-2.7.7a1,1,0,0,1,1.4,0l.4.4a1,1,0,0,1,0,1.4l-.8.8L15.3,6.3Zm-5.3,5.3L12,12l1.4,1.4L14.8,12ZM7.2,14.1a1.2,1.2,0,0,1,.6.2l2.3,2.3a1.2,1.2,0,0,1,.2.6l.3,1.3-1.9-.5ZM21,21H3a1,1,0,0,0,0,2H21a1,1,0,0,0,0-2Z"/></svg>`; // *** جدید
         let isMusicPlaying = false;
         let isInitialLoad = true;
         let currentUserData = null;
@@ -605,7 +620,7 @@
                 if (docSnap.exists() && docSnap.data().isAdmin === true) {
                     return true;
                 } else {
-                    showCustomAlert("دسترسی شما به پنل مدیریت قطع شده است.", hideAllAdminModals);
+                    showCustomAlert("دسترسی شما به این قابلیت قطع شده است.", hideAllAdminModals);
                     return false;
                 }
             } catch (error) {
@@ -615,7 +630,7 @@
             }
         }
 
-        // --- توابع پروفایل کاربر (بدون تغییر) ---
+        // --- توابع پروفایل کاربر ---
         function populateProfileModal() {
             if (!currentUserData) return;
             profileModalAvatar.src = currentUserData.avatarUrl || DEFAULT_AVATAR;
@@ -630,13 +645,13 @@
             } else { profileStatDate.textContent = "نامشخص"; }
         }
 
-        // --- توابع موسیقی (بدون تغییر) ---
+        // --- توابع موسیقی ---
         const playMusicAfterUserInteraction = () => { if (!isMusicPlaying && backgroundMusic.src && backgroundMusic.paused) { backgroundMusic.play().then(() => { isMusicPlaying = true; document.body.removeEventListener('click', playMusicAfterUserInteraction, true); document.body.removeEventListener('keydown', playMusicAfterUserInteraction, true); }).catch(e => console.error("خطا در پخش موسیقی.", e)); } else { document.body.removeEventListener('click', playMusicAfterUserInteraction, true); document.body.removeEventListener('keydown', playMusicAfterUserInteraction, true); } };
         function playMusicFromBlob(blob) { const objectUrl = URL.createObjectURL(blob); backgroundMusic.src = objectUrl; backgroundMusic.volume = 0.4; const playPromise = backgroundMusic.play(); if (playPromise !== undefined) { playPromise.then(() => { isMusicPlaying = true; }).catch(error => { console.warn("پخش خودکار موسیقی مسدود شد.", error); isMusicPlaying = false; document.body.addEventListener('click', playMusicAfterUserInteraction, true); document.body.addEventListener('keydown', playMusicAfterUserInteraction, true); }); } }
         function downloadAndCacheMusic() { return new Promise((resolve, reject) => { musicDownloadOverlay.classList.add('visible'); const xhr = new XMLHttpRequest(); xhr.open('GET', MUSIC_URL, true); xhr.responseType = 'blob'; xhr.onprogress = (event) => { if (event.lengthComputable) { const percentComplete = Math.round((event.loaded / event.total) * 100); progressBar.style.width = percentComplete + '%'; progressText.textContent = `در حال دانلود... ${percentComplete}%`; } }; xhr.onload = async () => { if (xhr.status === 200) { const musicBlob = xhr.response; try { const cache = await caches.open(MUSIC_CACHE_NAME); await cache.put(MUSIC_URL, new Response(musicBlob)); localStorage.setItem(MUSIC_VERSION_KEY, MUSIC_URL); musicDownloadOverlay.classList.remove('visible'); resolve(musicBlob); } catch (cacheError) { reject(cacheError); } } else { reject(new Error(`خطای شبکه: ${xhr.statusText}`)); } }; xhr.onerror = () => { musicDownloadOverlay.classList.remove('visible'); showCustomAlert("دانلود موسیقی پس‌زمینه با خطا مواجه شد.", () => {}); reject(new Error('خطای شبکه در دانلود موسیقی.')); }; xhr.send(); }); }
         async function handleBackgroundMusic() { const cachedVersion = localStorage.getItem(MUSIC_VERSION_KEY); if (cachedVersion === MUSIC_URL) { try { const cache = await caches.open(MUSIC_CACHE_NAME); const cachedResponse = await cache.match(MUSIC_URL); if (cachedResponse) { playMusicFromBlob(await cachedResponse.blob()); } else { playMusicFromBlob(await downloadAndCacheMusic()); } } catch (error) { playMusicFromBlob(await downloadAndCacheMusic()); } } else { try { playMusicFromBlob(await downloadAndCacheMusic()); } catch (error) { console.error('فرایند دانلود و پخش موسیقی با خطا مواجه شد:', error); } } }
 
-        // --- توابع پنل مدیریت (بدون تغییر) ---
+        // --- توابع پنل مدیریت ---
         async function loadAndShowUserList() { if (!(await verifyAdminStatus())) return; userListContainer.innerHTML = '<p style="padding: 20px;">در حال بارگذاری لیست کاربران...</p>'; userSearchInput.value = ''; hideModal(adminPanelOverlay); showModal(userListModalOverlay); try { const usersCollection = collection(db, "users"); const querySnapshot = await getDocs(usersCollection); userListContainer.innerHTML = ''; if (querySnapshot.empty) { userListContainer.innerHTML = '<p style="padding: 20px;">هیچ کاربری یافت نشد.</p>'; return; } querySnapshot.forEach(doc => { const userData = doc.data(); const userElement = document.createElement('div'); userElement.classList.add('user-list-item'); userElement.dataset.uid = doc.id; userElement.innerHTML = ` <div class="user-info"> <img src="${userData.avatarUrl || DEFAULT_AVATAR}" alt="avatar"> <div class="user-details"> <span class="name">${userData.displayName || 'بدون نام'}</span> <span class="email">${userData.email || 'بدون ایمیل'}</span> </div> </div> <span class="edit-user-icon">${EDIT_ICON_SVG}</span> `; userListContainer.appendChild(userElement); }); } catch (error) { console.error("خطا در دریافت لیست کاربران: ", error); userListContainer.innerHTML = '<p style="padding: 20px;">خطا در بارگذاری اطلاعات. لطفا دوباره تلاش کنید.</p>'; } }
         async function openEditModalForUser(uid) { if (!(await verifyAdminStatus())) return; try { const userDocRef = doc(db, 'users', uid); const docSnap = await getDoc(userDocRef); if (docSnap.exists()) { const userData = docSnap.data(); editUserNamePreview.textContent = userData.displayName || 'کاربر'; editUserAvatarPreview.src = userData.avatarUrl || DEFAULT_AVATAR; editUserUid.value = uid; editDisplayName.value = userData.displayName || ''; editUserAge.value = userData.old || ''; editUserDiamonds.value = userData.game || 0; hideModal(userListModalOverlay); showModal(editUserModalOverlay); } else { showCustomAlert("کاربر مورد نظر یافت نشد."); } } catch (error) { console.error("خطا در دریافت اطلاعات کاربر برای ویرایش:", error); showCustomAlert("خطا در دریافت اطلاعات کاربر."); } }
         async function handleSaveChanges(e) { e.preventDefault(); if (!(await verifyAdminStatus())) return; const uid = editUserUid.value; const newDisplayName = editDisplayName.value; const newAge = parseInt(editUserAge.value, 10); const newDiamonds = parseInt(editUserDiamonds.value, 10); if (!uid) { showCustomAlert("خطای سیستمی: شناسه کاربر موجود نیست."); return; } if (isNaN(newAge) || isNaN(newDiamonds)) { showCustomAlert("لطفا مقادیر معتبر برای سن و الماس وارد کنید."); return; } saveUserChangesBtn.disabled = true; saveUserChangesBtn.textContent = 'در حال ذخیره...'; try { const userDocRef = doc(db, 'users', uid); await updateDoc(userDocRef, { displayName: newDisplayName, old: newAge, game: newDiamonds }); hideModal(editUserModalOverlay); showCustomAlert("تغییرات با موفقیت ذخیره شد.", async () => { await loadAndShowUserList(); }); } catch (error) { console.error("خطا در بروزرسانی اطلاعات کاربر:", error); showCustomAlert("خطا در ذخیره تغییرات. لطفا دوباره تلاش کنید."); } finally { saveUserChangesBtn.disabled = false; saveUserChangesBtn.textContent = 'ذخیره تغییرات'; } }
@@ -644,20 +659,19 @@
         async function openGameModesPanel() { if (!(await verifyAdminStatus())) return; hideModal(adminPanelOverlay); showModal(gameModesPanelOverlay); friendlyModeToggle.disabled = true; rankedModeToggle.disabled = true; gameModesSaveBtn.disabled = true; try { const gameModesDocRef = doc(db, 'settings', 'gameModes'); const docSnap = await getDoc(gameModesDocRef); if (docSnap.exists()) { const modes = docSnap.data(); friendlyModeToggle.checked = modes.friendlyEnabled || false; rankedModeToggle.checked = modes.rankedEnabled || false; } } catch (error) { console.error("خطا در خواندن تنظیمات ورودی بازی: ", error); showCustomAlert("خطا در دریافت اطلاعات. لطفا دوباره تلاش کنید.", () => { hideModal(gameModesPanelOverlay); showModal(adminPanelOverlay); }); } finally { friendlyModeToggle.disabled = false; rankedModeToggle.disabled = false; gameModesSaveBtn.disabled = false; } }
         async function handleSaveGameModes() { if (!(await verifyAdminStatus())) return; gameModesSaveBtn.disabled = true; gameModesSaveBtn.textContent = 'در حال ذخیره...'; const newSettings = { friendlyEnabled: friendlyModeToggle.checked, rankedEnabled: rankedModeToggle.checked }; try { const gameModesDocRef = doc(db, 'settings', 'gameModes'); await updateDoc(gameModesDocRef, newSettings); showCustomAlert("تنظیمات ورودی بازی با موفقیت ذخیره شد."); hideModal(gameModesPanelOverlay); } catch (error) { console.error("خطا در ذخیره تنظیمات ورودی بازی: ", error); showCustomAlert("خطا در ذخیره تغییرات. لطفا دوباره تلاش کنید."); } finally { gameModesSaveBtn.disabled = false; gameModesSaveBtn.textContent = 'ذخیره'; } }
 
-        // *** جدید *** توابع پنل رده بندی
+        // --- توابع پنل رده بندی ---
         async function fetchAndDisplayRankings() {
             rankingListContainer.innerHTML = '<p style="padding: 20px; text-align: center;">در حال بارگذاری رده‌بندی...</p>';
             const currentUser = auth.currentUser;
             if (!currentUser) return;
 
             try {
-                // کوئری برای گرفتن 50 کاربر برتر بر اساس فیلد game (الماس)
                 const usersRef = collection(db, "users");
                 const q = query(usersRef, orderBy("game", "desc"), limit(50));
                 
                 const querySnapshot = await getDocs(q);
 
-                rankingListContainer.innerHTML = ''; // پاک کردن محتوای قبلی
+                rankingListContainer.innerHTML = '';
                 if (querySnapshot.empty) {
                     rankingListContainer.innerHTML = '<p style="padding: 20px; text-align: center;">هنوز بازیکنی در رده‌بندی وجود ندارد.</p>';
                     return;
@@ -669,7 +683,12 @@
                     const userElement = document.createElement('div');
                     userElement.classList.add('ranking-list-item');
                     
-                    // اگر کاربر فعلی در لیست بود، آن را هایلایت کن
+                    // *** جدید *** افزودن دیتا اتریبیوت برای استفاده در قابلیت ویرایش
+                    userElement.dataset.uid = doc.id;
+                    userElement.dataset.displayName = userData.displayName || 'بدون نام';
+                    userElement.dataset.gems = userData.game || 0;
+                    userElement.dataset.rank = rank;
+                    
                     if(doc.id === currentUser.uid) {
                         userElement.classList.add('current-user-rank');
                     }
@@ -685,6 +704,8 @@
                         <div class="gems-count">
                             <span>${userData.game || 0}</span>
                         </div>
+                        <!-- *** جدید *** آیکون ویرایش رتبه برای ادمین‌ها -->
+                        <span class="edit-rank-icon" title="تغییر رتبه کاربر">${EDIT_RANK_SVG}</span>
                     `;
                     rankingListContainer.appendChild(userElement);
                     rank++;
@@ -693,12 +714,25 @@
             } catch (error) {
                 console.error("خطا در دریافت لیست رده‌بندی: ", error);
                 rankingListContainer.innerHTML = '<p style="padding: 20px; text-align: center;">خطا در بارگذاری اطلاعات. لطفا دوباره تلاش کنید.</p>';
-                // این خطا معمولا به خاطر نبود ایندکس در فایراستور است
                 showCustomAlert("خطا در بارگذاری رده‌بندی. ممکن است نیاز به ساخت ایندکس در پایگاه داده باشد. ( کنسول را چک کنید )");
             }
         }
+        
+        // *** جدید *** تابع برای فیلتر کردن لیست رده‌بندی
+        function filterRankingList() {
+            const searchTerm = rankingSearchInput.value.toLowerCase();
+            const allUsers = rankingListContainer.querySelectorAll('.ranking-list-item');
+            allUsers.forEach(userItem => {
+                const name = userItem.dataset.displayName.toLowerCase();
+                if (name.includes(searchTerm)) {
+                    userItem.style.display = 'flex';
+                } else {
+                    userItem.style.display = 'none';
+                }
+            });
+        }
 
-        // --- منطق اصلی و احراز هویت (بدون تغییر) ---
+        // --- منطق اصلی و احراز هویت ---
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 const userDocRef = doc(db, 'users', user.uid);
@@ -707,11 +741,22 @@
                         currentUserData = userDocSnap.data();
                         userDisplayName.textContent = currentUserData.displayName || "کاربر ناشناس";
                         userAvatar.src = currentUserData.avatarUrl || DEFAULT_AVATAR;
-                        adminPanelButton.style.display = currentUserData.isAdmin === true ? 'block' : 'none';
+                        
+                        const isAdmin = currentUserData.isAdmin === true;
+                        adminPanelButton.style.display = isAdmin ? 'block' : 'none';
+                        
+                        // *** جدید *** کنترل زنده نمایش قابلیت‌های ادمین در پنل رده‌بندی
+                        if (isAdmin) {
+                            rankingModalContent.classList.add('admin-view');
+                        } else {
+                            rankingModalContent.classList.remove('admin-view');
+                        }
+
                     } else {
                         userDisplayName.textContent = user.displayName || "کاربر ناشناس";
                         userAvatar.src = DEFAULT_AVATAR;
                         adminPanelButton.style.display = 'none';
+                        rankingModalContent.classList.remove('admin-view'); // *** جدید
                     }
                     if (isInitialLoad) {
                         document.body.classList.add('loaded');
@@ -760,7 +805,6 @@
         rankedGameBtn.addEventListener('click', () => checkMaintenanceAndProceed(() => { window.location.href = './users search.html'; }));
         
         menuButtons.forEach(button => {
-            // *** جدید *** دکمه‌های ادمین و رده‌بندی از این بخش مستثنی شدند
             if (button.id !== 'admin-panel-button' && button.id !== 'ranking-button') {
                 button.addEventListener('click', () => checkMaintenanceAndProceed(() => {
                     showCustomAlert(`عملکرد دکمه "${button.textContent}" هنوز پیاده‌سازی نشده است.`);
@@ -784,13 +828,72 @@
         gameModesSaveBtn.addEventListener('click', handleSaveGameModes);
         gameModesCancelBtn.addEventListener('click', () => { hideModal(gameModesPanelOverlay); showModal(adminPanelOverlay); });
 
-        // *** جدید *** رویدادهای پنل رده بندی
+        // رویدادهای پنل رده بندی
         rankingButton.addEventListener('click', () => checkMaintenanceAndProceed(() => {
             showModal(rankingModalOverlay);
-            fetchAndDisplayRankings(); // دریافت اطلاعات هنگام باز شدن پنل
+            fetchAndDisplayRankings();
         }));
         rankingModalOverlay.addEventListener('click', (e) => { if(e.target === rankingModalOverlay) hideModal(rankingModalOverlay); });
         rankingModalCloseBtn.addEventListener('click', () => hideModal(rankingModalOverlay));
+
+        // *** جدید *** رویدادهای قابلیت‌های ادمین در پنل رده‌بندی
+        rankingSearchInput.addEventListener('input', filterRankingList);
+
+        rankingListContainer.addEventListener('click', async (e) => {
+            const editBtn = e.target.closest('.edit-rank-icon');
+            if (!editBtn) return;
+
+            if (!(await verifyAdminStatus())) return;
+
+            const sourceUserItem = editBtn.closest('.ranking-list-item');
+            const sourceUID = sourceUserItem.dataset.uid;
+            const sourceName = sourceUserItem.dataset.displayName;
+            const sourceGems = parseInt(sourceUserItem.dataset.gems);
+            const sourceRank = parseInt(sourceUserItem.dataset.rank);
+            const maxRank = rankingListContainer.querySelectorAll('.ranking-list-item').length;
+
+            const targetRankInput = prompt(`رتبه جدید برای کاربر "${sourceName}" را وارد کنید (بین 1 تا ${maxRank}):`, sourceRank);
+            
+            if (targetRankInput === null) return; // کاربر انصراف داد
+
+            const targetRank = parseInt(targetRankInput);
+
+            if (isNaN(targetRank) || targetRank < 1 || targetRank > maxRank) {
+                showCustomAlert("لطفا یک شماره رتبه معتبر وارد کنید.");
+                return;
+            }
+            if (targetRank === sourceRank) return; // تغییری لازم نیست
+
+            const targetUserItem = rankingListContainer.querySelector(`.ranking-list-item:nth-child(${targetRank})`);
+            if (!targetUserItem) {
+                showCustomAlert("خطا: کاربر مقصد یافت نشد.");
+                return;
+            }
+            
+            const targetUID = targetUserItem.dataset.uid;
+            const targetGems = parseInt(targetUserItem.dataset.gems);
+            
+            try {
+                // استفاده از batch برای جابجایی اتمیک امتیازها
+                const batch = writeBatch(db);
+                
+                const sourceUserRef = doc(db, "users", sourceUID);
+                batch.update(sourceUserRef, { game: targetGems });
+
+                const targetUserRef = doc(db, "users", targetUID);
+                batch.update(targetUserRef, { game: sourceGems });
+
+                await batch.commit();
+
+                showCustomAlert("رتبه کاربر با موفقیت تغییر کرد.", () => {
+                    fetchAndDisplayRankings(); // بارگذاری مجدد لیست برای نمایش تغییرات
+                });
+
+            } catch (error) {
+                console.error("خطا در جابجایی رتبه کاربر: ", error);
+                showCustomAlert("خطا در هنگام ذخیره تغییرات. لطفا دوباره تلاش کنید.");
+            }
+        });
 
     </script>
 </body>
