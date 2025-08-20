@@ -244,30 +244,21 @@
         .user-details { display: flex; flex-direction: column; overflow: hidden; text-align: right; }
         .user-details .name { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .user-details .email { font-size: 0.8rem; color: #c5a687; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .user-actions { display: flex; gap: 8px; } /* *** جدید *** */
-        .user-action-icon { cursor: pointer; padding: 5px; } /* *** جدید *** */
-        .user-action-icon svg { width: 24px; height: 24px; fill: #c5a687; transition: all 0.2s ease; } /* *** جدید *** */
+        .edit-user-icon { cursor: pointer; padding: 5px; }
+        .edit-user-icon svg { width: 24px; height: 24px; fill: #c5a687; transition: all 0.2s ease; }
         .edit-user-icon:hover svg { fill: #ffc947; transform: scale(1.2) rotate(15deg); }
-        .send-message-icon:hover svg { fill: #34d399; transform: scale(1.2); } /* *** جدید *** */
         
         #edit-user-header, #edit-rank-header { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid #5c4a3a; }
         #edit-user-avatar-preview, #edit-rank-avatar-preview { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 3px solid #a47d54; }
         #edit-user-name-preview, #edit-rank-name-preview { font-size: 1.2rem; font-weight: 700; color: #e0dacc; }
-        #edit-user-form, #edit-rank-form, #send-message-form { display: flex; flex-direction: column; gap: 15px; text-align: right; } /* *** جدید *** */
+        #edit-user-form, #edit-rank-form { display: flex; flex-direction: column; gap: 15px; text-align: right; }
         .form-group { display: flex; flex-direction: column; gap: 5px; }
         .form-label { font-weight: 700; color: #c5a687; font-size: 0.9rem; }
-        .form-input, .form-textarea { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #5c4a3a; background-color: #1e170f; color: #f0e6d2; font-family: 'Vazirmatn', sans-serif; font-size: 1rem; direction: ltr; text-align: right; transition: all 0.3s ease; } /* *** جدید *** */
-        .form-textarea { height: 120px; resize: vertical; } /* *** جدید *** */
-        .form-input:focus, .form-textarea:focus { outline: none; border-color: #ffc947; box-shadow: 0 0 12px rgba(255, 201, 71, 0.3); } /* *** جدید *** */
-        #edit-user-form .modal-button, #edit-rank-form .modal-button, #send-message-form .modal-button { margin-top: 15px; } /* *** جدید *** */
-        #edit-user-cancel-btn, #edit-rank-cancel-btn, #send-message-cancel-btn { background: linear-gradient(145deg, #616161, #3a3a3a); border-color: #777; } /* *** جدید *** */
-        #edit-user-cancel-btn:hover, #edit-rank-cancel-btn:hover, #send-message-cancel-btn:hover { background: linear-gradient(145deg, #757575, #4f4f4f); } /* *** جدید *** */
-
-        /* *** جدید *** استایل‌های پنل ارسال پیام */
-        #send-message-header { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid #5c4a3a; }
-        #send-message-recipient-avatar { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #a47d54; }
-        #send-message-recipient-name { font-size: 1.2rem; font-weight: 700; color: #e0dacc; }
-
+        .form-input { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #5c4a3a; background-color: #1e170f; color: #f0e6d2; font-family: 'Vazirmatn', sans-serif; font-size: 1rem; direction: ltr; text-align: right; transition: all 0.3s ease; }
+        .form-input:focus { outline: none; border-color: #ffc947; box-shadow: 0 0 12px rgba(255, 201, 71, 0.3); }
+        #edit-user-form .modal-button, #edit-rank-form .modal-button { margin-top: 15px; }
+        #edit-user-cancel-btn, #edit-rank-cancel-btn { background: linear-gradient(145deg, #616161, #3a3a3a); border-color: #777; }
+        #edit-user-cancel-btn:hover, #edit-rank-cancel-btn:hover { background: linear-gradient(145deg, #757575, #4f4f4f); }
 
         /* --- استایل‌های پنل مدیریت ورودی بازی --- */
         .settings-container { display: flex; flex-direction: column; gap: 20px; margin-bottom: 25px; }
@@ -500,30 +491,6 @@
             </div>
         </div>
     </div>
-
-    <!-- *** جدید *** پنل ارسال پیام به کاربر -->
-    <div id="send-message-modal-overlay" class="modal-overlay">
-        <div id="send-message-modal-content" class="modal-content">
-            <div id="send-message-header">
-                <img id="send-message-recipient-avatar" src="" alt="آواتار کاربر">
-                <h3 id="send-message-recipient-name"></h3>
-            </div>
-            <h2 class="modal-title">ارسال پیام</h2>
-            <form id="send-message-form">
-                <input type="hidden" id="send-message-recipient-uid">
-                <div class="form-group">
-                    <label for="send-message-title" class="form-label">عنوان پیام:</label>
-                    <input type="text" id="send-message-title" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label for="send-message-content" class="form-label">متن پیام:</label>
-                    <textarea id="send-message-content" class="form-textarea" required></textarea>
-                </div>
-                <button type="submit" id="send-message-btn" class="modal-button">ارسال پیام</button>
-                <button type="button" id="send-message-cancel-btn" class="modal-button cancel-button">انصراف</button>
-            </form>
-        </div>
-    </div>
     
     <!-- پنل رده بندی بازیکنان (با تغییرات) -->
     <div id="ranking-modal-overlay" class="modal-overlay">
@@ -572,7 +539,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, getDoc, onSnapshot, collection, getDocs, updateDoc, query, orderBy, limit, where, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, onSnapshot, collection, getDocs, updateDoc, query, orderBy, limit, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
@@ -651,17 +618,6 @@
         const gameModesSaveBtn = document.getElementById('game-modes-save-btn');
         const gameModesCancelBtn = document.getElementById('game-modes-cancel-btn');
 
-        // *** جدید *** المان‌های پنل ارسال پیام
-        const sendMessageModalOverlay = document.getElementById('send-message-modal-overlay');
-        const sendMessageForm = document.getElementById('send-message-form');
-        const sendMessageRecipientUid = document.getElementById('send-message-recipient-uid');
-        const sendMessageRecipientAvatar = document.getElementById('send-message-recipient-avatar');
-        const sendMessageRecipientName = document.getElementById('send-message-recipient-name');
-        const sendMessageTitle = document.getElementById('send-message-title');
-        const sendMessageContent = document.getElementById('send-message-content');
-        const sendMessageBtn = document.getElementById('send-message-btn');
-        const sendMessageCancelBtn = document.getElementById('send-message-cancel-btn');
-
         // المان‌های پنل رده‌بندی
         const rankingButton = document.getElementById('ranking-button');
         const rankingModalOverlay = document.getElementById('ranking-modal-overlay');
@@ -686,7 +642,6 @@
         const MUSIC_VERSION_KEY = 'mafia-music-version';
         const DEFAULT_AVATAR = 'https://i.imgur.com/T2bT1tG.png';
         const EDIT_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19.14,12.94a1.72,1.72,0,0,0-2.28,0l-.63.63a1.72,1.72,0,0,0,0,2.28l.63.63a1.72,1.72,0,0,0,2.28,0l1.47-1.47A3.39,3.39,0,0,0,19.14,12.94Zm-4.88,2.28a3.39,3.39,0,0,0,0-4.56l-2-2a3.39,3.39,0,0,0-4.56,0l-.63.63a3.39,3.39,0,0,0,0,4.56l2,2A3.39,3.39,0,0,0,14.26,15.22Z" opacity="0"/><path d="M12,2A10,10,0,1,0,22,12,10,10,0,0,0,12,2Zm3.71,12.29-2,2a1.72,1.72,0,0,1-2.28,0l-.63-.63a1.72,1.72,0,0,1,0-2.28l.63-.63a1.72,1.72,0,0,1,2.28,0l1.47,1.47A1.72,1.72,0,0,1,15.71,14.29ZM8.29,9.71a1.72,1.72,0,0,1,2.28,0l.63.63a1.72,1.72,0,0,1,0,2.28l-2,2a1.72,1.72,0,0,1-2.28,0l-1.47-1.47a1.72,1.72,0,0,1,0-2.28Z"/></svg>`;
-        const SEND_MESSAGE_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.34,9.32l-14-7a3,3,0,0,0-4.08,3.9l2.4,5.37h0a1.06,1.06,0,0,1,0,.82l-2.4,5.37A3,3,0,0,0,5,22a3.14,3.14,0,0,0,1.35-.32l14-7a3,3,0,0,0,0-5.36Zm-1,2.36-14,7a1,1,0,0,1-1.35-1.3l2.39-5.37A2,2,0,0,0,6.51,12h6.84a1,1,0,0,0,0-2H6.51a2,2,0,0,0-.13-.71L4,4a1,1,0,0,1,1.35-1.3l14,7a1,1,0,0,1,0,1.78Z"/></svg>`;
         const RANK_EDIT_SVG = `<svg viewBox="0 0 20 20"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"></path><path d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path></svg>`;
         const RANK_BAN_SVG = `<svg viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd"></path></svg>`;
         const RANK_RESTORE_SVG = `<svg viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd"></path></svg>`;
@@ -703,7 +658,6 @@
             hideModal(userListModalOverlay);
             hideModal(editUserModalOverlay);
             hideModal(gameModesPanelOverlay);
-            hideModal(sendMessageModalOverlay); // *** جدید ***
         }
         function showCustomAlert(message, onConfirm) {
             customAlertMessage.textContent = message;
@@ -789,73 +743,181 @@
         async function handleBackgroundMusic() { const cachedVersion = localStorage.getItem(MUSIC_VERSION_KEY); if (cachedVersion === MUSIC_URL) { try { const cache = await caches.open(MUSIC_CACHE_NAME); const cachedResponse = await cache.match(MUSIC_URL); if (cachedResponse) { playMusicFromBlob(await cachedResponse.blob()); } else { playMusicFromBlob(await downloadAndCacheMusic()); } } catch (error) { playMusicFromBlob(await downloadAndCacheMusic()); } } else { try { playMusicFromBlob(await downloadAndCacheMusic()); } catch (error) { console.error('فرایند دانلود و پخش موسیقی با خطا مواجه شد:', error); } } }
 
         // --- توابع پنل مدیریت ---
-        async function loadAndShowUserList() { if (!(await verifyAdminStatus())) return; userListContainer.innerHTML = '<p style="padding: 20px;">در حال بارگذاری لیست کاربران...</p>'; userSearchInput.value = ''; hideModal(adminPanelOverlay); showModal(userListModalOverlay); try { const usersCollection = collection(db, "users"); const querySnapshot = await getDocs(usersCollection); userListContainer.innerHTML = ''; if (querySnapshot.empty) { userListContainer.innerHTML = '<p style="padding: 20px;">هیچ کاربری یافت نشد.</p>'; return; } querySnapshot.forEach(doc => { const userData = doc.data(); const userElement = document.createElement('div'); userElement.classList.add('user-list-item'); userElement.dataset.uid = doc.id; userElement.dataset.name = userData.displayName || 'بدون نام'; userElement.dataset.avatar = userData.avatarUrl || DEFAULT_AVATAR; userElement.innerHTML = ` <div class="user-info"> <img src="${userData.avatarUrl || DEFAULT_AVATAR}" alt="avatar"> <div class="user-details"> <span class="name">${userData.displayName || 'بدون نام'}</span> <span class="email">${userData.email || 'بدون ایمیل'}</span> </div> </div> <div class="user-actions"> <span class="user-action-icon send-message-icon" title="ارسال پیام">${SEND_MESSAGE_ICON_SVG}</span> <span class="user-action-icon edit-user-icon" title="ویرایش کاربر">${EDIT_ICON_SVG}</span> </div> `; userListContainer.appendChild(userElement); }); } catch (error) { console.error("خطا در دریافت لیست کاربران: ", error); userListContainer.innerHTML = '<p style="padding: 20px;">خطا در بارگذاری اطلاعات. لطفا دوباره تلاش کنید.</p>'; } }
+        async function loadAndShowUserList() { if (!(await verifyAdminStatus())) return; userListContainer.innerHTML = '<p style="padding: 20px;">در حال بارگذاری لیست کاربران...</p>'; userSearchInput.value = ''; hideModal(adminPanelOverlay); showModal(userListModalOverlay); try { const usersCollection = collection(db, "users"); const querySnapshot = await getDocs(usersCollection); userListContainer.innerHTML = ''; if (querySnapshot.empty) { userListContainer.innerHTML = '<p style="padding: 20px;">هیچ کاربری یافت نشد.</p>'; return; } querySnapshot.forEach(doc => { const userData = doc.data(); const userElement = document.createElement('div'); userElement.classList.add('user-list-item'); userElement.dataset.uid = doc.id; userElement.innerHTML = ` <div class="user-info"> <img src="${userData.avatarUrl || DEFAULT_AVATAR}" alt="avatar"> <div class="user-details"> <span class="name">${userData.displayName || 'بدون نام'}</span> <span class="email">${userData.email || 'بدون ایمیل'}</span> </div> </div> <span class="edit-user-icon">${EDIT_ICON_SVG}</span> `; userListContainer.appendChild(userElement); }); } catch (error) { console.error("خطا در دریافت لیست کاربران: ", error); userListContainer.innerHTML = '<p style="padding: 20px;">خطا در بارگذاری اطلاعات. لطفا دوباره تلاش کنید.</p>'; } }
         async function openEditModalForUser(uid) { if (!(await verifyAdminStatus())) return; try { const userDocRef = doc(db, 'users', uid); const docSnap = await getDoc(userDocRef); if (docSnap.exists()) { const userData = docSnap.data(); editUserNamePreview.textContent = userData.displayName || 'کاربر'; editUserAvatarPreview.src = userData.avatarUrl || DEFAULT_AVATAR; editUserUid.value = uid; editDisplayName.value = userData.displayName || ''; editUserAge.value = userData.old || ''; editUserDiamonds.value = userData.game || 0; hideModal(userListModalOverlay); showModal(editUserModalOverlay); } else { showCustomAlert("کاربر مورد نظر یافت نشد."); } } catch (error) { console.error("خطا در دریافت اطلاعات کاربر برای ویرایش:", error); showCustomAlert("خطا در دریافت اطلاعات کاربر."); } }
-        
-        // *** جدید *** تابع برای باز کردن پنل ارسال پیام
-        function openSendMessageModal(userData) {
-            sendMessageRecipientAvatar.src = userData.avatar;
-            sendMessageRecipientName.textContent = `ارسال پیام به: ${userData.name}`;
-            sendMessageRecipientUid.value = userData.uid;
-            sendMessageForm.reset(); // پاک کردن فرم از پیام‌های قبلی
-            hideModal(userListModalOverlay);
-            showModal(sendMessageModalOverlay);
-        }
-
         async function handleSaveChanges(e) { e.preventDefault(); if (!(await verifyAdminStatus())) return; const uid = editUserUid.value; const newDisplayName = editDisplayName.value; const newAge = parseInt(editUserAge.value, 10); const newDiamonds = parseInt(editUserDiamonds.value, 10); if (!uid) { showCustomAlert("خطای سیستمی: شناسه کاربر موجود نیست."); return; } if (isNaN(newAge) || isNaN(newDiamonds)) { showCustomAlert("لطفا مقادیر معتبر برای سن و الماس وارد کنید."); return; } saveUserChangesBtn.disabled = true; saveUserChangesBtn.textContent = 'در حال ذخیره...'; try { const userDocRef = doc(db, 'users', uid); await updateDoc(userDocRef, { displayName: newDisplayName, old: newAge, game: newDiamonds }); hideModal(editUserModalOverlay); showCustomAlert("تغییرات با موفقیت ذخیره شد.", async () => { await loadAndShowUserList(); }); } catch (error) { console.error("خطا در بروزرسانی اطلاعات کاربر:", error); showCustomAlert("خطا در ذخیره تغییرات. لطفا دوباره تلاش کنید."); } finally { saveUserChangesBtn.disabled = false; saveUserChangesBtn.textContent = 'ذخیره تغییرات'; } }
-        
-        // *** جدید *** تابع برای ارسال پیام
-        async function handleSendMessage(e) {
-            e.preventDefault();
-            if (!(await verifyAdminStatus())) return;
-            
-            const recipientUid = sendMessageRecipientUid.value;
-            const title = sendMessageTitle.value.trim();
-            const content = sendMessageContent.value.trim();
-            
-            if (!recipientUid) { showCustomAlert("خطای سیستمی: گیرنده پیام مشخص نیست."); return; }
-            if (!title || !content) { showCustomAlert("لطفا عنوان و متن پیام را وارد کنید."); return; }
-            
-            sendMessageBtn.disabled = true;
-            sendMessageBtn.textContent = 'در حال ارسال...';
-            
-            try {
-                const messagesRef = collection(db, 'users', recipientUid, 'messages');
-                await addDoc(messagesRef, {
-                    title: title,
-                    content: content,
-                    senderName: "پشتیبانی شهر مافیا",
-                    isRead: false,
-                    timestamp: serverTimestamp()
-                });
-                
-                hideModal(sendMessageModalOverlay);
-                showCustomAlert("پیام شما با موفقیت برای کاربر ارسال شد.", () => {
-                    showModal(userListModalOverlay); // بازگشت به لیست کاربران
-                });
-
-            } catch (error) {
-                console.error("خطا در ارسال پیام:", error);
-                showCustomAlert("ارسال پیام با خطا مواجه شد. لطفا دوباره تلاش کنید.");
-            } finally {
-                sendMessageBtn.disabled = false;
-                sendMessageBtn.textContent = 'ارسال پیام';
-            }
-        }
-
         function filterUserList() { const searchTerm = userSearchInput.value.toLowerCase(); const allUsers = userListContainer.querySelectorAll('.user-list-item'); allUsers.forEach(userItem => { const name = userItem.querySelector('.user-details .name')?.textContent.toLowerCase() || ''; const email = userItem.querySelector('.user-details .email')?.textContent.toLowerCase() || ''; if (name.includes(searchTerm) || email.includes(searchTerm)) { userItem.style.display = 'flex'; } else { userItem.style.display = 'none'; } }); }
         async function openGameModesPanel() { if (!(await verifyAdminStatus())) return; hideModal(adminPanelOverlay); showModal(gameModesPanelOverlay); friendlyModeToggle.disabled = true; rankedModeToggle.disabled = true; gameModesSaveBtn.disabled = true; try { const gameModesDocRef = doc(db, 'settings', 'gameModes'); const docSnap = await getDoc(gameModesDocRef); if (docSnap.exists()) { const modes = docSnap.data(); friendlyModeToggle.checked = modes.friendlyEnabled || false; rankedModeToggle.checked = modes.rankedEnabled || false; } } catch (error) { console.error("خطا در خواندن تنظیمات ورودی بازی: ", error); showCustomAlert("خطا در دریافت اطلاعات. لطفا دوباره تلاش کنید.", () => { hideModal(gameModesPanelOverlay); showModal(adminPanelOverlay); }); } finally { friendlyModeToggle.disabled = false; rankedModeToggle.disabled = false; gameModesSaveBtn.disabled = false; } }
         async function handleSaveGameModes() { if (!(await verifyAdminStatus())) return; gameModesSaveBtn.disabled = true; gameModesSaveBtn.textContent = 'در حال ذخیره...'; const newSettings = { friendlyEnabled: friendlyModeToggle.checked, rankedEnabled: rankedModeToggle.checked }; try { const gameModesDocRef = doc(db, 'settings', 'gameModes'); await updateDoc(gameModesDocRef, newSettings); showCustomAlert("تنظیمات ورودی بازی با موفقیت ذخیره شد."); hideModal(gameModesPanelOverlay); } catch (error) { console.error("خطا در ذخیره تنظیمات ورودی بازی: ", error); showCustomAlert("خطا در ذخیره تغییرات. لطفا دوباره تلاش کنید."); } finally { gameModesSaveBtn.disabled = false; gameModesSaveBtn.textContent = 'ذخیره'; } }
 
         // *** توابع پنل رده بندی (بازنویسی شده برای حالت زنده) ***
-        function renderRankings(allUsers) { const currentUser = auth.currentUser; if (!currentUser) return; const isAdmin = currentUserData?.isAdmin === true; rankingAdminFeatures.forEach(el => { el.style.display = isAdmin ? 'block' : 'none' }); const rankedUsers = allUsers .filter(user => !user.isBannedFromRanking && user.game > 0) .sort((a, b) => (b.game || 0) - (a.game || 0)) .slice(0, 100); const bannedUsers = allUsers.filter(user => user.isBannedFromRanking); rankingListContainer.innerHTML = ''; if (rankedUsers.length === 0) { rankingListContainer.innerHTML = '<p style="padding: 20px; text-align: center;">هنوز بازیکنی در رده‌بندی وجود ندارد.</p>'; } else { rankedUsers.forEach((userData, index) => { const rank = index + 1; const userElement = document.createElement('div'); userElement.classList.add('ranking-list-item'); if(userData.id === currentUser.uid) userElement.classList.add('current-user-rank'); const adminControlsHTML = isAdmin ? ` <div class="ranking-admin-controls" data-uid="${userData.id}" data-name="${userData.displayName || 'کاربر'}" data-avatar="${userData.avatarUrl || DEFAULT_AVATAR}" data-gems="${userData.game || 0}"> <button class="edit-rank-btn" title="ویرایش امتیاز">${RANK_EDIT_SVG}</button> <button class="ban-rank-btn" title="حذف از رده‌بندی">${RANK_BAN_SVG}</button> </div> ` : ''; userElement.innerHTML = ` <span class="rank-number">${rank}</span> <div class="user-info"> <img src="${userData.avatarUrl || DEFAULT_AVATAR}" alt="avatar"> <div class="user-details"> <span class="name">${userData.displayName || 'بدون نام'}</span> </div> </div> <div class="gems-count"> <span>${userData.game || 0}</span> </div> ${adminControlsHTML} `; rankingListContainer.appendChild(userElement); }); } if(isAdmin) { bannedRankingListContainer.innerHTML = ''; if (bannedUsers.length === 0) { bannedRankingListContainer.innerHTML = '<p style="padding: 15px; text-align: center; color: #999;">لیست خالی است.</p>'; } else { bannedUsers.forEach(userData => { const userElement = document.createElement('div'); userElement.classList.add('user-list-item'); userElement.innerHTML = ` <div class="user-info" style="flex-grow: 1;"> <img src="${userData.avatarUrl || DEFAULT_AVATAR}" alt="avatar"> <div class="user-details"> <span class="name">${userData.displayName || 'بدون نام'}</span> </div> </div> <button class="restore-rank-btn" title="بازگردانی به رده‌بندی" data-uid="${userData.id}" data-name="${userData.displayName || 'کاربر'}"> ${RANK_RESTORE_SVG} <span>بازگردانی</span> </button> `; bannedRankingListContainer.appendChild(userElement); }); } } }
-        function startRankingListener() { if (rankingListenerUnsubscribe) { rankingListenerUnsubscribe(); } const usersRef = collection(db, "users"); rankingListenerUnsubscribe = onSnapshot(usersRef, (querySnapshot) => { let allUsers = []; querySnapshot.forEach(doc => { allUsers.push({ id: doc.id, ...doc.data() }); }); renderRankings(allUsers); }, (error) => { console.error("خطا در شنونده زنده رده‌بندی:", error); rankingListContainer.innerHTML = '<p style="padding: 20px; text-align: center;">خطا در دریافت اطلاعات زنده.</p>'; showCustomAlert("خطا در بارگذاری زنده رده‌بندی."); }); }
-        function stopRankingListener() { if (rankingListenerUnsubscribe) { rankingListenerUnsubscribe(); rankingListenerUnsubscribe = null; } }
-        function filterRankingList() { const searchTerm = rankingSearchInput.value.toLowerCase(); rankingListContainer.querySelectorAll('.ranking-list-item').forEach(userItem => { const name = userItem.querySelector('.user-details .name')?.textContent.toLowerCase() || ''; userItem.style.display = name.includes(searchTerm) ? 'flex' : 'none'; }); bannedRankingListContainer.querySelectorAll('.user-list-item').forEach(userItem => { const name = userItem.querySelector('.user-details .name')?.textContent.toLowerCase() || ''; userItem.style.display = name.includes(searchTerm) ? 'flex' : 'none'; }); }
-        function openEditRankModal(userData) { editRankAvatarPreview.src = userData.avatar; editRankNamePreview.textContent = userData.name; editRankDiamonds.value = userData.gems; editRankUid.value = userData.uid; showModal(editRankModalOverlay); }
-        async function handleSaveRankChanges(e) { e.preventDefault(); if (!(await verifyAdminStatus())) return; const uid = editRankUid.value; const newGems = parseInt(editRankDiamonds.value, 10); if (!uid) { showCustomAlert("خطای سیستمی: شناسه کاربر موجود نیست."); return; } if (isNaN(newGems) || newGems < 0) { showCustomAlert("لطفا مقدار عددی معتبر و مثبت برای امتیاز وارد کنید."); return; } saveRankChangesBtn.disabled = true; saveRankChangesBtn.textContent = 'در حال ذخیره...'; try { await updateDoc(doc(db, 'users', uid), { game: newGems }); hideModal(editRankModalOverlay); showCustomAlert("امتیاز کاربر با موفقیت ویرایش شد."); } catch (error) { console.error("خطا در ویرایش امتیاز کاربر:", error); showCustomAlert("خطا در ذخیره تغییرات."); } finally { saveRankChangesBtn.disabled = false; saveRankChangesBtn.textContent = 'ذخیره تغییرات'; } }
-        async function handleBanFromRanking(userData) { if (!(await verifyAdminStatus())) return; const message = `آیا از حذف کاربر "<b>${userData.name}</b>" از لیست رده‌بندی مطمئن هستید؟<br><small>این کاربر به لیست حذف شده‌ها منتقل می‌شود.</small>`; showCustomConfirm(message, async () => { try { await updateDoc(doc(db, 'users', userData.uid), { isBannedFromRanking: true }); showCustomAlert("کاربر با موفقیت از رده‌بندی حذف شد."); } catch (error) { console.error("خطا در حذف کاربر از رده بندی:", error); showCustomAlert("عملیات با خطا مواجه شد."); } }); }
-        async function handleRestoreToRanking(userData) { if (!(await verifyAdminStatus())) return; const message = `آیا می‌خواهید کاربر "<b>${userData.name}</b>" را به رده‌بندی بازگردانید؟`; showCustomConfirm(message, async () => { try { await updateDoc(doc(db, 'users', userData.uid), { isBannedFromRanking: false }); showCustomAlert("کاربر با موفقیت به رده‌بندی بازگردانده شد."); } catch (error) { console.error("خطا در بازگردانی کاربر:", error); showCustomAlert("عملیات با خطا مواجه شد."); } }); }
+        
+        // تابع اصلی برای رندر کردن لیست‌ها بر اساس آرایه کاربران ورودی
+        function renderRankings(allUsers) {
+            const currentUser = auth.currentUser;
+            if (!currentUser) return;
+            
+            const isAdmin = currentUserData?.isAdmin === true;
+            rankingAdminFeatures.forEach(el => { el.style.display = isAdmin ? 'block' : 'none' });
+
+            // جدا کردن کاربران به لیست‌های رده‌بندی و بن شده
+            const rankedUsers = allUsers
+                .filter(user => !user.isBannedFromRanking && user.game > 0)
+                .sort((a, b) => (b.game || 0) - (a.game || 0))
+                .slice(0, 100); // محدود به ۱۰۰ نفر برتر
+
+            const bannedUsers = allUsers.filter(user => user.isBannedFromRanking);
+
+            // --- نمایش لیست اصلی رده‌بندی ---
+            rankingListContainer.innerHTML = ''; 
+            if (rankedUsers.length === 0) {
+                rankingListContainer.innerHTML = '<p style="padding: 20px; text-align: center;">هنوز بازیکنی در رده‌بندی وجود ندارد.</p>';
+            } else {
+                rankedUsers.forEach((userData, index) => {
+                    const rank = index + 1;
+                    const userElement = document.createElement('div');
+                    userElement.classList.add('ranking-list-item');
+                    if(userData.id === currentUser.uid) userElement.classList.add('current-user-rank');
+                    
+                    const adminControlsHTML = isAdmin ? `
+                        <div class="ranking-admin-controls" data-uid="${userData.id}" data-name="${userData.displayName || 'کاربر'}" data-avatar="${userData.avatarUrl || DEFAULT_AVATAR}" data-gems="${userData.game || 0}">
+                            <button class="edit-rank-btn" title="ویرایش امتیاز">${RANK_EDIT_SVG}</button>
+                            <button class="ban-rank-btn" title="حذف از رده‌بندی">${RANK_BAN_SVG}</button>
+                        </div>
+                    ` : '';
+
+                    userElement.innerHTML = `
+                        <span class="rank-number">${rank}</span>
+                        <div class="user-info">
+                            <img src="${userData.avatarUrl || DEFAULT_AVATAR}" alt="avatar">
+                            <div class="user-details"> <span class="name">${userData.displayName || 'بدون نام'}</span> </div>
+                        </div>
+                        <div class="gems-count"> <span>${userData.game || 0}</span> </div>
+                        ${adminControlsHTML}
+                    `;
+                    rankingListContainer.appendChild(userElement);
+                });
+            }
+            
+            // --- نمایش لیست کاربران بن شده (برای ادمین) ---
+            if(isAdmin) {
+                bannedRankingListContainer.innerHTML = '';
+                if (bannedUsers.length === 0) {
+                    bannedRankingListContainer.innerHTML = '<p style="padding: 15px; text-align: center; color: #999;">لیست خالی است.</p>';
+                } else {
+                    bannedUsers.forEach(userData => {
+                        const userElement = document.createElement('div');
+                        userElement.classList.add('user-list-item');
+                        userElement.innerHTML = `
+                            <div class="user-info" style="flex-grow: 1;">
+                                <img src="${userData.avatarUrl || DEFAULT_AVATAR}" alt="avatar">
+                                <div class="user-details"> <span class="name">${userData.displayName || 'بدون نام'}</span> </div>
+                            </div>
+                            <button class="restore-rank-btn" title="بازگردانی به رده‌بندی" data-uid="${userData.id}" data-name="${userData.displayName || 'کاربر'}">
+                                ${RANK_RESTORE_SVG}
+                                <span>بازگردانی</span>
+                            </button>
+                        `;
+                        bannedRankingListContainer.appendChild(userElement);
+                    });
+                }
+            }
+        }
+        
+        // تابع برای شروع شنونده زنده
+        function startRankingListener() {
+            if (rankingListenerUnsubscribe) { // جلوگیری از ایجاد شنونده‌های تکراری
+                rankingListenerUnsubscribe();
+            }
+            const usersRef = collection(db, "users");
+            rankingListenerUnsubscribe = onSnapshot(usersRef, (querySnapshot) => {
+                let allUsers = [];
+                querySnapshot.forEach(doc => {
+                    allUsers.push({ id: doc.id, ...doc.data() });
+                });
+                renderRankings(allUsers); // رندر کردن لیست با داده‌های جدید و زنده
+            }, (error) => {
+                console.error("خطا در شنونده زنده رده‌بندی:", error);
+                rankingListContainer.innerHTML = '<p style="padding: 20px; text-align: center;">خطا در دریافت اطلاعات زنده.</p>';
+                showCustomAlert("خطا در بارگذاری زنده رده‌بندی.");
+            });
+        }
+
+        // تابع برای توقف شنونده زنده
+        function stopRankingListener() {
+            if (rankingListenerUnsubscribe) {
+                rankingListenerUnsubscribe(); // قطع ارتباط با سرور
+                rankingListenerUnsubscribe = null;
+            }
+        }
+
+        function filterRankingList() {
+            const searchTerm = rankingSearchInput.value.toLowerCase();
+            rankingListContainer.querySelectorAll('.ranking-list-item').forEach(userItem => {
+                const name = userItem.querySelector('.user-details .name')?.textContent.toLowerCase() || '';
+                userItem.style.display = name.includes(searchTerm) ? 'flex' : 'none';
+            });
+            bannedRankingListContainer.querySelectorAll('.user-list-item').forEach(userItem => {
+                const name = userItem.querySelector('.user-details .name')?.textContent.toLowerCase() || '';
+                userItem.style.display = name.includes(searchTerm) ? 'flex' : 'none';
+            });
+        }
+        
+        function openEditRankModal(userData) {
+            editRankAvatarPreview.src = userData.avatar;
+            editRankNamePreview.textContent = userData.name;
+            editRankDiamonds.value = userData.gems;
+            editRankUid.value = userData.uid;
+            showModal(editRankModalOverlay);
+        }
+
+        async function handleSaveRankChanges(e) {
+            e.preventDefault();
+            if (!(await verifyAdminStatus())) return;
+            const uid = editRankUid.value;
+            const newGems = parseInt(editRankDiamonds.value, 10);
+            if (!uid) { showCustomAlert("خطای سیستمی: شناسه کاربر موجود نیست."); return; }
+            if (isNaN(newGems) || newGems < 0) { showCustomAlert("لطفا مقدار عددی معتبر و مثبت برای امتیاز وارد کنید."); return; }
+            saveRankChangesBtn.disabled = true; saveRankChangesBtn.textContent = 'در حال ذخیره...';
+            try {
+                await updateDoc(doc(db, 'users', uid), { game: newGems });
+                hideModal(editRankModalOverlay);
+                showCustomAlert("امتیاز کاربر با موفقیت ویرایش شد."); // نیازی به رفرش دستی نیست
+            } catch (error) {
+                console.error("خطا در ویرایش امتیاز کاربر:", error);
+                showCustomAlert("خطا در ذخیره تغییرات.");
+            } finally {
+                saveRankChangesBtn.disabled = false; saveRankChangesBtn.textContent = 'ذخیره تغییرات';
+            }
+        }
+
+        async function handleBanFromRanking(userData) {
+            if (!(await verifyAdminStatus())) return;
+            const message = `آیا از حذف کاربر "<b>${userData.name}</b>" از لیست رده‌بندی مطمئن هستید؟<br><small>این کاربر به لیست حذف شده‌ها منتقل می‌شود.</small>`;
+            showCustomConfirm(message, async () => {
+                try {
+                    await updateDoc(doc(db, 'users', userData.uid), { isBannedFromRanking: true });
+                    showCustomAlert("کاربر با موفقیت از رده‌بندی حذف شد."); // نیازی به رفرش دستی نیست
+                } catch (error) {
+                     console.error("خطا در حذف کاربر از رده بندی:", error);
+                    showCustomAlert("عملیات با خطا مواجه شد.");
+                }
+            });
+        }
+        
+        async function handleRestoreToRanking(userData) {
+            if (!(await verifyAdminStatus())) return;
+            const message = `آیا می‌خواهید کاربر "<b>${userData.name}</b>" را به رده‌بندی بازگردانید؟`;
+             showCustomConfirm(message, async () => {
+                try {
+                    await updateDoc(doc(db, 'users', userData.uid), { isBannedFromRanking: false });
+                    showCustomAlert("کاربر با موفقیت به رده‌بندی بازگردانده شد."); // نیازی به رفرش دستی نیست
+                } catch (error) {
+                     console.error("خطا در بازگردانی کاربر:", error);
+                    showCustomAlert("عملیات با خطا مواجه شد.");
+                }
+            });
+        }
 
 
         // --- منطق اصلی و احراز هویت ---
@@ -935,25 +997,7 @@
         userListModalOverlay.addEventListener('click', (e) => { if (e.target === userListModalOverlay) hideModal(userListModalOverlay); });
         userListCloseBtn.addEventListener('click', () => { hideModal(userListModalOverlay); showModal(adminPanelOverlay); });
         userSearchInput.addEventListener('input', filterUserList);
-        
-        // *** جدید *** رویداد کلیک روی لیست کاربران برای تفکیک دکمه‌ها
-        userListContainer.addEventListener('click', (e) => {
-            const userItem = e.target.closest('.user-list-item');
-            if (!userItem) return;
-
-            const editButton = e.target.closest('.edit-user-icon');
-            if (editButton) {
-                openEditModalForUser(userItem.dataset.uid);
-                return;
-            }
-
-            const messageButton = e.target.closest('.send-message-icon');
-            if (messageButton) {
-                openSendMessageModal({ ...userItem.dataset });
-                return;
-            }
-        });
-
+        userListContainer.addEventListener('click', (e) => { const editButton = e.target.closest('.edit-user-icon'); if (editButton) { const userItem = editButton.closest('.user-list-item'); if (userItem && userItem.dataset.uid) { openEditModalForUser(userItem.dataset.uid); } } });
         editUserModalOverlay.addEventListener('click', (e) => { if (e.target === editUserModalOverlay) hideModal(editUserModalOverlay); });
         editUserForm.addEventListener('submit', handleSaveChanges);
         editUserCancelBtn.addEventListener('click', () => { hideModal(editUserModalOverlay); showModal(userListModalOverlay); });
@@ -961,24 +1005,46 @@
         gameModesPanelOverlay.addEventListener('click', (e) => { if (e.target === gameModesPanelOverlay) hideModal(gameModesPanelOverlay); });
         gameModesSaveBtn.addEventListener('click', handleSaveGameModes);
         gameModesCancelBtn.addEventListener('click', () => { hideModal(gameModesPanelOverlay); showModal(adminPanelOverlay); });
-        
-        // *** جدید *** رویدادهای پنل ارسال پیام
-        sendMessageModalOverlay.addEventListener('click', (e) => { if (e.target === sendMessageModalOverlay) hideModal(sendMessageModalOverlay); });
-        sendMessageForm.addEventListener('submit', handleSendMessage);
-        sendMessageCancelBtn.addEventListener('click', () => {
-            hideModal(sendMessageModalOverlay);
-            showModal(userListModalOverlay); // بازگشت به لیست کاربران
-        });
-
 
         // رویدادهای پنل رده بندی
-        const closeRankingModal = () => { hideModal(rankingModalOverlay); stopRankingListener(); };
-        rankingButton.addEventListener('click', () => checkMaintenanceAndProceed(() => { rankingListContainer.innerHTML = '<p style="padding: 20px; text-align: center;">در حال بارگذاری رده‌بندی...</p>'; bannedRankingListContainer.innerHTML = ''; rankingSearchInput.value = ''; showModal(rankingModalOverlay); startRankingListener(); }));
+        const closeRankingModal = () => {
+            hideModal(rankingModalOverlay);
+            stopRankingListener(); // **مهم** توقف شنونده هنگام بستن پنل
+        };
+
+        rankingButton.addEventListener('click', () => checkMaintenanceAndProceed(() => {
+            rankingListContainer.innerHTML = '<p style="padding: 20px; text-align: center;">در حال بارگذاری رده‌بندی...</p>';
+            bannedRankingListContainer.innerHTML = '';
+            rankingSearchInput.value = '';
+            showModal(rankingModalOverlay);
+            startRankingListener(); // **مهم** شروع شنونده هنگام باز کردن پنل
+        }));
+
         rankingModalOverlay.addEventListener('click', (e) => { if(e.target === rankingModalOverlay) closeRankingModal(); });
         rankingModalCloseBtn.addEventListener('click', closeRankingModal);
         rankingSearchInput.addEventListener('input', filterRankingList);
-        rankingListContainer.addEventListener('click', (e) => { const editBtn = e.target.closest('.edit-rank-btn'); const banBtn = e.target.closest('.ban-rank-btn'); if (editBtn) { const userData = { ...editBtn.closest('.ranking-admin-controls').dataset }; openEditRankModal(userData); } if (banBtn) { const userData = { ...banBtn.closest('.ranking-admin-controls').dataset }; handleBanFromRanking(userData); } });
-        bannedRankingListContainer.addEventListener('click', (e) => { const restoreBtn = e.target.closest('.restore-rank-btn'); if (restoreBtn) { const userData = { ...restoreBtn.dataset }; handleRestoreToRanking(userData); } });
+        
+        rankingListContainer.addEventListener('click', (e) => {
+            const editBtn = e.target.closest('.edit-rank-btn');
+            const banBtn = e.target.closest('.ban-rank-btn');
+            if (editBtn) {
+                const userData = { ...editBtn.closest('.ranking-admin-controls').dataset };
+                openEditRankModal(userData);
+            }
+            if (banBtn) {
+                const userData = { ...banBtn.closest('.ranking-admin-controls').dataset };
+                handleBanFromRanking(userData);
+            }
+        });
+
+        bannedRankingListContainer.addEventListener('click', (e) => {
+             const restoreBtn = e.target.closest('.restore-rank-btn');
+             if (restoreBtn) {
+                 const userData = { ...restoreBtn.dataset };
+                 handleRestoreToRanking(userData);
+             }
+        });
+
         editRankModalOverlay.addEventListener('click', (e) => { if (e.target === editRankModalOverlay) hideModal(editRankModalOverlay); });
         editRankForm.addEventListener('submit', handleSaveRankChanges);
         editRankCancelBtn.addEventListener('click', () => hideModal(editRankModalOverlay));
