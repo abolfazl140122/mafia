@@ -266,13 +266,38 @@
         .creator-info { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
         .lobby-creator { font-size: 0.9rem; color: var(--text-secondary); }
         
-        /* استایل‌های جدید برای بخش ادمین */
-        .admin-controls { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
-        .admin-password-view {
-            font-size: 0.8rem; color: #f39c12; background-color: rgba(0,0,0,0.4);
-            padding: 2px 8px; border-radius: 4px; font-family: monospace;
+        /* --- [تغییر] استایل‌های جدید و یکپارچه برای بخش ادمین --- */
+        .admin-password-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 4px 8px;
+            margin-top: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
-
+        .admin-password-container:hover {
+            background-color: var(--admin-edit-bg);
+            border-color: var(--primary-gold);
+        }
+        .admin-password-text {
+            font-size: 0.8rem;
+            color: #f39c12;
+            font-family: monospace;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100px; /* جلوگیری از طولانی شدن بیش از حد رمز */
+        }
+        .admin-edit-icon {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            padding-left: 8px;
+        }
+        
         .lobby-actions { display: flex; gap: 10px; }
         .lobby-btn {
             padding: 8px 20px; font-size: 1rem; font-weight: 700;
@@ -308,19 +333,6 @@
         .btn-admin-delete:hover {
             background: linear-gradient(145deg, var(--admin-red-hover), var(--admin-red));
             transform: translateY(-2px);
-        }
-        /* [تغییر یافته] استایل دکمه ویرایش رمز برای هماهنگی با تم */
-        .btn-edit-pass {
-            background: linear-gradient(145deg, var(--admin-edit-bg), #332a20);
-            color: var(--primary-gold);
-            padding: 4px 8px; /* کوچکتر */
-            font-size: 1rem; /* آیکون خواناتر */
-            border-radius: 6px;
-            border: 1px solid var(--admin-edit-border);
-        }
-        .btn-edit-pass:hover {
-            background: linear-gradient(145deg, var(--admin-edit-bg-hover), var(--admin-edit-bg));
-            transform: translateY(-1px);
         }
 
         /* --- دکمه شناور --- */
@@ -768,12 +780,13 @@
                 actionButtonsHTML += `<button class="lobby-btn btn-join" data-action="join">پیوستن</button>`;
             }
             
+            // --- [تغییر] ساختار HTML برای بخش ادمین ---
             let adminControlsHTML = '';
             if (currentUserIsAdmin && isPrivate) {
                 adminControlsHTML = `
-                    <div class="admin-controls">
-                        <span class="admin-password-view">رمز: ${lobbyData.password}</span>
-                        <button class="lobby-btn btn-edit-pass" data-action="edit-pass" title="تغییر رمز">✏️</button>
+                    <div class="admin-password-container" data-action="edit-pass" title="تغییر رمز">
+                        <span class="admin-password-text">رمز: ${lobbyData.password}</span>
+                        <span class="admin-edit-icon">✏️</span>
                     </div>`;
             }
 
@@ -826,6 +839,7 @@
                 deleteAction('تایید ادمین', `آیا از بستن لابی "${lobbyData.lobbyName}" مطمئن هستید؟`);
             });
             
+            // event listener روی کل کانتینر عمل می‌کند
             card.querySelector('[data-action="edit-pass"]')?.addEventListener('click', () => {
                 promptForPasswordChange(lobbyData);
             });
