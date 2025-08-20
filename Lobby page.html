@@ -12,10 +12,12 @@
             --primary-gold: #ffc947;
             --dark-red: #8c4843;
             --darker-red: #5a2c2a;
-            --admin-red: #c0392b; /* رنگ جدید برای دکمه ادمین */
+            --admin-red: #c0392b; /* رنگ برای دکمه ادمین */
             --admin-red-hover: #e74c3c;
-            --admin-blue: #2980b9; /* رنگ برای دکمه ویرایش ادمین */
-            --admin-blue-hover: #3498db;
+            /* رنگ‌های جدید برای دکمه ویرایش */
+            --admin-edit-bg: #504436; 
+            --admin-edit-bg-hover: #615342;
+            --admin-edit-border: #c5a687;
             --text-light: #f0e6d2;
             --text-secondary: #c5a687;
             --bg-dark: #1a140e;
@@ -115,6 +117,63 @@
             text-shadow: 1px 1px 3px #000;
         }
         
+        /* --- [جدید] پنل دانلود موسیقی --- */
+        #music-download-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1999; /* زیر لودینگ اصلی */
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease;
+        }
+        #music-download-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        .download-panel {
+            width: 90%;
+            max-width: 350px;
+            text-align: center;
+        }
+        .download-title {
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: var(--primary-gold);
+            margin-bottom: 20px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.7);
+        }
+        .progress-bar-container {
+            width: 100%;
+            height: 20px;
+            background-color: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+        }
+        #progress-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--dark-red), var(--primary-gold));
+            border-radius: 10px;
+            transition: width 0.3s ease-out;
+        }
+        #progress-text {
+            margin-top: 15px;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-light);
+        }
+
         /* --- محتوای اصلی --- */
         .main-container {
             width: 100%;
@@ -250,20 +309,19 @@
             background: linear-gradient(145deg, var(--admin-red-hover), var(--admin-red));
             transform: translateY(-2px);
         }
-        /* استایل دکمه جدید ویرایش رمز */
+        /* [تغییر یافته] استایل دکمه ویرایش رمز برای هماهنگی با تم */
         .btn-edit-pass {
-            background: linear-gradient(145deg, var(--admin-blue), #216a94);
-            color: white;
+            background: linear-gradient(145deg, var(--admin-edit-bg), #332a20);
+            color: var(--primary-gold);
             padding: 4px 8px; /* کوچکتر */
-            font-size: 0.9rem;
+            font-size: 1rem; /* آیکون خواناتر */
             border-radius: 6px;
-            border: 1px solid #7dc6ff;
+            border: 1px solid var(--admin-edit-border);
         }
         .btn-edit-pass:hover {
-            background: linear-gradient(145deg, var(--admin-blue-hover), var(--admin-blue));
+            background: linear-gradient(145deg, var(--admin-edit-bg-hover), var(--admin-edit-bg));
             transform: translateY(-1px);
         }
-
 
         /* --- دکمه شناور --- */
         #create-lobby-fab {
@@ -395,6 +453,20 @@
 
     <div id="background-blurry"></div>
 
+    <!-- [جدید] موسیقی پس‌زمینه -->
+    <audio id="background-music" loop></audio>
+
+    <!-- [جدید] پنل دانلود موسیقی -->
+    <div id="music-download-overlay">
+        <div class="download-panel">
+            <h2 class="download-title">موسیقی پس‌زمینه</h2>
+            <div class="progress-bar-container">
+                <div id="progress-bar"></div>
+            </div>
+            <p id="progress-text">در حال دانلود... 0%</p>
+        </div>
+    </div>
+
     <div id="loading-overlay">
         <div class="loader-logo-wrapper">
             <img src="https://up.20script.ir/file/eaae-Copilot-20250812-110015-removebg-preview-1-.png" alt="Loading Logo" class="loader-logo">
@@ -491,10 +563,108 @@
         const customAlertMessage = document.getElementById('custom-alert-message');
         const customAlertButtons = document.getElementById('custom-alert-buttons');
         const loadingOverlay = document.getElementById('loading-overlay');
+        
+        // --- [جدید] عناصر مربوط به موسیقی ---
+        const backgroundMusic = document.getElementById('background-music');
+        const musicDownloadOverlay = document.getElementById('music-download-overlay');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
 
         let currentUser = null;
         let currentUserIsAdmin = false;
         let allLobbiesData = new Map(); // برای نگهداری دیتای لابی‌ها و بازسازی لیست
+
+        // --- [جدید] متغیرهای مربوط به موسیقی ---
+        let isMusicPlaying = false;
+        const MUSIC_URL = "https://raw.githubusercontent.com/abolfazl140122/mafia/main/mysterious-dark-background-310162%20(1).mp3";
+        const MUSIC_CACHE_NAME = 'mafia-lobby-music-cache-v1';
+        const MUSIC_VERSION_KEY = 'mafia-lobby-music-version';
+
+        // --- توابع ---
+        
+        // --- [جدید] توابع مربوط به موسیقی ---
+        const playMusicAfterUserInteraction = () => {
+            if (!isMusicPlaying && backgroundMusic.src && backgroundMusic.paused) {
+                backgroundMusic.play()
+                    .then(() => {
+                        isMusicPlaying = true;
+                        document.body.removeEventListener('click', playMusicAfterUserInteraction, true);
+                        document.body.removeEventListener('keydown', playMusicAfterUserInteraction, true);
+                    })
+                    .catch(e => console.error("Error playing music post-interaction.", e));
+            } else {
+                document.body.removeEventListener('click', playMusicAfterUserInteraction, true);
+                document.body.removeEventListener('keydown', playMusicAfterUserInteraction, true);
+            }
+        };
+
+        function playMusicFromBlob(blob) {
+            const objectUrl = URL.createObjectURL(blob);
+            backgroundMusic.src = objectUrl;
+            backgroundMusic.volume = 0.3;
+            
+            const playPromise = backgroundMusic.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    isMusicPlaying = true;
+                }).catch(error => {
+                    isMusicPlaying = false;
+                    document.body.addEventListener('click', playMusicAfterUserInteraction, true);
+                    document.body.addEventListener('keydown', playMusicAfterUserInteraction, true);
+                });
+            }
+        }
+
+        function downloadAndCacheMusic() {
+            return new Promise((resolve, reject) => {
+                musicDownloadOverlay.classList.add('visible');
+                const xhr = new XMLHttpRequest();
+                xhr.open('GET', MUSIC_URL, true);
+                xhr.responseType = 'blob';
+
+                xhr.onprogress = (event) => {
+                    if (event.lengthComputable) {
+                        const percentComplete = Math.round((event.loaded / event.total) * 100);
+                        progressBar.style.width = percentComplete + '%';
+                        progressText.textContent = `در حال دانلود... ${percentComplete}%`;
+                    }
+                };
+                xhr.onload = async () => {
+                    if (xhr.status === 200) {
+                        const musicBlob = xhr.response;
+                        try {
+                            const cache = await caches.open(MUSIC_CACHE_NAME);
+                            await cache.put(MUSIC_URL, new Response(musicBlob));
+                            localStorage.setItem(MUSIC_VERSION_KEY, MUSIC_URL);
+                            musicDownloadOverlay.classList.remove('visible');
+                            resolve(musicBlob);
+                        } catch (cacheError) { reject(cacheError); }
+                    } else { reject(new Error(`Network error: ${xhr.statusText}`)); }
+                };
+                xhr.onerror = () => {
+                    musicDownloadOverlay.classList.remove('visible');
+                    reject(new Error('Network error during download.'));
+                };
+                xhr.send();
+            });
+        }
+        
+        async function handleBackgroundMusic() {
+            const cachedVersion = localStorage.getItem(MUSIC_VERSION_KEY);
+            if (cachedVersion === MUSIC_URL) {
+                try {
+                    const cache = await caches.open(MUSIC_CACHE_NAME);
+                    const cachedResponse = await cache.match(MUSIC_URL);
+                    if (cachedResponse) {
+                        playMusicFromBlob(await cachedResponse.blob());
+                    } else { playMusicFromBlob(await downloadAndCacheMusic()); }
+                } catch (error) { playMusicFromBlob(await downloadAndCacheMusic()); }
+            } else {
+                try { playMusicFromBlob(await downloadAndCacheMusic()); } 
+                catch (error) { console.error('Music download/play process failed:', error); }
+            }
+        }
+        // --- پایان توابع موسیقی ---
 
         function showModal(modalElement) { modalElement.classList.add('visible'); }
         function hideModal(modalElement) { modalElement.classList.remove('visible'); }
@@ -598,7 +768,6 @@
                 actionButtonsHTML += `<button class="lobby-btn btn-join" data-action="join">پیوستن</button>`;
             }
             
-            // نمایش رمز و دکمه ویرایش برای ادمین
             let adminControlsHTML = '';
             if (currentUserIsAdmin && isPrivate) {
                 adminControlsHTML = `
@@ -657,7 +826,6 @@
                 deleteAction('تایید ادمین', `آیا از بستن لابی "${lobbyData.lobbyName}" مطمئن هستید؟`);
             });
             
-            // اضافه کردن event listener برای دکمه ویرایش رمز
             card.querySelector('[data-action="edit-pass"]')?.addEventListener('click', () => {
                 promptForPasswordChange(lobbyData);
             });
@@ -665,9 +833,8 @@
             return card;
         }
         
-        // تابع جدید برای بازسازی کل لیست لابی‌ها
         function rerenderAllLobbyCards() {
-            lobbyList.innerHTML = ''; // پاک کردن لیست فعلی
+            lobbyList.innerHTML = ''; 
             const sortedLobbies = Array.from(allLobbiesData.values()).sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis());
             
             sortedLobbies.forEach((lobbyData, index) => {
@@ -679,21 +846,23 @@
             filterLobbies();
         }
         
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => { // اضافه شدن async
             if (user) {
                 currentUser = user;
+                
+                // [جدید] شروع دانلود و پخش موسیقی
+                await handleBackgroundMusic();
+
                 const userDocRef = doc(db, 'users', user.uid);
                 
-                // --- شنونده لحظه‌ای برای وضعیت ادمین ---
                 onSnapshot(userDocRef, (docSnap) => {
                     if (docSnap.exists()) {
                         const userData = docSnap.data();
                         const newAdminStatus = userData && userData.isAdmin === true;
                         
-                        // فقط اگر وضعیت تغییر کرد، لیست را بازسازی کن
                         if (newAdminStatus !== currentUserIsAdmin) {
                             currentUserIsAdmin = newAdminStatus;
-                            rerenderAllLobbyCards(); // بازسازی لحظه‌ای
+                            rerenderAllLobbyCards(); 
                         }
                     }
                 });
@@ -713,7 +882,7 @@
                         }
                     });
 
-                    rerenderAllLobbyCards(); // بازسازی لیست با هر تغییر
+                    rerenderAllLobbyCards();
 
                     if (loadingOverlay.style.opacity !== '0') {
                         loadingOverlay.style.opacity = '0';
@@ -832,7 +1001,7 @@
             let msgElement = lobbyList.querySelector('.info-message-filter');
             if (!msgElement) {
                 msgElement = document.createElement('p');
-                msgElement.className = 'info-message-filter'; // کلاس متفاوت برای جلوگیری از تداخل
+                msgElement.className = 'info-message-filter'; 
                 msgElement.style.textAlign = 'center';
                 msgElement.style.color = 'var(--text-secondary)';
                 lobbyList.appendChild(msgElement);
