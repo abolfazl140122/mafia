@@ -99,11 +99,10 @@
         .gem-icon {
             width: 24px;
             height: 24px;
-            /* UPDATED: Changed shadow to match new diamond icon */
             filter: drop-shadow(0 0 4px rgba(173, 216, 230, 0.9)); 
         }
 
-        /* --- NEW: Controls Bar (Search, Sort, Filter) --- */
+        /* --- Controls Bar (Search, Sort, Filter) --- */
         .controls-bar {
             width: 100%;
             display: flex;
@@ -116,7 +115,7 @@
 
         #search-input {
             flex-grow: 1; /* Takes up available space */
-            min-width: 200px; /* Minimum width before wrapping */
+            min-width: 150px; /* Minimum width before wrapping */
             background-color: rgba(0,0,0,0.4);
             border: 1px solid #5a4a3a;
             color: #c5a687;
@@ -141,7 +140,8 @@
             flex-shrink: 0; /* Prevents buttons from shrinking */
         }
 
-        .filter-btn, .sort-btn {
+        /* UPDATED: Applied same style to all control buttons */
+        .filter-btn, .sort-btn, .gender-btn {
             background-color: rgba(0,0,0,0.4);
             border: 1px solid #5a4a3a;
             color: #c5a687;
@@ -153,11 +153,11 @@
             transition: all 0.3s ease;
             white-space: nowrap;
         }
-        .filter-btn:hover, .sort-btn:hover {
+        .filter-btn:hover, .sort-btn:hover, .gender-btn:hover {
             background-color: rgba(0,0,0,0.6);
             border-color: #ffc947;
         }
-        .filter-btn.active, .sort-btn.active {
+        .filter-btn.active, .sort-btn.active, .gender-btn.active {
             background-color: #ffc947;
             color: #1a130e;
             border-color: #ffc947;
@@ -257,7 +257,6 @@
             text-align: center;
             margin-top: auto; /* Pushes to bottom */
         }
-        /* UPDATED: Increased icon size inside price tags */
         .price-tag .gem-icon { width: 16px; height: 16px; filter: none; }
         .status-text.owned-text { color: #a0a0a0; }
         .status-text.equipped-text { color: #ffc947; font-weight: 900; }
@@ -356,14 +355,19 @@
             <span id="user-display-name">...</span>
             <div class="gem-balance">
                 <span id="user-gems">0</span>
-                <!-- UPDATED: New diamond icon URL -->
                 <img src="https://up.20script.ir/file/03e7-4photoshop-diamond-pack1-removebg-preview.png" alt="Diamond" class="gem-icon">
             </div>
         </div>
 
-        <!-- NEW/IMPROVED: Controls Bar -->
+        <!-- IMPROVED: Controls Bar with Gender Filter -->
         <div class="controls-bar">
             <input type="text" id="search-input" placeholder="جستجوی نام آواتار...">
+            <!-- NEW: Gender Filter Group -->
+            <div class="control-group">
+                <button class="gender-btn active" data-gender="all">همه</button>
+                <button class="gender-btn" data-gender="male">مردانه</button>
+                <button class="gender-btn" data-gender="female">زنانه</button>
+            </div>
             <div class="control-group">
                 <button class="sort-btn active" data-sort="price-asc">ارزان‌ترین</button>
                 <button class="sort-btn" data-sort="price-desc">گران‌ترین</button>
@@ -441,14 +445,16 @@
         const modalConfirmBtn = document.getElementById('modal-confirm-btn');
         const modalCancelBtn = document.getElementById('modal-cancel-btn');
         const filterButtons = document.querySelectorAll('.filter-btn');
-        const sortButtons = document.querySelectorAll('.sort-btn'); // NEW
-        const searchInput = document.getElementById('search-input'); // NEW
+        const sortButtons = document.querySelectorAll('.sort-btn');
+        const searchInput = document.getElementById('search-input');
+        const genderFilterButtons = document.querySelectorAll('.gender-btn'); // NEW: Gender buttons
 
         let currentUserData = null;
         let allAvatars = [];
         let currentFilter = 'all'; 
-        let currentSort = 'price-asc'; // NEW: Sort state
-        let searchTerm = ''; // NEW: Search state
+        let currentSort = 'price-asc'; 
+        let searchTerm = ''; 
+        let currentGenderFilter = 'all'; // NEW: Gender filter state
 
         // --- Main Function ---
         function main() {
@@ -497,7 +503,16 @@
                         let rarity = 'common';
                         if (avatarData.price >= 500) rarity = 'legendary';
                         else if (avatarData.price >= 150) rarity = 'rare';
-                        allAvatars.push({ ...avatarData, rarity });
+
+                        // NEW: Automatic Gender Detection based on name
+                        // In a real application, this 'gender' field should come from the database.
+                        // This is a simulation for demonstration.
+                        let detectedGender = 'male'; // Default to male
+                        if (avatarData.name.includes('دختر') || avatarData.name.includes('زن') || avatarData.name.includes('خانم')) {
+                            detectedGender = 'female';
+                        }
+                        
+                        allAvatars.push({ ...avatarData, rarity, gender: detectedGender });
                     } else {
                         console.warn("آواتار با اطلاعات ناقص نادیده گرفته شد:", doc.id);
                     }
@@ -526,10 +541,15 @@
             userGemsEl.textContent = currentUserData.gems.toLocaleString('fa');
             avatarGrid.innerHTML = '';
             
-            // --- NEW: Combined Filter, Search, and Sort Logic ---
+            // --- IMPROVED: Combined Filter, Search, and Sort Logic ---
             let itemsToRender = [...allAvatars];
 
-            // 1. Apply category filter
+            // 1. Apply GENDER filter
+            if (currentGenderFilter !== 'all') {
+                itemsToRender = itemsToRender.filter(avatar => avatar.gender === currentGenderFilter);
+            }
+
+            // 2. Apply OWNERSHIP filter
             if (currentFilter !== 'all') {
                 itemsToRender = itemsToRender.filter(avatar => {
                     const isOwned = currentUserData.ownedAvatars.includes(avatar.id);
@@ -539,14 +559,14 @@
                 });
             }
 
-            // 2. Apply search filter
+            // 3. Apply SEARCH filter
             if (searchTerm) {
                 itemsToRender = itemsToRender.filter(avatar => 
                     avatar.name.toLowerCase().includes(searchTerm.toLowerCase())
                 );
             }
             
-            // 3. Apply sorting
+            // 4. Apply SORTING
             switch(currentSort) {
                 case 'price-asc':
                     itemsToRender.sort((a, b) => a.price - b.price);
@@ -584,7 +604,6 @@
                         bottomContent = `<div class="status-text owned-text">خریداری شده</div>`;
                     }
                 } else {
-                    // UPDATED: New diamond icon URL
                     bottomContent = `
                         <div class="price-tag">
                             <span>${avatar.price.toLocaleString('fa')}</span>
@@ -708,7 +727,7 @@
         modalCancelBtn.addEventListener('click', hideModal);
         modal.addEventListener('click', (e) => e.target === modal && hideModal());
         
-        // --- NEW: Event Listeners for Controls ---
+        // --- Event Listeners for Controls ---
         filterButtons.forEach(button => {
             button.addEventListener('click', () => {
                 playSound('audio-click');
@@ -724,6 +743,17 @@
                 playSound('audio-click');
                 currentSort = button.dataset.sort;
                 sortButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                renderShop();
+            });
+        });
+
+        // NEW: Event listeners for gender filter buttons
+        genderFilterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                playSound('audio-click');
+                currentGenderFilter = button.dataset.gender;
+                genderFilterButtons.forEach(btn => btn.classList.remove('active'));
                 button.classList.add('active');
                 renderShop();
             });
