@@ -277,6 +277,7 @@
         const db = getFirestore(app);
 
         const loadingOverlay = document.getElementById('loading-overlay');
+        const loadingText = document.getElementById('loading-text');
         const lobbyContainer = document.querySelector('.lobby-container');
         const lobbyNameEl = document.getElementById('lobby-name');
         const leftPlayersEl = document.getElementById('left-players');
@@ -307,6 +308,7 @@
         let unsubscribeLobby = null;
         let isHost = false;
         let isReady = false;
+        let hasJoined = false; // ** NEW: Flag to track if user is fully in lobby
         let lastPlayerCount = 0;
         
         const servers = { iceServers: [{ urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'] }] };
@@ -333,9 +335,20 @@
         function listenToLobbyChanges() {
             const lobbyDocRef = doc(db, "Lobbys_list", lobbyId);
             unsubscribeLobby = onSnapshot(lobbyDocRef, async (docSnap) => {
-                if (!docSnap.exists()) { showNotificationModal("لابی حذف شد", "این لابی توسط سازنده یا مدیر حذف شده است.", () => window.location.href = './Lobby page.html'); return; }
+                if (!docSnap.exists()) { if(hasJoined) { showNotificationModal("لابی حذف شد", "این لابی توسط سازنده یا مدیر حذف شده است.", () => window.location.href = './Lobby page.html'); } return; }
                 const lobbyData = docSnap.data();
                 const players = lobbyData.players || [];
+                
+                // ** NEW: Kick detection logic
+                const isCurrentUserInLobby = players.some(p => p.uid === currentUser.uid);
+                if (hasJoined && !isCurrentUserInLobby) {
+                    if (unsubscribeLobby) unsubscribeLobby();
+                    await hangupVoiceChat();
+                    window.removeEventListener('beforeunload', handleLeaveLobby); // Prevent leave logic
+                    showNotificationModal("اخراج شدید", "شما توسط سازنده از لابی اخراج شدید.", () => { window.location.href = './Lobby page.html'; });
+                    return; // Stop processing this snapshot
+                }
+
                 if(players.length > lastPlayerCount) playSound('sound-player-join');
                 else if(players.length < lastPlayerCount) playSound('sound-player-leave');
                 lastPlayerCount = players.length;
@@ -344,8 +357,17 @@
                 const connectedPeerIds = new Set(Object.keys(peerConnections));
                 for (const player of players) { if (player.uid !== myId && !connectedPeerIds.has(player.uid)) { console.log(`New player detected: ${player.displayName}. Creating peer connection.`); peerConnections[player.uid] = createPeerConnection(player.uid); if (myId < player.uid) { console.log(`My ID is smaller. Sending offer to ${player.displayName}.`); await sendOffer(player.uid); } } }
                 for (const peerId of connectedPeerIds) { if (!currentPlayerIds.has(peerId)) { closeConnection(peerId); } }
+                
                 renderLobby(lobbyData);
-                if (loadingOverlay.style.display !== 'none') { loadingOverlay.style.opacity = '0'; setTimeout(() => { loadingOverlay.style.display = 'none'; lobbyContainer.style.display = 'flex'; }, 500); }
+                
+                if (loadingOverlay.style.display !== 'none') {
+                    loadingOverlay.style.opacity = '0';
+                    setTimeout(() => {
+                        loadingOverlay.style.display = 'none';
+                        lobbyContainer.style.display = 'flex';
+                        hasJoined = true; // ** NEW: Set flag here, user is officially in
+                    }, 500);
+                }
             }, (error) => { console.error("Firestore listen error:", error); showNotificationModal("خطای ارتباط", "ارتباط با لابی قطع شد. لطفاً از اتصال اینترنت خود اطمینان حاصل کرده و صفحه را رفرش کنید.", () => window.location.reload()); });
             listenToSignals();
         }
@@ -368,11 +390,8 @@
                     slot.dataset.uid = player.uid; 
                     if (player.isReady) slot.classList.add('ready');
                     const hostCrown = player.uid === data.creatorId ? `<div class="host-crown">👑</div>` : '';
-                    slot.innerHTML = `<${hostCrown}<img src="${player.avatarUrl || DEFAULT_AVATAR}" alt="avatar" class="player-avatar"><p class="player-name">${player.displayName}</p><div class="ready-indicator">✔</div>`;
-                    
-                    // --- تغییر جدید: اضافه کردن رویداد کلیک برای نمایش پروفایل ---
+                    slot.innerHTML = `${hostCrown}<img src="${player.avatarUrl || DEFAULT_AVATAR}" alt="avatar" class="player-avatar"><p class="player-name">${player.displayName}</p><div class="ready-indicator">✔</div>`;
                     slot.onclick = () => showPlayerProfile(player.uid);
-
                 } else {
                     slot.classList.add('empty');
                     slot.innerHTML = `<span class="empty-text">جایگاه خالی</span>`;
@@ -390,23 +409,19 @@
         async function kickPlayer(uidToKick) { const lobbyDocRef = doc(db, "Lobbys_list", lobbyId); await runTransaction(db, async (transaction) => { const lobbyDoc = await transaction.get(lobbyDocRef); if (!lobbyDoc.exists()) return; let players = lobbyDoc.data().players.filter(p => p.uid !== uidToKick); transaction.update(lobbyDocRef, { players: players, playerCount: players.length }); }); }
         
         async function handleLeaveLobby() {
+            hasJoined = false; // Prevent kick modal from showing on intentional leave
             if (unsubscribeLobby) unsubscribeLobby();
             await hangupVoiceChat(); 
             const lobbyDocRef = doc(db, "Lobbys_list", lobbyId);
             try { await runTransaction(db, async (transaction) => { const lobbyDoc = await transaction.get(lobbyDocRef); if (!lobbyDoc.exists()) return; if (isHost) { transaction.delete(lobbyDocRef); } else { let players = lobbyDoc.data().players.filter(p => p.uid !== currentUser.uid); transaction.update(lobbyDocRef, { players: players, playerCount: players.length }); } }); } finally { window.location.href = './Lobby page.html'; }
         }
         
-        // --- تابع جدید برای نمایش پروفایل بازیکن ---
+        // ** NEW: Updated function to show player profile
         async function showPlayerProfile(playerUid) {
-            // نمایش مودال با حالت لودینگ
-            profileModalAvatar.src = DEFAULT_AVATAR;
-            profileModalName.textContent = 'در حال بارگذاری...';
-            profileStatDate.textContent = '...';
-            profileStatAge.textContent = '...';
-            profileStatDiamonds.textContent = '...';
-            profileStatEmail.textContent = '...';
-            profileKickButton.style.display = 'none'; // مخفی کردن دکمه اخراج
-            profileModalOverlay.classList.add('visible');
+            loadingText.textContent = "در حال دریافت اطلاعات پروفایل...";
+            loadingOverlay.style.display = 'flex';
+            loadingOverlay.style.opacity = '1';
+            profileKickButton.style.display = 'none';
 
             try {
                 const userDocRef = doc(db, 'users', playerUid);
@@ -414,13 +429,21 @@
 
                 if (userDocSnap.exists()) {
                     const playerData = userDocSnap.data();
-                    // پر کردن مودال با اطلاعات واقعی
+                    
                     profileModalAvatar.src = playerData.avatarUrl || DEFAULT_AVATAR;
                     profileModalName.textContent = playerData.displayName || "کاربر ناشناس";
                     profileStatAge.textContent = playerData.old || "نامشخص";
                     profileStatDiamonds.textContent = playerData.game || 0;
-                    profileStatEmail.textContent = playerData.email || "ثبت نشده";
 
+                    // Privacy: Only show email to the owner of the profile
+                    const emailRow = profileStatEmail.parentElement;
+                    if (playerUid === currentUser.uid) {
+                        emailRow.style.display = 'flex';
+                        profileStatEmail.textContent = playerData.email || "ثبت نشده";
+                    } else {
+                        emailRow.style.display = 'none';
+                    }
+                    
                     if (playerData.createdAt && typeof playerData.createdAt.toDate === 'function') {
                         const date = playerData.createdAt.toDate();
                         profileStatDate.textContent = new Intl.DateTimeFormat('fa-IR', { year: 'numeric', month: 'long', day: 'numeric' }).format(date);
@@ -428,22 +451,29 @@
                         profileStatDate.textContent = "نامشخص";
                     }
 
-                    // منطق نمایش دکمه اخراج برای سازنده
                     if (isHost && playerUid !== currentUser.uid) {
                         profileKickButton.style.display = 'block';
-                        // رویداد کلیک جدید برای دکمه اخراج
                         profileKickButton.onclick = () => {
-                             profileModalOverlay.classList.remove('visible'); // بستن پروفایل
+                             profileModalOverlay.classList.remove('visible');
                              showConfirmModal(`اخراج ${playerData.displayName}`, `آیا از اخراج این بازیکن مطمئن هستید؟`, () => kickPlayer(playerUid));
                         };
                     }
+                    
+                    profileModalOverlay.classList.add('visible');
 
                 } else {
-                    profileModalName.textContent = 'کاربر یافت نشد';
+                    showNotificationModal("خطا", "کاربر مورد نظر یافت نشد.", ()=>{});
                 }
             } catch (error) {
                 console.error("خطا در دریافت اطلاعات پروفایل:", error);
-                profileModalName.textContent = 'خطا در بارگذاری';
+                showNotificationModal("خطا", `خطا در بارگذاری: ${error.message}`, ()=>{});
+            } finally {
+                // Hide loading overlay regardless of the outcome
+                loadingOverlay.style.opacity = '0';
+                setTimeout(() => {
+                    loadingOverlay.style.display = 'none';
+                    loadingText.textContent = "در حال ورود به لابی..."; // Reset text
+                }, 300);
             }
         }
 
