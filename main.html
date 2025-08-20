@@ -239,11 +239,41 @@
         .user-list-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background-color: rgba(255, 255, 255, 0.05); border-bottom: 1px solid #5c4a3a; color: #e0dacc; transition: background-color 0.2s ease; }
         .user-list-item:hover { background-color: rgba(255, 201, 71, 0.1); }
         .user-list-item:last-child { border-bottom: none; }
-        .user-info { display: flex; align-items: center; gap: 15px; overflow: hidden; }
-        .user-info img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #5c4a3a; }
-        .user-details { display: flex; flex-direction: column; overflow: hidden; text-align: right; }
-        .user-details .name { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .user-details .email { font-size: 0.8rem; color: #c5a687; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        /* START: === اصلاحیه برای نمایش کامل نام === */
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            min-width: 0; /*  اضافه شده برای کمک به flexbox */
+        }
+        .user-info img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #5c4a3a;
+        }
+        .user-details {
+            display: flex;
+            flex-direction: column;
+            text-align: right;
+            min-width: 0; /* اضافه شده برای کمک به flexbox */
+        }
+        .user-details .name {
+            font-weight: 700;
+            white-space: normal; /* تغییر کرد: اجازه می‌دهد نام به خط بعدی برود */
+            word-break: break-word; /* اضافه شد: کلمات طولانی را می‌شکند */
+        }
+        /* END: === اصلاحیه === */
+
+        .user-details .email {
+            font-size: 0.8rem;
+            color: #c5a687;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
         .edit-user-icon { cursor: pointer; padding: 5px; }
         .edit-user-icon svg { width: 24px; height: 24px; fill: #c5a687; transition: all 0.2s ease; }
         .edit-user-icon:hover svg { fill: #ffc947; transform: scale(1.2) rotate(15deg); }
@@ -282,11 +312,11 @@
         .ranking-list-item.current-user-rank { background-color: rgba(255, 201, 71, 0.15); border-color: #ffc947; box-shadow: 0 0 10px rgba(255, 201, 71, 0.2); }
         .rank-number { font-size: 1.3rem; font-weight: 900; color: #ffc947; width: 40px; text-align: center; margin-left: 15px; flex-shrink: 0; }
         .ranking-list-item .user-info { flex-grow: 1; }
-        .gems-count { display: flex; align-items: center; gap: 8px; font-size: 1.1rem; font-weight: 700; color: #e0dacc; direction: ltr; margin-left: 15px; }
+        .gems-count { display: flex; align-items: center; gap: 8px; font-size: 1.1rem; font-weight: 700; color: #e0dacc; direction: ltr; margin-left: 15px; flex-shrink: 0; }
         .gems-count span { text-shadow: 1px 1px 3px #000; }
         .gems-count::after { content: '💎'; font-size: 1.2rem; }
         .admin-only-ranking-feature { display: none; padding: 0 20px; }
-        .ranking-admin-controls { display: flex; gap: 10px; }
+        .ranking-admin-controls { display: flex; gap: 10px; flex-shrink: 0; }
         .ranking-admin-controls button { background-color: rgba(255,255,255,0.08); border: 1px solid #5c4a3a; border-radius: 50%; width: 32px; height: 32px; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: all 0.2s ease; }
         .ranking-admin-controls svg { width: 18px; height: 18px; transition: fill 0.2s ease; }
         .edit-rank-btn svg { fill: #c5a687; }
@@ -499,7 +529,7 @@
                  <h2 class="modal-title">رده بندی بازیکنان</h2>
                  <span id="ranking-modal-close-btn" class="modal-close-btn">&times;</span>
             </div>
-            <div class="search-bar-container admin-only-ranking-feature">
+            <div class="search-bar-container admin-only-ranking-feature" style="padding: 0 10px;">
                 <input type="text" id="ranking-search-input" placeholder="جستجوی بازیکن در رده‌بندی...">
             </div>
             <div id="ranking-list-container">
