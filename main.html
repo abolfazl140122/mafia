@@ -6,7 +6,7 @@
     <title>شهر مافیا - لابی اصلی</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -203,252 +203,27 @@
         .game-mode-buttons { display: flex; flex-direction: column; gap: 15px; width: 100%; }
         .game-mode-button { padding: 15px; font-size: 1.1rem; }
 
-
-        /* ====[ START ]==== استایل‌های جدید و بهبودیافته پنل پروفایل ==== */
-        #profile-modal-overlay.visible {
-            perspective: 1500px;
-        }
-
-        #profile-modal-content {
-            background: #1a140e; /* Fallback */
-            background-image: 
-                radial-gradient(ellipse at center, rgba(40, 32, 25, 0.8) 0%, rgba(26, 20, 14, 1) 70%),
-                url('https://www.transparenttextures.com/patterns/dark-leather.png'); /* بافت چرم */
-            border: 2px solid #5c4a3a;
-            border-radius: 16px;
-            max-width: 420px;
-            width: 90%;
-            padding: 0;
-            overflow: hidden;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75), 
-                        inset 0 0 20px rgba(0, 0, 0, 0.6);
-            position: relative;
-            
-            /* تنظیمات انیمیشن ورود */
-            opacity: 0;
-            transform: scale(0.85) rotateX(15deg);
-            transition: opacity 0.5s cubic-bezier(0.165, 0.84, 0.44, 1), transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
-        }
-
-        #profile-modal-overlay.visible #profile-modal-content {
-            opacity: 1;
-            transform: scale(1) rotateX(0deg);
-        }
-
-        /* گوشه‌های تزئینی با استفاده از شبه‌عناصر */
-        #profile-modal-content::before,
-        #profile-modal-content::after {
-            content: '';
-            position: absolute;
-            width: 60px;
-            height: 60px;
-            border: 3px solid #ffc947;
-            opacity: 0.5;
-            z-index: 1;
-            transition: all 0.5s ease 0.3s;
-        }
-
-        #profile-modal-content::before {
-            top: -15px;
-            left: -15px;
-            border-right: none;
-            border-bottom: none;
-            border-top-left-radius: 16px;
-        }
-        #profile-modal-content::after {
-            bottom: -15px;
-            right: -15px;
-            border-left: none;
-            border-top: none;
-            border-bottom-right-radius: 16px;
-        }
-        /* انیمیشن گوشه‌ها هنگام باز شدن پنل */
-        #profile-modal-overlay.visible #profile-modal-content::before { top: 10px; left: 10px; }
-        #profile-modal-overlay.visible #profile-modal-content::after { bottom: 10px; right: 10px; }
-
-        .profile-header {
-            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.6));
-            padding: 40px 25px 30px;
-            text-align: center;
-            position: relative;
-            border-bottom: 1px solid transparent;
-            border-image: linear-gradient(to right, transparent, #ffc947 30%, #ffc947 70%, transparent) 1;
-            overflow: hidden;
-        }
-        
-        /* افکت نور متحرک روی هدر */
-        .profile-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -80%;
-            width: 60%;
-            height: 100%;
-            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0) 100%);
-            transform: skewX(-25deg);
-            animation: shine 6s infinite ease-in-out;
-            animation-delay: 1s;
-        }
-
-        @keyframes shine {
-            0% { left: -80%; }
-            50% { left: 120%; }
-            100% { left: -80%; }
-        }
-
-        .modal-close-btn {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            font-size: 2.5rem;
-            color: #c5a687;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            line-height: 1;
-            text-shadow: 0 0 8px rgba(0,0,0,0.8);
-            z-index: 10;
-        }
-        .modal-close-btn:hover {
-            color: #ffc947;
-            transform: scale(1.3) rotate(180deg);
-        }
-
-        #profile-modal-avatar {
-            width: 130px;
-            height: 130px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin: 0 auto 25px;
-            position: relative;
-            border: 4px solid #3c3022;
-            box-shadow: 0 0 0 5px #a47d54, 
-                        0 10px 30px rgba(0,0,0,0.8),
-                        inset 0 0 15px rgba(0,0,0,0.5);
-            transition: transform 0.4s ease, box-shadow 0.4s ease;
-            animation: avatar-glow 4s infinite alternate;
-        }
-
-        #profile-modal-avatar:hover {
-            transform: scale(1.08) translateY(-5px);
-            box-shadow: 0 0 0 5px #ffc947, 
-                        0 15px 40px rgba(255, 201, 71, 0.3),
-                        inset 0 0 15px rgba(0,0,0,0.3);
-        }
-
-        @keyframes avatar-glow {
-            from {
-                box-shadow: 0 0 0 5px #a47d54, 
-                            0 10px 30px rgba(0,0,0,0.8),
-                            inset 0 0 15px rgba(0,0,0,0.5);
-            }
-            to {
-                box-shadow: 0 0 0 5px #c5b09c, 
-                            0 10px 35px rgba(0,0,0,0.7),
-                            inset 0 0 15px rgba(0,0,0,0.5);
-            }
-        }
-        
-        /* حذف بنر قدیمی برای نمایش ساده و شیک‌تر نام */
-        .profile-name-banner {
-            background: none; padding: 0; box-shadow: none; border: none;
-        }
-        .profile-name-banner::before, .profile-name-banner::after { display: none; }
-
-        #profile-modal-name {
-            font-size: 2.2rem;
-            font-weight: 900;
-            color: #f0e6d2;
-            text-shadow: 0px 3px 0px #000, 
-                         0px 5px 10px rgba(0,0,0,0.8),
-                         0 0 15px rgba(255, 201, 71, 0.4);
-            letter-spacing: 1px;
-        }
-
-        .profile-body {
-            padding: 25px 35px 35px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .profile-stat-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 1rem;
-            padding: 15px 10px;
-            background: rgba(0,0,0,0.2);
-            border-radius: 8px;
-            position: relative;
-            overflow: hidden;
-            
-            /* تنظیمات انیمیشن برای آیتم‌ها */
-            opacity: 0;
-            transform: translateX(30px);
-            animation: slide-in 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-        }
-        /* انیمیشن مرحله‌ای با تاخیر */
-        .profile-stat-item:nth-child(1) { animation-delay: 0.3s; }
-        .profile-stat-item:nth-child(2) { animation-delay: 0.4s; }
-        .profile-stat-item:nth-child(3) { animation-delay: 0.5s; }
-        .profile-stat-item:nth-child(4) { animation-delay: 0.6s; }
-        .profile-stat-item:nth-child(5) { animation-delay: 0.7s; }
-
-        @keyframes slide-in {
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        /* خط تزئینی در حالت هاور */
-        .profile-stat-item::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            height: 3px;
-            width: 100%;
-            background: linear-gradient(90deg, transparent, #ffc947, transparent);
-            transform: scaleX(0);
-            transform-origin: center;
-            transition: transform 0.4s ease;
-        }
-        .profile-stat-item:hover::after {
-            transform: scaleX(1);
-        }
-
-        .stat-label {
-            font-weight: 700;
-            color: #c5a687;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        /* استایل آیکون‌ها */
-        .stat-label .stat-icon {
-            font-size: 1.6rem;
-            line-height: 1;
-            color: #ffc947;
-            min-width: 25px;
-            text-align: center;
-            text-shadow: 0 0 8px rgba(255, 201, 71, 0.5);
-        }
-
-        .stat-value {
-            font-weight: 500;
-            color: #e0dacc;
-            direction: ltr;
-            text-align: right;
-            font-size: 1.2rem;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
-            background-color: rgba(0,0,0,0.2);
-            padding: 4px 10px;
-            border-radius: 6px;
-            min-width: 80px; /* برای هم‌ترازی */
-        }
-        /* ====[ END ]==== استایل‌های جدید و بهبودیافته پنل پروفایل ==== */
+        /* --- استایل‌های پنل پروفایل --- */
+        #profile-modal-content { background: radial-gradient(circle, #3a2e22 0%, #1a140e 100%); border: 4px solid transparent; border-image: linear-gradient(145deg, #ffc947, #a47d54) 1; max-width: 400px; padding: 0; overflow: hidden; box-shadow: 0 15px 40px rgba(0,0,0,0.7), inset 0 0 15px rgba(0,0,0,0.5); }
+        .profile-header { background-color: #1a140e; background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.02) 10px, rgba(255,255,255,0.02) 20px); padding: 30px 25px; text-align: center; position: relative; border-bottom: 2px solid; border-image: linear-gradient(to right, transparent, #ffc947, transparent) 1; overflow: hidden; }
+        .profile-header::before, .profile-header::after { content: ''; position: absolute; width: 150px; height: 2px; background: linear-gradient(to right, rgba(255, 201, 71, 0), rgba(255, 201, 71, 0.8), rgba(255, 201, 71, 0)); }
+        .profile-header::before { top: 10px; left: 50%; transform: translateX(-50%); }
+        .profile-header::after { bottom: 10px; left: 50%; transform: translateX(-50%); }
+        .modal-close-btn { position: absolute; top: 10px; left: 15px; font-size: 2.2rem; color: #c5a687; cursor: pointer; transition: all 0.2s ease; line-height: 1; text-shadow: 0 0 5px rgba(0,0,0,0.7); z-index: 10; }
+        .modal-close-btn:hover { color: #ffc947; transform: scale(1.2) rotate(90deg); }
+        #profile-modal-avatar { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin-bottom: 25px; position: relative; border: none; box-shadow: 0 0 0 4px #1a140e, 0 0 0 8px #a47d54, 0 5px 25px rgba(0,0,0,0.6); transition: transform 0.3s ease; }
+        #profile-modal-avatar:hover { transform: scale(1.05); }
+        .profile-name-banner { background-color: #8c4843; padding: 5px 40px; display: inline-block; position: relative; box-shadow: 0 3px 10px rgba(0,0,0,0.5); border-top: 1px solid #c5a687; border-bottom: 1px solid #c5a687; }
+        .profile-name-banner::before, .profile-name-banner::after { content: ''; position: absolute; top: 0; width: 0; height: 0; border-style: solid; border-color: #5a2c2a transparent; }
+        .profile-name-banner::before { left: -19px; border-width: 19px 20px 19px 0; }
+        .profile-name-banner::after { right: -19px; border-width: 19px 0 19px 20px; }
+        #profile-modal-name { font-size: 1.8rem; font-weight: 900; color: #f0e6d2; text-shadow: 2px 2px 0px #000, 3px 3px 5px rgba(0,0,0,0.7); }
+        .profile-body { padding: 20px 30px 30px; display: flex; flex-direction: column; gap: 18px; }
+        .profile-stat-item { display: flex; align-items: center; justify-content: space-between; font-size: 1rem; padding-bottom: 18px; border: none; background-image: linear-gradient(to right, transparent, rgba(122, 92, 67, 0.4) 50%, transparent 100%); background-size: 100% 1px; background-position: bottom; background-repeat: no-repeat; transition: background-color 0.3s ease; }
+        .profile-stat-item:last-child { background: none; padding-bottom: 0; }
+        .stat-label { font-weight: 700; color: #c5a687; display: flex; align-items: center; gap: 12px; }
+        .stat-label span:first-child { font-size: 1.4rem; line-height: 1; }
+        .stat-value { font-weight: 400; color: #e0dacc; direction: ltr; text-align: right; font-size: 1.1rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
         
         /* --- استایل‌های پنل مدیریت --- */
         #admin-panel-content .modal-button { margin-top: 10px; }
@@ -611,7 +386,7 @@
         </div>
     </div>
 
-    <!-- پنل پروفایل کاربر (بازطراحی شده) -->
+    <!-- پنل پروفایل کاربر -->
     <div id="profile-modal-overlay" class="modal-overlay">
         <div id="profile-modal-content" class="modal-content">
             <div class="profile-header">
@@ -623,23 +398,23 @@
             </div>
             <div class="profile-body">
                 <div class="profile-stat-item">
-                    <span class="stat-label"><span class="stat-icon">📜</span><span>تاریخ ثبت نام:</span></span>
+                    <span class="stat-label"><span>📜</span><span>تاریخ ثبت نام:</span></span>
                     <span id="profile-stat-date" class="stat-value"></span>
                 </div>
                 <div class="profile-stat-item">
-                    <span class="stat-label"><span class="stat-icon">🎂</span><span>سن:</span></span>
+                    <span class="stat-label"><span>🎂</span><span>سن:</span></span>
                     <span id="profile-stat-age" class="stat-value"></span>
                 </div>
                 <div class="profile-stat-item">
-                    <span class="stat-label"><span class="stat-icon">🎭</span><span>تعداد آواتارها:</span></span>
+                    <span class="stat-label"><span>🎭</span><span>تعداد آواتارها:</span></span>
                     <span id="profile-stat-avatars" class="stat-value"></span>
                 </div>
                  <div class="profile-stat-item">
-                    <span class="stat-label"><span class="stat-icon">💎</span><span>تعداد الماس:</span></span>
+                    <span class="stat-label"><span>💎</span><span>تعداد الماس:</span></span>
                     <span id="profile-stat-diamonds" class="stat-value"></span>
                 </div>
                 <div class="profile-stat-item">
-                    <span class="stat-label"><span class="stat-icon">📧</span><span>ایمیل:</span></span>
+                    <span class="stat-label"><span>📧</span><span>ایمیل:</span></span>
                     <span id="profile-stat-email" class="stat-value"></span>
                 </div>
             </div>
@@ -873,7 +648,7 @@
         let isMusicPlaying = false;
         let isInitialLoad = true;
         let currentUserData = null;
-        let rankingListenerUnsubscribe = null;
+        let rankingListenerUnsubscribe = null; // متغیر برای نگهداری شنونده زنده رده‌بندی
 
         // --- توابع عمومی ---
         function showModal(modalElement) { modalElement.classList.add('visible'); }
@@ -893,7 +668,7 @@
             };
         }
         function showCustomConfirm(message, onConfirm) {
-            customConfirmMessage.innerHTML = message;
+            customConfirmMessage.innerHTML = message; // Use innerHTML to support simple styling like bold tags
             showModal(customConfirmOverlay);
             
             const confirmHandler = () => {
@@ -946,60 +721,19 @@
             }
         }
 
-        // --- توابع پروفایل کاربر (با انیمیشن شمارش) ---
-        /**
-         * تابع انیمیشن شمارش اعداد
-         * @param {HTMLElement} el - المان مورد نظر
-         * @param {number} to - عدد نهایی
-         * @param {number} duration - مدت زمان انیمیشن (میلی‌ثانیه)
-        */
-        function animateCountUp(el, to, duration = 1200) {
-            const end = parseInt(to, 10);
-            if (isNaN(end)) {
-                el.textContent = to; // اگر عدد نبود، فقط مقدار را تنظیم کن
-                return;
-            }
-            
-            let start = 0;
-            const range = end - start;
-            if (range === 0) {
-                el.textContent = end.toLocaleString('fa-IR');
-                return;
-            }
-            
-            let current = start;
-            const increment = end > start ? 1 : -1;
-            const stepTime = Math.abs(Math.floor(duration / range));
-            el.textContent = start.toLocaleString('fa-IR');
-
-            const timer = setInterval(() => {
-                current += increment;
-                el.textContent = Math.ceil(current).toLocaleString('fa-IR');
-                if (current == end) {
-                    clearInterval(timer);
-                    el.textContent = end.toLocaleString('fa-IR');
-                }
-            }, stepTime);
-        }
-
+        // --- توابع پروفایل کاربر ---
         function populateProfileModal() {
             if (!currentUserData) return;
             profileModalAvatar.src = currentUserData.avatarUrl || DEFAULT_AVATAR;
             profileModalName.textContent = currentUserData.displayName || "کاربر ناشناس";
-            
-            // فیلدهای غیر عددی
+            profileStatAge.textContent = currentUserData.old || "نامشخص";
+            profileStatAvatars.textContent = (currentUserData.ownedAvatars?.length || 0) + " عدد";
+            profileStatDiamonds.textContent = currentUserData.game || 0;
             profileStatEmail.textContent = currentUserData.email || "ثبت نشده";
             if (currentUserData.createdAt && typeof currentUserData.createdAt.toDate === 'function') {
                 const date = currentUserData.createdAt.toDate();
                 profileStatDate.textContent = new Intl.DateTimeFormat('fa-IR', { year: 'numeric', month: 'long', day: 'numeric' }).format(date);
-            } else {
-                profileStatDate.textContent = "نامشخص";
-            }
-
-            // ریست و اجرای انیمیشن برای فیلدهای عددی
-            animateCountUp(profileStatAge, currentUserData.old || 0);
-            animateCountUp(profileStatAvatars, currentUserData.ownedAvatars?.length || 0);
-            animateCountUp(profileStatDiamonds, currentUserData.game || 0);
+            } else { profileStatDate.textContent = "نامشخص"; }
         }
 
         // --- توابع موسیقی ---
@@ -1017,6 +751,8 @@
         async function handleSaveGameModes() { if (!(await verifyAdminStatus())) return; gameModesSaveBtn.disabled = true; gameModesSaveBtn.textContent = 'در حال ذخیره...'; const newSettings = { friendlyEnabled: friendlyModeToggle.checked, rankedEnabled: rankedModeToggle.checked }; try { const gameModesDocRef = doc(db, 'settings', 'gameModes'); await updateDoc(gameModesDocRef, newSettings); showCustomAlert("تنظیمات ورودی بازی با موفقیت ذخیره شد."); hideModal(gameModesPanelOverlay); } catch (error) { console.error("خطا در ذخیره تنظیمات ورودی بازی: ", error); showCustomAlert("خطا در ذخیره تغییرات. لطفا دوباره تلاش کنید."); } finally { gameModesSaveBtn.disabled = false; gameModesSaveBtn.textContent = 'ذخیره'; } }
 
         // *** توابع پنل رده بندی (بازنویسی شده برای حالت زنده) ***
+        
+        // تابع اصلی برای رندر کردن لیست‌ها بر اساس آرایه کاربران ورودی
         function renderRankings(allUsers) {
             const currentUser = auth.currentUser;
             if (!currentUser) return;
@@ -1024,13 +760,15 @@
             const isAdmin = currentUserData?.isAdmin === true;
             rankingAdminFeatures.forEach(el => { el.style.display = isAdmin ? 'block' : 'none' });
 
+            // جدا کردن کاربران به لیست‌های رده‌بندی و بن شده
             const rankedUsers = allUsers
                 .filter(user => !user.isBannedFromRanking && user.game > 0)
                 .sort((a, b) => (b.game || 0) - (a.game || 0))
-                .slice(0, 100);
+                .slice(0, 100); // محدود به ۱۰۰ نفر برتر
 
             const bannedUsers = allUsers.filter(user => user.isBannedFromRanking);
 
+            // --- نمایش لیست اصلی رده‌بندی ---
             rankingListContainer.innerHTML = ''; 
             if (rankedUsers.length === 0) {
                 rankingListContainer.innerHTML = '<p style="padding: 20px; text-align: center;">هنوز بازیکنی در رده‌بندی وجود ندارد.</p>';
@@ -1054,13 +792,14 @@
                             <img src="${userData.avatarUrl || DEFAULT_AVATAR}" alt="avatar">
                             <div class="user-details"> <span class="name">${userData.displayName || 'بدون نام'}</span> </div>
                         </div>
-                        <div class="gems-count"> <span>${(userData.game || 0).toLocaleString('fa-IR')}</span> </div>
+                        <div class="gems-count"> <span>${userData.game || 0}</span> </div>
                         ${adminControlsHTML}
                     `;
                     rankingListContainer.appendChild(userElement);
                 });
             }
             
+            // --- نمایش لیست کاربران بن شده (برای ادمین) ---
             if(isAdmin) {
                 bannedRankingListContainer.innerHTML = '';
                 if (bannedUsers.length === 0) {
@@ -1085,8 +824,9 @@
             }
         }
         
+        // تابع برای شروع شنونده زنده
         function startRankingListener() {
-            if (rankingListenerUnsubscribe) {
+            if (rankingListenerUnsubscribe) { // جلوگیری از ایجاد شنونده‌های تکراری
                 rankingListenerUnsubscribe();
             }
             const usersRef = collection(db, "users");
@@ -1095,7 +835,7 @@
                 querySnapshot.forEach(doc => {
                     allUsers.push({ id: doc.id, ...doc.data() });
                 });
-                renderRankings(allUsers);
+                renderRankings(allUsers); // رندر کردن لیست با داده‌های جدید و زنده
             }, (error) => {
                 console.error("خطا در شنونده زنده رده‌بندی:", error);
                 rankingListContainer.innerHTML = '<p style="padding: 20px; text-align: center;">خطا در دریافت اطلاعات زنده.</p>';
@@ -1103,9 +843,10 @@
             });
         }
 
+        // تابع برای توقف شنونده زنده
         function stopRankingListener() {
             if (rankingListenerUnsubscribe) {
-                rankingListenerUnsubscribe();
+                rankingListenerUnsubscribe(); // قطع ارتباط با سرور
                 rankingListenerUnsubscribe = null;
             }
         }
@@ -1141,7 +882,7 @@
             try {
                 await updateDoc(doc(db, 'users', uid), { game: newGems });
                 hideModal(editRankModalOverlay);
-                showCustomAlert("امتیاز کاربر با موفقیت ویرایش شد.");
+                showCustomAlert("امتیاز کاربر با موفقیت ویرایش شد."); // نیازی به رفرش دستی نیست
             } catch (error) {
                 console.error("خطا در ویرایش امتیاز کاربر:", error);
                 showCustomAlert("خطا در ذخیره تغییرات.");
@@ -1156,7 +897,7 @@
             showCustomConfirm(message, async () => {
                 try {
                     await updateDoc(doc(db, 'users', userData.uid), { isBannedFromRanking: true });
-                    showCustomAlert("کاربر با موفقیت از رده‌بندی حذف شد.");
+                    showCustomAlert("کاربر با موفقیت از رده‌بندی حذف شد."); // نیازی به رفرش دستی نیست
                 } catch (error) {
                      console.error("خطا در حذف کاربر از رده بندی:", error);
                     showCustomAlert("عملیات با خطا مواجه شد.");
@@ -1170,7 +911,7 @@
              showCustomConfirm(message, async () => {
                 try {
                     await updateDoc(doc(db, 'users', userData.uid), { isBannedFromRanking: false });
-                    showCustomAlert("کاربر با موفقیت به رده‌بندی بازگردانده شد.");
+                    showCustomAlert("کاربر با موفقیت به رده‌بندی بازگردانده شد."); // نیازی به رفرش دستی نیست
                 } catch (error) {
                      console.error("خطا در بازگردانی کاربر:", error);
                     showCustomAlert("عملیات با خطا مواجه شد.");
@@ -1268,7 +1009,7 @@
         // رویدادهای پنل رده بندی
         const closeRankingModal = () => {
             hideModal(rankingModalOverlay);
-            stopRankingListener();
+            stopRankingListener(); // **مهم** توقف شنونده هنگام بستن پنل
         };
 
         rankingButton.addEventListener('click', () => checkMaintenanceAndProceed(() => {
@@ -1276,7 +1017,7 @@
             bannedRankingListContainer.innerHTML = '';
             rankingSearchInput.value = '';
             showModal(rankingModalOverlay);
-            startRankingListener();
+            startRankingListener(); // **مهم** شروع شنونده هنگام باز کردن پنل
         }));
 
         rankingModalOverlay.addEventListener('click', (e) => { if(e.target === rankingModalOverlay) closeRankingModal(); });
