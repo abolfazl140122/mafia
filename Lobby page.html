@@ -766,6 +766,10 @@
             const canAdminDelete = currentUserIsAdmin && !isOwner;
             const isLobbyFull = (lobbyData.playerCount || 1) >= (lobbyData.maxPlayers || 12);
             const isPrivate = lobbyData.password && lobbyData.password.length > 0;
+            
+            // [تغییر] منطق جدید برای کاربر اخراج شده
+            const isKicked = lobbyData.kickedPlayers && lobbyData.kickedPlayers.includes(currentUser.uid);
+            const wasKickedAsAdmin = isKicked && currentUserIsAdmin;
 
             let actionButtonsHTML = '';
             if (isOwner) {
@@ -774,13 +778,16 @@
                 actionButtonsHTML += `<button class="lobby-btn btn-admin-delete" data-action="admin-delete">بستن لابی</button>`;
             }
             
-            if (isLobbyFull) {
+            // [تغییر] بازنویسی منطق دکمه پیوستن با در نظر گرفتن وضعیت اخراج
+            if (isKicked && !currentUserIsAdmin) {
+                actionButtonsHTML += `<button class="lobby-btn btn-join" disabled>اخراج شده‌اید</button>`;
+            } else if (isLobbyFull) {
                 actionButtonsHTML += `<button class="lobby-btn btn-join" disabled>لابی پر است</button>`;
             } else {
-                actionButtonsHTML += `<button class="lobby-btn btn-join" data-action="join">پیوستن</button>`;
+                const joinButtonText = wasKickedAsAdmin ? 'ورود (اخراج شده)' : 'پیوستن';
+                actionButtonsHTML += `<button class="lobby-btn btn-join" data-action="join">${joinButtonText}</button>`;
             }
             
-            // --- [تغییر] ساختار HTML برای بخش ادمین ---
             let adminControlsHTML = '';
             if (currentUserIsAdmin && isPrivate) {
                 adminControlsHTML = `
@@ -813,7 +820,9 @@
             `;
             
             card.querySelector('[data-action="join"]')?.addEventListener('click', () => {
-                if ((lobbyData.playerCount || 1) >= (lobbyData.maxPlayers || 12)) {
+                // این شرط‌ها در زمان ساخت دکمه اعمال شده، اما برای اطمینان اینجا هم می‌ماند
+                if (isKicked && !currentUserIsAdmin) return; 
+                if (isLobbyFull) {
                     showCustomAlert('لابی پر است', 'ظرفیت این لابی تکمیل شده است.', [{ text: 'باشه', class: 'primary' }]);
                     return;
                 }
@@ -839,7 +848,6 @@
                 deleteAction('تایید ادمین', `آیا از بستن لابی "${lobbyData.lobbyName}" مطمئن هستید؟`);
             });
             
-            // event listener روی کل کانتینر عمل می‌کند
             card.querySelector('[data-action="edit-pass"]')?.addEventListener('click', () => {
                 promptForPasswordChange(lobbyData);
             });
@@ -860,11 +868,10 @@
             filterLobbies();
         }
         
-        onAuthStateChanged(auth, async (user) => { // اضافه شدن async
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
                 
-                // [جدید] شروع دانلود و پخش موسیقی
                 await handleBackgroundMusic();
 
                 const userDocRef = doc(db, 'users', user.uid);
@@ -966,7 +973,8 @@
                 creatorName: currentUser.displayName || 'کاربر ناشناس',
                 createdAt: serverTimestamp(),
                 playerCount: 1,
-                maxPlayers: 12
+                maxPlayers: 12,
+                kickedPlayers: [] // [تغییر] اضافه کردن فیلد اولیه برای بازیکنان اخراجی
             };
             
             if (isPrivate) {
