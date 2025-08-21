@@ -22,114 +22,191 @@
             --text-secondary: #c5a687;
             --bg-dark: #1a140e;
             --border-color: #5c4a3a;
-            /* [ویژگی جدید] رنگ‌های وضعیت لابی */
-            --status-waiting-bg: rgba(46, 204, 113, 0.15);
-            --status-waiting-text: #2ecc71;
-            --status-ingame-bg: rgba(231, 76, 60, 0.15);
-            --status-ingame-text: #e74c3c;
-            --status-full-bg: rgba(243, 156, 18, 0.15);
-            --status-full-text: #f39c12;
         }
 
         * {
-            margin: 0; padding: 0; box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
         }
 
         html, body {
-            height: 100%; overflow: hidden; background-color: var(--bg-dark);
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--bg-dark);
         }
 
         body {
-            font-family: 'Vazirmatn', sans-serif; color: var(--text-light);
-            display: flex; flex-direction: column; position: relative;
+            font-family: 'Vazirmatn', sans-serif;
+            color: var(--text-light);
+            display: flex;
+            flex-direction: column;
+            position: relative;
         }
 
         #background-blurry {
-            position: fixed; top: -20px; left: -20px; width: calc(100% + 40px);
+            position: fixed;
+            top: -20px;
+            left: -20px;
+            width: calc(100% + 40px);
             height: calc(100% + 40px);
             background-image: url('https://up.20script.ir/file/6195-file-000000001500622f9419de6c322df297-1-.jpg');
-            background-size: cover; background-position: center center;
-            filter: blur(8px) brightness(0.6); z-index: -1;
+            background-size: cover;
+            background-position: center center;
+            filter: blur(8px) brightness(0.6);
+            z-index: -1;
         }
         
+        /* --- لودینگ حرفه‌ای و جدید --- */
         #loading-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.9); display: flex;
-            flex-direction: column; justify-content: center; align-items: center;
-            z-index: 2000; transition: opacity 0.5s ease;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            transition: opacity 0.5s ease;
         }
+
         .loader-logo-wrapper {
-            position: relative; width: 180px; height: 180px; display: flex;
-            justify-content: center; align-items: center;
+            position: relative;
+            width: 180px; /* اندازه بزرگتر */
+            height: 180px; /* اندازه بزرگتر */
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
+        
         .loader-logo-wrapper::before {
-            content: ''; position: absolute; top: 50%; left: 50%;
-            width: 120%; height: 120%;
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 120%;
+            height: 120%;
             background: radial-gradient(circle, rgba(255, 201, 71, 0.4) 0%, rgba(255, 201, 71, 0) 70%);
             transform: translate(-50%, -50%);
             animation: pulse-glow 3s infinite ease-in-out;
         }
+        
         .loader-logo {
-            width: 120px; height: auto; animation: fadeIn 2s forwards; opacity: 0;
+            width: 120px; /* اندازه بزرگتر */
+            height: auto;
+            animation: fadeIn 2s forwards;
+            opacity: 0;
         }
+        
         @keyframes pulse-glow {
             0%, 100% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.7; }
             50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
         }
+
         @keyframes fadeIn { to { opacity: 1; } }
+
         #loading-text {
-            margin-top: 25px; font-size: 1.1rem; font-weight: 700;
-            color: var(--text-light); text-shadow: 1px 1px 3px #000;
+            margin-top: 25px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-light);
+            text-shadow: 1px 1px 3px #000;
         }
         
+        /* --- [جدید] پنل دانلود موسیقی --- */
         #music-download-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.95); backdrop-filter: blur(10px);
-            display: flex; flex-direction: column; justify-content: center;
-            align-items: center; z-index: 1999; opacity: 0; visibility: hidden;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1999; /* زیر لودینگ اصلی */
+            opacity: 0;
+            visibility: hidden;
             transition: all 0.5s ease;
         }
-        #music-download-overlay.visible { opacity: 1; visibility: visible; }
-        .download-panel { width: 90%; max-width: 350px; text-align: center; }
+        #music-download-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        .download-panel {
+            width: 90%;
+            max-width: 350px;
+            text-align: center;
+        }
         .download-title {
-            font-size: 1.4rem; font-weight: 900; color: var(--primary-gold);
-            margin-bottom: 20px; text-shadow: 0 2px 4px rgba(0,0,0,0.7);
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: var(--primary-gold);
+            margin-bottom: 20px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.7);
         }
         .progress-bar-container {
-            width: 100%; height: 20px; background-color: rgba(0, 0, 0, 0.4);
-            border: 1px solid var(--border-color); border-radius: 10px;
-            overflow: hidden; box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+            width: 100%;
+            height: 20px;
+            background-color: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
         }
         #progress-bar {
-            width: 0%; height: 100%; background: linear-gradient(90deg, var(--dark-red), var(--primary-gold));
-            border-radius: 10px; transition: width 0.3s ease-out;
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--dark-red), var(--primary-gold));
+            border-radius: 10px;
+            transition: width 0.3s ease-out;
         }
         #progress-text {
-            margin-top: 15px; font-size: 1rem; font-weight: 700; color: var(--text-light);
+            margin-top: 15px;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-light);
         }
 
+        /* --- محتوای اصلی --- */
         .main-container {
-            width: 100%; height: 100%; display: flex; flex-direction: column;
-            padding: 15px; padding-bottom: 90px;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            padding-bottom: 90px;
         }
 
         header {
-            width: 100%; display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
         }
+        
         .search-bar { flex-grow: 1; position: relative; }
         .search-bar input {
-            width: 100%; padding: 12px 20px 12px 50px; background-color: rgba(0,0,0,0.5);
-            border: 1px solid var(--border-color); border-radius: 25px; color: var(--text-light);
-            font-size: 1rem; font-family: 'Vazirmatn', sans-serif; transition: all 0.3s ease;
+            width: 100%; padding: 12px 20px 12px 50px;
+            background-color: rgba(0,0,0,0.5); border: 1px solid var(--border-color);
+            border-radius: 25px; color: var(--text-light); font-size: 1rem;
+            font-family: 'Vazirmatn', sans-serif; transition: all 0.3s ease;
         }
         .search-bar input:focus {
             outline: none; border-color: var(--primary-gold);
             box-shadow: 0 0 10px rgba(255, 201, 71, 0.3);
         }
         .search-bar .search-icon {
-            position: absolute; left: 15px; top: 50%; transform: translateY(-50%);
-            color: var(--text-secondary); font-size: 1.2rem;
+            position: absolute; left: 15px; top: 50%;
+            transform: translateY(-50%); color: var(--text-secondary);
+            font-size: 1.2rem;
         }
         .back-button {
             padding: 12px; background: linear-gradient(145deg, #443a2e, #2a2118);
@@ -138,28 +215,7 @@
             line-height: 1; transform: scaleX(-1);
         }
 
-        /* --- [ویژگی جدید] فیلتر و مرتب‌سازی پیشرفته --- */
-        .controls-container {
-            display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;
-            align-items: center;
-        }
-        .filter-buttons { display: flex; gap: 8px; flex-grow: 1; flex-wrap: wrap; }
-        .filter-btn {
-            background-color: rgba(0,0,0,0.4); border: 1px solid var(--border-color);
-            color: var(--text-secondary); padding: 6px 12px; border-radius: 20px;
-            font-size: 0.85rem; cursor: pointer; transition: all 0.3s ease;
-        }
-        .filter-btn.active, .filter-btn:hover {
-            background-color: var(--primary-gold); color: var(--bg-dark);
-            border-color: var(--primary-gold); font-weight: 700;
-        }
-        .sort-dropdown {
-            background-color: rgba(0,0,0,0.4); border: 1px solid var(--border-color);
-            color: var(--text-light); padding: 6px 10px; border-radius: 8px;
-            font-family: 'Vazirmatn', sans-serif;
-        }
-        .sort-dropdown:focus { outline: none; border-color: var(--primary-gold); }
-
+        /* --- لیست لابی‌ها --- */
         #lobby-list {
             flex-grow: 1; overflow-y: auto; display: flex;
             flex-direction: column; gap: 15px; padding-right: 5px;
@@ -173,29 +229,17 @@
         .lobby-card {
             background: linear-gradient(160deg, #2a2118, var(--bg-dark));
             border: 1px solid var(--border-color); border-radius: 16px; padding: 15px;
-            display: flex; flex-direction: column; gap: 12px; position: relative;
+            display: flex; flex-direction: column; gap: 12px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.4); opacity: 0;
             transform: translateY(20px); animation: slideInUp 0.5s forwards;
-            transition: transform 0.3s ease, box-shadow 0.3s ease; will-change: transform;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            will-change: transform; /* بهینه‌سازی انیمیشن */
         }
         .lobby-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 25px rgba(0,0,0,0.5), 0 0 15px rgba(255, 201, 71, 0.2);
         }
         @keyframes slideInUp { to { opacity: 1; transform: translateY(0); } }
-
-        /* --- [ویژگی جدید] انیمیشن Pulse برای لابی در حال بازی --- */
-        .lobby-card.in-game::before {
-            content: ''; position: absolute; top: 0; left: 0;
-            width: 100%; height: 100%; border-radius: 16px;
-            background: radial-gradient(circle, rgba(231, 76, 60, 0.2) 0%, transparent 70%);
-            animation: red-pulse 2.5s infinite ease-in-out;
-            pointer-events: none;
-        }
-        @keyframes red-pulse {
-            0%, 100% { transform: scale(1); opacity: 0; }
-            50% { transform: scale(1.05); opacity: 1; }
-        }
 
         .lobby-card-header, .lobby-card-footer {
             display: flex; justify-content: space-between; align-items: center;
@@ -206,70 +250,53 @@
             text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
         .lock-icon { font-size: 1rem; color: var(--primary-gold); }
-        .lobby-info-top { display: flex; gap: 15px; align-items: center; }
+        .lobby-info { display: flex; gap: 15px; align-items: center; }
         .lobby-scenario {
             background: rgba(255, 201, 71, 0.1); color: var(--primary-gold);
             padding: 4px 12px; border-radius: 15px; font-size: 0.8rem;
             font-weight: 700; border: 1px solid rgba(255, 201, 71, 0.3);
         }
-        /* --- [ویژگی جدید] استایل وضعیت لابی --- */
-        .lobby-status {
-            padding: 4px 12px; border-radius: 15px; font-size: 0.8rem;
-            font-weight: 700;
-        }
-        .lobby-status.waiting { background: var(--status-waiting-bg); color: var(--status-waiting-text); }
-        .lobby-status.in-game { background: var(--status-ingame-bg); color: var(--status-ingame-text); }
-        .lobby-status.full { background: var(--status-full-bg); color: var(--status-full-text); }
-        
-        /* --- [ویژگی جدید] استایل توضیحات لابی --- */
-        .lobby-description {
-            font-size: 0.85rem; color: var(--text-secondary);
-            margin-top: 8px; font-style: italic;
-            width: 100%; text-align: right;
-        }
-        
         .player-count {
             display: flex; align-items: center; gap: 8px; font-size: 1.1rem;
             font-weight: 700; background-color: rgba(0,0,0,0.3);
-            padding: 5px 10px; border-radius: 20px; transition: text-shadow 0.3s ease;
+            padding: 5px 10px; border-radius: 20px;
         }
-        /* --- [ویژگی جدید] انیمیشن درخشش تعداد بازیکن --- */
-        .player-count.glowing {
-            animation: gold-glow 1.5s ease-out;
-        }
-        @keyframes gold-glow {
-            0% { text-shadow: 0 0 0px var(--primary-gold); }
-            50% { text-shadow: 0 0 15px var(--primary-gold); }
-            100% { text-shadow: 0 0 0px var(--primary-gold); }
-        }
-        
+        .player-count span { animation: pulse 2s infinite ease-in-out; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
         .creator-info { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
         .lobby-creator { font-size: 0.9rem; color: var(--text-secondary); }
         
-        /* --- [ویژگی جدید] استایل آواتار بازیکنان --- */
-        .player-avatars { display: flex; align-items: center; direction: ltr; }
-        .player-avatar {
-            width: 32px; height: 32px; border-radius: 50%;
-            border: 2px solid var(--border-color); object-fit: cover;
-            margin-left: -12px; background-color: #333;
-            transition: transform 0.2s ease;
-        }
-        .player-avatar:hover { transform: scale(1.2); z-index: 1; }
-        
+        /* --- [تغییر] استایل‌های جدید و یکپارچه برای بخش ادمین --- */
         .admin-password-container {
-            display: flex; align-items: center; justify-content: space-between;
-            background-color: rgba(0, 0, 0, 0.4); border: 1px solid var(--border-color);
-            border-radius: 6px; padding: 4px 8px; margin-top: 6px;
-            cursor: pointer; transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 4px 8px;
+            margin-top: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
         .admin-password-container:hover {
-            background-color: var(--admin-edit-bg); border-color: var(--primary-gold);
+            background-color: var(--admin-edit-bg);
+            border-color: var(--primary-gold);
         }
         .admin-password-text {
-            font-size: 0.8rem; color: #f39c12; font-family: monospace;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px;
+            font-size: 0.8rem;
+            color: #f39c12;
+            font-family: monospace;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100px; /* جلوگیری از طولانی شدن بیش از حد رمز */
         }
-        .admin-edit-icon { font-size: 0.9rem; color: var(--text-secondary); padding-left: 8px; }
+        .admin-edit-icon {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            padding-left: 8px;
+        }
         
         .lobby-actions { display: flex; gap: 10px; }
         .lobby-btn {
@@ -286,22 +313,33 @@
             background: linear-gradient(145deg, #a1534d, #6b3431); transform: translateY(-2px);
         }
         .btn-join:disabled {
-            background: linear-gradient(145deg, #616161, #3a3a3a); border-color: #888;
-            cursor: not-allowed; opacity: 0.7;
+            background: linear-gradient(145deg, #616161, #3a3a3a);
+            border-color: #888;
+            cursor: not-allowed;
+            opacity: 0.7;
         }
         .btn-join:disabled:hover { transform: none; }
-        .btn-delete, .btn-admin-delete {
-            background: linear-gradient(145deg, var(--admin-red), #962d22); color: white;
-            border: 1px solid #ff7961;
+        .btn-delete {
+            background: linear-gradient(145deg, #616161, #3a3a3a); color: var(--text-light);
+            border: 1px solid #888;
         }
-        .btn-delete:hover, .btn-admin-delete:hover {
+        .btn-delete:hover {
+             background: linear-gradient(145deg, #7a7a7a, #4f4f4f); transform: translateY(-2px);
+        }
+        .btn-admin-delete {
+            background: linear-gradient(145deg, var(--admin-red), #962d22);
+            color: white; border: 1px solid #ff7961;
+        }
+        .btn-admin-delete:hover {
             background: linear-gradient(145deg, var(--admin-red-hover), var(--admin-red));
             transform: translateY(-2px);
         }
 
+        /* --- دکمه شناور --- */
         #create-lobby-fab {
             position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
-            width: 60px; height: 60px; background: linear-gradient(145deg, var(--primary-gold), #c89c36);
+            width: 60px; height: 60px;
+            background: linear-gradient(145deg, var(--primary-gold), #c89c36);
             color: var(--bg-dark); border-radius: 50%; border: none; font-size: 2.5rem;
             font-weight: 900; line-height: 60px; text-align: center; cursor: pointer;
             box-shadow: 0 5px 15px rgba(255, 201, 71, 0.4);
@@ -313,18 +351,21 @@
         }
         #create-lobby-fab:active { transform: translateX(-50%) scale(0.95); }
 
+        /* --- پنل‌های مودال (Modal) --- */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.85); display: flex;
-            justify-content: center; align-items: center; z-index: 1000;
-            opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease;
+            background-color: rgba(0, 0, 0, 0.85); 
+            display: flex; justify-content: center; align-items: center;
+            z-index: 1000; opacity: 0; visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
         }
         .modal-overlay.visible { opacity: 1; visibility: visible; }
         .modal-content {
             background: linear-gradient(145deg, #3c3022, var(--bg-dark));
-            border: 2px solid var(--border-color); border-radius: 16px; padding: 25px 30px;
-            width: 90%; max-width: 380px; text-align: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); transform: scale(0.9) translateY(20px);
+            border: 2px solid var(--border-color); border-radius: 16px;
+            padding: 25px 30px; width: 90%; max-width: 380px; text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transform: scale(0.9) translateY(20px);
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .modal-overlay.visible .modal-content { transform: scale(1) translateY(0); }
@@ -334,15 +375,15 @@
         }
         .modal-message { font-size: 1rem; line-height: 1.6; margin-bottom: 25px; color: var(--text-light); }
         .modal-input-group { width: 100%; margin-bottom: 20px; }
-        .modal-input, .modal-select, .modal-textarea {
-            width: 100%; padding: 12px 15px; background-color: rgba(0,0,0,0.4);
-            border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-light);
-            font-family: 'Vazirmatn', sans-serif; font-size: 1rem; text-align: center; margin-bottom: 15px;
+        .modal-input, .modal-select {
+            width: 100%; padding: 12px 15px;
+            background-color: rgba(0,0,0,0.4); border: 1px solid var(--border-color);
+            border-radius: 8px; color: var(--text-light);
+            font-family: 'Vazirmatn', sans-serif; font-size: 1rem; text-align: center;
         }
-        .modal-textarea { resize: vertical; min-height: 80px; text-align: right; }
+        .modal-input { margin-bottom: 15px; }
         .modal-select { text-align: center; padding-right: 15px; }
-        .modal-input:focus, .modal-select:focus, .modal-textarea:focus { outline: none; border-color: var(--primary-gold); }
-        
+        .modal-input:focus, .modal-select:focus { outline: none; border-color: var(--primary-gold); }
         .modal-buttons { display: flex; gap: 15px; width: 100%; }
         .modal-button {
             flex-grow: 1; padding: 12px; font-size: 1rem; font-weight: 700;
@@ -360,43 +401,80 @@
         }
         .modal-button.secondary:hover { background: linear-gradient(145deg, #615342, #403529); }
         
+        /* استایل‌های جدید برای رمز لابی */
         .password-toggle-group {
-            display: flex; align-items: center; justify-content: center;
-            gap: 10px; margin-top: 5px; cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+            cursor: pointer;
         }
-        .password-toggle-group label { color: var(--text-secondary); font-weight: 700; }
-        .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
+        .password-toggle-group label {
+            color: var(--text-secondary);
+            font-weight: 700;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 28px;
+        }
+        .switch input { 
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
         .slider {
-            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #332a20; transition: .4s; border-radius: 34px;
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #332a20;
+            transition: .4s;
+            border-radius: 34px;
         }
         .slider:before {
-            position: absolute; content: ""; height: 20px; width: 20px;
-            left: 4px; bottom: 4px; background-color: var(--text-light);
-            transition: .4s; border-radius: 50%;
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: var(--text-light);
+            transition: .4s;
+            border-radius: 50%;
         }
-        input:checked + .slider { background-color: var(--primary-gold); }
+        input:checked + .slider {
+            background-color: var(--primary-gold);
+        }
         input:checked + .slider:before {
-            transform: translateX(22px); background-color: var(--bg-dark);
+            transform: translateX(22px);
+            background-color: var(--bg-dark);
         }
-        #lobby-password-input { margin-top: 15px; display: none; }
+
+        #lobby-password-input {
+            margin-top: 15px;
+            display: none; /* مخفی به صورت پیش‌فرض */
+        }
     </style>
 </head>
 <body>
 
     <div id="background-blurry"></div>
-    <audio id="background-music" loop></audio>
-    
-    <!-- [ویژگی جدید] افکت‌های صوتی -->
-    <audio id="sfx-click" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_2491f84234.mp3" preload="auto"></audio>
-    <audio id="sfx-open-modal" src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_a43f06c1b3.mp3" preload="auto"></audio>
-    <audio id="sfx-success" src="https://cdn.pixabay.com/download/audio/2022/01/18/audio_8526f4a85d.mp3" preload="auto"></audio>
 
+    <!-- [جدید] موسیقی پس‌زمینه -->
+    <audio id="background-music" loop></audio>
+
+    <!-- [جدید] پنل دانلود موسیقی -->
     <div id="music-download-overlay">
         <div class="download-panel">
             <h2 class="download-title">موسیقی پس‌زمینه</h2>
-            <div class="progress-bar-container"><div id="progress-bar"></div></div>
+            <div class="progress-bar-container">
+                <div id="progress-bar"></div>
+            </div>
             <p id="progress-text">در حال دانلود... 0%</p>
         </div>
     </div>
@@ -417,21 +495,6 @@
             </div>
         </header>
 
-        <!-- [ویژگی جدید] کنترل‌های فیلتر و مرتب‌سازی -->
-        <div class="controls-container">
-            <div id="filter-buttons" class="filter-buttons">
-                <button class="filter-btn active" data-filter="all">همه</button>
-                <button class="filter-btn" data-filter="unlocked">آزاد</button>
-                <button class="filter-btn" data-filter="locked">خصوصی</button>
-                <button class="filter-btn" data-filter="not_full">جای خالی</button>
-            </div>
-            <select id="sort-dropdown" class="sort-dropdown">
-                <option value="newest">جدیدترین</option>
-                <option value="most_players">بیشترین بازیکن</option>
-                <option value="least_players">کمترین بازیکن</option>
-            </select>
-        </div>
-
         <div id="lobby-list">
             <!-- لابی‌ها به صورت داینامیک اینجا اضافه می‌شوند -->
         </div>
@@ -451,8 +514,7 @@
                     <option value="زودیاک">سناریو: زودیاک</option>
                     <option value="ارتش سری">سناریو: ارتش سری</option>
                 </select>
-                <!-- [ویژگی جدید] فیلد توضیحات لابی -->
-                <textarea id="lobby-description-input" class="modal-textarea" placeholder="توضیحات کوتاه (اختیاری)... مثلا: بازی دوستانه" maxlength="100"></textarea>
+                <!-- بخش جدید برای رمزگذاری -->
                 <div class="password-toggle-group">
                     <label for="private-lobby-toggle">لابی خصوصی (با رمز)</label>
                     <label class="switch">
@@ -483,7 +545,6 @@
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, query, where, getDocs, deleteDoc, doc, orderBy, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // ... (Firebase config remains the same)
         const firebaseConfig = {
           apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
           authDomain: "mafia-9fcbf.firebaseapp.com",
@@ -500,70 +561,141 @@
 
         // --- DOM Elements ---
         const lobbyList = document.getElementById('lobby-list');
-        const searchInput = document.getElementById('search-input');
-        const loadingOverlay = document.getElementById('loading-overlay');
         const createLobbyFab = document.getElementById('create-lobby-fab');
-        
-        // Modal elements
+        const searchInput = document.getElementById('search-input');
         const createLobbyModal = document.getElementById('create-lobby-modal');
         const lobbyNameInput = document.getElementById('lobby-name-input');
         const lobbyScenarioSelect = document.getElementById('lobby-scenario-select');
-        const lobbyDescriptionInput = document.getElementById('lobby-description-input'); // [جدید]
         const privateLobbyToggle = document.getElementById('private-lobby-toggle');
         const lobbyPasswordInput = document.getElementById('lobby-password-input');
         const createLobbyConfirmBtn = document.getElementById('create-lobby-confirm-btn');
         const createLobbyCancelBtn = document.getElementById('create-lobby-cancel-btn');
-
-        // Custom alert elements
         const customAlertModal = document.getElementById('custom-alert-modal');
         const customAlertTitle = document.getElementById('custom-alert-title');
         const customAlertMessage = document.getElementById('custom-alert-message');
         const customAlertButtons = document.getElementById('custom-alert-buttons');
+        const loadingOverlay = document.getElementById('loading-overlay');
         
-        // Music elements
+        // --- [جدید] عناصر مربوط به موسیقی ---
         const backgroundMusic = document.getElementById('background-music');
         const musicDownloadOverlay = document.getElementById('music-download-overlay');
         const progressBar = document.getElementById('progress-bar');
         const progressText = document.getElementById('progress-text');
 
-        // [ویژگی جدید] Filter & Sort elements
-        const filterButtonsContainer = document.getElementById('filter-buttons');
-        const sortDropdown = document.getElementById('sort-dropdown');
-
         let currentUser = null;
         let currentUserIsAdmin = false;
-        let allLobbiesData = new Map();
-        let loadingTimeout; // [جدید] برای جلوگیری از گیر کردن لودینگ
+        let allLobbiesData = new Map(); // برای نگهداری دیتای لابی‌ها و بازسازی لیست
 
-        // Music constants
+        // --- [جدید] متغیرهای مربوط به موسیقی ---
+        let isMusicPlaying = false;
         const MUSIC_URL = "https://raw.githubusercontent.com/abolfazl140122/mafia/main/mysterious-dark-background-310162%20(1).mp3";
         const MUSIC_CACHE_NAME = 'mafia-lobby-music-cache-v1';
         const MUSIC_VERSION_KEY = 'mafia-lobby-music-version';
-        
-        // [ویژگی جدید] تابع پخش افکت صوتی
-        function playSound(soundId) {
-            try {
-                const sound = document.getElementById(soundId);
-                sound.currentTime = 0;
-                sound.volume = (soundId === 'sfx-click') ? 0.4 : 0.6;
-                sound.play();
-            } catch(e) { console.warn("Could not play sound", e); }
-        }
 
-        // --- توابع اصلی ---
-        function hideLoadingOverlay() {
-            clearTimeout(loadingTimeout); // [جدید]
-            if (loadingOverlay.style.opacity !== '0') {
-                loadingOverlay.style.opacity = '0';
-                setTimeout(() => loadingOverlay.style.display = 'none', 500);
+        // --- توابع ---
+        
+        // --- [جدید] توابع مربوط به موسیقی ---
+        const playMusicAfterUserInteraction = () => {
+            if (!isMusicPlaying && backgroundMusic.src && backgroundMusic.paused) {
+                backgroundMusic.play()
+                    .then(() => {
+                        isMusicPlaying = true;
+                        document.body.removeEventListener('click', playMusicAfterUserInteraction, true);
+                        document.body.removeEventListener('keydown', playMusicAfterUserInteraction, true);
+                    })
+                    .catch(e => console.error("Error playing music post-interaction.", e));
+            } else {
+                document.body.removeEventListener('click', playMusicAfterUserInteraction, true);
+                document.body.removeEventListener('keydown', playMusicAfterUserInteraction, true);
+            }
+        };
+
+        function playMusicFromBlob(blob) {
+            const objectUrl = URL.createObjectURL(blob);
+            backgroundMusic.src = objectUrl;
+            backgroundMusic.volume = 0.3;
+            
+            const playPromise = backgroundMusic.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    isMusicPlaying = true;
+                }).catch(error => {
+                    isMusicPlaying = false;
+                    document.body.addEventListener('click', playMusicAfterUserInteraction, true);
+                    document.body.addEventListener('keydown', playMusicAfterUserInteraction, true);
+                });
             }
         }
+
+        function downloadAndCacheMusic() {
+            return new Promise((resolve, reject) => {
+                musicDownloadOverlay.classList.add('visible');
+                const xhr = new XMLHttpRequest();
+                xhr.open('GET', MUSIC_URL, true);
+                xhr.responseType = 'blob';
+
+                xhr.onprogress = (event) => {
+                    if (event.lengthComputable) {
+                        const percentComplete = Math.round((event.loaded / event.total) * 100);
+                        progressBar.style.width = percentComplete + '%';
+                        progressText.textContent = `در حال دانلود... ${percentComplete}%`;
+                    }
+                };
+                xhr.onload = async () => {
+                    if (xhr.status === 200) {
+                        const musicBlob = xhr.response;
+                        try {
+                            const cache = await caches.open(MUSIC_CACHE_NAME);
+                            await cache.put(MUSIC_URL, new Response(musicBlob));
+                            localStorage.setItem(MUSIC_VERSION_KEY, MUSIC_URL);
+                            musicDownloadOverlay.classList.remove('visible');
+                            resolve(musicBlob);
+                        } catch (cacheError) { reject(cacheError); }
+                    } else { reject(new Error(`Network error: ${xhr.statusText}`)); }
+                };
+                xhr.onerror = () => {
+                    musicDownloadOverlay.classList.remove('visible');
+                    reject(new Error('Network error during download.'));
+                };
+                xhr.send();
+            });
+        }
+        
+        async function handleBackgroundMusic() {
+            const cachedVersion = localStorage.getItem(MUSIC_VERSION_KEY);
+            if (cachedVersion === MUSIC_URL) {
+                try {
+                    const cache = await caches.open(MUSIC_CACHE_NAME);
+                    const cachedResponse = await cache.match(MUSIC_URL);
+                    if (cachedResponse) {
+                        playMusicFromBlob(await cachedResponse.blob());
+                    } else { playMusicFromBlob(await downloadAndCacheMusic()); }
+                } catch (error) { playMusicFromBlob(await downloadAndCacheMusic()); }
+            } else {
+                try { playMusicFromBlob(await downloadAndCacheMusic()); } 
+                catch (error) { console.error('Music download/play process failed:', error); }
+            }
+        }
+        // --- پایان توابع موسیقی ---
 
         function showModal(modalElement) { modalElement.classList.add('visible'); }
         function hideModal(modalElement) { modalElement.classList.remove('visible'); }
 
         function showCustomAlert(title, message, buttons) {
-            // ... (تابع بدون تغییر)
+            customAlertTitle.textContent = title;
+            customAlertMessage.innerHTML = message;
+            customAlertButtons.innerHTML = '';
+            buttons.forEach(btnInfo => {
+                const button = document.createElement('button');
+                button.textContent = btnInfo.text;
+                button.className = `modal-button ${btnInfo.class}`;
+                button.onclick = () => {
+                    if (!btnInfo.keepOpen) hideModal(customAlertModal);
+                    if (btnInfo.action) btnInfo.action();
+                };
+                customAlertButtons.appendChild(button);
+            });
+            showModal(customAlertModal);
         }
         
         function debounce(func, delay) {
@@ -574,10 +706,55 @@
             };
         }
 
-        // --- توابع مربوط به لابی ---
-        function promptForPasswordChange(lobbyData) { /* ... (بدون تغییر) */ }
-        async function updateLobbyPassword(lobbyId, newPassword) { /* ... (بدون تغییر) */ }
-        function promptForLobbyPassword(lobbyData) { /* ... (بدون تغییر) */ }
+        // --- توابع جدید برای تغییر رمز ---
+        function promptForPasswordChange(lobbyData) {
+            const messageHTML = `
+                <p>رمز جدید را برای لابی "${lobbyData.lobbyName}" وارد کنید:</p>
+                <input type="text" id="new-password-input" class="modal-input" style="margin-top: 15px;" placeholder="رمز جدید" value="${lobbyData.password || ''}">
+            `;
+            showCustomAlert('تغییر رمز لابی', messageHTML, [
+                { text: 'ذخیره', class: 'primary', keepOpen: true, action: () => {
+                    const newPassword = document.getElementById('new-password-input').value.trim();
+                    if (!newPassword) {
+                        showCustomAlert('خطا', 'رمز عبور نمی‌تواند خالی باشد.', [{ text: 'باشه', class: 'primary' }]);
+                        return;
+                    }
+                    updateLobbyPassword(lobbyData.id, newPassword);
+                }},
+                { text: 'انصراف', class: 'secondary' }
+            ]);
+        }
+        
+        async function updateLobbyPassword(lobbyId, newPassword) {
+            try {
+                const lobbyDocRef = doc(db, 'Lobbys_list', lobbyId);
+                await updateDoc(lobbyDocRef, { password: newPassword });
+                hideModal(customAlertModal); // بستن مودال تغییر رمز
+                showCustomAlert('موفقیت', 'رمز لابی با موفقیت تغییر کرد.', [{text: 'عالی', class: 'primary'}]);
+            } catch (error) {
+                console.error("Error updating password:", error);
+                showCustomAlert('خطا', 'مشکلی در به‌روزرسانی رمز پیش آمد.', [{text: 'باشه', class: 'primary'}]);
+            }
+        }
+
+        function promptForLobbyPassword(lobbyData) {
+            const messageHTML = `
+                <p>این لابی خصوصی است. لطفا رمز عبور را وارد کنید:</p>
+                <input type="password" id="join-password-input" class="modal-input" style="margin-top: 15px;" placeholder="رمز عبور">
+            `;
+            showCustomAlert('ورود به لابی خصوصی', messageHTML, [
+                { text: 'پیوستن', class: 'primary', keepOpen: true, action: () => {
+                    const enteredPassword = document.getElementById('join-password-input').value;
+                    if (enteredPassword === lobbyData.password) {
+                        hideModal(customAlertModal);
+                        window.location.href = `./lobby.html?id=${lobbyData.id}`;
+                    } else {
+                        showCustomAlert('خطا', 'رمز عبور وارد شده اشتباه است.', [{text: 'امتحان مجدد', class: 'primary', action: () => promptForLobbyPassword(lobbyData)}]);
+                    }
+                }},
+                { text: 'انصراف', class: 'secondary' }
+            ]);
+        }
 
         function renderLobbyCard(lobbyData, index) {
             const card = document.createElement('div');
@@ -587,25 +764,9 @@
 
             const isOwner = currentUser && currentUser.uid === lobbyData.creatorId;
             const canAdminDelete = currentUserIsAdmin && !isOwner;
+            const isLobbyFull = (lobbyData.playerCount || 1) >= (lobbyData.maxPlayers || 12);
             const isPrivate = lobbyData.password && lobbyData.password.length > 0;
-            
-            // [ویژگی جدید] منطق وضعیت لابی
-            let status = lobbyData.status || 'waiting'; // 'waiting', 'in-game', 'full'
-            if (status === 'waiting' && lobbyData.playerCount >= lobbyData.maxPlayers) {
-                status = 'full';
-            }
-            
-            let statusText = '';
-            let statusClass = '';
-            switch(status) {
-                case 'in-game': statusText = 'در حال بازی'; statusClass = 'in-game'; break;
-                case 'full': statusText = 'لابی پر است'; statusClass = 'full'; break;
-                default: statusText = 'در انتظار بازیکن'; statusClass = 'waiting';
-            }
-            
-            if (status === 'in-game') card.classList.add('in-game');
 
-            // دکمه‌ها بر اساس وضعیت
             let actionButtonsHTML = '';
             if (isOwner) {
                 actionButtonsHTML += `<button class="lobby-btn btn-delete" data-action="delete">حذف لابی</button>`;
@@ -613,16 +774,13 @@
                 actionButtonsHTML += `<button class="lobby-btn btn-admin-delete" data-action="admin-delete">بستن لابی</button>`;
             }
             
-            if (status === 'full') {
+            if (isLobbyFull) {
                 actionButtonsHTML += `<button class="lobby-btn btn-join" disabled>لابی پر است</button>`;
-            } else if (status === 'in-game') {
-                // در آینده میتواند به صفحه تماشا لینک شود
-                actionButtonsHTML += `<button class="lobby-btn btn-join" data-action="watch" disabled>تماشا</button>`;
             } else {
                 actionButtonsHTML += `<button class="lobby-btn btn-join" data-action="join">پیوستن</button>`;
             }
-
-            // بخش ادمین
+            
+            // --- [تغییر] ساختار HTML برای بخش ادمین ---
             let adminControlsHTML = '';
             if (currentUserIsAdmin && isPrivate) {
                 adminControlsHTML = `
@@ -632,220 +790,266 @@
                     </div>`;
             }
 
-            // [ویژگی جدید] رندر آواتارها
-            let players = lobbyData.players || [{ avatar: `https://i.pravatar.cc/40?u=${lobbyData.creatorId}` }]; // شبیه‌سازی
-            let avatarsHTML = `<div class="player-avatars">`;
-            players.slice(0, 5).forEach(p => {
-                avatarsHTML += `<img src="${p.avatar}" alt="avatar" class="player-avatar" title="${p.name || 'بازیکن'}">`;
-            });
-            avatarsHTML += `</div>`;
-
-
             card.innerHTML = `
                 <div class="lobby-card-header">
-                    <div class="lobby-info-top">
+                    <div class="lobby-info">
                         <div class="lobby-name-wrapper">
                             ${isPrivate ? '<span class="lock-icon">🔒</span>' : ''}
                             <h3 class="lobby-name">${lobbyData.lobbyName}</h3>
                         </div>
                         <span class="lobby-scenario">${lobbyData.scenario || 'کلاسیک'}</span>
-                        <span class="lobby-status ${statusClass}">${statusText}</span>
                     </div>
                     <div class="player-count">
                         <span>👤</span> ${lobbyData.playerCount || 1}/${lobbyData.maxPlayers || 12}
                     </div>
                 </div>
-                ${lobbyData.description ? `<p class="lobby-description">${lobbyData.description}</p>` : ''}
                 <div class="lobby-card-footer">
-                     ${avatarsHTML}
+                    <div class="creator-info">
+                        <span class="lobby-creator">سازنده: ${lobbyData.creatorName}</span>
+                        ${adminControlsHTML}
+                    </div>
                     <div class="lobby-actions">${actionButtonsHTML}</div>
                 </div>
             `;
             
-            // Event listeners for actions...
-            card.querySelector('[data-action="join"]')?.addEventListener('click', () => { /* ... */ });
-            // ... Other action listeners
-            
-            return card;
-        }
-
-        // [ویژگی جدید] تابع اصلی برای رندر کردن لیست با فیلتر و مرتب‌سازی
-        function updateAndRenderLobbies() {
-            const currentFilter = filterButtonsContainer.querySelector('.active').dataset.filter;
-            const currentSort = sortDropdown.value;
-            const searchTerm = searchInput.value.toLowerCase().trim();
-
-            let lobbiesArray = Array.from(allLobbiesData.values());
-
-            // 1. Filtering
-            lobbiesArray = lobbiesArray.filter(lobby => {
-                const isPrivate = lobby.password && lobby.password.length > 0;
-                const isFull = lobby.playerCount >= lobby.maxPlayers;
+            card.querySelector('[data-action="join"]')?.addEventListener('click', () => {
+                if ((lobbyData.playerCount || 1) >= (lobbyData.maxPlayers || 12)) {
+                    showCustomAlert('لابی پر است', 'ظرفیت این لابی تکمیل شده است.', [{ text: 'باشه', class: 'primary' }]);
+                    return;
+                }
                 
-                // Search filter
-                const nameMatch = lobby.lobbyName.toLowerCase().includes(searchTerm);
-                const creatorMatch = lobby.creatorName.toLowerCase().includes(searchTerm);
-                const scenarioMatch = (lobby.scenario || '').toLowerCase().includes(searchTerm);
-                if (searchTerm && !(nameMatch || creatorMatch || scenarioMatch)) return false;
-
-                // Button filters
-                if (currentFilter === 'unlocked' && isPrivate) return false;
-                if (currentFilter === 'locked' && !isPrivate) return false;
-                if (currentFilter === 'not_full' && isFull) return false;
-                
-                return true;
-            });
-
-            // 2. Sorting
-            lobbiesArray.sort((a, b) => {
-                switch(currentSort) {
-                    case 'most_players':
-                        return b.playerCount - a.playerCount;
-                    case 'least_players':
-                        return a.playerCount - b.playerCount;
-                    case 'newest':
-                    default:
-                        return b.createdAt.toMillis() - a.createdAt.toMillis();
+                if (isPrivate) {
+                    promptForLobbyPassword(lobbyData);
+                } else {
+                    window.location.href = `./lobby.html?id=${lobbyData.id}`;
                 }
             });
 
-            // 3. Rendering
-            lobbyList.innerHTML = '';
-            if (lobbiesArray.length === 0) {
-                let msgElement = document.createElement('p');
-                msgElement.style.textAlign = 'center';
-                msgElement.style.color = 'var(--text-secondary)';
-                msgElement.textContent = allLobbiesData.size > 0 ? 'هیچ لابی با این مشخصات یافت نشد.' : 'هیچ لابی فعالی وجود ندارد. اولین لابی را شما بسازید!';
-                lobbyList.appendChild(msgElement);
-            } else {
-                lobbiesArray.forEach((lobbyData, index) => {
-                    const cardElement = renderLobbyCard(lobbyData, index);
-                    lobbyList.appendChild(cardElement);
-                });
-            }
+            const deleteAction = (title, message) => {
+                 showCustomAlert(title, message, [
+                    { text: 'بله، حذف کن', class: 'primary', action: () => deleteLobby(lobbyData.id) },
+                    { text: 'خیر', class: 'secondary' }
+                ]);
+            };
+
+            card.querySelector('[data-action="delete"]')?.addEventListener('click', () => {
+                deleteAction('تایید حذف', 'آیا از حذف لابی خود مطمئن هستید؟');
+            });
+            card.querySelector('[data-action="admin-delete"]')?.addEventListener('click', () => {
+                deleteAction('تایید ادمین', `آیا از بستن لابی "${lobbyData.lobbyName}" مطمئن هستید؟`);
+            });
+            
+            // event listener روی کل کانتینر عمل می‌کند
+            card.querySelector('[data-action="edit-pass"]')?.addEventListener('click', () => {
+                promptForPasswordChange(lobbyData);
+            });
+
+            return card;
         }
         
-        onAuthStateChanged(auth, async (user) => {
+        function rerenderAllLobbyCards() {
+            lobbyList.innerHTML = ''; 
+            const sortedLobbies = Array.from(allLobbiesData.values()).sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis());
+            
+            sortedLobbies.forEach((lobbyData, index) => {
+                const cardElement = renderLobbyCard(lobbyData, index);
+                lobbyList.appendChild(cardElement);
+            });
+            
+            updateLobbyListState();
+            filterLobbies();
+        }
+        
+        onAuthStateChanged(auth, async (user) => { // اضافه شدن async
             if (user) {
                 currentUser = user;
-                // [جدید] تایمر برای جلوگیری از گیر کردن صفحه لودینگ
-                loadingTimeout = setTimeout(() => {
-                    hideLoadingOverlay();
-                    showCustomAlert('خطا', 'ارتباط با سرور برقرار نشد. لطفا اتصال اینترنت خود را بررسی کرده و صفحه را رفرش کنید.', [{text:'باشه', class:'primary'}]);
-                }, 15000); // 15 ثانیه
                 
-                // ... (کد موسیقی و بررسی ادمین بودن بدون تغییر)
+                // [جدید] شروع دانلود و پخش موسیقی
+                await handleBackgroundMusic();
+
+                const userDocRef = doc(db, 'users', user.uid);
+                
+                onSnapshot(userDocRef, (docSnap) => {
+                    if (docSnap.exists()) {
+                        const userData = docSnap.data();
+                        const newAdminStatus = userData && userData.isAdmin === true;
+                        
+                        if (newAdminStatus !== currentUserIsAdmin) {
+                            currentUserIsAdmin = newAdminStatus;
+                            rerenderAllLobbyCards(); 
+                        }
+                    }
+                });
 
                 const lobbiesRef = collection(db, 'Lobbys_list');
                 const q = query(lobbiesRef, orderBy("createdAt", "desc"));
 
                 onSnapshot(q, (snapshot) => {
-                    let playerGlowUpdates = new Map();
-
                     snapshot.docChanges().forEach((change) => {
                         const lobbyData = { id: change.doc.id, ...change.doc.data() };
-                        const oldData = allLobbiesData.get(lobbyData.id);
-
+                        
                         if (change.type === "added" || change.type === "modified") {
                            allLobbiesData.set(lobbyData.id, lobbyData);
-                           // [ویژگی جدید] بررسی برای انیمیشن درخشش
-                           if(change.type === "modified" && oldData && lobbyData.playerCount > oldData.playerCount) {
-                               playerGlowUpdates.set(lobbyData.id, true);
-                           }
                         }
                         if (change.type === "removed") {
                            allLobbiesData.delete(lobbyData.id);
                         }
                     });
 
-                    updateAndRenderLobbies();
-                    hideLoadingOverlay();
+                    rerenderAllLobbyCards();
 
-                    // [ویژگی جدید] اعمال انیمیشن درخشش
-                    playerGlowUpdates.forEach((_, lobbyId) => {
-                        const card = lobbyList.querySelector(`.lobby-card[data-id="${lobbyId}"]`);
-                        if(card) {
-                            const playerCountEl = card.querySelector('.player-count');
-                            playerCountEl.classList.remove('glowing'); // Reset animation
-                            void playerCountEl.offsetWidth; // Trigger reflow
-                            playerCountEl.classList.add('glowing');
-                        }
-                    });
-
+                    if (loadingOverlay.style.opacity !== '0') {
+                        loadingOverlay.style.opacity = '0';
+                        setTimeout(() => loadingOverlay.style.display = 'none', 500);
+                    }
                 }, (error) => {
                     console.error("Error fetching lobbies:", error);
-                    hideLoadingOverlay();
                     showCustomAlert('خطای شبکه', 'دریافت لیست لابی‌ها با مشکل مواجه شد.', [{text:'باشه', class:'primary'}]);
                 });
             } else {
                 window.location.href = './login.html';
             }
         });
+        
+        function updateLobbyListState() {
+            const hasCards = allLobbiesData.size > 0;
+            let msgElement = lobbyList.querySelector('.info-message');
+
+            if (!hasCards) {
+                if (!msgElement) {
+                    msgElement = document.createElement('p');
+                    msgElement.className = 'info-message';
+                    msgElement.style.textAlign = 'center';
+                    msgElement.style.color = 'var(--text-secondary)';
+                    lobbyList.appendChild(msgElement);
+                }
+                msgElement.textContent = 'هیچ لابی فعالی وجود ندارد. اولین لابی را شما بسازید!';
+                msgElement.style.display = 'block';
+            } else if (msgElement) {
+                msgElement.style.display = 'none';
+            }
+        }
 
         async function createLobby() {
             const lobbyName = lobbyNameInput.value.trim();
             const scenario = lobbyScenarioSelect.value;
-            const description = lobbyDescriptionInput.value.trim(); // [جدید]
             const isPrivate = privateLobbyToggle.checked;
             const password = lobbyPasswordInput.value;
 
-            // ... (validation remains the same)
+            if (!lobbyName) {
+                showCustomAlert('خطا', 'نام لابی نمی‌تواند خالی باشد.', [{ text: 'باشه', class: 'primary' }]);
+                return;
+            }
+            if (isPrivate && !password) {
+                showCustomAlert('خطا', 'برای لابی خصوصی باید رمز عبور تعیین کنید.', [{ text: 'باشه', class: 'primary' }]);
+                return;
+            }
 
-            // ... (check for existing lobby remains the same)
+            if (!currentUser) return;
+
+            const lobbiesRef = collection(db, 'Lobbys_list');
+            const q = query(lobbiesRef, where("creatorId", "==", currentUser.uid));
+            const querySnapshot = await getDocs(q);
+
+            if (!querySnapshot.empty) {
+                hideModal(createLobbyModal);
+                showCustomAlert('خطا', 'شما قبلاً یک لابی ایجاد کرده‌اید. برای ساخت لابی جدید، ابتدا لابی قبلی خود را حذف کنید.', [
+                    { text: 'باشه', class: 'primary' }
+                ]);
+                return;
+            }
             
             const lobbyData = {
-                lobbyName, scenario, description, // 'description' is new
+                lobbyName: lobbyName,
+                scenario: scenario,
                 creatorId: currentUser.uid,
                 creatorName: currentUser.displayName || 'کاربر ناشناس',
                 createdAt: serverTimestamp(),
                 playerCount: 1,
-                maxPlayers: 12,
-                status: 'waiting', // [جدید]
-                players: [{ // [جدید]
-                    uid: currentUser.uid,
-                    name: currentUser.displayName,
-                    avatar: currentUser.photoURL || `https://i.pravatar.cc/40?u=${currentUser.uid}`
-                }]
+                maxPlayers: 12
             };
             
-            if (isPrivate) lobbyData.password = password;
+            if (isPrivate) {
+                lobbyData.password = password;
+            }
 
             try {
-                await addDoc(collection(db, 'Lobbys_list'), lobbyData);
-                playSound('sfx-success'); // [جدید]
+                await addDoc(lobbiesRef, lobbyData);
                 hideModal(createLobbyModal);
-                // Reset form...
+                lobbyNameInput.value = '';
+                lobbyPasswordInput.value = '';
+                privateLobbyToggle.checked = false;
+                lobbyPasswordInput.style.display = 'none';
                 showCustomAlert('موفقیت!', 'لابی شما با موفقیت ساخته شد.', [{ text: 'عالی', class: 'primary' }]);
-            } catch (error) { /* ... */ }
+            } catch (error) {
+                showCustomAlert('خطای سرور', 'مشکلی در ساخت لابی پیش آمد.', [{ text: 'باشه', class: 'primary' }]);
+            }
         }
 
-        async function deleteLobby(lobbyId) { /* ... (بدون تغییر) */ }
+        async function deleteLobby(lobbyId) {
+            try {
+                await deleteDoc(doc(db, "Lobbys_list", lobbyId));
+            } catch (error) {
+                showCustomAlert('خطای سرور', 'مشکلی در حذف لابی پیش آمد.', [{ text: 'باشه', class: 'primary' }]);
+            }
+        }
+
+        function filterLobbies() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            const cards = lobbyList.querySelectorAll('.lobby-card');
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const lobbyName = card.querySelector('.lobby-name')?.textContent.toLowerCase() || '';
+                const creatorName = card.querySelector('.lobby-creator')?.textContent.toLowerCase() || '';
+                const scenario = card.querySelector('.lobby-scenario')?.textContent.toLowerCase() || '';
+
+                if (lobbyName.includes(searchTerm) || creatorName.includes(searchTerm) || scenario.includes(searchTerm)) {
+                    card.style.display = 'flex';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            let msgElement = lobbyList.querySelector('.info-message-filter');
+            if (!msgElement) {
+                msgElement = document.createElement('p');
+                msgElement.className = 'info-message-filter'; 
+                msgElement.style.textAlign = 'center';
+                msgElement.style.color = 'var(--text-secondary)';
+                lobbyList.appendChild(msgElement);
+            }
+
+            if (visibleCount === 0 && allLobbiesData.size > 0) {
+                msgElement.textContent = 'هیچ لابی با این مشخصات یافت نشد.';
+                msgElement.style.display = 'block';
+            } else {
+                 msgElement.style.display = 'none';
+            }
+        }
 
         // --- Event Listeners ---
-        createLobbyFab.addEventListener('click', () => {
-            playSound('sfx-open-modal');
-            showModal(createLobbyModal);
+        createLobbyFab.addEventListener('click', () => showModal(createLobbyModal));
+        createLobbyCancelBtn.addEventListener('click', () => {
+             hideModal(createLobbyModal);
+             lobbyPasswordInput.style.display = 'none';
+             privateLobbyToggle.checked = false;
         });
-        createLobbyCancelBtn.addEventListener('click', () => hideModal(createLobbyModal));
         createLobbyConfirmBtn.addEventListener('click', createLobby);
         
-        // [ویژگی جدید] Event listeners برای فیلتر و مرتب‌سازی
-        filterButtonsContainer.addEventListener('click', (e) => {
-            if (e.target.classList.contains('filter-btn')) {
-                playSound('sfx-click');
-                filterButtonsContainer.querySelector('.active').classList.remove('active');
-                e.target.classList.add('active');
-                updateAndRenderLobbies();
-            }
+        searchInput.addEventListener('input', debounce(filterLobbies, 250));
+
+        privateLobbyToggle.addEventListener('change', () => {
+            lobbyPasswordInput.style.display = privateLobbyToggle.checked ? 'block' : 'none';
         });
-        sortDropdown.addEventListener('change', () => {
-             playSound('sfx-click');
-             updateAndRenderLobbies();
+
+        [createLobbyModal, customAlertModal].forEach(modal => {
+             modal.addEventListener('click', (e) => {
+                if (e.target === modal) hideModal(modal);
+            });
         });
-        searchInput.addEventListener('input', debounce(updateAndRenderLobbies, 250));
-        
-        // ... (سایر event listener ها بدون تغییر)
-        
+
     </script>
 </body>
 </html>
