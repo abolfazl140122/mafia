@@ -302,6 +302,55 @@
         .banned-users-title { font-size: 1.1rem; font-weight: 700; color: #c5a687; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #5c4a3a; }
         #banned-ranking-list-container { max-height: 25vh; opacity: 0.8; }
         #banned-ranking-list-container .user-list-item { background-color: rgba(80, 40, 40, 0.2); }
+
+        /* *** [جدید] استایل‌های پنل تغییر نام *** */
+        .name-check-result-container {
+            width: 100%;
+            min-height: 90px; /* رزرو فضا برای جلوگیری از پرش صفحه */
+            margin-top: 5px;
+            padding: 15px;
+            background-color: rgba(0,0,0,0.2);
+            border: 1px solid transparent;
+            border-radius: 8px;
+            text-align: center;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .name-check-result-container.error {
+            border-color: #ef444480;
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+
+        .name-check-result-container .error-message {
+            color: #fca5a5;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .name-check-result-container .user-exists-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-exists-info img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid #a47d54;
+            object-fit: cover;
+        }
+
+        .user-exists-info .name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #ffc947;
+        }
+
     </style>
 </head>
 <body>
@@ -371,6 +420,8 @@
         <div id="avatar-menu-content" class="modal-content">
             <button id="avatar-menu-profile-btn" class="modal-button">پروفایل</button>
             <button id="avatar-menu-shop-btn" class="modal-button">فروشگاه</button>
+            <!-- [جدید] دکمه تغییر نام -->
+            <button id="change-name-btn" class="modal-button">تغییر نام</button>
         </div>
     </div>
     
@@ -535,6 +586,26 @@
         </div>
     </div>
 
+    <!-- [جدید] پنل تغییر نام -->
+    <div id="change-name-overlay" class="modal-overlay">
+        <div id="change-name-content" class="modal-content">
+            <h2 class="modal-title">تغییر نام نمایشی</h2>
+            <form id="change-name-form" style="width: 100%;" novalidate>
+                <div class="form-group">
+                    <label for="new-display-name-input" class="form-label" style="margin-bottom: 8px;">نام جدید:</label>
+                    <input type="text" id="new-display-name-input" class="form-input" required minlength="3" maxlength="15" placeholder="نام جدید را وارد کنید...">
+                </div>
+                <div id="name-check-result" class="name-check-result-container">
+                    <!-- نتایج بررسی اینجا نمایش داده می‌شود -->
+                </div>
+                <div class="confirm-buttons-container" style="margin-top: 20px;">
+                    <button type="button" id="cancel-new-name-btn" class="modal-button cancel-button" style="width: 50%;">انصراف</button>
+                    <button type="submit" id="save-new-name-btn" class="modal-button" style="width: 50%;">ذخیره تغییرات</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -635,6 +706,14 @@
         const editRankCancelBtn = document.getElementById('edit-rank-cancel-btn');
         const bannedRankingListContainer = document.getElementById('banned-ranking-list-container');
 
+        // [جدید] المان‌های پنل تغییر نام
+        const changeNameBtn = document.getElementById('change-name-btn');
+        const changeNameOverlay = document.getElementById('change-name-overlay');
+        const changeNameForm = document.getElementById('change-name-form');
+        const newDisplayNameInput = document.getElementById('new-display-name-input');
+        const nameCheckResultContainer = document.getElementById('name-check-result');
+        const saveNewNameBtn = document.getElementById('save-new-name-btn');
+        const cancelNewNameBtn = document.getElementById('cancel-new-name-btn');
 
         // متغیرها
         const MUSIC_URL = "https://raw.githubusercontent.com/abolfazl140122/mafia/main/dark-music-249503.mp3";
@@ -751,8 +830,6 @@
         async function handleSaveGameModes() { if (!(await verifyAdminStatus())) return; gameModesSaveBtn.disabled = true; gameModesSaveBtn.textContent = 'در حال ذخیره...'; const newSettings = { friendlyEnabled: friendlyModeToggle.checked, rankedEnabled: rankedModeToggle.checked }; try { const gameModesDocRef = doc(db, 'settings', 'gameModes'); await updateDoc(gameModesDocRef, newSettings); showCustomAlert("تنظیمات ورودی بازی با موفقیت ذخیره شد."); hideModal(gameModesPanelOverlay); } catch (error) { console.error("خطا در ذخیره تنظیمات ورودی بازی: ", error); showCustomAlert("خطا در ذخیره تغییرات. لطفا دوباره تلاش کنید."); } finally { gameModesSaveBtn.disabled = false; gameModesSaveBtn.textContent = 'ذخیره'; } }
 
         // *** توابع پنل رده بندی (بازنویسی شده برای حالت زنده) ***
-        
-        // تابع اصلی برای رندر کردن لیست‌ها بر اساس آرایه کاربران ورودی
         function renderRankings(allUsers) {
             const currentUser = auth.currentUser;
             if (!currentUser) return;
@@ -760,15 +837,13 @@
             const isAdmin = currentUserData?.isAdmin === true;
             rankingAdminFeatures.forEach(el => { el.style.display = isAdmin ? 'block' : 'none' });
 
-            // جدا کردن کاربران به لیست‌های رده‌بندی و بن شده
             const rankedUsers = allUsers
                 .filter(user => !user.isBannedFromRanking && user.game > 0)
                 .sort((a, b) => (b.game || 0) - (a.game || 0))
-                .slice(0, 100); // محدود به ۱۰۰ نفر برتر
+                .slice(0, 100);
 
             const bannedUsers = allUsers.filter(user => user.isBannedFromRanking);
 
-            // --- نمایش لیست اصلی رده‌بندی ---
             rankingListContainer.innerHTML = ''; 
             if (rankedUsers.length === 0) {
                 rankingListContainer.innerHTML = '<p style="padding: 20px; text-align: center;">هنوز بازیکنی در رده‌بندی وجود ندارد.</p>';
@@ -799,7 +874,6 @@
                 });
             }
             
-            // --- نمایش لیست کاربران بن شده (برای ادمین) ---
             if(isAdmin) {
                 bannedRankingListContainer.innerHTML = '';
                 if (bannedUsers.length === 0) {
@@ -823,34 +897,27 @@
                 }
             }
         }
-        
-        // تابع برای شروع شنونده زنده
         function startRankingListener() {
-            if (rankingListenerUnsubscribe) { // جلوگیری از ایجاد شنونده‌های تکراری
-                rankingListenerUnsubscribe();
-            }
+            if (rankingListenerUnsubscribe) { rankingListenerUnsubscribe(); }
             const usersRef = collection(db, "users");
             rankingListenerUnsubscribe = onSnapshot(usersRef, (querySnapshot) => {
                 let allUsers = [];
                 querySnapshot.forEach(doc => {
                     allUsers.push({ id: doc.id, ...doc.data() });
                 });
-                renderRankings(allUsers); // رندر کردن لیست با داده‌های جدید و زنده
+                renderRankings(allUsers);
             }, (error) => {
                 console.error("خطا در شنونده زنده رده‌بندی:", error);
                 rankingListContainer.innerHTML = '<p style="padding: 20px; text-align: center;">خطا در دریافت اطلاعات زنده.</p>';
                 showCustomAlert("خطا در بارگذاری زنده رده‌بندی.");
             });
         }
-
-        // تابع برای توقف شنونده زنده
         function stopRankingListener() {
             if (rankingListenerUnsubscribe) {
-                rankingListenerUnsubscribe(); // قطع ارتباط با سرور
+                rankingListenerUnsubscribe();
                 rankingListenerUnsubscribe = null;
             }
         }
-
         function filterRankingList() {
             const searchTerm = rankingSearchInput.value.toLowerCase();
             rankingListContainer.querySelectorAll('.ranking-list-item').forEach(userItem => {
@@ -862,7 +929,6 @@
                 userItem.style.display = name.includes(searchTerm) ? 'flex' : 'none';
             });
         }
-        
         function openEditRankModal(userData) {
             editRankAvatarPreview.src = userData.avatar;
             editRankNamePreview.textContent = userData.name;
@@ -870,7 +936,6 @@
             editRankUid.value = userData.uid;
             showModal(editRankModalOverlay);
         }
-
         async function handleSaveRankChanges(e) {
             e.preventDefault();
             if (!(await verifyAdminStatus())) return;
@@ -882,7 +947,7 @@
             try {
                 await updateDoc(doc(db, 'users', uid), { game: newGems });
                 hideModal(editRankModalOverlay);
-                showCustomAlert("امتیاز کاربر با موفقیت ویرایش شد."); // نیازی به رفرش دستی نیست
+                showCustomAlert("امتیاز کاربر با موفقیت ویرایش شد.");
             } catch (error) {
                 console.error("خطا در ویرایش امتیاز کاربر:", error);
                 showCustomAlert("خطا در ذخیره تغییرات.");
@@ -890,28 +955,26 @@
                 saveRankChangesBtn.disabled = false; saveRankChangesBtn.textContent = 'ذخیره تغییرات';
             }
         }
-
         async function handleBanFromRanking(userData) {
             if (!(await verifyAdminStatus())) return;
             const message = `آیا از حذف کاربر "<b>${userData.name}</b>" از لیست رده‌بندی مطمئن هستید؟<br><small>این کاربر به لیست حذف شده‌ها منتقل می‌شود.</small>`;
             showCustomConfirm(message, async () => {
                 try {
                     await updateDoc(doc(db, 'users', userData.uid), { isBannedFromRanking: true });
-                    showCustomAlert("کاربر با موفقیت از رده‌بندی حذف شد."); // نیازی به رفرش دستی نیست
+                    showCustomAlert("کاربر با موفقیت از رده‌بندی حذف شد.");
                 } catch (error) {
                      console.error("خطا در حذف کاربر از رده بندی:", error);
                     showCustomAlert("عملیات با خطا مواجه شد.");
                 }
             });
         }
-        
         async function handleRestoreToRanking(userData) {
             if (!(await verifyAdminStatus())) return;
             const message = `آیا می‌خواهید کاربر "<b>${userData.name}</b>" را به رده‌بندی بازگردانید؟`;
              showCustomConfirm(message, async () => {
                 try {
                     await updateDoc(doc(db, 'users', userData.uid), { isBannedFromRanking: false });
-                    showCustomAlert("کاربر با موفقیت به رده‌بندی بازگردانده شد."); // نیازی به رفرش دستی نیست
+                    showCustomAlert("کاربر با موفقیت به رده‌بندی بازگردانده شد.");
                 } catch (error) {
                      console.error("خطا در بازگردانی کاربر:", error);
                     showCustomAlert("عملیات با خطا مواجه شد.");
@@ -919,6 +982,79 @@
             });
         }
 
+        // --- [جدید] توابع تغییر نام ---
+        function showNameCheckError(message) {
+            nameCheckResultContainer.classList.add('error');
+            nameCheckResultContainer.innerHTML = `<p class="error-message">${message}</p>`;
+        }
+        function clearNameCheckResult() {
+            nameCheckResultContainer.classList.remove('error');
+            nameCheckResultContainer.innerHTML = '';
+        }
+        async function handleNameChange(e) {
+            e.preventDefault();
+            if (!auth.currentUser || !currentUserData) return;
+
+            const newName = newDisplayNameInput.value.trim();
+            clearNameCheckResult();
+
+            // 1. اعتبارسنجی ورودی
+            if (newName.length < 3 || newName.length > 15) {
+                showNameCheckError("نام باید بین ۳ تا ۱۵ کاراکتر باشد.");
+                return;
+            }
+            if (newName === currentUserData.displayName) {
+                showNameCheckError("این نام در حال حاضر نام شماست.");
+                return;
+            }
+            const validNameRegex = /^[a-zA-Z0-9_.\u0600-\u06FF\s]+$/;
+            if (!validNameRegex.test(newName)) {
+                showNameCheckError("نام شامل کاراکترهای غیرمجاز است.");
+                return;
+            }
+
+            // 2. بازخورد به کاربر
+            saveNewNameBtn.disabled = true;
+            saveNewNameBtn.textContent = 'در حال بررسی...';
+
+            try {
+                // 3. کوئری به فایربیس برای بررسی وجود نام
+                // نکته: این بررسی به حروف بزرگ و کوچک حساس است. برای بررسی غیرحساس،
+                // باید یک فیلد جداگانه با حروف کوچک در دیتابیس ذخیره شود.
+                const usersRef = collection(db, "users");
+                const q = query(usersRef, where("displayName", "==", newName));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    // 4. نام منحصر به فرد است، آپدیت انجام می‌شود
+                    saveNewNameBtn.textContent = 'در حال ذخیره...';
+                    const userDocRef = doc(db, 'users', auth.currentUser.uid);
+                    await updateDoc(userDocRef, { displayName: newName });
+                    
+                    hideModal(changeNameOverlay);
+                    showCustomAlert("نام شما با موفقیت تغییر کرد.");
+
+                } else {
+                    // 5. نام قبلاً گرفته شده، نمایش اطلاعات کاربر صاحب نام
+                    const existingUserData = querySnapshot.docs[0].data();
+                    nameCheckResultContainer.classList.add('error');
+                    nameCheckResultContainer.innerHTML = `
+                        <div class="user-exists-info">
+                             <p class="error-message" style="margin-bottom: 10px;">این نام قبلاً ثبت شده و متعلق به کاربر زیر است:</p>
+                            <img src="${existingUserData.avatarUrl || DEFAULT_AVATAR}" alt="avatar">
+                            <span class="name">${existingUserData.displayName}</span>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error("خطا در تغییر نام:", error);
+                showNameCheckError("خطا در ارتباط با سرور. لطفا دوباره تلاش کنید.");
+            } finally {
+                // 6. بازگرداندن حالت اولیه دکمه
+                saveNewNameBtn.disabled = false;
+                saveNewNameBtn.textContent = 'ذخیره تغییرات';
+            }
+        }
 
         // --- منطق اصلی و احراز هویت ---
         onAuthStateChanged(auth, (user) => {
@@ -1007,47 +1143,32 @@
         gameModesCancelBtn.addEventListener('click', () => { hideModal(gameModesPanelOverlay); showModal(adminPanelOverlay); });
 
         // رویدادهای پنل رده بندی
-        const closeRankingModal = () => {
-            hideModal(rankingModalOverlay);
-            stopRankingListener(); // **مهم** توقف شنونده هنگام بستن پنل
-        };
-
-        rankingButton.addEventListener('click', () => checkMaintenanceAndProceed(() => {
-            rankingListContainer.innerHTML = '<p style="padding: 20px; text-align: center;">در حال بارگذاری رده‌بندی...</p>';
-            bannedRankingListContainer.innerHTML = '';
-            rankingSearchInput.value = '';
-            showModal(rankingModalOverlay);
-            startRankingListener(); // **مهم** شروع شنونده هنگام باز کردن پنل
-        }));
-
+        const closeRankingModal = () => { hideModal(rankingModalOverlay); stopRankingListener(); };
+        rankingButton.addEventListener('click', () => checkMaintenanceAndProceed(() => { rankingListContainer.innerHTML = '<p style="padding: 20px; text-align: center;">در حال بارگذاری رده‌بندی...</p>'; bannedRankingListContainer.innerHTML = ''; rankingSearchInput.value = ''; showModal(rankingModalOverlay); startRankingListener(); }));
         rankingModalOverlay.addEventListener('click', (e) => { if(e.target === rankingModalOverlay) closeRankingModal(); });
         rankingModalCloseBtn.addEventListener('click', closeRankingModal);
         rankingSearchInput.addEventListener('input', filterRankingList);
-        
         rankingListContainer.addEventListener('click', (e) => {
-            const editBtn = e.target.closest('.edit-rank-btn');
-            const banBtn = e.target.closest('.ban-rank-btn');
-            if (editBtn) {
-                const userData = { ...editBtn.closest('.ranking-admin-controls').dataset };
-                openEditRankModal(userData);
-            }
-            if (banBtn) {
-                const userData = { ...banBtn.closest('.ranking-admin-controls').dataset };
-                handleBanFromRanking(userData);
-            }
+            const editBtn = e.target.closest('.edit-rank-btn'); const banBtn = e.target.closest('.ban-rank-btn');
+            if (editBtn) { const userData = { ...editBtn.closest('.ranking-admin-controls').dataset }; openEditRankModal(userData); }
+            if (banBtn) { const userData = { ...banBtn.closest('.ranking-admin-controls').dataset }; handleBanFromRanking(userData); }
         });
-
-        bannedRankingListContainer.addEventListener('click', (e) => {
-             const restoreBtn = e.target.closest('.restore-rank-btn');
-             if (restoreBtn) {
-                 const userData = { ...restoreBtn.dataset };
-                 handleRestoreToRanking(userData);
-             }
-        });
-
+        bannedRankingListContainer.addEventListener('click', (e) => { const restoreBtn = e.target.closest('.restore-rank-btn'); if (restoreBtn) { const userData = { ...restoreBtn.dataset }; handleRestoreToRanking(userData); } });
         editRankModalOverlay.addEventListener('click', (e) => { if (e.target === editRankModalOverlay) hideModal(editRankModalOverlay); });
         editRankForm.addEventListener('submit', handleSaveRankChanges);
         editRankCancelBtn.addEventListener('click', () => hideModal(editRankModalOverlay));
+
+        // [جدید] رویدادهای پنل تغییر نام
+        changeNameBtn.addEventListener('click', () => {
+            hideModal(avatarMenuOverlay);
+            if (currentUserData) { newDisplayNameInput.value = currentUserData.displayName || ''; }
+            clearNameCheckResult();
+            showModal(changeNameOverlay);
+        });
+        changeNameOverlay.addEventListener('click', (e) => { if (e.target === changeNameOverlay) hideModal(changeNameOverlay); });
+        cancelNewNameBtn.addEventListener('click', () => { hideModal(changeNameOverlay); });
+        changeNameForm.addEventListener('submit', handleNameChange);
+
     </script>
 </body>
 </html>
