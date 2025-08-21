@@ -117,7 +117,7 @@
             text-shadow: 1px 1px 3px #000;
         }
         
-        /* --- [جدید] پنل دانلود موسیقی --- */
+        /* --- پنل دانلود موسیقی --- */
         #music-download-overlay {
             position: fixed;
             top: 0;
@@ -263,10 +263,31 @@
         }
         .player-count span { animation: pulse 2s infinite ease-in-out; }
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-        .creator-info { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+        
+        /* [جدید] استایل برای توضیحات لابی */
+        .lobby-description {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-color);
+            padding-top: 12px;
+            margin-top: 5px;
+            line-height: 1.6;
+            white-space: pre-wrap; /* برای حفظ فاصله‌ها و خطوط جدید */
+        }
+        
+        /* [تغییر] استایل برای بخش سازنده با آواتار */
+        .creator-info { display: flex; align-items: center; gap: 10px; }
+        .creator-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid var(--primary-gold);
+            object-fit: cover;
+            background-color: #333; /* رنگ پس‌زمینه در صورت عدم بارگذاری عکس */
+        }
+        .creator-details { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
         .lobby-creator { font-size: 0.9rem; color: var(--text-secondary); }
         
-        /* --- [تغییر] استایل‌های جدید و یکپارچه برای بخش ادمین --- */
         .admin-password-container {
             display: flex;
             align-items: center;
@@ -290,7 +311,7 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 100px; /* جلوگیری از طولانی شدن بیش از حد رمز */
+            max-width: 100px;
         }
         .admin-edit-icon {
             font-size: 0.9rem;
@@ -375,15 +396,30 @@
         }
         .modal-message { font-size: 1rem; line-height: 1.6; margin-bottom: 25px; color: var(--text-light); }
         .modal-input-group { width: 100%; margin-bottom: 20px; }
-        .modal-input, .modal-select {
+        .modal-input, .modal-select, .modal-textarea {
             width: 100%; padding: 12px 15px;
             background-color: rgba(0,0,0,0.4); border: 1px solid var(--border-color);
             border-radius: 8px; color: var(--text-light);
             font-family: 'Vazirmatn', sans-serif; font-size: 1rem; text-align: center;
         }
         .modal-input { margin-bottom: 15px; }
-        .modal-select { text-align: center; padding-right: 15px; }
-        .modal-input:focus, .modal-select:focus { outline: none; border-color: var(--primary-gold); }
+        .modal-select { text-align: center; padding-right: 15px; margin-bottom: 15px; }
+        /* [جدید] استایل برای فیلد توضیحات و شمارشگر */
+        .modal-textarea {
+            height: 80px;
+            resize: none;
+            text-align: right;
+            padding: 10px;
+        }
+        .char-counter-wrapper {
+            text-align: left;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 5px;
+            padding-left: 5px;
+        }
+        .modal-input:focus, .modal-select:focus, .modal-textarea:focus { outline: none; border-color: var(--primary-gold); }
+        
         .modal-buttons { display: flex; gap: 15px; width: 100%; }
         .modal-button {
             flex-grow: 1; padding: 12px; font-size: 1rem; font-weight: 700;
@@ -401,7 +437,6 @@
         }
         .modal-button.secondary:hover { background: linear-gradient(145deg, #615342, #403529); }
         
-        /* استایل‌های جدید برای رمز لابی */
         .password-toggle-group {
             display: flex;
             align-items: center;
@@ -465,10 +500,8 @@
 
     <div id="background-blurry"></div>
 
-    <!-- [جدید] موسیقی پس‌زمینه -->
     <audio id="background-music" loop></audio>
 
-    <!-- [جدید] پنل دانلود موسیقی -->
     <div id="music-download-overlay">
         <div class="download-panel">
             <h2 class="download-title">موسیقی پس‌زمینه</h2>
@@ -514,7 +547,12 @@
                     <option value="زودیاک">سناریو: زودیاک</option>
                     <option value="ارتش سری">سناریو: ارتش سری</option>
                 </select>
-                <!-- بخش جدید برای رمزگذاری -->
+                <!-- [جدید] فیلد توضیحات کوتاه -->
+                <textarea id="lobby-description-input" class="modal-textarea" placeholder="توضیح کوتاه برای لابی (اختیاری)" maxlength="70"></textarea>
+                <div class="char-counter-wrapper">
+                    <span id="char-counter">0/70</span>
+                </div>
+                <!-- بخش رمزگذاری -->
                 <div class="password-toggle-group">
                     <label for="private-lobby-toggle">لابی خصوصی (با رمز)</label>
                     <label class="switch">
@@ -566,6 +604,9 @@
         const createLobbyModal = document.getElementById('create-lobby-modal');
         const lobbyNameInput = document.getElementById('lobby-name-input');
         const lobbyScenarioSelect = document.getElementById('lobby-scenario-select');
+        // [جدید] عناصر مربوط به توضیحات
+        const lobbyDescriptionInput = document.getElementById('lobby-description-input');
+        const charCounter = document.getElementById('char-counter');
         const privateLobbyToggle = document.getElementById('private-lobby-toggle');
         const lobbyPasswordInput = document.getElementById('lobby-password-input');
         const createLobbyConfirmBtn = document.getElementById('create-lobby-confirm-btn');
@@ -576,7 +617,6 @@
         const customAlertButtons = document.getElementById('custom-alert-buttons');
         const loadingOverlay = document.getElementById('loading-overlay');
         
-        // --- [جدید] عناصر مربوط به موسیقی ---
         const backgroundMusic = document.getElementById('background-music');
         const musicDownloadOverlay = document.getElementById('music-download-overlay');
         const progressBar = document.getElementById('progress-bar');
@@ -584,17 +624,16 @@
 
         let currentUser = null;
         let currentUserIsAdmin = false;
-        let allLobbiesData = new Map(); // برای نگهداری دیتای لابی‌ها و بازسازی لیست
+        let allLobbiesData = new Map();
 
-        // --- [جدید] متغیرهای مربوط به موسیقی ---
         let isMusicPlaying = false;
         const MUSIC_URL = "https://raw.githubusercontent.com/abolfazl140122/mafia/main/mysterious-dark-background-310162%20(1).mp3";
         const MUSIC_CACHE_NAME = 'mafia-lobby-music-cache-v1';
         const MUSIC_VERSION_KEY = 'mafia-lobby-music-version';
+        // [جدید] آدرس آواتار پیش‌فرض
+        const DEFAULT_AVATAR_URL = 'https://up.20script.ir/file/6c1b-user-1.png';
 
         // --- توابع ---
-        
-        // --- [جدید] توابع مربوط به موسیقی ---
         const playMusicAfterUserInteraction = () => {
             if (!isMusicPlaying && backgroundMusic.src && backgroundMusic.paused) {
                 backgroundMusic.play()
@@ -676,8 +715,7 @@
                 catch (error) { console.error('Music download/play process failed:', error); }
             }
         }
-        // --- پایان توابع موسیقی ---
-
+        
         function showModal(modalElement) { modalElement.classList.add('visible'); }
         function hideModal(modalElement) { modalElement.classList.remove('visible'); }
 
@@ -706,7 +744,6 @@
             };
         }
 
-        // --- توابع جدید برای تغییر رمز ---
         function promptForPasswordChange(lobbyData) {
             const messageHTML = `
                 <p>رمز جدید را برای لابی "${lobbyData.lobbyName}" وارد کنید:</p>
@@ -729,7 +766,7 @@
             try {
                 const lobbyDocRef = doc(db, 'Lobbys_list', lobbyId);
                 await updateDoc(lobbyDocRef, { password: newPassword });
-                hideModal(customAlertModal); // بستن مودال تغییر رمز
+                hideModal(customAlertModal);
                 showCustomAlert('موفقیت', 'رمز لابی با موفقیت تغییر کرد.', [{text: 'عالی', class: 'primary'}]);
             } catch (error) {
                 console.error("Error updating password:", error);
@@ -766,6 +803,7 @@
             const canAdminDelete = currentUserIsAdmin && !isOwner;
             const isLobbyFull = (lobbyData.playerCount || 1) >= (lobbyData.maxPlayers || 12);
             const isPrivate = lobbyData.password && lobbyData.password.length > 0;
+            const hasDescription = lobbyData.description && lobbyData.description.trim().length > 0;
 
             let actionButtonsHTML = '';
             if (isOwner) {
@@ -780,7 +818,6 @@
                 actionButtonsHTML += `<button class="lobby-btn btn-join" data-action="join">پیوستن</button>`;
             }
             
-            // --- [تغییر] ساختار HTML برای بخش ادمین ---
             let adminControlsHTML = '';
             if (currentUserIsAdmin && isPrivate) {
                 adminControlsHTML = `
@@ -803,10 +840,18 @@
                         <span>👤</span> ${lobbyData.playerCount || 1}/${lobbyData.maxPlayers || 12}
                     </div>
                 </div>
+                
+                <!-- [جدید] نمایش توضیحات در صورت وجود -->
+                ${hasDescription ? `<p class="lobby-description">${lobbyData.description}</p>` : ''}
+
                 <div class="lobby-card-footer">
+                    <!-- [تغییر] نمایش آواتار در کنار نام سازنده -->
                     <div class="creator-info">
-                        <span class="lobby-creator">سازنده: ${lobbyData.creatorName}</span>
-                        ${adminControlsHTML}
+                        <img class="creator-avatar" src="${lobbyData.creatorAvatar || DEFAULT_AVATAR_URL}" alt="آواتار سازنده">
+                        <div class="creator-details">
+                            <span class="lobby-creator">سازنده: ${lobbyData.creatorName}</span>
+                            ${adminControlsHTML}
+                        </div>
                     </div>
                     <div class="lobby-actions">${actionButtonsHTML}</div>
                 </div>
@@ -839,7 +884,6 @@
                 deleteAction('تایید ادمین', `آیا از بستن لابی "${lobbyData.lobbyName}" مطمئن هستید؟`);
             });
             
-            // event listener روی کل کانتینر عمل می‌کند
             card.querySelector('[data-action="edit-pass"]')?.addEventListener('click', () => {
                 promptForPasswordChange(lobbyData);
             });
@@ -860,11 +904,10 @@
             filterLobbies();
         }
         
-        onAuthStateChanged(auth, async (user) => { // اضافه شدن async
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
                 
-                // [جدید] شروع دانلود و پخش موسیقی
                 await handleBackgroundMusic();
 
                 const userDocRef = doc(db, 'users', user.uid);
@@ -933,6 +976,7 @@
         async function createLobby() {
             const lobbyName = lobbyNameInput.value.trim();
             const scenario = lobbyScenarioSelect.value;
+            const description = lobbyDescriptionInput.value.trim(); // [جدید] گرفتن مقدار توضیحات
             const isPrivate = privateLobbyToggle.checked;
             const password = lobbyPasswordInput.value;
 
@@ -959,11 +1003,14 @@
                 return;
             }
             
+            // [تغییر] افزودن آواتار و توضیحات به دیتای لابی
             const lobbyData = {
                 lobbyName: lobbyName,
                 scenario: scenario,
                 creatorId: currentUser.uid,
                 creatorName: currentUser.displayName || 'کاربر ناشناس',
+                creatorAvatar: currentUser.photoURL || DEFAULT_AVATAR_URL, // آواتار کاربر یا پیش‌فرض
+                description: description, // توضیحات
                 createdAt: serverTimestamp(),
                 playerCount: 1,
                 maxPlayers: 12
@@ -976,7 +1023,10 @@
             try {
                 await addDoc(lobbiesRef, lobbyData);
                 hideModal(createLobbyModal);
+                // ریست کردن فیلدهای مودال
                 lobbyNameInput.value = '';
+                lobbyDescriptionInput.value = '';
+                charCounter.textContent = '0/70';
                 lobbyPasswordInput.value = '';
                 privateLobbyToggle.checked = false;
                 lobbyPasswordInput.style.display = 'none';
@@ -1042,6 +1092,13 @@
 
         privateLobbyToggle.addEventListener('change', () => {
             lobbyPasswordInput.style.display = privateLobbyToggle.checked ? 'block' : 'none';
+        });
+        
+        // [جدید] ایونت برای شمارشگر کاراکتر توضیحات
+        lobbyDescriptionInput.addEventListener('input', () => {
+            const currentLength = lobbyDescriptionInput.value.length;
+            const maxLength = lobbyDescriptionInput.maxLength;
+            charCounter.textContent = `${currentLength}/${maxLength}`;
         });
 
         [createLobbyModal, customAlertModal].forEach(modal => {
