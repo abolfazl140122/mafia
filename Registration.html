@@ -87,7 +87,7 @@
             box-shadow: 0 0 0 3px rgba(255, 201, 71, 0.2);
         }
 
-        /* --- استایل‌های جدید برای فیلد سن --- */
+        /* --- استایل‌های فیلد سن --- */
         .age-input-wrapper {
             display: flex;
             align-items: center;
@@ -96,7 +96,7 @@
         
         #age-input {
             text-align: center;
-            -moz-appearance: textfield; /* Firefox */
+            -moz-appearance: textfield;
         }
         
         #age-input::-webkit-outer-spin-button,
@@ -120,7 +120,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding-bottom: 4px; /* for vertical alignment */
+            padding-bottom: 4px;
         }
         .age-control-btn:hover {
             border-color: #ffc947;
@@ -129,9 +129,53 @@
         .age-control-btn:active {
             transform: scale(0.95);
         }
+        
+        /* --- استایل‌های جدید برای بخش انتخاب آواتار --- */
+        #avatar-loader {
+            color: #c5a687;
+            font-size: 0.9rem;
+        }
+        .avatar-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 10px;
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #5c4a3a;
+        }
+
+        .avatar-item {
+            cursor: pointer;
+            border-radius: 50%;
+            overflow: hidden;
+            width: 70px;
+            height: 70px;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .avatar-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .avatar-item:hover {
+            border-color: rgba(255, 201, 71, 0.5);
+            transform: scale(1.05);
+        }
+
+        .avatar-item.selected {
+            border-color: #ffc947;
+            box-shadow: 0 0 15px rgba(255, 201, 71, 0.5);
+            transform: scale(1.1);
+        }
 
         /* --- ادامه استایل‌ها --- */
-
         .auth-button {
             width: 100%;
             padding: 14px;
@@ -144,6 +188,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+            margin-top: 25px; /* Add margin to separate from avatar section */
         }
 
         .auth-button:hover {
@@ -209,7 +254,6 @@
                 <input type="password" id="password" class="auth-input" required>
             </div>
 
-            <!-- بخش جدید و گرافیکی برای ورود سن -->
             <div class="input-group">
                 <label for="age-input">سن</label>
                 <div class="age-input-wrapper">
@@ -219,6 +263,16 @@
                 </div>
             </div>
 
+            <!-- بخش جدید برای انتخاب آواتار -->
+            <div class="input-group">
+                <label>انتخاب آواتار</label>
+                <div id="avatar-list" class="avatar-list">
+                    <p id="avatar-loader">در حال بارگذاری آواتارهای رایگان...</p>
+                </div>
+            </div>
+
+            <input type="hidden" id="selected-avatar-url" required>
+            
             <button type="submit" id="register-button" class="auth-button">ساخت حساب</button>
         </form>
 
@@ -232,7 +286,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
@@ -255,35 +309,86 @@
         const passwordInput = document.getElementById('password');
         const registerButton = document.getElementById('register-button');
         const errorMessage = document.getElementById('error-message');
-
-        // --- المان‌های جدید مربوط به سن ---
         const ageInput = document.getElementById('age-input');
         const incrementAgeBtn = document.getElementById('increment-age');
         const decrementAgeBtn = document.getElementById('decrement-age');
+        
+        // --- المان‌های جدید مربوط به آواتار ---
+        const avatarList = document.getElementById('avatar-list');
+        const avatarLoader = document.getElementById('avatar-loader');
+        const selectedAvatarUrlInput = document.getElementById('selected-avatar-url');
 
         // --- کنترلرهای دکمه‌های سن ---
         incrementAgeBtn.addEventListener('click', () => {
             let currentValue = parseInt(ageInput.value) || 8;
-            if (currentValue < 99) {
-                ageInput.value = currentValue + 1;
-            }
+            if (currentValue < 99) ageInput.value = currentValue + 1;
         });
 
         decrementAgeBtn.addEventListener('click', () => {
             let currentValue = parseInt(ageInput.value) || 9;
-            if (currentValue > 8) {
-                ageInput.value = currentValue - 1;
-            }
+            if (currentValue > 8) ageInput.value = currentValue - 1;
         });
 
+        // --- تابع جدید: واکشی و نمایش آواتارهای رایگان ---
+        async function fetchAndDisplayAvatars() {
+            try {
+                const avatarsRef = collection(db, 'avatars');
+                const q = query(avatarsRef, where("price", "==", 0)); // فقط آواتارهای رایگان
+                
+                const querySnapshot = await getDocs(q);
+                
+                avatarLoader.style.display = 'none'; // مخفی کردن پیام لودینگ
+                
+                querySnapshot.forEach((doc) => {
+                    const avatarData = doc.data();
+                    const avatarUrl = avatarData.url; // فرض می‌کنیم فیلد حاوی لینک عکس url است
 
+                    const avatarItem = document.createElement('div');
+                    avatarItem.className = 'avatar-item';
+                    avatarItem.dataset.url = avatarUrl; // ذخیره URL در دیتا-اتریبیوت
+
+                    const avatarImg = document.createElement('img');
+                    avatarImg.src = avatarUrl;
+                    avatarImg.alt = 'Avatar';
+                    
+                    avatarItem.appendChild(avatarImg);
+
+                    // افزودن رویداد کلیک برای انتخاب آواتار
+                    avatarItem.addEventListener('click', () => {
+                        // حذف کلاس selected از آیتم قبلی
+                        const currentSelected = document.querySelector('.avatar-item.selected');
+                        if (currentSelected) {
+                            currentSelected.classList.remove('selected');
+                        }
+                        
+                        // افزودن کلاس selected به آیتم کلیک شده
+                        avatarItem.classList.add('selected');
+
+                        // ذخیره URL آواتار در فیلد مخفی
+                        selectedAvatarUrlInput.value = avatarUrl;
+                    });
+
+                    avatarList.appendChild(avatarItem);
+                });
+
+            } catch (error) {
+                console.error("Error fetching avatars: ", error);
+                avatarLoader.textContent = "خطا در بارگذاری آواتارها!";
+            }
+        }
+        
+        // فراخوانی تابع برای نمایش آواتارها در زمان بارگذاری صفحه
+        fetchAndDisplayAvatars();
+
+        // --- رویداد ثبت فرم ---
         registrationForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const displayName = displayNameInput.value.trim();
             const email = emailInput.value.trim();
             const password = passwordInput.value.trim();
-            const old = parseInt(ageInput.value); // **متغیر جدید برای سن**
+            const age = parseInt(ageInput.value);
+            const selectedAvatarUrl = selectedAvatarUrlInput.value; // **متغیر جدید برای آواتار**
 
             // --- اعتبارسنجی‌ها ---
             if (!displayName || !email || !password || !ageInput.value) {
@@ -295,11 +400,13 @@
             if (/[^a-zA-Z0-9_.]/.test(displayName)) {
                 showError("نام نمایشی فقط می‌تواند شامل حروف و اعداد انگلیسی، نقطه و آندرلاین باشد."); return;
             }
-            // **اعتبارسنجی الزامی برای سن**
-            if (isNaN(old) || old < 8 || old > 99) {
+            if (isNaN(age) || age < 8 || age > 99) {
                 showError("لطفاً سن معتبری بین ۸ تا ۹۹ سال وارد کنید."); return;
             }
-
+            // **اعتبارسنجی الزامی برای آواتار**
+            if (!selectedAvatarUrl) {
+                showError("لطفاً یک آواتار انتخاب کنید."); return;
+            }
 
             registerButton.disabled = true;
             registerButton.textContent = 'در حال ساخت...';
@@ -318,8 +425,8 @@
                     email: user.email,
                     createdAt: new Date(),
                     currentStage: 1,
-                    avatarUrl: '',
-                    old: old // **ذخیره کردن سن در دیتابیس**
+                    age: age, // ذخیره سن
+                    avatarUrl: selectedAvatarUrl // **ذخیره کردن URL آواتار در دیتابیس**
                 });
 
                 window.location.href = './index.html'; 
