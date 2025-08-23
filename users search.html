@@ -383,6 +383,9 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        // *** START: App Check Change 1 - Import modules ***
+        import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check.js";
+        // *** END: App Check Change 1 ***
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
@@ -401,6 +404,21 @@
         };
 
         const app = initializeApp(firebaseConfig);
+        
+        // *** START: App Check Change 2 - Initialize App Check ***
+        try {
+            const appCheck = initializeAppCheck(app, {
+                provider: new ReCaptchaV3Provider('6LfUt68rAAAAAAFMi9RjlUdtymYS3KZWILO5IA_fD'),
+                isTokenAutoRefreshEnabled: true
+            });
+            console.log("Firebase App Check initialized successfully.");
+        } catch(error) {
+            console.error("Error initializing Firebase App Check:", error);
+            // در صورت بروز خطا در فعال‌سازی App Check، به کاربر اطلاع می‌دهیم
+            document.getElementById('initial-loader-overlay').innerHTML = `<h2>خطای امنیتی</h2><p style="color: #ff9e9e;">امکان برقراری ارتباط امن وجود ندارد. لطفاً صفحه را رفرش کنید یا بعداً تلاش کنید.</p>`;
+        }
+        // *** END: App Check Change 2 ***
+
         const auth = getAuth(app);
         const db = getFirestore(app);
 
@@ -592,7 +610,7 @@
                 startSearchTimer();
             } catch (error) {
                 console.error("خطا در اضافه شدن به لیست جستجو:", error);
-                alert("خطا در اتصال به سرور. لطفا صفحه را تازه‌سازی کنید.");
+                showCustomAlert("خطا در اتصال به سرور. لطفا صفحه را تازه‌سازی کنید.", () => window.location.reload());
             }
         }
 
@@ -677,7 +695,7 @@
             }, (error) => {
                 console.error("خطا در دریافت لیست بازیکنان:", error);
                 hideInitialLoader();
-                alert("ارتباط با سرور قطع شد. لطفا اتصال اینترنت خود را بررسی کنید.");
+                showCustomAlert("ارتباط با سرور قطع شد. لطفا اتصال اینترنت خود را بررسی کنید.", () => window.location.reload());
             });
         }
 
