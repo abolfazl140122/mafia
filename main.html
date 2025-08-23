@@ -1,3 +1,5 @@
+--- START OF FILE main.txt ---
+
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -342,6 +344,7 @@
         #banned-ranking-list-container .user-list-item { background-color: rgba(80, 40, 40, 0.2); }
 
         /* *** استایل‌های پنل تغییر نام *** */
+        #change-name-form { width: 100%; }
         .name-check-result-container { width: 100%; min-height: 90px; margin-top: 5px; padding: 15px; background-color: rgba(0,0,0,0.2); border: 1px solid transparent; border-radius: 8px; text-align: center; transition: all 0.3s ease; display: flex; justify-content: center; align-items: center; }
         .name-check-result-container.error { border-color: #ef444480; background-color: rgba(239, 68, 68, 0.1); }
         .name-check-result-container .error-message { color: #fca5a5; font-size: 0.9rem; font-weight: 700; }
@@ -367,7 +370,7 @@
             border: none;
         }
 
-        /* --- [جدید] استایل‌های راهنمای کاربری --- */
+        /* --- استایل‌های راهنمای کاربری --- */
         #tutorial-overlay {
             position: fixed;
             top: 0;
@@ -716,7 +719,7 @@
     <div id="change-name-overlay" class="modal-overlay">
         <div id="change-name-content" class="modal-content">
             <h2 class="modal-title">تغییر نام نمایشی</h2>
-            <form id="change-name-form" style="width: 100%;" novalidate>
+            <form id="change-name-form" novalidate>
                 <div class="form-group">
                     <label for="new-display-name-input" class="form-label" style="margin-bottom: 8px;">نام جدید:</label>
                     <input type="text" id="new-display-name-input" class="form-input" required minlength="3" maxlength="15" placeholder="نام جدید را وارد کنید...">
@@ -881,7 +884,7 @@
         const particleCanvas = document.getElementById('particle-effect-canvas');
         const ctx = particleCanvas.getContext('2d');
 
-        // --- [جدید] المان‌های راهنمای کاربری ---
+        // --- المان‌های راهنمای کاربری ---
         const tutorialOverlay = document.getElementById('tutorial-overlay');
         const tutorialHighlightBox = document.getElementById('tutorial-highlight-box');
         const tutorialPanel = document.getElementById('tutorial-panel');
@@ -986,27 +989,88 @@
         window.addEventListener('resize', () => { if(animationFrameId) { resizeCanvas(); initParticles(); } });
         function loadAndApplySettings() { const savedIntensity = localStorage.getItem(ANIMATION_INTENSITY_KEY); const intensity = savedIntensity !== null ? parseInt(savedIntensity, 10) : DEFAULT_ANIMATION_INTENSITY; animationIntensitySlider.value = intensity; animationIntensityValue.textContent = `${intensity}%`; applyAnimationSettings(intensity); const isEffectEnabled = localStorage.getItem(VISUAL_EFFECT_KEY) === 'true'; visualEffectToggle.checked = isEffectEnabled; if (isEffectEnabled) { startParticleEffect(); } else { stopParticleEffect(); } }
 
-        // --- [جدید] توابع راهنمای کاربری ---
+        // --- توابع راهنمای کاربری (نسخه جدید و جامع) ---
         const TUTORIAL_COMPLETED_KEY = 'mafia-tutorial-completed';
         let currentTutorialStep = -1;
+
+        // تابع کمکی برای ایجاد تاخیر
+        const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
         const tutorialSteps = [
             {
                 element: '.profile-section',
                 title: 'به شهر مافیا خوش آمدی!',
-                text: 'اینجا بخش پروفایل توست. با کلیک روی آواتارت، می‌تونی به پروفایل کامل، فروشگاه و تنظیمات دسترسی پیدا کنی.',
+                text: 'اینجا پنل کاربری توئه که همیشه اسم و آواتارت رو نشون میده. با کلیک روی آواتارت، به امکانات جالبی دسترسی پیدا می‌کنی. بیا با هم بخش‌های مختلف رو بررسی کنیم.',
                 position: 'bottom-right'
             },
             {
+                element: '#avatar-menu-content',
+                title: 'منوی کاربری',
+                text: 'عالی! این منوی اصلی توئه. از اینجا می‌تونی پروفایلت رو ببینی، به فروشگاه بری، اسمت رو عوض کنی و تنظیمات رو تغییر بدی. اول از همه، بریم سراغ پروفایل.',
+                position: 'bottom-right',
+                action: async () => {
+                    showModal(avatarMenuOverlay);
+                    await sleep(500); // منتظر انیمیشن مودال
+                }
+            },
+            {
+                element: '#profile-modal-content',
+                title: 'پروفایل شخصی',
+                text: 'اینجا تمام اطلاعات حساب کاربری تو نمایش داده میشه؛ مثل تاریخ ثبت‌نام، سن، تعداد الماس‌ها و ایمیل. این یک دید کلی از وضعیت حساب تو در بازیه.',
+                position: 'bottom-center',
+                action: async () => {
+                    hideModal(avatarMenuOverlay);
+                    await sleep(500);
+                    populateProfileModal(); // اطمینان از پر بودن اطلاعات
+                    showModal(profileModalOverlay);
+                    await sleep(500);
+                }
+            },
+            {
+                element: '#change-name-content',
+                title: 'تغییر نام نمایشی',
+                text: 'از این بخش می‌تونی نام نمایشی خودت رو در بازی تغییر بدی. یادت باشه که نامت باید خاص باشه و قبلا توسط کسی انتخاب نشده باشه. فعلا این پنل رو می‌بندیم.',
+                position: 'top-center',
+                action: async () => {
+                    hideModal(profileModalOverlay);
+                    await sleep(500);
+                    // برای نمایش این مرحله، منوی آواتار را باز و روی دکمه کلیک می‌کنیم
+                    showModal(avatarMenuOverlay);
+                    await sleep(500);
+                    hideModal(avatarMenuOverlay);
+                    showModal(changeNameOverlay);
+                    await sleep(500);
+                }
+            },
+            {
+                element: '#settings-content',
+                title: 'تنظیمات شخصی',
+                text: 'اینجا می‌تونی جلوه‌های بصری و انیمیشن پس‌زمینه رو مطابق سلیقه‌ات تنظیم کنی تا بهترین تجربه رو از محیط بازی داشته باشی. هر تغییری بدی، ذخیره میشه.',
+                position: 'top-center',
+                action: async () => {
+                    hideModal(changeNameOverlay);
+                    await sleep(500);
+                    showModal(avatarMenuOverlay);
+                    await sleep(500);
+                    hideModal(avatarMenuOverlay);
+                    showModal(settingsOverlay);
+                    await sleep(500);
+                }
+            },
+            {
                 element: '.menu-buttons',
-                title: 'منوی اصلی',
-                text: 'از این دکمه‌ها برای دیدن رده‌بندی بازیکنان، سازندگان بازی و (اگر مدیر باشی) پنل مدیریت استفاده کن.',
-                position: 'bottom-right'
+                title: 'منوهای اصلی',
+                text: 'حالا که با پنل کاربری آشنا شدی، این دکمه‌ها رو ببین. از اینجا می‌تونی لیست سازندگان بازی رو ببینی و مهم‌تر از اون، جدول رده‌بندی بازیکنان برتر رو مشاهده کنی و برای رسیدن به صدر جدول تلاش کنی!',
+                position: 'bottom-right',
+                action: async () => {
+                    hideModal(settingsOverlay);
+                    await sleep(500);
+                }
             },
             {
                 element: '#start-game-button',
                 title: 'شروع ماجراجویی',
-                text: 'و اما دکمه اصلی! با زدن این دکمه، وارد لابی می‌شی و می‌تونی بازی رو شروع کنی. آماده‌ای؟',
+                text: 'و بالاخره، مهم‌ترین دکمه! با زدن این دکمه، می‌تونی نوع بازی (دوستانه یا امتیازی) رو انتخاب کنی و وارد دنیای پرهیجان مافیا بشی. آماده‌ای؟ موفق باشی!',
                 position: 'top-center'
             }
         ];
@@ -1027,101 +1091,100 @@
             }, 40);
         }
 
-        function showTutorialStep(stepIndex) {
+        async function showTutorialStep(stepIndex) {
             if (stepIndex >= tutorialSteps.length) {
                 endTutorial();
                 return;
             }
 
             const step = tutorialSteps[stepIndex];
-            const targetElement = document.querySelector(step.element);
 
-            if (!targetElement) {
-                showTutorialStep(stepIndex + 1);
-                return;
-            }
-            
             tutorialPanel.classList.remove('visible');
             tutorialNextBtn.classList.remove('visible');
 
-            setTimeout(() => {
-                const targetRect = targetElement.getBoundingClientRect();
-                const padding = 10;
-                
-                tutorialHighlightBox.style.width = (targetRect.width + padding) + 'px';
-                tutorialHighlightBox.style.height = (targetRect.height + padding) + 'px';
-                tutorialHighlightBox.style.top = (targetRect.top - padding / 2) + 'px';
-                tutorialHighlightBox.style.left = (targetRect.left - padding / 2) + 'px';
-                
-                tutorialTitle.textContent = step.title;
-                
-                typeWriterEffect(tutorialText, step.text, () => {
-                    tutorialNextBtn.textContent = (stepIndex === tutorialSteps.length - 1) ? 'پایان آموزش' : 'بعدی';
-                    tutorialNextBtn.classList.add('visible');
-                });
-                
-                // --- Improved Positioning Logic ---
-                const panel = tutorialPanel;
-                // Temporarily make it visible but off-screen to measure its actual dimensions
-                panel.style.visibility = 'hidden';
-                panel.style.display = 'block';
-                const panelRect = panel.getBoundingClientRect();
-                panel.style.visibility = '';
-                panel.style.display = '';
+            // اجرای اکشن‌های قبل از نمایش مرحله (مثل باز/بسته کردن مودال)
+            if (step.action) {
+                await step.action();
+            }
 
-                const margin = 20;
-                const edgePadding = 10;
-                const vw = window.innerWidth;
-                const vh = window.innerHeight;
+            const targetElement = document.querySelector(step.element);
 
-                let top, left;
+            if (!targetElement) {
+                console.warn(`عنصر راهنما یافت نشد: ${step.element}`);
+                showTutorialStep(stepIndex + 1); // رد شدن از این مرحله
+                return;
+            }
+            
+            // تاخیر کوتاه برای اطمینان از رندر شدن تغییرات DOM
+            await sleep(100);
 
-                // Calculate initial desired position based on the step's preference
-                switch (step.position) {
-                    case 'top-center':
-                        top = targetRect.top - panelRect.height - margin;
-                        left = targetRect.left + targetRect.width / 2 - panelRect.width / 2;
-                        break;
-                    case 'bottom-right':
-                        top = targetRect.bottom + margin;
-                        left = targetRect.right - panelRect.width;
-                        break;
-                    default: // bottom-center
-                        top = targetRect.bottom + margin;
-                        left = targetRect.left + targetRect.width / 2 - panelRect.width / 2;
-                        break;
-                }
+            const targetRect = targetElement.getBoundingClientRect();
+            const padding = 10;
+            
+            tutorialHighlightBox.style.width = (targetRect.width + padding) + 'px';
+            tutorialHighlightBox.style.height = (targetRect.height + padding) + 'px';
+            tutorialHighlightBox.style.top = (targetRect.top - padding / 2) + 'px';
+            tutorialHighlightBox.style.left = (targetRect.left - padding / 2) + 'px';
+            
+            tutorialTitle.textContent = step.title;
+            
+            typeWriterEffect(tutorialText, step.text, () => {
+                tutorialNextBtn.textContent = (stepIndex === tutorialSteps.length - 1) ? 'پایان آموزش' : 'بعدی';
+                tutorialNextBtn.classList.add('visible');
+            });
+            
+            // --- Improved Positioning Logic ---
+            const panel = tutorialPanel;
+            panel.style.visibility = 'hidden';
+            panel.style.display = 'block';
+            const panelRect = panel.getBoundingClientRect();
+            panel.style.visibility = '';
+            panel.style.display = '';
 
-                // --- Vertical Correction ---
-                // If it overflows the bottom, try to place it on top
-                if (top + panelRect.height > vh - edgePadding) {
-                    let newTop = targetRect.top - panelRect.height - margin;
-                    // If it fits on top, use that position. Otherwise, clamp it to the bottom edge.
-                    top = (newTop >= edgePadding) ? newTop : (vh - panelRect.height - edgePadding);
-                }
-                
-                // If it overflows the top, try to place it at the bottom
-                if (top < edgePadding) {
-                    let newTop = targetRect.bottom + margin;
-                    // If it fits at the bottom, use that position. Otherwise, clamp it to the top edge.
-                    top = (newTop + panelRect.height <= vh - edgePadding) ? newTop : edgePadding;
-                }
-                
-                // --- Horizontal Correction ---
-                if (left < edgePadding) {
-                    left = edgePadding;
-                }
-                if (left + panelRect.width > vw - edgePadding) {
-                    left = vw - panelRect.width - edgePadding;
-                }
-                
-                // Apply the final, safe coordinates
-                panel.style.top = `${top}px`;
-                panel.style.left = `${left}px`;
-                
-                panel.classList.add('visible');
-            }, 400);
+            const margin = 20;
+            const edgePadding = 10;
+            const vw = window.innerWidth;
+            const vh = window.innerHeight;
+            let top, left;
 
+            switch (step.position) {
+                case 'top-center':
+                    top = targetRect.top - panelRect.height - margin;
+                    left = targetRect.left + targetRect.width / 2 - panelRect.width / 2;
+                    break;
+                case 'bottom-right':
+                    top = targetRect.bottom + margin;
+                    left = targetRect.right - panelRect.width;
+                    break;
+                case 'bottom-center':
+                    top = targetRect.bottom + margin;
+                    left = targetRect.left + targetRect.width / 2 - panelRect.width / 2;
+                    break;
+                default: // bottom-center
+                    top = targetRect.bottom + margin;
+                    left = targetRect.left + targetRect.width / 2 - panelRect.width / 2;
+                    break;
+            }
+
+            if (top + panelRect.height > vh - edgePadding) {
+                let newTop = targetRect.top - panelRect.height - margin;
+                top = (newTop >= edgePadding) ? newTop : (vh - panelRect.height - edgePadding);
+            }
+            if (top < edgePadding) {
+                let newTop = targetRect.bottom + margin;
+                top = (newTop + panelRect.height <= vh - edgePadding) ? newTop : edgePadding;
+            }
+            if (left < edgePadding) {
+                left = edgePadding;
+            }
+            if (left + panelRect.width > vw - edgePadding) {
+                left = vw - panelRect.width - edgePadding;
+            }
+            
+            panel.style.top = `${top}px`;
+            panel.style.left = `${left}px`;
+            
+            panel.classList.add('visible');
             currentTutorialStep = stepIndex;
         }
 
@@ -1140,7 +1203,6 @@
         });
 
         // --- سایر توابع (مدیریت، رده‌بندی و ...) ---
-        // (این توابع بدون تغییر باقی می‌مانند)
         async function loadAndShowUserList() { if (!(await verifyAdminStatus())) return; userListContainer.innerHTML = '<p style="padding: 20px;">در حال بارگذاری لیست کاربران...</p>'; userSearchInput.value = ''; hideModal(adminPanelOverlay); showModal(userListModalOverlay); try { const usersCollection = collection(db, "users"); const querySnapshot = await getDocs(usersCollection); userListContainer.innerHTML = ''; if (querySnapshot.empty) { userListContainer.innerHTML = '<p style="padding: 20px;">هیچ کاربری یافت نشد.</p>'; return; } querySnapshot.forEach(doc => { const userData = doc.data(); const userElement = document.createElement('div'); userElement.classList.add('user-list-item'); userElement.dataset.uid = doc.id; userElement.innerHTML = ` <div class="user-info"> <img src="${userData.avatarUrl || DEFAULT_AVATAR}" alt="avatar"> <div class="user-details"> <span class="name">${userData.displayName || 'بدون نام'}</span> <span class="email">${userData.email || 'بدون ایمیل'}</span> </div> </div> <span class="edit-user-icon">${EDIT_ICON_SVG}</span> `; userListContainer.appendChild(userElement); }); } catch (error) { console.error("خطا در دریافت لیست کاربران: ", error); userListContainer.innerHTML = '<p style="padding: 20px;">خطا در بارگذاری اطلاعات. لطفا دوباره تلاش کنید.</p>'; } }
         async function openEditModalForUser(uid) { if (!(await verifyAdminStatus())) return; try { const userDocRef = doc(db, 'users', uid); const docSnap = await getDoc(userDocRef); if (docSnap.exists()) { const userData = docSnap.data(); editUserNamePreview.textContent = userData.displayName || 'کاربر'; editUserAvatarPreview.src = userData.avatarUrl || DEFAULT_AVATAR; editUserUid.value = uid; editDisplayName.value = userData.displayName || ''; editUserAge.value = userData.old || ''; editUserDiamonds.value = userData.game || 0; hideModal(userListModalOverlay); showModal(editUserModalOverlay); } else { showCustomAlert("کاربر مورد نظر یافت نشد."); } } catch (error) { console.error("خطا در دریافت اطلاعات کاربر برای ویرایش:", error); showCustomAlert("خطا در دریافت اطلاعات کاربر."); } }
         async function handleSaveChanges(e) { e.preventDefault(); if (!(await verifyAdminStatus())) return; const uid = editUserUid.value; const newDisplayName = editDisplayName.value; const newAge = parseInt(editUserAge.value, 10); const newDiamonds = parseInt(editUserDiamonds.value, 10); if (!uid) { showCustomAlert("خطای سیستمی: شناسه کاربر موجود نیست."); return; } if (isNaN(newAge) || isNaN(newDiamonds)) { showCustomAlert("لطفا مقادیر معتبر برای سن و الماس وارد کنید."); return; } saveUserChangesBtn.disabled = true; saveUserChangesBtn.textContent = 'در حال ذخیره...'; try { const userDocRef = doc(db, 'users', uid); await updateDoc(userDocRef, { displayName: newDisplayName, old: newAge, game: newDiamonds }); hideModal(editUserModalOverlay); showCustomAlert("تغییرات با موفقیت ذخیره شد.", async () => { await loadAndShowUserList(); }); } catch (error) { console.error("خطا در بروزرسانی اطلاعات کاربر:", error); showCustomAlert("خطا در ذخیره تغییرات. لطفا دوباره تلاش کنید."); } finally { saveUserChangesBtn.disabled = false; saveUserChangesBtn.textContent = 'ذخیره تغییرات'; } }
@@ -1181,7 +1243,7 @@
                         loadAndApplySettings();
                         isInitialLoad = false;
                         
-                        // [جدید] بررسی و شروع راهنمای کاربری
+                        // بررسی و شروع راهنمای کاربری
                         if (!localStorage.getItem(TUTORIAL_COMPLETED_KEY)) {
                             setTimeout(startTutorial, 1000); // تاخیر برای اطمینان از بارگذاری کامل صفحه
                         }
@@ -1236,26 +1298,16 @@
         changeNameOverlay.addEventListener('click', (e) => { if (e.target === changeNameOverlay) hideModal(changeNameOverlay); });
         cancelNewNameBtn.addEventListener('click', () => { hideModal(changeNameOverlay); });
         changeNameForm.addEventListener('submit', handleNameChange);
-
-        // رویدادهای پنل تنظیمات
-        settingsBtn.addEventListener('click', () => {
-            hideModal(avatarMenuOverlay);
-            showModal(settingsOverlay);
-        });
+        settingsBtn.addEventListener('click', () => { hideModal(avatarMenuOverlay); showModal(settingsOverlay); });
         settingsOverlay.addEventListener('click', (e) => { if (e.target === settingsOverlay) hideModal(settingsOverlay); });
-        cancelSettingsBtn.addEventListener('click', () => {
-             hideModal(settingsOverlay);
-             loadAndApplySettings();
-        });
+        cancelSettingsBtn.addEventListener('click', () => { hideModal(settingsOverlay); loadAndApplySettings(); });
         saveSettingsBtn.addEventListener('click', () => {
             const newIntensity = animationIntensitySlider.value;
             localStorage.setItem(ANIMATION_INTENSITY_KEY, newIntensity);
             applyAnimationSettings(newIntensity);
-
             const effectEnabled = visualEffectToggle.checked;
             localStorage.setItem(VISUAL_EFFECT_KEY, effectEnabled);
             if(effectEnabled) startParticleEffect(); else stopParticleEffect();
-
             hideModal(settingsOverlay);
             showCustomAlert("تنظیمات با موفقیت ذخیره شد.");
         });
