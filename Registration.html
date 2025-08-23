@@ -210,6 +210,9 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getFirestore, doc, setDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        // START: *** تغییر ۱: اضافه کردن import های App Check ***
+        import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check.js";
+        // END: *** تغییر ۱ ***
 
         const firebaseConfig = {
           apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
@@ -222,6 +225,15 @@
         };
 
         const app = initializeApp(firebaseConfig);
+        
+        // START: *** تغییر ۲: راه‌اندازی App Check ***
+        // کلید سایت (Site Key) خود را اینجا قرار دهید
+        const appCheck = initializeAppCheck(app, {
+          provider: new ReCaptchaV3Provider('6LfUt68rAAAAAAFMi9RjlUdtymYS3KZWILO5IA_fD'),
+          isTokenAutoRefreshEnabled: true
+        });
+        // END: *** تغییر ۲ ***
+
         const auth = getAuth(app);
         const db = getFirestore(app);
 
@@ -323,9 +335,7 @@
                     currentStage: 1,
                     avatarUrl: selectedAvatarUrl,
                     old: age,
-                    // *** START: تغییر اصلی برای افزودن جم اولیه ***
                     game: 25 
-                    // *** END: تغییر اصلی برای افزودن جم اولیه ***
                 });
 
                 window.location.href = './index.html'; 
@@ -336,6 +346,9 @@
                     friendlyMessage = "این ایمیل قبلاً ثبت شده است. لطفاً وارد شوید.";
                 } else if (error.code === 'auth/weak-password') {
                     friendlyMessage = "رمز عبور ضعیف است. لطفاً رمز قوی‌تری انتخاب کنید.";
+                } else if (error.code === 'auth/app-not-authorized') {
+                    // این خطا مربوط به App Check است
+                    friendlyMessage = "خطای امنیتی: دامنه شما برای این عملیات مجاز نیست.";
                 }
                 console.error("Registration Error:", error);
                 showError(friendlyMessage);
