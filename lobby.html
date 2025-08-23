@@ -255,9 +255,12 @@
     <div id="audio-container" style="display: none;"></div>
 
     <script type="module">
+        // *** START: Firebase Imports ***
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getFirestore, doc, onSnapshot, runTransaction, getDoc, collection, where, query, addDoc, writeBatch, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        // *** END: Firebase Imports ***
 
         // --- Config & Elements ---
         const MAX_PLAYERS = 12;
@@ -272,7 +275,28 @@
           appId: "1:471627157488:web:92f008548a5596619a5735",
         };
         
+        // --- Firebase Initialization ---
         const app = initializeApp(firebaseConfig);
+        
+        // *** START: App Check Initialization ***
+        try {
+          const appCheck = initializeAppCheck(app, {
+            provider: new ReCaptchaV3Provider('6LfUt68rAAAAAAFMi9RjlUdtymYS3KZWILO5IA_fD'),
+            isTokenAutoRefreshEnabled: true
+          });
+          console.log("Firebase App Check initialized successfully in Lobby.");
+        } catch (error) {
+          console.error("Error initializing Firebase App Check:", error);
+          // Show a fatal error because the app can't continue securely
+          document.getElementById('loading-text').textContent = "خطای امنیتی!";
+          showNotificationModal(
+              "خطای امنیتی", 
+              "امکان فعال‌سازی لایه امنیتی برنامه وجود ندارد. لطفاً صفحه را مجدداً بارگیری کنید.", 
+              () => window.location.reload()
+          );
+        }
+        // *** END: App Check Initialization ***
+        
         const auth = getAuth(app);
         const db = getFirestore(app);
 
