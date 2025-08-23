@@ -1037,7 +1037,6 @@
             const targetElement = document.querySelector(step.element);
 
             if (!targetElement) {
-                // اگر المان پیدا نشد، به مرحله بعد برو
                 showTutorialStep(stepIndex + 1);
                 return;
             }
@@ -1046,13 +1045,13 @@
             tutorialNextBtn.classList.remove('visible');
 
             setTimeout(() => {
-                const rect = targetElement.getBoundingClientRect();
+                const targetRect = targetElement.getBoundingClientRect();
                 const padding = 10;
                 
-                tutorialHighlightBox.style.width = (rect.width + padding) + 'px';
-                tutorialHighlightBox.style.height = (rect.height + padding) + 'px';
-                tutorialHighlightBox.style.top = (rect.top - padding / 2) + 'px';
-                tutorialHighlightBox.style.left = (rect.left - padding / 2) + 'px';
+                tutorialHighlightBox.style.width = (targetRect.width + padding) + 'px';
+                tutorialHighlightBox.style.height = (targetRect.height + padding) + 'px';
+                tutorialHighlightBox.style.top = (targetRect.top - padding / 2) + 'px';
+                tutorialHighlightBox.style.left = (targetRect.left - padding / 2) + 'px';
                 
                 tutorialTitle.textContent = step.title;
                 
@@ -1061,31 +1060,66 @@
                     tutorialNextBtn.classList.add('visible');
                 });
                 
-                // Position the panel
-                const panelRect = tutorialPanel.getBoundingClientRect();
+                // --- Improved Positioning Logic ---
+                const panel = tutorialPanel;
+                // Temporarily make it visible but off-screen to measure its actual dimensions
+                panel.style.visibility = 'hidden';
+                panel.style.display = 'block';
+                const panelRect = panel.getBoundingClientRect();
+                panel.style.visibility = '';
+                panel.style.display = '';
+
+                const margin = 20;
+                const edgePadding = 10;
+                const vw = window.innerWidth;
+                const vh = window.innerHeight;
+
+                let top, left;
+
+                // Calculate initial desired position based on the step's preference
                 switch (step.position) {
                     case 'top-center':
-                        tutorialPanel.style.top = `${rect.top - panelRect.height - 20}px`;
-                        tutorialPanel.style.left = `${rect.left + rect.width / 2 - panelRect.width / 2}px`;
+                        top = targetRect.top - panelRect.height - margin;
+                        left = targetRect.left + targetRect.width / 2 - panelRect.width / 2;
                         break;
                     case 'bottom-right':
-                         tutorialPanel.style.top = `${rect.bottom + 20}px`;
-                         tutorialPanel.style.left = `${rect.right - panelRect.width}px`;
+                        top = targetRect.bottom + margin;
+                        left = targetRect.right - panelRect.width;
                         break;
                     default: // bottom-center
-                        tutorialPanel.style.top = `${rect.bottom + 20}px`;
-                        tutorialPanel.style.left = `${rect.left + rect.width / 2 - panelRect.width / 2}px`;
+                        top = targetRect.bottom + margin;
+                        left = targetRect.left + targetRect.width / 2 - panelRect.width / 2;
                         break;
                 }
 
-                // Adjust if panel is off-screen
-                const finalPanelRect = tutorialPanel.getBoundingClientRect();
-                if (finalPanelRect.left < 10) tutorialPanel.style.left = '10px';
-                if (finalPanelRect.right > window.innerWidth - 10) tutorialPanel.style.left = `${window.innerWidth - 10 - finalPanelRect.width}px`;
-                if (finalPanelRect.top < 10) tutorialPanel.style.top = '10px';
-
-
-                tutorialPanel.classList.add('visible');
+                // --- Vertical Correction ---
+                // If it overflows the bottom, try to place it on top
+                if (top + panelRect.height > vh - edgePadding) {
+                    let newTop = targetRect.top - panelRect.height - margin;
+                    // If it fits on top, use that position. Otherwise, clamp it to the bottom edge.
+                    top = (newTop >= edgePadding) ? newTop : (vh - panelRect.height - edgePadding);
+                }
+                
+                // If it overflows the top, try to place it at the bottom
+                if (top < edgePadding) {
+                    let newTop = targetRect.bottom + margin;
+                    // If it fits at the bottom, use that position. Otherwise, clamp it to the top edge.
+                    top = (newTop + panelRect.height <= vh - edgePadding) ? newTop : edgePadding;
+                }
+                
+                // --- Horizontal Correction ---
+                if (left < edgePadding) {
+                    left = edgePadding;
+                }
+                if (left + panelRect.width > vw - edgePadding) {
+                    left = vw - panelRect.width - edgePadding;
+                }
+                
+                // Apply the final, safe coordinates
+                panel.style.top = `${top}px`;
+                panel.style.left = `${left}px`;
+                
+                panel.classList.add('visible');
             }, 400);
 
             currentTutorialStep = stepIndex;
