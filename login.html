@@ -180,6 +180,9 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        // --- [شروع تغییر] اضافه کردن ماژول App Check ---
+        import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check.js";
+        // --- [پایان تغییر] ---
 
         const firebaseConfig = {
           apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
@@ -192,6 +195,19 @@
         };
 
         const app = initializeApp(firebaseConfig);
+        
+        // --- [شروع تغییر] راه‌اندازی App Check با Site Key ---
+        try {
+            const appCheck = initializeAppCheck(app, {
+              provider: new ReCaptchaV3Provider('6LfUt68rAAAAAAFMi9RjlUdtymYS3KZWILO5IA_fD'),
+              isTokenAutoRefreshEnabled: true
+            });
+            console.log("App Check successfully initialized.");
+        } catch(error) {
+            console.error("Error initializing App Check:", error);
+        }
+        // --- [پایان تغییر] ---
+
         const auth = getAuth(app);
 
         const loginForm = document.getElementById('login-form');
@@ -222,6 +238,11 @@
                 if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
                     friendlyMessage = "ایمیل یا رمز عبور وارد شده صحیح نمی‌باشد.";
                 }
+                // --- [شروع تغییر] نمایش خطای App Check به کاربر ---
+                else if (error.code === 'appCheck/token-error') {
+                     friendlyMessage = "خطا در تأیید امنیتی. لطفاً صفحه را رفرش کرده و دوباره تلاش کنید.";
+                }
+                // --- [پایان تغییر] ---
                 console.error("Login Error:", error);
                 showError(friendlyMessage);
             } finally {
