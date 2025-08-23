@@ -272,7 +272,7 @@
             const displayName = displayNameInput.value.trim();
             const email = emailInput.value.trim();
             const password = passwordInput.value.trim();
-            const age = parseInt(ageInput.value);
+            const age = parseInt(ageInput.value); // نام متغیر داخلی همچنان age است
 
             if (!displayName || !email || !password || !ageInput.value) {
                 showError("لطفاً تمام فیلدها را پر کنید."); return;
@@ -308,12 +308,8 @@
                     createdAt: new Date(),
                     currentStage: 1,
                     avatarUrl: selectedAvatarUrl,
-                    old: age,
-                    // =========================================================
-                    // *** تغییر اصلی و رفع مشکل اینجاست ***
-                    // اضافه کردن فیلد جم اولیه برای کاربر جدید
-                    game: 25 
-                    // =========================================================
+                    // *** تغییر اصلی اینجاست: بازگرداندن فیلد به 'old' ***
+                    old: age 
                 });
 
                 window.location.href = './index.html'; 
