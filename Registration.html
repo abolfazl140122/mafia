@@ -102,8 +102,7 @@
             padding: 10px;
             display: flex;
             align-items: center;
-            /* === تغییر برای وسط چین کردن آواتارها === */
-            justify-content: center; 
+            justify-content: flex-start;
             gap: 12px;
             overflow-x: auto;
             overflow-y: hidden;
@@ -273,7 +272,7 @@
             const displayName = displayNameInput.value.trim();
             const email = emailInput.value.trim();
             const password = passwordInput.value.trim();
-            const age = parseInt(ageInput.value);
+            const age = parseInt(ageInput.value); // نام متغیر داخلی همچنان age است
 
             if (!displayName || !email || !password || !ageInput.value) {
                 showError("لطفاً تمام فیلدها را پر کنید."); return;
@@ -302,24 +301,15 @@
                 await updateProfile(user, { displayName: displayName });
 
                 const userDocRef = doc(db, 'users', user.uid);
-                
-                // === کد اصلاح شده برای ذخیره اطلاعات کاربر با جم هدیه ===
                 await setDoc(userDocRef, {
                     uid: user.uid,
                     displayName: displayName,
                     email: user.email,
                     createdAt: new Date(),
+                    currentStage: 1,
                     avatarUrl: selectedAvatarUrl,
-                    old: age,
-                    
-                    // افزودن اطلاعات پیش‌فرض برای کاربر جدید
-                    gems: 25,          // هدیه ثبت نام
-                    level: 1,          // شروع از سطح ۱
-                    xp: 0,             // تجربه صفر
-                    wins: 0,           // تعداد بردها
-                    losses: 0,         // تعداد باخت‌ها
-                    currentStage: 1,   // مرحله فعلی
-                    isAdmin: false     // کاربر معمولی
+                    // *** تغییر اصلی اینجاست: بازگرداندن فیلد به 'old' ***
+                    old: age 
                 });
 
                 window.location.href = './index.html'; 
