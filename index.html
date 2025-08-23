@@ -78,8 +78,9 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        // **** تغییر ۱: اضافه کردن updateDoc برای به‌روزرسانی سند ****
         import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        // *** تغییر ۱: وارد کردن ماژول‌های App Check ***
+        import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
@@ -107,11 +108,15 @@
         const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
         function playMusicFromBlob(blob) { try { const objectUrl = URL.createObjectURL(blob); backgroundMusic.src = objectUrl; backgroundMusic.volume = 0.4; backgroundMusic.play().catch(e => console.warn("پخش خودکار موسیقی توسط مرورگر مسدود شد.", e)); } catch (error) { console.error("خطا در ایجاد URL برای پخش موسیقی:", error); } }
         function downloadAndCacheMusic(progressCallback) { return new Promise((resolve, reject) => { const xhr = new XMLHttpRequest(); xhr.open('GET', MUSIC_URL, true); xhr.responseType = 'blob'; xhr.onprogress = (event) => { if (event.lengthComputable) { const percentComplete = Math.round((event.loaded / event.total) * 100); progressCallback(percentComplete); } }; xhr.onload = async () => { if (xhr.status === 200) { const musicBlob = xhr.response; try { const cache = await caches.open(MUSIC_CACHE_NAME); await cache.put(MUSIC_URL, new Response(musicBlob)); localStorage.setItem(MUSIC_VERSION_KEY, MUSIC_URL); console.log('موسیقی با موفقیت دانلود و در حافظه موقت ذخیره شد.'); resolve(musicBlob); } catch (cacheError) { console.error('خطا در ذخیره سازی موسیقی در کش:', cacheError); reject(cacheError); } } else { reject(new Error(`خطای شبکه در دانلود موسیقی: ${xhr.statusText}`)); } }; xhr.onerror = () => { console.error('خطای XHR در دانلود موسیقی.'); reject(new Error('خطای شبکه در هنگام دانلود موسیقی.')); }; xhr.send(); }); }
-        async function handleBackgroundMusic() { const cachedVersion = localStorage.getItem(MUSIC_VERSION_KEY); try { if (cachedVersion === MUSIC_URL) { const cache = await caches.open(MUSIC_CACHE_NAME); const cachedResponse = await cache.match(MUSIC_URL); if (cachedResponse) { console.log('موسیقی از حافظه موقت بارگذاری می‌شود.'); const musicBlob = await cachedResponse.blob(); playMusicFromBlob(musicBlob); return; } console.warn('نسخه در localStorage موجود بود ولی فایل در کش یافت نشد. دانلود مجدد...'); } console.log('نسخه جدید موسیقی یافت شد یا اولین بازدید است. شروع دانلود...'); const musicBlob = await downloadAndCacheMusic((percent) => { const overallProgress = 20 + (percent * 0.4); updateProgress(overallProgress, `در حال دریافت موسیقی... ${percent}%`); }); playMusicFromBlob(musicBlob); } catch (error) { console.error('فرایند مدیریت موسیقی با خطا مواجه شد:', error); statusMessage.textContent = 'خطا در دریافت موسیقی پس‌زمینه.'; } }
+        async function handleBackgroundMusic() { const cachedVersion = localStorage.getItem(MUSIC_VERSION_KEY); try { if (cachedVersion === MUSIC_URL) { const cache = await caches.open(MUSIC_CACHE_NAME); const cachedResponse = await cache.match(MUSIC_URL); if (cachedResponse) { console.log('موسیقی از حافظه موقت بارگذاری می‌شود.'); const musicBlob = await cachedResponse.blob(); playMusicFromBlob(musicBlob); return; } console.warn('نسخه در localStorage موجود بود ولی فایل در کش یافت نشد. دانلود مجدد...'); } console.log('نسخه جدید موسیقی یافت شد یا اولین بازدید است. شروع دانلود...'); const musicBlob = await downloadAndCacheMusic((percent) => { const overallProgress = 30 + (percent * 0.3); updateProgress(overallProgress, `در حال دریافت موسیقی... ${percent}%`); }); playMusicFromBlob(musicBlob); } catch (error) { console.error('فرایند مدیریت موسیقی با خطا مواجه شد:', error); statusMessage.textContent = 'خطا در دریافت موسیقی پس‌زمینه.'; } }
         
-        // --- Main Loading Logic (بدون تغییر) ---
+        // --- Main Loading Logic (با تغییر) ---
         async function startNormalLoading(auth, db) {
-            updateProgress(10, '...برقراری ارتباط با سرورهای شهر');
+            // *** تغییر ۳: اضافه کردن مرحله بررسی امنیتی به لودینگ ***
+            updateProgress(10, '...در حال بررسی امنیتی');
+            await delay(500); // تاخیر کوتاه برای نمایش پیام
+
+            updateProgress(20, '...برقراری ارتباط با سرورهای شهر');
             const authPromise = new Promise((resolve, reject) => {
                 onAuthStateChanged(auth, async (user) => {
                     if (user) {
@@ -145,9 +150,7 @@
             }
         }
 
-        // --- Maintenance & Initializer ---
-        
-        // **** تغییر ۲: اضافه کردن پارامتر maintenanceDocRef برای ارسال رفرنس به توابع بعدی ****
+        // --- Maintenance & Initializer (بدون تغییر) ---
         function showMaintenancePanel(config, auth, db, maintenanceDocRef) {
             document.getElementById('loading-panel').style.display = 'none';
             const maintenancePanel = document.getElementById('maintenance-panel');
@@ -161,51 +164,37 @@
             messageEl.textContent = config.message || "به زودی باز خواهیم گشت.";
             if (config.textColor) { messageEl.style.color = config.textColor; }
             if (config.endTime && typeof config.endTime.toDate === 'function') {
-                // پاس دادن رفرنس سند به تابع شمارش معکوس
                 startCountdown(config.endTime.toDate(), auth, db, maintenanceDocRef);
             } else {
                 document.getElementById('countdown-timer').innerHTML = "<p>زمان پایان مشخص نشده است.</p>";
             }
         }
-
-        // **** تغییر ۳: ایجاد تابع جدید برای مدیریت پایان زمان بروزرسانی ****
         async function endMaintenanceMode(auth, db, maintenanceDocRef) {
-            // مرحله اول: تلاش برای به‌روزرسانی سند در Firestore
             try {
                 console.log("زمان بروزرسانی به پایان رسید. در حال تغییر وضعیت enabled به false...");
                 await updateDoc(maintenanceDocRef, { enabled: false });
                 console.log("وضعیت با موفقیت در Firestore به‌روزرسانی شد.");
             } catch (error) {
                 console.error("خطا در به‌روزرسانی خودکار وضعیت بروزرسانی:", error);
-                // حتی اگر خطا رخ دهد، باز هم برنامه را برای کاربر فعلی لود می‌کنیم
             }
-
-            // مرحله دوم: تغییر رابط کاربری و شروع لودینگ عادی
             document.getElementById('maintenance-panel').style.display = 'none';
             const loadingPanel = document.getElementById('loading-panel');
             loadingPanel.style.display = 'block';
-            loadingPanel.style.animation = 'none'; // ریست کردن انیمیشن
+            loadingPanel.style.animation = 'none'; 
             requestAnimationFrame(() => {
                 loadingPanel.style.animation = 'panel-intro 1s cubic-bezier(0.25, 1, 0.5, 1)';
             });
-            
-            // شروع لودینگ عادی بازی
             startNormalLoading(auth, db);
         }
-
         function startCountdown(targetDate, auth, db, maintenanceDocRef) {
             const countdownElements = { days: document.getElementById('days'), hours: document.getElementById('hours'), minutes: document.getElementById('minutes'), seconds: document.getElementById('seconds') };
-            
             const interval = setInterval(() => {
                 const distance = targetDate.getTime() - new Date().getTime();
-                
                 if (distance < 0) {
                     clearInterval(interval);
-                    // **** تغییر ۴: فراخوانی تابع جدید به جای انجام مستقیم کارها ****
                     endMaintenanceMode(auth, db, maintenanceDocRef);
-                    return; // خروج از این تکرار interval
+                    return;
                 }
-                
                 const f = (n) => String(Math.floor(n)).padStart(2, '0');
                 countdownElements.days.textContent = f(distance / (1000 * 60 * 60 * 24));
                 countdownElements.hours.textContent = f((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -217,13 +206,26 @@
         async function main() {
             try {
                 const app = initializeApp(firebaseConfig);
+                
+                // *** تغییر ۲: فعال‌سازی App Check ***
+                // این کد باید بلافاصله بعد از initializeApp اجرا شود
+                try {
+                    initializeAppCheck(app, {
+                        provider: new ReCaptchaV3Provider('6LfUt68rAAAAAAFMi9RjlUdtymYS3KZWILO5IA_fD'),
+                        isTokenAutoRefreshEnabled: true
+                    });
+                    console.log("Firebase App Check با موفقیت فعال شد.");
+                } catch (error) {
+                    console.error("خطا در فعال‌سازی App Check:", error);
+                    // برنامه به کار خود ادامه می‌دهد اما ممکن است درخواست‌ها به فایربیس با خطا مواجه شوند
+                }
+
                 const db = getFirestore(app);
                 const auth = getAuth(app);
                 const maintenanceDocRef = doc(db, 'settings', 'maintenance');
                 const docSnap = await getDoc(maintenanceDocRef);
 
                 if (docSnap.exists() && docSnap.data().enabled === true) {
-                    // **** تغییر ۵: ارسال رفرنس سند به تابع showMaintenancePanel ****
                     showMaintenancePanel(docSnap.data(), auth, db, maintenanceDocRef);
                 } else {
                     startNormalLoading(auth, db);
