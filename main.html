@@ -30,7 +30,7 @@
             padding: 20px;
         }
 
-        /* *** [جدید] کانتینر انیمیشن پس‌زمینه *** */
+        /* *** کانتینر انیمیشن پس‌زمینه *** */
         #background-animation-container {
             position: fixed;
             top: 0;
@@ -42,7 +42,6 @@
             background-size: cover;
             background-position: center center;
             background-repeat: no-repeat;
-            /* انیمیشن به صورت پیش‌فرض اعمال می‌شود و با جاوااسکریپت کنترل خواهد شد */
             animation: kenBurnsEffect 30s ease-in-out infinite alternate;
         }
 
@@ -55,6 +54,22 @@
                 transform: scale(1.15) translate(-2%, 2%);
                 transform-origin: 30% 80%;
             }
+        }
+        
+        /* *** [جدید] استایل بوم جلوه‌های بصری *** */
+        #particle-effect-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0; /* بالای پس‌زمینه، زیر محتوای اصلی */
+            pointer-events: none; /* اجازه می‌دهد کلیک‌ها از روی آن عبور کنند */
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+        }
+        #particle-effect-canvas.visible {
+            opacity: 1;
         }
 
 
@@ -107,6 +122,8 @@
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.5s ease, visibility 0.5s ease;
+            position: relative; /* [جدید] برای اطمینان از قرارگیری z-index */
+            z-index: 1; /* [جدید] بالای بوم ذرات قرار می‌گیرد */
         }
 
         body.loaded .main-content {
@@ -332,7 +349,7 @@
         .user-exists-info img { width: 50px; height: 50px; border-radius: 50%; border: 2px solid #a47d54; object-fit: cover; }
         .user-exists-info .name { font-size: 1.1rem; font-weight: 700; color: #ffc947; }
         
-        /* *** [جدید] استایل‌های پنل تنظیمات *** */
+        /* *** استایل‌های پنل تنظیمات *** */
         #settings-content .form-group { margin-bottom: 20px; }
         .range-slider-container { display: flex; flex-direction: column; gap: 10px; align-items: center; }
         .range-slider-label { display: flex; justify-content: space-between; width: 100%; font-size: 1rem; font-weight: 700; color: #c5a687; }
@@ -343,13 +360,23 @@
         input[type="range"]::-moz-range-track { width: 100%; height: 8px; background: rgba(0,0,0,0.4); border-radius: 5px; border: 1px solid #5c4a3a; cursor: pointer; }
         input[type="range"]::-moz-range-thumb { width: 22px; height: 22px; background: #c5a687; border-radius: 50%; border: 3px solid #1e170f; box-shadow: 0 0 5px rgba(0,0,0,0.5); cursor: pointer; transition: background 0.2s, transform 0.2s; }
         input[type="range"]::-moz-range-thumb:hover { background: #ffc947; transform: scale(1.1); }
+        
+        /* [جدید] استایل برای toggle در پنل تنظیمات */
+        #settings-content .toggle-switch-container {
+            padding: 0;
+            background-color: transparent;
+            border: none;
+        }
 
     </style>
 </head>
 <body>
     
-    <!-- [جدید] کانتینر برای انیمیشن پس‌زمینه -->
+    <!-- کانتینر برای انیمیشن پس‌زمینه -->
     <div id="background-animation-container"></div>
+    
+    <!-- [جدید] بوم برای انیمیشن جلوه‌های بصری -->
+    <canvas id="particle-effect-canvas"></canvas>
 
     <div id="loading-overlay">
         <div class="loader"></div>
@@ -417,7 +444,6 @@
             <button id="avatar-menu-profile-btn" class="modal-button">پروفایل</button>
             <button id="avatar-menu-shop-btn" class="modal-button">فروشگاه</button>
             <button id="change-name-btn" class="modal-button">تغییر نام</button>
-            <!-- [جدید] دکمه تنظیمات -->
             <button id="settings-btn" class="modal-button">تنظیمات</button>
         </div>
     </div>
@@ -596,7 +622,7 @@
         </div>
     </div>
     
-    <!-- [جدید] پنل تنظیمات -->
+    <!-- پنل تنظیمات -->
     <div id="settings-overlay" class="modal-overlay">
         <div id="settings-content" class="modal-content">
             <h2 class="modal-title">تنظیمات</h2>
@@ -607,6 +633,16 @@
                         <span id="animation-intensity-value">50%</span>
                     </div>
                     <input type="range" min="0" max="100" value="50" class="range-slider" id="animation-intensity-slider">
+                </div>
+            </div>
+            <!-- [جدید] toggle برای جلوه بصری -->
+            <div class="form-group">
+                <div class="toggle-switch-container">
+                    <span class="toggle-label">جلوه بصری</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="visual-effect-toggle">
+                        <span class="slider"></span>
+                    </label>
                 </div>
             </div>
             <div class="confirm-buttons-container" style="margin-top: 20px;">
@@ -716,7 +752,7 @@
         const saveNewNameBtn = document.getElementById('save-new-name-btn');
         const cancelNewNameBtn = document.getElementById('cancel-new-name-btn');
 
-        // [جدید] المان‌های پنل تنظیمات و انیمیشن
+        // المان‌های پنل تنظیمات و انیمیشن
         const backgroundContainer = document.getElementById('background-animation-container');
         const settingsBtn = document.getElementById('settings-btn');
         const settingsOverlay = document.getElementById('settings-overlay');
@@ -725,6 +761,11 @@
         const saveSettingsBtn = document.getElementById('save-settings-btn');
         const cancelSettingsBtn = document.getElementById('cancel-settings-btn');
 
+        // [جدید] المان‌های جلوه بصری
+        const visualEffectToggle = document.getElementById('visual-effect-toggle');
+        const particleCanvas = document.getElementById('particle-effect-canvas');
+        const ctx = particleCanvas.getContext('2d');
+        
         // متغیرها
         const MUSIC_URL = "https://raw.githubusercontent.com/abolfazl140122/mafia/main/dark-music-249503.mp3";
         const MUSIC_CACHE_NAME = 'mafia-music-cache-v1';
@@ -806,32 +847,116 @@
         function downloadAndCacheMusic() { return new Promise((resolve, reject) => { musicDownloadOverlay.classList.add('visible'); const xhr = new XMLHttpRequest(); xhr.open('GET', MUSIC_URL, true); xhr.responseType = 'blob'; xhr.onprogress = (event) => { if (event.lengthComputable) { const percentComplete = Math.round((event.loaded / event.total) * 100); progressBar.style.width = percentComplete + '%'; progressText.textContent = `در حال دانلود... ${percentComplete}%`; } }; xhr.onload = async () => { if (xhr.status === 200) { const musicBlob = xhr.response; try { const cache = await caches.open(MUSIC_CACHE_NAME); await cache.put(MUSIC_URL, new Response(musicBlob)); localStorage.setItem(MUSIC_VERSION_KEY, MUSIC_URL); musicDownloadOverlay.classList.remove('visible'); resolve(musicBlob); } catch (cacheError) { reject(cacheError); } } else { reject(new Error(`خطای شبکه: ${xhr.statusText}`)); } }; xhr.onerror = () => { musicDownloadOverlay.classList.remove('visible'); showCustomAlert("دانلود موسیقی پس‌زمینه با خطا مواجه شد.", () => {}); reject(new Error('خطای شبکه در دانلود موسیقی.')); }; xhr.send(); }); }
         async function handleBackgroundMusic() { const cachedVersion = localStorage.getItem(MUSIC_VERSION_KEY); if (cachedVersion === MUSIC_URL) { try { const cache = await caches.open(MUSIC_CACHE_NAME); const cachedResponse = await cache.match(MUSIC_URL); if (cachedResponse) { playMusicFromBlob(await cachedResponse.blob()); } else { playMusicFromBlob(await downloadAndCacheMusic()); } } catch (error) { playMusicFromBlob(await downloadAndCacheMusic()); } } else { try { playMusicFromBlob(await downloadAndCacheMusic()); } catch (error) { console.error('فرایند دانلود و پخش موسیقی با خطا مواجه شد:', error); } } }
 
-        // --- [جدید] توابع تنظیمات انیمیشن ---
+        // --- توابع تنظیمات ---
         const ANIMATION_INTENSITY_KEY = 'mafia-animation-intensity';
-        const DEFAULT_ANIMATION_INTENSITY = 50; // مقدار پیش‌فرض 50%
+        const VISUAL_EFFECT_KEY = 'mafia-visual-effect-enabled'; // [جدید]
+        const DEFAULT_ANIMATION_INTENSITY = 50;
         
         function applyAnimationSettings(intensity) {
             if (intensity == 0) {
                 backgroundContainer.style.animation = 'none';
             } else {
-                // محاسبه زمان انیمیشن بر اساس شدت
-                // شدت 100 = سریعترین (مثلا 15 ثانیه)
-                // شدت 1 = کندترین (مثلا 40 ثانیه)
-                const minDuration = 15; // ثانیه
-                const maxDuration = 40; // ثانیه
+                const minDuration = 15;
+                const maxDuration = 40;
                 const duration = maxDuration - (intensity / 100) * (maxDuration - minDuration);
-                
                 backgroundContainer.style.animation = `kenBurnsEffect ${duration}s ease-in-out infinite alternate`;
             }
         }
+        
+        // --- [جدید] توابع جلوه بصری ذرات ---
+        let particlesArray = [];
+        let animationFrameId = null;
 
+        class Particle {
+            constructor() {
+                this.x = Math.random() * particleCanvas.width;
+                this.y = Math.random() * particleCanvas.height;
+                this.size = Math.random() * 2.5 + 1;
+                this.speedX = (Math.random() * 1 - 0.5) * 0.5;
+                this.speedY = (Math.random() * 1 - 0.5) * 0.5;
+                this.color = `rgba(255, 201, 71, ${Math.random() * 0.5 + 0.3})`;
+            }
+            update() {
+                if (this.x > particleCanvas.width || this.x < 0) this.speedX = -this.speedX;
+                if (this.y > particleCanvas.height || this.y < 0) this.speedY = -this.speedY;
+                this.x += this.speedX;
+                this.y += this.speedY;
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particlesArray = [];
+            const numberOfParticles = (particleCanvas.width * particleCanvas.height) / 12000;
+            for (let i = 0; i < numberOfParticles; i++) {
+                particlesArray.push(new Particle());
+            }
+        }
+        
+        function animateParticles() {
+            ctx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
+            }
+            animationFrameId = requestAnimationFrame(animateParticles);
+        }
+
+        function resizeCanvas() {
+            particleCanvas.width = window.innerWidth;
+            particleCanvas.height = window.innerHeight;
+        }
+
+        function startParticleEffect() {
+            if (animationFrameId) return;
+            particleCanvas.classList.add('visible');
+            resizeCanvas();
+            initParticles();
+            animateParticles();
+        }
+
+        function stopParticleEffect() {
+            particleCanvas.classList.remove('visible');
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = null;
+            }
+             setTimeout(() => {
+                 if (!animationFrameId) {
+                    ctx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+                 }
+            }, 800);
+        }
+
+        window.addEventListener('resize', () => {
+            if(animationFrameId) {
+                resizeCanvas();
+                initParticles();
+            }
+        });
+        
+        // تابع اصلی بارگذاری تنظیمات
         function loadAndApplySettings() {
+            // انیمیشن پس‌زمینه
             const savedIntensity = localStorage.getItem(ANIMATION_INTENSITY_KEY);
             const intensity = savedIntensity !== null ? parseInt(savedIntensity, 10) : DEFAULT_ANIMATION_INTENSITY;
-            
             animationIntensitySlider.value = intensity;
             animationIntensityValue.textContent = `${intensity}%`;
             applyAnimationSettings(intensity);
+
+            // [جدید] جلوه بصری
+            const isEffectEnabled = localStorage.getItem(VISUAL_EFFECT_KEY) === 'true';
+            visualEffectToggle.checked = isEffectEnabled;
+            if (isEffectEnabled) {
+                startParticleEffect();
+            } else {
+                stopParticleEffect();
+            }
         }
 
         // --- سایر توابع (مدیریت، رده‌بندی و ...) ---
@@ -873,7 +998,7 @@
                     if (isInitialLoad) {
                         document.body.classList.add('loaded');
                         handleBackgroundMusic();
-                        loadAndApplySettings(); // [جدید] اعمال تنظیمات انیمیشن
+                        loadAndApplySettings();
                         isInitialLoad = false;
                     }
                 }, (error) => {
@@ -927,7 +1052,7 @@
         cancelNewNameBtn.addEventListener('click', () => { hideModal(changeNameOverlay); });
         changeNameForm.addEventListener('submit', handleNameChange);
 
-        // [جدید] رویدادهای پنل تنظیمات
+        // رویدادهای پنل تنظیمات
         settingsBtn.addEventListener('click', () => {
             hideModal(avatarMenuOverlay);
             showModal(settingsOverlay);
@@ -935,20 +1060,25 @@
         settingsOverlay.addEventListener('click', (e) => { if (e.target === settingsOverlay) hideModal(settingsOverlay); });
         cancelSettingsBtn.addEventListener('click', () => {
              hideModal(settingsOverlay);
-             // بازگرداندن اسلایدر به مقدار ذخیره شده قبلی
              loadAndApplySettings();
         });
         saveSettingsBtn.addEventListener('click', () => {
+            // ذخیره انیمیشن
             const newIntensity = animationIntensitySlider.value;
             localStorage.setItem(ANIMATION_INTENSITY_KEY, newIntensity);
             applyAnimationSettings(newIntensity);
+
+            // [جدید] ذخیره جلوه بصری
+            const effectEnabled = visualEffectToggle.checked;
+            localStorage.setItem(VISUAL_EFFECT_KEY, effectEnabled);
+            if(effectEnabled) startParticleEffect(); else stopParticleEffect();
+
             hideModal(settingsOverlay);
             showCustomAlert("تنظیمات با موفقیت ذخیره شد.");
         });
         animationIntensitySlider.addEventListener('input', (e) => {
             const value = e.target.value;
             animationIntensityValue.textContent = `${value}%`;
-            // به صورت زنده تغییرات را نمایش می‌دهد
             applyAnimationSettings(value); 
         });
 
