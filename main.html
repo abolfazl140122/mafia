@@ -1,3 +1,5 @@
+--- START OF FILE main.txt ---
+
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -21,11 +23,8 @@
 
         body {
             font-family: 'Vazirmatn', sans-serif;
-            background-image: url('https://up.20script.ir/file/6195-file-000000001500622f9419de6c322df297-1-.jpg');
-            background-size: cover;
-            background-position: center center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
+            /* [تغییر یافته] تصویر پس‌زمینه به لایه جدید منتقل شد */
+            background-color: #1a140e; /* یک رنگ پس‌زمینه برای حالت بارگذاری */
             color: #f0e6d2;
             display: flex;
             flex-direction: column;
@@ -33,6 +32,36 @@
             align-items: center;
             padding: 20px;
         }
+
+        /* --- [جدید] لایه پس‌زمینه متحرک --- */
+        #background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; /* قرار گرفتن پشت همه المان‌ها */
+            background-image: url('https://up.20script.ir/file/6195-file-000000001500622f9419de6c322df297-1-.jpg');
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            /* اعمال انیمیشن زوم */
+            animation: kenburnsZoom 25s ease-in-out infinite;
+        }
+
+        /* --- [جدید] تعریف انیمیشن زوم (افکت Ken Burns) --- */
+        @keyframes kenburnsZoom {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
 
         /* --- پنل بارگذاری اولیه --- */
         #loading-overlay {
@@ -354,6 +383,9 @@
     </style>
 </head>
 <body>
+    
+    <!-- [جدید] لایه پس‌زمینه متحرک -->
+    <div id="background-animation"></div>
 
     <div id="loading-overlay">
         <div class="loader"></div>
