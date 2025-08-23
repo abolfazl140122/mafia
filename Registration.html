@@ -94,49 +94,63 @@
         .age-control-btn:hover { border-color: #ffc947; background: linear-gradient(145deg, rgba(100, 65, 63, 0.9), rgba(74, 44, 42, 1)); }
         .age-control-btn:active { transform: scale(0.95); }
 
+        /* --- START: بهبود گرافیک بخش انتخاب آواتار --- */
         .avatar-selection-container {
-            min-height: 80px;
-            background-color: rgba(0, 0, 0, 0.3);
+            min-height: 90px;
+            background-color: rgba(0, 0, 0, 0.4);
             border: 1px solid #5c4a3a;
-            border-radius: 8px;
-            padding: 10px;
+            border-radius: 12px;
+            padding: 15px;
             display: flex;
             align-items: center;
-            justify-content: flex-start;
-            gap: 12px;
+            justify-content: center; /* کلید اصلی برای وسط‌چین کردن */
+            gap: 15px;
             overflow-x: auto;
             overflow-y: hidden;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.6); /* ایجاد عمق */
         }
 
-        .avatar-selection-container::-webkit-scrollbar { height: 6px; }
-        .avatar-selection-container::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 3px; }
-        .avatar-selection-container::-webkit-scrollbar-thumb { background: #5c4a3a; border-radius: 3px; }
+        .avatar-selection-container::-webkit-scrollbar { height: 8px; }
+        .avatar-selection-container::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); border-radius: 4px; }
+        .avatar-selection-container::-webkit-scrollbar-thumb { background: #6e5643; border-radius: 4px; border: 1px solid #4a3c30; }
         .avatar-selection-container::-webkit-scrollbar-thumb:hover { background: #c5a687; }
 
         .avatar-item {
-            width: 60px;
-            height: 60px;
+            width: 64px;
+            height: 64px;
             border-radius: 50%;
             object-fit: cover;
-            border: 3px solid transparent;
+            border: 3px solid #6e5643;
             cursor: pointer;
-            transition: all 0.2s ease-in-out;
+            transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
             flex-shrink: 0;
+            filter: grayscale(80%) opacity(0.7); /* افکت خاموش برای آیتم‌های غیرفعال */
+            box-shadow: 0 5px 10px rgba(0,0,0,0.5);
         }
         .avatar-item:hover {
-            transform: scale(1.1);
-            border-color: #c5a687;
+            transform: scale(1.1) translateY(-5px);
+            border-color: #e0dacc;
+            filter: grayscale(20%) opacity(1);
         }
         .avatar-item.selected {
             border-color: #ffc947;
-            transform: scale(1.15);
-            box-shadow: 0 0 15px rgba(255, 201, 71, 0.5);
+            transform: scale(1.2) translateY(-5px);
+            box-shadow: 0 0 25px rgba(255, 201, 71, 0.7);
+            filter: grayscale(0%) opacity(1); /* افکت روشن و رنگی برای آیتم انتخاب شده */
         }
         .avatar-loader {
             width: 100%;
             text-align: center;
             color: #c5a687;
+            font-weight: 700;
+            animation: pulse 2s infinite ease-in-out;
         }
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+        /* --- END: بهبود گرافیک بخش انتخاب آواتار --- */
         
         .auth-button { width: 100%; padding: 14px; font-size: 1.1rem; font-weight: 700; color: #ffffff; background: linear-gradient(145deg, #8c4843, #5a2c2a); border: 2px solid #c5a687; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
         .auth-button:hover { border-color: #ffc947; box-shadow: 0 0 15px rgba(255, 201, 71, 0.2); }
@@ -272,7 +286,7 @@
             const displayName = displayNameInput.value.trim();
             const email = emailInput.value.trim();
             const password = passwordInput.value.trim();
-            const age = parseInt(ageInput.value); // نام متغیر داخلی همچنان age است
+            const age = parseInt(ageInput.value);
 
             if (!displayName || !email || !password || !ageInput.value) {
                 showError("لطفاً تمام فیلدها را پر کنید."); return;
@@ -308,8 +322,10 @@
                     createdAt: new Date(),
                     currentStage: 1,
                     avatarUrl: selectedAvatarUrl,
-                    // *** تغییر اصلی اینجاست: بازگرداندن فیلد به 'old' ***
-                    old: age 
+                    old: age,
+                    // *** START: تغییر اصلی برای افزودن جم اولیه ***
+                    game: 25 
+                    // *** END: تغییر اصلی برای افزودن جم اولیه ***
                 });
 
                 window.location.href = './index.html'; 
