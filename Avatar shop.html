@@ -412,6 +412,9 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getFirestore, doc, getDoc, collection, getDocs, updateDoc, runTransaction, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        // *** START: App Check Imports ***
+        import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check.js";
+        // *** END: App Check Imports ***
 
         // --- Firebase Configuration ---
         const firebaseConfig = {
@@ -426,6 +429,21 @@
 
         // --- Initialize Firebase ---
         const app = initializeApp(firebaseConfig);
+        
+        // *** START: Firebase App Check Initialization ***
+        // این کد سپر امنیتی را برای تمام ارتباطات با فایربیس فعال می‌کند
+        try {
+            const appCheck = initializeAppCheck(app, {
+                provider: new ReCaptchaV3Provider('6LfUt68rAAAAAAFMi9RjlUdtymYS3KZWILO5IA_fD'),
+                isTokenAutoRefreshEnabled: true
+            });
+            console.log("Firebase App Check با موفقیت فعال شد.");
+        } catch (error) {
+            console.error("خطا در فعال‌سازی Firebase App Check:", error);
+            // در صورت بروز خطا، می‌توان یک پیام به کاربر نمایش داد
+        }
+        // *** END: Firebase App Check Initialization ***
+
         const auth = getAuth(app);
         const db = getFirestore(app);
 
@@ -463,7 +481,15 @@
         }
         
         async function loadShopData(user) {
+            const loaderTextEl = loader.querySelector('.loader-text');
             loader.style.display = 'flex';
+
+            // --- بهبود لودینگ با نمایش پیام امنیتی ---
+            loaderTextEl.textContent = 'بررسی امنیتی...';
+            await new Promise(resolve => setTimeout(resolve, 500)); // تاخیر کوتاه برای نمایش پیام
+            loaderTextEl.textContent = 'در حال بارگذاری فروشگاه...';
+            // ------------------------------------
+            
             try {
                 const userDocRef = doc(db, 'users', user.uid);
                 const avatarsCollectionRef = collection(db, 'avatars');
