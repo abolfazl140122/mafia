@@ -14,7 +14,6 @@
             --darker-red: #5a2c2a;
             --admin-red: #c0392b; /* رنگ برای دکمه ادمین */
             --admin-red-hover: #e74c3c;
-            /* رنگ‌های جدید برای دکمه ویرایش */
             --admin-edit-bg: #504436; 
             --admin-edit-bg-hover: #615342;
             --admin-edit-border: #c5a687;
@@ -58,7 +57,6 @@
             z-index: -1;
         }
         
-        /* --- لودینگ حرفه‌ای و جدید --- */
         #loading-overlay {
             position: fixed;
             top: 0;
@@ -76,8 +74,8 @@
 
         .loader-logo-wrapper {
             position: relative;
-            width: 180px; /* اندازه بزرگتر */
-            height: 180px; /* اندازه بزرگتر */
+            width: 180px;
+            height: 180px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -96,7 +94,7 @@
         }
         
         .loader-logo {
-            width: 120px; /* اندازه بزرگتر */
+            width: 120px;
             height: auto;
             animation: fadeIn 2s forwards;
             opacity: 0;
@@ -117,7 +115,6 @@
             text-shadow: 1px 1px 3px #000;
         }
         
-        /* --- [جدید] پنل دانلود موسیقی --- */
         #music-download-overlay {
             position: fixed;
             top: 0;
@@ -130,7 +127,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 1999; /* زیر لودینگ اصلی */
+            z-index: 1999;
             opacity: 0;
             visibility: hidden;
             transition: all 0.5s ease;
@@ -174,7 +171,6 @@
             color: var(--text-light);
         }
 
-        /* --- محتوای اصلی --- */
         .main-container {
             width: 100%;
             height: 100%;
@@ -215,7 +211,6 @@
             line-height: 1; transform: scaleX(-1);
         }
 
-        /* --- لیست لابی‌ها --- */
         #lobby-list {
             flex-grow: 1; overflow-y: auto; display: flex;
             flex-direction: column; gap: 15px; padding-right: 5px;
@@ -233,7 +228,7 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.4); opacity: 0;
             transform: translateY(20px); animation: slideInUp 0.5s forwards;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-            will-change: transform; /* بهینه‌سازی انیمیشن */
+            will-change: transform;
         }
         .lobby-card:hover {
             transform: translateY(-5px);
@@ -244,7 +239,6 @@
         .lobby-card-header, .lobby-card-footer {
             display: flex; justify-content: space-between; align-items: center;
         }
-        /* [جدید] بخش میانی کارت برای توضیحات */
         .lobby-card-body {
             padding: 8px 0;
             border-top: 1px solid rgba(92, 74, 58, 0.5);
@@ -276,7 +270,8 @@
         .player-count span { animation: pulse 2s infinite ease-in-out; }
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
         
-        /* [جدید] استایل برای بخش سازنده (آواتار و نام) */
+        /* [مهم] استایل‌های جدید برای بخش پایینی کارت */
+        .footer-left { display: flex; align-items: center; gap: 15px; }
         .creator-info { display: flex; align-items: center; gap: 10px; }
         .creator-avatar {
             width: 40px;
@@ -289,37 +284,50 @@
         .creator-details { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
         .lobby-creator { font-size: 0.9rem; color: var(--text-secondary); }
         
-        .admin-password-container {
+        /* [مهم] استایل‌های جدید برای پنل مدیریت و دکمه‌های آیکون */
+        .admin-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            border-left: 1px solid var(--border-color);
+            padding-left: 15px;
+        }
+        .admin-icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid var(--border-color);
+            background: linear-gradient(145deg, #443a2e, #2a2118);
+            color: var(--text-light);
+            font-size: 1rem;
+            cursor: pointer;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            background-color: rgba(0, 0, 0, 0.4);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 4px 8px;
-            margin-top: 6px;
-            cursor: pointer;
+            justify-content: center;
             transition: all 0.2s ease;
         }
-        .admin-password-container:hover {
-            background-color: var(--admin-edit-bg);
+        .admin-icon-btn:hover {
+            transform: scale(1.1);
             border-color: var(--primary-gold);
         }
-        .admin-password-text {
-            font-size: 0.8rem;
+        .btn-icon-delete {
+            background: linear-gradient(145deg, var(--admin-red), #962d22);
+            border-color: #ff7961;
+            color: white;
+        }
+        .btn-icon-delete:hover {
+            background: linear-gradient(145deg, var(--admin-red-hover), var(--admin-red));
+            border-color: white;
+        }
+        .admin-password-text { /* استایل جدید برای نمایش رمز */
+            font-size: 0.85rem;
             color: #f39c12;
             font-family: monospace;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 100px;
+            background-color: rgba(0,0,0,0.4);
+            padding: 2px 8px;
+            border-radius: 4px;
         }
-        .admin-edit-icon {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            padding-left: 8px;
-        }
-        
+
         .lobby-actions { display: flex; gap: 10px; }
         .lobby-btn {
             padding: 8px 20px; font-size: 1rem; font-weight: 700;
@@ -341,23 +349,7 @@
             opacity: 0.7;
         }
         .btn-join:disabled:hover { transform: none; }
-        .btn-delete {
-            background: linear-gradient(145deg, #616161, #3a3a3a); color: var(--text-light);
-            border: 1px solid #888;
-        }
-        .btn-delete:hover {
-             background: linear-gradient(145deg, #7a7a7a, #4f4f4f); transform: translateY(-2px);
-        }
-        .btn-admin-delete {
-            background: linear-gradient(145deg, var(--admin-red), #962d22);
-            color: white; border: 1px solid #ff7961;
-        }
-        .btn-admin-delete:hover {
-            background: linear-gradient(145deg, var(--admin-red-hover), var(--admin-red));
-            transform: translateY(-2px);
-        }
-
-        /* --- دکمه شناور --- */
+        
         #create-lobby-fab {
             position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
             width: 60px; height: 60px;
@@ -373,7 +365,6 @@
         }
         #create-lobby-fab:active { transform: translateX(-50%) scale(0.95); }
 
-        /* --- پنل‌های مودال (Modal) --- */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(0, 0, 0, 0.85); 
@@ -404,9 +395,8 @@
             font-family: 'Vazirmatn', sans-serif; font-size: 1rem; text-align: center;
         }
         .modal-input, .modal-textarea { margin-bottom: 15px; }
-        /* [جدید] استایل برای توضیحات */
         .modal-textarea {
-            resize: none; /* جلوگیری از تغییر اندازه دستی */
+            resize: none;
             height: 80px;
             text-align: right;
             padding: 10px;
@@ -430,7 +420,6 @@
         }
         .modal-button.secondary:hover { background: linear-gradient(145deg, #615342, #403529); }
         
-        /* استایل‌های جدید برای رمز لابی */
         .password-toggle-group {
             display: flex;
             align-items: center;
@@ -486,7 +475,7 @@
 
         #lobby-password-input {
             margin-top: 15px;
-            display: none; /* مخفی به صورت پیش‌فرض */
+            display: none;
         }
     </style>
 </head>
@@ -535,7 +524,6 @@
             <h2 class="modal-title">ساخت لابی جدید</h2>
             <div class="modal-input-group">
                 <input type="text" id="lobby-name-input" class="modal-input" placeholder="نام لابی خود را وارد کنید" maxlength="30">
-                <!-- [جدید] فیلد توضیحات لابی -->
                 <textarea id="lobby-description-input" class="modal-textarea" placeholder="توضیحات کوتاه (اختیاری)" maxlength="120"></textarea>
                 <select id="lobby-scenario-select" class="modal-select">
                     <option value="کلاسیک">سناریو: کلاسیک</option>
@@ -543,7 +531,6 @@
                     <option value="زودیاک">سناریو: زودیاک</option>
                     <option value="ارتش سری">سناریو: ارتش سری</option>
                 </select>
-                <!-- بخش جدید برای رمزگذاری -->
                 <div class="password-toggle-group">
                     <label for="private-lobby-toggle">لابی خصوصی (با رمز)</label>
                     <label class="switch">
@@ -572,7 +559,6 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        // [جدید] ایمپورت کردن getDoc
         import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, query, where, getDocs, deleteDoc, doc, orderBy, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -595,7 +581,6 @@
         const searchInput = document.getElementById('search-input');
         const createLobbyModal = document.getElementById('create-lobby-modal');
         const lobbyNameInput = document.getElementById('lobby-name-input');
-        // [جدید] گرفتن عنصر توضیحات
         const lobbyDescriptionInput = document.getElementById('lobby-description-input');
         const lobbyScenarioSelect = document.getElementById('lobby-scenario-select');
         const privateLobbyToggle = document.getElementById('private-lobby-toggle');
@@ -783,7 +768,7 @@
             ]);
         }
         
-        // [مهم] تابع رندر کارت با قابلیت نمایش توضیحات و آواتار
+        // [مهم] تابع رندر کارت با چیدمان جدید برای ادمین
         function renderLobbyCard(lobbyData, index) {
             const card = document.createElement('div');
             card.className = 'lobby-card';
@@ -794,32 +779,29 @@
             const canAdminDelete = currentUserIsAdmin && !isOwner;
             const isLobbyFull = (lobbyData.playerCount || 1) >= (lobbyData.maxPlayers || 12);
             const isPrivate = lobbyData.password && lobbyData.password.length > 0;
-            // آواتار پیش‌فرض در صورتی که کاربر آواتار نداشته باشد
             const creatorAvatar = lobbyData.creatorAvatarUrl || 'https://up.20script.ir/file/1d50-defult.png';
 
-            let actionButtonsHTML = '';
-            if (isOwner) {
-                actionButtonsHTML += `<button class="lobby-btn btn-delete" data-action="delete">حذف لابی</button>`;
-            } else if (canAdminDelete) {
-                actionButtonsHTML += `<button class="lobby-btn btn-admin-delete" data-action="admin-delete">بستن لابی</button>`;
-            }
-            
+            // دکمه اصلی کاربر (پیوستن یا لابی پر است)
+            let userActionHTML = '';
             if (isLobbyFull) {
-                actionButtonsHTML += `<button class="lobby-btn btn-join" disabled>لابی پر است</button>`;
+                userActionHTML = `<button class="lobby-btn btn-join" disabled>لابی پر است</button>`;
             } else {
-                actionButtonsHTML += `<button class="lobby-btn btn-join" data-action="join">پیوستن</button>`;
+                userActionHTML = `<button class="lobby-btn btn-join" data-action="join">پیوستن</button>`;
             }
             
+            // کنترل‌های ادمین (فقط در صورت ادمین بودن نمایش داده می‌شود)
             let adminControlsHTML = '';
-            if (currentUserIsAdmin && isPrivate) {
-                adminControlsHTML = `
-                    <div class="admin-password-container" data-action="edit-pass" title="تغییر رمز">
-                        <span class="admin-password-text">رمز: ${lobbyData.password}</span>
-                        <span class="admin-edit-icon">✏️</span>
-                    </div>`;
+            if (isOwner) {
+                adminControlsHTML += `<button class="admin-icon-btn" data-action="delete" title="حذف لابی خود">🗑️</button>`;
+            } else if (canAdminDelete) {
+                adminControlsHTML += `<button class="admin-icon-btn btn-icon-delete" data-action="admin-delete" title="بستن لابی توسط ادمین">🗑️</button>`;
             }
 
-            // [جدید] ساخت بخش توضیحات فقط در صورتی که وجود داشته باشد
+            if (currentUserIsAdmin && isPrivate) {
+                adminControlsHTML += `<span class="admin-password-text" title="رمز لابی">${lobbyData.password}</span>`;
+                adminControlsHTML += `<button class="admin-icon-btn" data-action="edit-pass" title="تغییر رمز">✏️</button>`;
+            }
+            
             const descriptionHTML = lobbyData.description ? `
                 <div class="lobby-card-body">
                     <p class="lobby-description">${lobbyData.description}</p>
@@ -841,14 +823,16 @@
                 </div>
                 ${descriptionHTML}
                 <div class="lobby-card-footer">
-                    <div class="creator-info">
-                        <img src="${creatorAvatar}" alt="آواتار سازنده" class="creator-avatar" onerror="this.src='https://up.20script.ir/file/1d50-defult.png';">
-                        <div class="creator-details">
-                            <span class="lobby-creator">سازنده: ${lobbyData.creatorName}</span>
-                            ${adminControlsHTML}
+                    <div class="footer-left">
+                        <div class="creator-info">
+                            <img src="${creatorAvatar}" alt="آواتار سازنده" class="creator-avatar" onerror="this.src='https://up.20script.ir/file/1d50-defult.png';">
+                            <div class="creator-details">
+                                <span class="lobby-creator">سازنده: ${lobbyData.creatorName}</span>
+                            </div>
                         </div>
+                        ${adminControlsHTML ? `<div class="admin-actions">${adminControlsHTML}</div>` : ''}
                     </div>
-                    <div class="lobby-actions">${actionButtonsHTML}</div>
+                    <div class="lobby-actions">${userActionHTML}</div>
                 </div>
             `;
             
@@ -968,7 +952,6 @@
             }
         }
         
-        // [مهم] تابع ساخت لابی با قابلیت ذخیره توضیحات و آواتار
         async function createLobby() {
             const lobbyName = lobbyNameInput.value.trim();
             const description = lobbyDescriptionInput.value.trim();
@@ -999,7 +982,6 @@
                 return;
             }
 
-            // [جدید] دریافت اطلاعات کاربر (شامل آواتار) قبل از ساخت لابی
             const userDocRef = doc(db, 'users', currentUser.uid);
             const userDocSnap = await getDoc(userDocRef);
             let creatorAvatarUrl = null;
@@ -1009,11 +991,11 @@
             
             const lobbyData = {
                 lobbyName: lobbyName,
-                description: description, // ذخیره توضیحات
+                description: description,
                 scenario: scenario,
                 creatorId: currentUser.uid,
                 creatorName: currentUser.displayName || 'کاربر ناشناس',
-                creatorAvatarUrl: creatorAvatarUrl, // ذخیره آواتار
+                creatorAvatarUrl: creatorAvatarUrl,
                 createdAt: serverTimestamp(),
                 playerCount: 1,
                 maxPlayers: 12
@@ -1027,7 +1009,7 @@
                 await addDoc(lobbiesRef, lobbyData);
                 hideModal(createLobbyModal);
                 lobbyNameInput.value = '';
-                lobbyDescriptionInput.value = ''; // خالی کردن فیلد توضیحات
+                lobbyDescriptionInput.value = '';
                 lobbyPasswordInput.value = '';
                 privateLobbyToggle.checked = false;
                 lobbyPasswordInput.style.display = 'none';
