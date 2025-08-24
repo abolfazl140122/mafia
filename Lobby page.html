@@ -276,7 +276,7 @@
         .player-count span { animation: pulse 2s infinite ease-in-out; }
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
         
-        /* [اصلاح شده] استایل برای بخش سازنده و کنترل‌های ادمین */
+        /* [جدید] استایل برای بخش سازنده (آواتار و نام) */
         .creator-info { display: flex; align-items: center; gap: 10px; }
         .creator-avatar {
             width: 40px;
@@ -289,7 +289,6 @@
         .creator-details { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
         .lobby-creator { font-size: 0.9rem; color: var(--text-secondary); }
         
-        /* [طراحی جدید] استایل کنترل‌های ادمین برای رمز */
         .admin-password-container {
             display: flex;
             align-items: center;
@@ -304,12 +303,12 @@
         }
         .admin-password-container:hover {
             background-color: var(--admin-edit-bg);
-            border-color: var(--admin-edit-border);
+            border-color: var(--primary-gold);
         }
         .admin-password-text {
             font-size: 0.8rem;
-            color: #f39c12; /* رنگ نارنجی برای تاکید */
-            font-family: monospace; /* فونت مناسب برای نمایش رمز */
+            color: #f39c12;
+            font-family: monospace;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -573,6 +572,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        // [جدید] ایمپورت کردن getDoc
         import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, query, where, getDocs, deleteDoc, doc, orderBy, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -595,6 +595,7 @@
         const searchInput = document.getElementById('search-input');
         const createLobbyModal = document.getElementById('create-lobby-modal');
         const lobbyNameInput = document.getElementById('lobby-name-input');
+        // [جدید] گرفتن عنصر توضیحات
         const lobbyDescriptionInput = document.getElementById('lobby-description-input');
         const lobbyScenarioSelect = document.getElementById('lobby-scenario-select');
         const privateLobbyToggle = document.getElementById('private-lobby-toggle');
@@ -782,7 +783,7 @@
             ]);
         }
         
-        // [مهم و اصلاح شده] تابع رندر کارت با چیدمان جدید برای ادمین
+        // [مهم] تابع رندر کارت با قابلیت نمایش توضیحات و آواتار
         function renderLobbyCard(lobbyData, index) {
             const card = document.createElement('div');
             card.className = 'lobby-card';
@@ -793,6 +794,7 @@
             const canAdminDelete = currentUserIsAdmin && !isOwner;
             const isLobbyFull = (lobbyData.playerCount || 1) >= (lobbyData.maxPlayers || 12);
             const isPrivate = lobbyData.password && lobbyData.password.length > 0;
+            // آواتار پیش‌فرض در صورتی که کاربر آواتار نداشته باشد
             const creatorAvatar = lobbyData.creatorAvatarUrl || 'https://up.20script.ir/file/1d50-defult.png';
 
             let actionButtonsHTML = '';
@@ -808,7 +810,6 @@
                 actionButtonsHTML += `<button class="lobby-btn btn-join" data-action="join">پیوستن</button>`;
             }
             
-            // [اصلاح شده] کنترل‌های ادمین در یک متغیر جداگانه تعریف می‌شوند
             let adminControlsHTML = '';
             if (currentUserIsAdmin && isPrivate) {
                 adminControlsHTML = `
@@ -818,13 +819,13 @@
                     </div>`;
             }
 
+            // [جدید] ساخت بخش توضیحات فقط در صورتی که وجود داشته باشد
             const descriptionHTML = lobbyData.description ? `
                 <div class="lobby-card-body">
                     <p class="lobby-description">${lobbyData.description}</p>
                 </div>
             ` : '';
 
-            // [اصلاح شده] در ساختار HTML، متغیر adminControlsHTML در جای درست قرار می‌گیرد
             card.innerHTML = `
                 <div class="lobby-card-header">
                     <div class="lobby-info">
@@ -844,7 +845,7 @@
                         <img src="${creatorAvatar}" alt="آواتار سازنده" class="creator-avatar" onerror="this.src='https://up.20script.ir/file/1d50-defult.png';">
                         <div class="creator-details">
                             <span class="lobby-creator">سازنده: ${lobbyData.creatorName}</span>
-                            ${adminControlsHTML} 
+                            ${adminControlsHTML}
                         </div>
                     </div>
                     <div class="lobby-actions">${actionButtonsHTML}</div>
@@ -967,6 +968,7 @@
             }
         }
         
+        // [مهم] تابع ساخت لابی با قابلیت ذخیره توضیحات و آواتار
         async function createLobby() {
             const lobbyName = lobbyNameInput.value.trim();
             const description = lobbyDescriptionInput.value.trim();
@@ -997,6 +999,7 @@
                 return;
             }
 
+            // [جدید] دریافت اطلاعات کاربر (شامل آواتار) قبل از ساخت لابی
             const userDocRef = doc(db, 'users', currentUser.uid);
             const userDocSnap = await getDoc(userDocRef);
             let creatorAvatarUrl = null;
@@ -1006,11 +1009,11 @@
             
             const lobbyData = {
                 lobbyName: lobbyName,
-                description: description, 
+                description: description, // ذخیره توضیحات
                 scenario: scenario,
                 creatorId: currentUser.uid,
                 creatorName: currentUser.displayName || 'کاربر ناشناس',
-                creatorAvatarUrl: creatorAvatarUrl, 
+                creatorAvatarUrl: creatorAvatarUrl, // ذخیره آواتار
                 createdAt: serverTimestamp(),
                 playerCount: 1,
                 maxPlayers: 12
@@ -1024,7 +1027,7 @@
                 await addDoc(lobbiesRef, lobbyData);
                 hideModal(createLobbyModal);
                 lobbyNameInput.value = '';
-                lobbyDescriptionInput.value = ''; 
+                lobbyDescriptionInput.value = ''; // خالی کردن فیلد توضیحات
                 lobbyPasswordInput.value = '';
                 privateLobbyToggle.checked = false;
                 lobbyPasswordInput.style.display = 'none';
