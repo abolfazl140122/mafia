@@ -367,84 +367,77 @@
             border: none;
         }
 
-        /* --- استایل‌های راهنمای دیالوگی --- */
-        #dialogue-guide-overlay {
+        /* --- استایل‌های راهنمای کاربری --- */
+        #tutorial-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             z-index: 2000;
-            background-color: rgba(0, 0, 0, 0.7);
-            display: flex;
-            justify-content: center;
-            align-items: flex-end; /* نمایش پنل در پایین صفحه */
-            padding: 20px;
             opacity: 0;
             visibility: hidden;
             transition: all 0.5s ease-in-out;
-            pointer-events: none; /* اجازه عبور کلیک */
+            pointer-events: none;
         }
 
-        #dialogue-guide-overlay.visible {
+        #tutorial-overlay.visible {
             opacity: 1;
             visibility: visible;
-            pointer-events: all; /* فعال کردن کلیک وقتی پنل دیده می‌شود */
+            pointer-events: all;
         }
 
-        #dialogue-guide-panel {
-            width: 100%;
-            max-width: 450px;
+        #tutorial-highlight-box {
+            position: absolute;
+            border-radius: 12px;
+            box-shadow: 0 0 0 200vmax rgba(0, 0, 0, 0.8);
+            border: 2px solid #ffc947;
+            pointer-events: none;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #tutorial-panel {
+            position: absolute;
+            width: 90%;
+            max-width: 320px;
             background: linear-gradient(145deg, #2c2217, #1a140e);
             border: 2px solid #a47d54;
             border-radius: 12px;
-            padding: 20px;
+            padding: 20px 25px;
             box-shadow: 0 8px 25px rgba(0,0,0,0.6);
-            display: flex;
-            align-items: center;
-            gap: 20px;
             opacity: 0;
-            transform: translateY(30px);
+            transform: translateY(20px) scale(0.95);
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: all;
         }
 
-        #dialogue-guide-overlay.visible #dialogue-guide-panel {
+        #tutorial-panel.visible {
             opacity: 1;
-            transform: translateY(0);
-        }
-        
-        #dialogue-guide-image {
-            width: 100px;
-            height: 100px;
-            object-fit: contain;
-            flex-shrink: 0;
-            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
-            transition: transform 0.3s ease;
+            transform: translateY(0) scale(1);
         }
 
-        .dialogue-content-wrapper {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            min-height: 100px;
+        #tutorial-title {
+            font-size: 1.3rem;
+            font-weight: 900;
+            color: #ffc947;
+            margin-bottom: 12px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
         }
-        
-        #dialogue-guide-text {
-            font-size: 1rem;
+
+        #tutorial-text {
+            font-size: 0.95rem;
             line-height: 1.7;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             min-height: 50px; /* برای جلوگیری از پرش در حین تایپ */
-            text-align: right;
         }
 
-        #dialogue-guide-text::after {
+        #tutorial-text::after {
             content: '|';
             animation: blink 0.7s infinite;
             font-weight: bold;
             color: #ffc947;
         }
-        #dialogue-guide-text.typing-done::after {
+        #tutorial-text.typing-done::after {
             content: '';
         }
 
@@ -452,13 +445,13 @@
             50% { opacity: 0; }
         }
 
-        .dialogue-button-container {
+        #tutorial-button-container {
             text-align: left;
         }
 
-        #dialogue-guide-next-btn {
-            padding: 8px 20px;
-            font-size: 0.9rem;
+        #tutorial-next-btn {
+            padding: 10px 25px;
+            font-size: 1rem;
             font-weight: 700;
             background: linear-gradient(145deg, #8c4843, #5a2c2a);
             border: 1px solid #ffc947;
@@ -471,16 +464,17 @@
             visibility: hidden;
         }
         
-        #dialogue-guide-next-btn:hover {
+        #tutorial-next-btn:hover {
              background: linear-gradient(145deg, #a1534d, #6b3431);
         }
 
-        #dialogue-guide-next-btn.visible {
+        #tutorial-next-btn.visible {
             opacity: 1;
             transform: translateY(0);
             visibility: visible;
             transition: all 0.4s ease 0.2s; /* تاخیر برای نمایش بعد از تایپ */
         }
+
 
     </style>
 </head>
@@ -765,15 +759,14 @@
         </div>
     </div>
 
-    <!-- المان‌های راهنمای دیالوگی -->
-    <div id="dialogue-guide-overlay">
-        <div id="dialogue-guide-panel">
-            <img id="dialogue-guide-image" src="" alt="راهنما">
-            <div class="dialogue-content-wrapper">
-                <p id="dialogue-guide-text"></p>
-                <div class="dialogue-button-container">
-                    <button id="dialogue-guide-next-btn"></button>
-                </div>
+    <!-- المان‌های راهنمای کاربری -->
+    <div id="tutorial-overlay">
+        <div id="tutorial-highlight-box"></div>
+        <div id="tutorial-panel">
+            <h3 id="tutorial-title"></h3>
+            <p id="tutorial-text"></p>
+            <div id="tutorial-button-container">
+                <button id="tutorial-next-btn"></button>
             </div>
         </div>
     </div>
@@ -782,7 +775,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, getDoc, onSnapshot, collection, getDocs, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, onSnapshot, collection, getDocs, updateDoc, query, orderBy, limit, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
@@ -888,11 +881,13 @@
         const particleCanvas = document.getElementById('particle-effect-canvas');
         const ctx = particleCanvas.getContext('2d');
 
-        // --- المان‌های راهنمای دیالوگی ---
-        const dialogueGuideOverlay = document.getElementById('dialogue-guide-overlay');
-        const dialogueGuideImage = document.getElementById('dialogue-guide-image');
-        const dialogueGuideText = document.getElementById('dialogue-guide-text');
-        const dialogueGuideNextBtn = document.getElementById('dialogue-guide-next-btn');
+        // --- المان‌های راهنمای کاربری ---
+        const tutorialOverlay = document.getElementById('tutorial-overlay');
+        const tutorialHighlightBox = document.getElementById('tutorial-highlight-box');
+        const tutorialPanel = document.getElementById('tutorial-panel');
+        const tutorialTitle = document.getElementById('tutorial-title');
+        const tutorialText = document.getElementById('tutorial-text');
+        const tutorialNextBtn = document.getElementById('tutorial-next-btn');
         
         // متغیرها
         const MUSIC_URL = "https://raw.githubusercontent.com/abolfazl140122/mafia/main/dark-music-249503.mp3";
@@ -991,17 +986,31 @@
         window.addEventListener('resize', () => { if(animationFrameId) { resizeCanvas(); initParticles(); } });
         function loadAndApplySettings() { const savedIntensity = localStorage.getItem(ANIMATION_INTENSITY_KEY); const intensity = savedIntensity !== null ? parseInt(savedIntensity, 10) : DEFAULT_ANIMATION_INTENSITY; animationIntensitySlider.value = intensity; animationIntensityValue.textContent = `${intensity}%`; applyAnimationSettings(intensity); const isEffectEnabled = localStorage.getItem(VISUAL_EFFECT_KEY) === 'true'; visualEffectToggle.checked = isEffectEnabled; if (isEffectEnabled) { startParticleEffect(); } else { stopParticleEffect(); } }
 
-        // --- توابع راهنمای دیالوگی ---
-        const DIALOGUE_GUIDE_SEEN_HASHES_KEY = 'mafia-dialogue-seen-hashes';
-        let dialoguesFromServer = [];
-        let currentDialogueIndex = -1;
+        // --- توابع راهنمای کاربری ---
+        const TUTORIAL_COMPLETED_KEY = 'mafia-tutorial-completed';
+        let currentTutorialStep = -1;
 
-        // یک شناسه منحصر به فرد بر اساس محتوای دیالوگ می سازد
-        function createDialogueHash(dialogue) {
-            if (!dialogue || !dialogue.text || !dialogue.imageUrl) return null;
-            return dialogue.text.trim() + '||' + dialogue.imageUrl.trim();
-        }
-        
+        const tutorialSteps = [
+            {
+                element: '.profile-section',
+                title: 'به شهر مافیا خوش آمدی!',
+                text: 'اینجا بخش پروفایل توست. با کلیک روی آواتارت، می‌تونی به پروفایل کامل، فروشگاه و تنظیمات دسترسی پیدا کنی.',
+                position: 'bottom-right'
+            },
+            {
+                element: '.menu-buttons',
+                title: 'منوی اصلی',
+                text: 'از این دکمه‌ها برای دیدن رده‌بندی بازیکنان، سازندگان بازی و (اگر مدیر باشی) پنل مدیریت استفاده کن.',
+                position: 'bottom-right'
+            },
+            {
+                element: '#start-game-button',
+                title: 'شروع ماجراجویی',
+                text: 'و اما دکمه اصلی! با زدن این دکمه، وارد لابی می‌شی و می‌تونی بازی رو شروع کنی. آماده‌ای؟',
+                position: 'top-center'
+            }
+        ];
+
         function typeWriterEffect(element, text, callback) {
             let i = 0;
             element.innerHTML = '';
@@ -1018,83 +1027,120 @@
             }, 40);
         }
 
-        function showDialogueStep(index) {
-            if (index >= dialoguesFromServer.length) {
-                hideDialogueGuide();
+        function showTutorialStep(stepIndex) {
+            if (stepIndex >= tutorialSteps.length) {
+                endTutorial();
                 return;
             }
-            const dialogue = dialoguesFromServer[index];
 
-            // انیمیشن کوچک برای تعویض عکس
-            dialogueGuideImage.style.transform = 'scale(0.9)';
+            const step = tutorialSteps[stepIndex];
+            const targetElement = document.querySelector(step.element);
+
+            if (!targetElement) {
+                showTutorialStep(stepIndex + 1);
+                return;
+            }
             
+            tutorialPanel.classList.remove('visible');
+            tutorialNextBtn.classList.remove('visible');
+
             setTimeout(() => {
-                dialogueGuideImage.src = dialogue.imageUrl;
-                dialogueGuideImage.style.transform = 'scale(1)';
-            }, 150);
-            
-            dialogueGuideNextBtn.classList.remove('visible');
-            typeWriterEffect(dialogueGuideText, dialogue.text, () => {
-                dialogueGuideNextBtn.textContent = (index === dialoguesFromServer.length - 1) ? 'فهمیدم!' : 'بعدی';
-                dialogueGuideNextBtn.classList.add('visible');
-            });
-
-            dialogueGuideOverlay.classList.add('visible');
-        }
-
-        function hideDialogueGuide() {
-            dialogueGuideOverlay.classList.remove('visible');
-        }
-        
-        async function checkAndShowDialogueGuide() {
-            try {
-                const guideDocRef = doc(db, 'settings', 'dialogueGuide');
-                const docSnap = await getDoc(guideDocRef);
-
-                if (!docSnap.exists() || !docSnap.data().dialogues || docSnap.data().dialogues.length === 0) {
-                    return; 
-                }
-
-                // [بهبود] فیلتر کردن دیالوگ های ناقص
-                const validDialogues = docSnap.data().dialogues.filter(d => d.text && d.imageUrl);
-                if (validDialogues.length === 0) return;
+                const targetRect = targetElement.getBoundingClientRect();
+                const padding = 10;
                 
-                dialoguesFromServer = validDialogues;
-
-                const seenHashes = JSON.parse(localStorage.getItem(DIALOGUE_GUIDE_SEEN_HASHES_KEY)) || [];
+                tutorialHighlightBox.style.width = (targetRect.width + padding) + 'px';
+                tutorialHighlightBox.style.height = (targetRect.height + padding) + 'px';
+                tutorialHighlightBox.style.top = (targetRect.top - padding / 2) + 'px';
+                tutorialHighlightBox.style.left = (targetRect.left - padding / 2) + 'px';
                 
-                const firstUnseenIndex = dialoguesFromServer.findIndex(dialogue => {
-                    const currentHash = createDialogueHash(dialogue);
-                    return !seenHashes.includes(currentHash);
+                tutorialTitle.textContent = step.title;
+                
+                typeWriterEffect(tutorialText, step.text, () => {
+                    tutorialNextBtn.textContent = (stepIndex === tutorialSteps.length - 1) ? 'پایان آموزش' : 'بعدی';
+                    tutorialNextBtn.classList.add('visible');
                 });
                 
-                if (firstUnseenIndex !== -1) {
-                    currentDialogueIndex = firstUnseenIndex;
-                    setTimeout(() => showDialogueStep(currentDialogueIndex), 1200); // تاخیر برای نمایش بهتر
+                // --- Improved Positioning Logic ---
+                const panel = tutorialPanel;
+                // Temporarily make it visible but off-screen to measure its actual dimensions
+                panel.style.visibility = 'hidden';
+                panel.style.display = 'block';
+                const panelRect = panel.getBoundingClientRect();
+                panel.style.visibility = '';
+                panel.style.display = '';
+
+                const margin = 20;
+                const edgePadding = 10;
+                const vw = window.innerWidth;
+                const vh = window.innerHeight;
+
+                let top, left;
+
+                // Calculate initial desired position based on the step's preference
+                switch (step.position) {
+                    case 'top-center':
+                        top = targetRect.top - panelRect.height - margin;
+                        left = targetRect.left + targetRect.width / 2 - panelRect.width / 2;
+                        break;
+                    case 'bottom-right':
+                        top = targetRect.bottom + margin;
+                        left = targetRect.right - panelRect.width;
+                        break;
+                    default: // bottom-center
+                        top = targetRect.bottom + margin;
+                        left = targetRect.left + targetRect.width / 2 - panelRect.width / 2;
+                        break;
                 }
 
-            } catch (error) {
-                console.error("خطا در دریافت راهنمای دیالوگی:", error);
-            }
+                // --- Vertical Correction ---
+                // If it overflows the bottom, try to place it on top
+                if (top + panelRect.height > vh - edgePadding) {
+                    let newTop = targetRect.top - panelRect.height - margin;
+                    // If it fits on top, use that position. Otherwise, clamp it to the bottom edge.
+                    top = (newTop >= edgePadding) ? newTop : (vh - panelRect.height - edgePadding);
+                }
+                
+                // If it overflows the top, try to place it at the bottom
+                if (top < edgePadding) {
+                    let newTop = targetRect.bottom + margin;
+                    // If it fits at the bottom, use that position. Otherwise, clamp it to the top edge.
+                    top = (newTop + panelRect.height <= vh - edgePadding) ? newTop : edgePadding;
+                }
+                
+                // --- Horizontal Correction ---
+                if (left < edgePadding) {
+                    left = edgePadding;
+                }
+                if (left + panelRect.width > vw - edgePadding) {
+                    left = vw - panelRect.width - edgePadding;
+                }
+                
+                // Apply the final, safe coordinates
+                panel.style.top = `${top}px`;
+                panel.style.left = `${left}px`;
+                
+                panel.classList.add('visible');
+            }, 400);
+
+            currentTutorialStep = stepIndex;
         }
 
-        dialogueGuideNextBtn.addEventListener('click', () => {
-            if (currentDialogueIndex < 0 || currentDialogueIndex >= dialoguesFromServer.length) return;
+        function startTutorial() {
+            tutorialOverlay.classList.add('visible');
+            showTutorialStep(0);
+        }
 
-            const currentDialogue = dialoguesFromServer[currentDialogueIndex];
-            const currentHash = createDialogueHash(currentDialogue);
+        function endTutorial() {
+            tutorialOverlay.classList.remove('visible');
+            localStorage.setItem(TUTORIAL_COMPLETED_KEY, 'true');
+        }
 
-            let seenHashes = JSON.parse(localStorage.getItem(DIALOGUE_GUIDE_SEEN_HASHES_KEY)) || [];
-            if (currentHash && !seenHashes.includes(currentHash)) {
-                seenHashes.push(currentHash);
-                localStorage.setItem(DIALOGUE_GUIDE_SEEN_HASHES_KEY, JSON.stringify(seenHashes));
-            }
-
-            currentDialogueIndex++;
-            showDialogueStep(currentDialogueIndex);
+        tutorialNextBtn.addEventListener('click', () => {
+            showTutorialStep(currentTutorialStep + 1);
         });
 
         // --- سایر توابع (مدیریت، رده‌بندی و ...) ---
+        // (این توابع بدون تغییر باقی می‌مانند)
         async function loadAndShowUserList() { if (!(await verifyAdminStatus())) return; userListContainer.innerHTML = '<p style="padding: 20px;">در حال بارگذاری لیست کاربران...</p>'; userSearchInput.value = ''; hideModal(adminPanelOverlay); showModal(userListModalOverlay); try { const usersCollection = collection(db, "users"); const querySnapshot = await getDocs(usersCollection); userListContainer.innerHTML = ''; if (querySnapshot.empty) { userListContainer.innerHTML = '<p style="padding: 20px;">هیچ کاربری یافت نشد.</p>'; return; } querySnapshot.forEach(doc => { const userData = doc.data(); const userElement = document.createElement('div'); userElement.classList.add('user-list-item'); userElement.dataset.uid = doc.id; userElement.innerHTML = ` <div class="user-info"> <img src="${userData.avatarUrl || DEFAULT_AVATAR}" alt="avatar"> <div class="user-details"> <span class="name">${userData.displayName || 'بدون نام'}</span> <span class="email">${userData.email || 'بدون ایمیل'}</span> </div> </div> <span class="edit-user-icon">${EDIT_ICON_SVG}</span> `; userListContainer.appendChild(userElement); }); } catch (error) { console.error("خطا در دریافت لیست کاربران: ", error); userListContainer.innerHTML = '<p style="padding: 20px;">خطا در بارگذاری اطلاعات. لطفا دوباره تلاش کنید.</p>'; } }
         async function openEditModalForUser(uid) { if (!(await verifyAdminStatus())) return; try { const userDocRef = doc(db, 'users', uid); const docSnap = await getDoc(userDocRef); if (docSnap.exists()) { const userData = docSnap.data(); editUserNamePreview.textContent = userData.displayName || 'کاربر'; editUserAvatarPreview.src = userData.avatarUrl || DEFAULT_AVATAR; editUserUid.value = uid; editDisplayName.value = userData.displayName || ''; editUserAge.value = userData.old || ''; editUserDiamonds.value = userData.game || 0; hideModal(userListModalOverlay); showModal(editUserModalOverlay); } else { showCustomAlert("کاربر مورد نظر یافت نشد."); } } catch (error) { console.error("خطا در دریافت اطلاعات کاربر برای ویرایش:", error); showCustomAlert("خطا در دریافت اطلاعات کاربر."); } }
         async function handleSaveChanges(e) { e.preventDefault(); if (!(await verifyAdminStatus())) return; const uid = editUserUid.value; const newDisplayName = editDisplayName.value; const newAge = parseInt(editUserAge.value, 10); const newDiamonds = parseInt(editUserDiamonds.value, 10); if (!uid) { showCustomAlert("خطای سیستمی: شناسه کاربر موجود نیست."); return; } if (isNaN(newAge) || isNaN(newDiamonds)) { showCustomAlert("لطفا مقادیر معتبر برای سن و الماس وارد کنید."); return; } saveUserChangesBtn.disabled = true; saveUserChangesBtn.textContent = 'در حال ذخیره...'; try { const userDocRef = doc(db, 'users', uid); await updateDoc(userDocRef, { displayName: newDisplayName, old: newAge, game: newDiamonds }); hideModal(editUserModalOverlay); showCustomAlert("تغییرات با موفقیت ذخیره شد.", async () => { await loadAndShowUserList(); }); } catch (error) { console.error("خطا در بروزرسانی اطلاعات کاربر:", error); showCustomAlert("خطا در ذخیره تغییرات. لطفا دوباره تلاش کنید."); } finally { saveUserChangesBtn.disabled = false; saveUserChangesBtn.textContent = 'ذخیره تغییرات'; } }
@@ -1135,7 +1181,10 @@
                         loadAndApplySettings();
                         isInitialLoad = false;
                         
-                        checkAndShowDialogueGuide();
+                        // بررسی و شروع راهنمای کاربری
+                        if (!localStorage.getItem(TUTORIAL_COMPLETED_KEY)) {
+                            setTimeout(startTutorial, 1000); // تاخیر برای اطمینان از بارگذاری کامل صفحه
+                        }
                     }
                 }, (error) => {
                     console.error("خطا در گوش دادن به اطلاعات کاربر:", error);
