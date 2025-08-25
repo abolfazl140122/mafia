@@ -367,7 +367,7 @@
             border: none;
         }
 
-        /* --- استایل‌های راهنمای کاربری --- */
+        /* --- استایل‌های راهنمای کاربری (هایلایت) --- */
         #tutorial-overlay {
             position: fixed;
             top: 0;
@@ -475,19 +475,19 @@
             transition: all 0.4s ease 0.2s; /* تاخیر برای نمایش بعد از تایپ */
         }
         
-        /* --- استایل‌های راهنمای دیالوگ --- */
+        /* --- [جدید] استایل‌های راهنمای دیالوگ سرور-محور --- */
         #dialogue-guide-overlay {
             z-index: 1999;
             background-color: transparent;
             backdrop-filter: none;
             pointer-events: none;
-            display: flex; /* تغییر از کد قبلی */
+            display: flex;
             flex-direction: column;
             justify-content: flex-end;
             align-items: center;
             padding: 20px;
             box-sizing: border-box;
-            overflow: hidden; /* جلوگیری از سرریز شدن کاراکتر */
+            overflow: hidden;
         }
 
         #dialogue-guide-overlay.visible {
@@ -496,15 +496,15 @@
 
         #dialogue-guide-character-container {
             position: absolute;
-            bottom: 10px; /* فاصله از پایین صفحه */
-            left: 20px; /* فاصله از چپ صفحه */
-            width: 150px; /* عرض ثابت برای کاراکتر */
+            bottom: 10px;
+            left: 20px;
+            width: 150px;
             height: auto;
-            z-index: 3; /* [مهم] بالاتر از پنل دیالوگ قرار می‌گیرد */
+            z-index: 3;
             transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.5s ease;
             transform-origin: bottom center;
             opacity: 0;
-            transform: translateY(30%); /* انیمیشن ورود از پایین */
+            transform: translateY(30%);
         }
 
         #dialogue-guide-overlay.visible #dialogue-guide-character-container {
@@ -520,27 +520,25 @@
         }
 
         #dialogue-guide-box {
-            width: 100%; /* تمام عرض والد */
+            width: 100%;
             max-width: 500px;
             background: linear-gradient(145deg, #2c2217, #1a140e);
             border: 2px solid #a47d54;
             border-radius: 16px;
-            /* [مهم] پدینگ چپ برای ایجاد فضا برای کاراکتر */
             padding: 20px 25px 20px 170px; 
             box-shadow: 0 8px 25px rgba(0,0,0,0.6);
             position: relative;
-            z-index: 2; /* پایین‌تر از کاراکتر */
+            z-index: 2;
             text-align: right;
             opacity: 0;
             transform: translateY(30px);
             transition: opacity 0.5s ease 0.2s, transform 0.5s ease 0.2s;
-            min-height: 140px; /* حداقل ارتفاع برای زیبایی بیشتر */
+            min-height: 140px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
         }
         
-        /* استایل ریسپانسیو برای موبایل های کوچکتر */
         @media (max-width: 480px) {
             #dialogue-guide-character-container {
                 width: 120px;
@@ -548,7 +546,7 @@
             }
             #dialogue-guide-box {
                 padding-right: 20px;
-                padding-left: 140px; /* پدینگ کمتر */
+                padding-left: 140px;
             }
         }
 
@@ -564,7 +562,7 @@
             min-height: 50px;
         }
         
-        #dialogue-guide-next-btn {
+        #dialogue-guide-button {
             padding: 10px 30px;
             font-size: 1rem;
             font-weight: 700;
@@ -576,13 +574,13 @@
             transition: all 0.2s ease;
             opacity: 0;
             visibility: hidden;
-            float: left; /* دکمه در سمت چپ قرار می‌گیرد */
-            align-self: flex-start; /* برای چیدمان بهتر در فلکس */
+            float: left;
+            align-self: flex-start;
         }
-        #dialogue-guide-next-btn:hover {
+        #dialogue-guide-button:hover {
              background: linear-gradient(145deg, #a1534d, #6b3431);
         }
-        #dialogue-guide-next-btn.visible {
+        #dialogue-guide-button.visible {
             opacity: 1;
             visibility: visible;
             transition: opacity 0.4s ease 0.2s;
@@ -872,7 +870,7 @@
         </div>
     </div>
 
-    <!-- المان‌های راهنمای کاربری -->
+    <!-- المان‌های راهنمای کاربری (هایلایت) -->
     <div id="tutorial-overlay">
         <div id="tutorial-highlight-box"></div>
         <div id="tutorial-panel">
@@ -884,14 +882,14 @@
         </div>
     </div>
 
-    <!-- راهنمای دیالوگ سرور-محور -->
+    <!-- [جدید] راهنمای دیالوگ سرور-محور -->
     <div id="dialogue-guide-overlay" class="modal-overlay">
         <div id="dialogue-guide-character-container">
             <img id="dialogue-guide-character-img" src="" alt="راهنما">
         </div>
         <div id="dialogue-guide-box">
             <p id="dialogue-guide-text" class="typing-text"></p>
-            <button id="dialogue-guide-next-btn">ادامه</button>
+            <button id="dialogue-guide-button">ادامه</button>
         </div>
     </div>
 
@@ -1013,9 +1011,9 @@
         const dialogueGuideOverlay = document.getElementById('dialogue-guide-overlay');
         const dialogueGuideCharacterImg = document.getElementById('dialogue-guide-character-img');
         const dialogueGuideText = document.getElementById('dialogue-guide-text');
-        const dialogueGuideNextBtn = document.getElementById('dialogue-guide-next-btn');
+        const dialogueGuideButton = document.getElementById('dialogue-guide-button');
 
-        // --- متغیرها ---
+        // متغیرها
         const MUSIC_URL = "https://raw.githubusercontent.com/abolfazl140122/mafia/main/dark-music-249503.mp3";
         const MUSIC_CACHE_NAME = 'mafia-music-cache-v1';
         const MUSIC_VERSION_KEY = 'mafia-music-version';
@@ -1028,12 +1026,8 @@
         let isInitialLoad = true;
         let currentUserData = null;
         let rankingListenerUnsubscribe = null;
-        
-        // متغیرهای شنونده‌های اصلی
-        let userUnsubscribe = null;
-        let dialogueUnsubscribe = null;
-        let maintenanceUnsubscribe = null;
-        let gameModesUnsubscribe = null;
+        let dialogueListenerUnsubscribe = null;
+        let currentActiveDialogueId = null; // [جدید] برای نگهداری شناسه دیالوگ فعلی
 
         // --- توابع عمومی ---
         function showModal(modalElement) { modalElement.classList.add('visible'); }
@@ -1135,10 +1129,63 @@
             }, 40);
         }
 
-        // --- توابع راهنمای کاربری (UI) ---
+        // --- [جدید] سیستم راهنمای Real-time و تک مرحله‌ای ---
+        function initializeDialogueListener() {
+            if (dialogueListenerUnsubscribe) dialogueListenerUnsubscribe();
+
+            const dialogueDocRef = doc(db, 'settings', 'activeDialogue');
+            dialogueListenerUnsubscribe = onSnapshot(dialogueDocRef, (docSnap) => {
+                if (!auth.currentUser || !currentUserData) return;
+
+                if (docSnap.exists()) {
+                    const serverDialogue = docSnap.data();
+                    const userLastSeenId = currentUserData.lastSeenDialogueId || null;
+
+                    // اگر دیالوگ فعال است و کاربر آن را ندیده، نمایش بده
+                    if (serverDialogue.isActive && serverDialogue.id !== userLastSeenId) {
+                        showActiveDialogue(serverDialogue);
+                    } else {
+                        // اگر دیالوگ غیرفعال است، مطمئن شو که بسته است
+                        hideModal(dialogueGuideOverlay);
+                    }
+                } else {
+                    // اگر داکیومنت دیالوگ اصلا وجود ندارد، آن را ببند
+                    hideModal(dialogueGuideOverlay);
+                }
+            }, (error) => {
+                console.error("خطا در شنونده دیالوگ:", error);
+            });
+        }
+
+        function showActiveDialogue(dialogueData) {
+            // اطمینان از بسته بودن سایر پنل ها
+            hideAllAdminModals();
+            hideModal(avatarMenuOverlay);
+            hideModal(profileModalOverlay);
+            hideModal(gameModeModalOverlay);
+            
+            currentActiveDialogueId = dialogueData.id;
+            
+            dialogueGuideButton.classList.remove('visible');
+            dialogueGuideCharacterImg.src = dialogueData.imageUrl || '';
+            dialogueGuideButton.textContent = dialogueData.buttonText || 'ادامه';
+
+            typeWriterEffect(dialogueGuideText, dialogueData.text, () => {
+                 dialogueGuideButton.classList.add('visible');
+            });
+
+            showModal(dialogueGuideOverlay);
+        }
+
+        // --- توابع راهنمای کاربری (هایلایت UI) ---
         const TUTORIAL_COMPLETED_KEY = 'mafia-tutorial-completed';
         let currentTutorialStep = -1;
-        const tutorialSteps = [ { element: '.profile-section', title: 'به شهر مافیا خوش آمدی!', text: 'اینجا بخش پروفایل توست. با کلیک روی آواتارت، می‌تونی به پروفایل کامل، فروشگاه و تنظیمات دسترسی پیدا کنی.', position: 'bottom-right' }, { element: '.menu-buttons', title: 'منوی اصلی', text: 'از این دکمه‌ها برای دیدن رده‌بندی بازیکنان، سازندگان بازی و (اگر مدیر باشی) پنل مدیریت استفاده کن.', position: 'bottom-right' }, { element: '#start-game-button', title: 'شروع ماجراجویی', text: 'و اما دکمه اصلی! با زدن این دکمه، وارد لابی می‌شی و می‌تونی بازی رو شروع کنی. آماده‌ای؟', position: 'top-center' } ];
+        const tutorialSteps = [
+            { element: '.profile-section', title: 'به شهر مافیا خوش آمدی!', text: 'اینجا بخش پروفایل توست. با کلیک روی آواتارت، می‌تونی به پروفایل کامل، فروشگاه و تنظیمات دسترسی پیدا کنی.', position: 'bottom-right' },
+            { element: '.menu-buttons', title: 'منوی اصلی', text: 'از این دکمه‌ها برای دیدن رده‌بندی بازیکنان، سازندگان بازی و (اگر مدیر باشی) پنل مدیریت استفاده کن.', position: 'bottom-right' },
+            { element: '#start-game-button', title: 'شروع ماجراجویی', text: 'و اما دکمه اصلی! با زدن این دکمه، وارد لابی می‌شی و می‌تونی بازی رو شروع کنی. آماده‌ای؟', position: 'top-center' }
+        ];
+
         function showTutorialStep(stepIndex) {
             if (stepIndex >= tutorialSteps.length) { endTutorial(); return; }
             const step = tutorialSteps[stepIndex];
@@ -1154,61 +1201,31 @@
                 tutorialHighlightBox.style.top = (targetRect.top - padding / 2) + 'px';
                 tutorialHighlightBox.style.left = (targetRect.left - padding / 2) + 'px';
                 tutorialTitle.textContent = step.title;
-                typeWriterEffect(tutorialText, step.text, () => { tutorialNextBtn.textContent = (stepIndex === tutorialSteps.length - 1) ? 'پایان آموزش' : 'بعدی'; tutorialNextBtn.classList.add('visible'); });
+                typeWriterEffect(tutorialText, step.text, () => {
+                    tutorialNextBtn.textContent = (stepIndex === tutorialSteps.length - 1) ? 'پایان آموزش' : 'بعدی';
+                    tutorialNextBtn.classList.add('visible');
+                });
                 const panel = tutorialPanel;
-                panel.style.visibility = 'hidden';
-                panel.style.display = 'block';
-                const panelRect = panel.getBoundingClientRect();
-                panel.style.visibility = '';
-                panel.style.display = '';
-                const margin = 20; const edgePadding = 10; const vw = window.innerWidth; const vh = window.innerHeight;
+                panel.style.visibility = 'hidden'; panel.style.display = 'block'; const panelRect = panel.getBoundingClientRect(); panel.style.visibility = ''; panel.style.display = '';
+                const margin = 20, edgePadding = 10, vw = window.innerWidth, vh = window.innerHeight;
                 let top, left;
-                switch (step.position) { case 'top-center': top = targetRect.top - panelRect.height - margin; left = targetRect.left + targetRect.width / 2 - panelRect.width / 2; break; case 'bottom-right': top = targetRect.bottom + margin; left = targetRect.right - panelRect.width; break; default: top = targetRect.bottom + margin; left = targetRect.left + targetRect.width / 2 - panelRect.width / 2; break; }
+                switch (step.position) {
+                    case 'top-center': top = targetRect.top - panelRect.height - margin; left = targetRect.left + targetRect.width / 2 - panelRect.width / 2; break;
+                    case 'bottom-right': top = targetRect.bottom + margin; left = targetRect.right - panelRect.width; break;
+                    default: top = targetRect.bottom + margin; left = targetRect.left + targetRect.width / 2 - panelRect.width / 2; break;
+                }
                 if (top + panelRect.height > vh - edgePadding) { let newTop = targetRect.top - panelRect.height - margin; top = (newTop >= edgePadding) ? newTop : (vh - panelRect.height - edgePadding); }
                 if (top < edgePadding) { let newTop = targetRect.bottom + margin; top = (newTop + panelRect.height <= vh - edgePadding) ? newTop : edgePadding; }
-                if (left < edgePadding) { left = edgePadding; }
-                if (left + panelRect.width > vw - edgePadding) { left = vw - panelRect.width - edgePadding; }
-                panel.style.top = `${top}px`;
-                panel.style.left = `${left}px`;
+                if (left < edgePadding) left = edgePadding;
+                if (left + panelRect.width > vw - edgePadding) left = vw - panelRect.width - edgePadding;
+                panel.style.top = `${top}px`; panel.style.left = `${left}px`;
                 panel.classList.add('visible');
             }, 400);
             currentTutorialStep = stepIndex;
         }
         function startTutorial() { tutorialOverlay.classList.add('visible'); showTutorialStep(0); }
         function endTutorial() { tutorialOverlay.classList.remove('visible'); localStorage.setItem(TUTORIAL_COMPLETED_KEY, 'true'); }
-        
-        // --- توابع راهنمای دیالوگ ---
-        let dialogueGuideSteps = [];
-        let currentDialogueStep = -1;
-        let currentDialogueId = null;
-        function showDialogueStep(stepIndex) {
-            if (stepIndex >= dialogueGuideSteps.length) { endDialogueGuide(); return; }
-            currentDialogueStep = stepIndex;
-            const step = dialogueGuideSteps[stepIndex];
-            dialogueGuideNextBtn.classList.remove('visible');
-            dialogueGuideCharacterImg.src = step.imageUrl || '';
-            typeWriterEffect(dialogueGuideText, step.text, () => { dialogueGuideNextBtn.classList.add('visible'); });
-            showModal(dialogueGuideOverlay);
-        }
-        function startDialogueGuide() {
-            hideAllAdminModals();
-            hideModal(avatarMenuOverlay);
-            hideModal(profileModalOverlay);
-            hideModal(gameModeModalOverlay);
-            showDialogueStep(0);
-        }
-        async function endDialogueGuide() {
-            hideModal(dialogueGuideOverlay);
-            if (auth.currentUser && currentDialogueId) {
-                try {
-                    const userDocRef = doc(db, 'users', auth.currentUser.uid);
-                    await updateDoc(userDocRef, { lastSeenDialogueId: currentDialogueId });
-                } catch (error) { console.error("خطا در آپدیت شناسه دیالوگ کاربر:", error); }
-            }
-            if (!localStorage.getItem(TUTORIAL_COMPLETED_KEY)) {
-                setTimeout(startTutorial, 500);
-            }
-        }
+
 
         // --- سایر توابع (مدیریت، رده‌بندی و ...) ---
         async function loadAndShowUserList() { if (!(await verifyAdminStatus())) return; userListContainer.innerHTML = '<p style="padding: 20px;">در حال بارگذاری لیست کاربران...</p>'; userSearchInput.value = ''; hideModal(adminPanelOverlay); showModal(userListModalOverlay); try { const usersCollection = collection(db, "users"); const querySnapshot = await getDocs(usersCollection); userListContainer.innerHTML = ''; if (querySnapshot.empty) { userListContainer.innerHTML = '<p style="padding: 20px;">هیچ کاربری یافت نشد.</p>'; return; } querySnapshot.forEach(doc => { const userData = doc.data(); const userElement = document.createElement('div'); userElement.classList.add('user-list-item'); userElement.dataset.uid = doc.id; userElement.innerHTML = ` <div class="user-info"> <img src="${userData.avatarUrl || DEFAULT_AVATAR}" alt="avatar"> <div class="user-details"> <span class="name">${userData.displayName || 'بدون نام'}</span> <span class="email">${userData.email || 'بدون ایمیل'}</span> </div> </div> <span class="edit-user-icon">${EDIT_ICON_SVG}</span> `; userListContainer.appendChild(userElement); }); } catch (error) { console.error("خطا در دریافت لیست کاربران: ", error); userListContainer.innerHTML = '<p style="padding: 20px;">خطا در بارگذاری اطلاعات. لطفا دوباره تلاش کنید.</p>'; } }
@@ -1229,96 +1246,44 @@
         function clearNameCheckResult() { nameCheckResultContainer.classList.remove('error'); nameCheckResultContainer.innerHTML = ''; }
         async function handleNameChange(e) { e.preventDefault(); if (!auth.currentUser || !currentUserData) return; const newName = newDisplayNameInput.value.trim(); clearNameCheckResult(); if (newName.length < 3 || newName.length > 15) { showNameCheckError("نام باید بین ۳ تا ۱۵ کاراکتر باشد."); return; } if (newName === currentUserData.displayName) { showNameCheckError("این نام در حال حاضر نام شماست."); return; } const validNameRegex = /^[a-zA-Z0-9_.\u0600-\u06FF\s]+$/; if (!validNameRegex.test(newName)) { showNameCheckError("نام شامل کاراکترهای غیرمجاز است."); return; } saveNewNameBtn.disabled = true; saveNewNameBtn.textContent = 'در حال بررسی...'; try { const usersRef = collection(db, "users"); const q = query(usersRef, where("displayName", "==", newName)); const querySnapshot = await getDocs(q); if (querySnapshot.empty) { saveNewNameBtn.textContent = 'در حال ذخیره...'; const userDocRef = doc(db, 'users', auth.currentUser.uid); await updateDoc(userDocRef, { displayName: newName }); hideModal(changeNameOverlay); showCustomAlert("نام شما با موفقیت تغییر کرد."); } else { const existingUserData = querySnapshot.docs[0].data(); nameCheckResultContainer.classList.add('error'); nameCheckResultContainer.innerHTML = `<div class="user-exists-info"><p class="error-message" style="margin-bottom: 10px;">این نام قبلاً ثبت شده و متعلق به کاربر زیر است:</p><img src="${existingUserData.avatarUrl || DEFAULT_AVATAR}" alt="avatar"><span class="name">${existingUserData.displayName}</span></div>`; } } catch (error) { console.error("خطا در تغییر نام:", error); showNameCheckError("خطا در ارتباط با سرور. لطفا دوباره تلاش کنید."); } finally { saveNewNameBtn.disabled = false; saveNewNameBtn.textContent = 'ذخیره تغییرات'; } }
 
-        // --- [جدید و اصلاح شده] منطق اصلی و احراز هویت ---
+        // --- منطق اصلی و احراز هویت ---
         onAuthStateChanged(auth, (user) => {
-            // اگر کاربر از سیستم خارج شد، تمام شنونده‌ها را پاک کرده و به صفحه لاگین هدایت کن
-            if (!user) {
-                if (userUnsubscribe) userUnsubscribe();
-                if (dialogueUnsubscribe) dialogueUnsubscribe();
-                if (maintenanceUnsubscribe) maintenanceUnsubscribe();
-                if (gameModesUnsubscribe) gameModesUnsubscribe();
-                window.location.href = './login.html';
-                return;
-            }
-
-            // پاک کردن شنونده‌های قبلی برای جلوگیری از اجرای چندباره در صورت تغییر کاربر
-            if (userUnsubscribe) userUnsubscribe();
-            if (dialogueUnsubscribe) dialogueUnsubscribe();
-
-            // 1. شنونده اطلاعات کاربر: وظیفه اصلی این بخش، به‌روز نگه داشتن اطلاعات کاربر است
-            const userDocRef = doc(db, 'users', user.uid);
-            userUnsubscribe = onSnapshot(userDocRef, (userDocSnap) => {
-                if (userDocSnap.exists()) {
-                    currentUserData = userDocSnap.data();
-                    userDisplayName.textContent = currentUserData.displayName || "کاربر ناشناس";
-                    userAvatar.src = currentUserData.avatarUrl || DEFAULT_AVATAR;
-                    adminPanelButton.style.display = currentUserData.isAdmin === true ? 'block' : 'none';
-                } else {
-                    // مدیریت حالتی که داکیومنت کاربر هنوز ساخته نشده
-                    currentUserData = { email: user.email, displayName: user.displayName };
-                    userDisplayName.textContent = user.displayName || "کاربر ناشناس";
-                    userAvatar.src = DEFAULT_AVATAR;
-                    adminPanelButton.style.display = 'none';
-                }
-
-                // اجرای عملیات اولیه فقط یک بار پس از بارگذاری اطلاعات کاربر
-                if (isInitialLoad) {
-                    document.body.classList.add('loaded');
-                    handleBackgroundMusic();
-                    loadAndApplySettings();
-                    isInitialLoad = false;
-                    // بررسی راهنمای UI بعد از اتمام دیالوگ انجام می‌شود
-                }
-            }, (error) => {
-                console.error("خطا در گوش دادن به اطلاعات کاربر:", error);
-                loaderSpinner.style.display = 'none';
-                loadingText.textContent = 'خطا در اتصال به سرور.';
-            });
-
-            // 2. شنونده دیالوگ: این شنونده مستقل است و فقط به تنظیمات دیالوگ گوش می‌دهد
-            const dialogueDocRef = doc(db, 'settings', 'dialogueGuide');
-            dialogueUnsubscribe = onSnapshot(dialogueDocRef, (dialogueDocSnap) => {
-                // اگر اطلاعات کاربر هنوز بارگذاری نشده، کاری نکن
-                if (!currentUserData) return;
-
-                if (dialogueDocSnap.exists()) {
-                    const serverDialogueData = dialogueDocSnap.data();
-                    const serverDialogueId = serverDialogueData.dialogueId;
-                    const userLastSeenId = currentUserData.lastSeenDialogueId || null;
-
-                    // اگر دیالوگ سرور جدید است و کاربر آن را ندیده، نمایش بده
-                    if (serverDialogueId && serverDialogueId !== userLastSeenId) {
-                        if (serverDialogueData.dialogues && serverDialogueData.dialogues.length > 0) {
-                            dialogueGuideSteps = serverDialogueData.dialogues;
-                            currentDialogueId = serverDialogueId;
-                            startDialogueGuide();
-                        }
+            if (user) {
+                const userDocRef = doc(db, 'users', user.uid);
+                onSnapshot(userDocRef, (userDocSnap) => {
+                    if (userDocSnap.exists()) {
+                        currentUserData = userDocSnap.data();
+                        userDisplayName.textContent = currentUserData.displayName || "کاربر ناشناس";
+                        userAvatar.src = currentUserData.avatarUrl || DEFAULT_AVATAR;
+                        adminPanelButton.style.display = currentUserData.isAdmin === true ? 'block' : 'none';
+                    } else {
+                        currentUserData = { email: user.email, displayName: user.displayName };
+                        userDisplayName.textContent = user.displayName || "کاربر ناشناس";
+                        userAvatar.src = DEFAULT_AVATAR;
+                        adminPanelButton.style.display = 'none';
                     }
-                }
-            }, (error) => {
-                console.error("خطا در شنونده دیالوگ:", error);
-            });
+                    if (isInitialLoad) {
+                        document.body.classList.add('loaded');
+                        handleBackgroundMusic();
+                        loadAndApplySettings();
+                        isInitialLoad = false;
+                        
+                        // [جدید] سیستم دو مرحله‌ای راهنما
+                        // 1. ابتدا شنونده دیالوگ سرور-محور را فعال کن
+                        initializeDialogueListener(); 
+                        
+                        // 2. اگر راهنمای UI هنوز انجام نشده، آن را برای اجرا بعد از دیالوگ آماده نگه دار
+                        // (منطق شروع آن داخل رویداد کلیک دکمه دیالوگ قرار گرفته است)
 
-            // 3. شنونده‌های دیگر (وضعیت سرور و حالت‌های بازی)
-            maintenanceUnsubscribe = onSnapshot(doc(db, 'settings', 'maintenance'), (docSnap) => { 
-                if (docSnap.exists() && docSnap.data().enabled === true) { 
-                    showCustomAlert("سرور در حالت بروزرسانی است.", () => { window.location.href = './index.html'; }); 
-                } 
-            });
-
-            gameModesUnsubscribe = onSnapshot(doc(db, 'settings', 'gameModes'), (docSnap) => { 
-                if (docSnap.exists()) { 
-                    const modes = docSnap.data();
-                    friendlyGameBtn.disabled = !modes.friendlyEnabled; 
-                    friendlyGameBtn.textContent = modes.friendlyEnabled ? "بازی دوستانه" : "بازی دوستانه (بزودی)"; 
-                    rankedGameBtn.disabled = !modes.rankedEnabled; 
-                    rankedGameBtn.textContent = modes.rankedEnabled ? "بازی امتیازی" : "بازی امتیازی (غیرفعال)"; 
-                } else { 
-                    friendlyGameBtn.disabled = true; rankedGameBtn.disabled = true; 
-                    friendlyGameBtn.textContent = "بازی دوستانه (ناموجود)"; 
-                    rankedGameBtn.textContent = "بازی امتیازی (ناموجود)"; 
-                } 
-            });
+                    }
+                }, (error) => {
+                    console.error("خطا در گوش دادن به اطلاعات کاربر:", error);
+                    loaderSpinner.style.display = 'none';
+                    loadingText.textContent = 'خطا در اتصال به سرور.';
+                });
+                onSnapshot(doc(db, 'settings', 'maintenance'), (docSnap) => { if (docSnap.exists() && docSnap.data().enabled === true) { showCustomAlert("سرور در حالت بروزرسانی است.", () => { window.location.href = './index.html'; }); } });
+                onSnapshot(doc(db, 'settings', 'gameModes'), (docSnap) => { if (docSnap.exists()) { const modes = docSnap.data(); friendlyGameBtn.disabled = !modes.friendlyEnabled; friendlyGameBtn.textContent = modes.friendlyEnabled ? "بازی دوستانه" : "بازی دوستانه (بزودی)"; rankedGameBtn.disabled = !modes.rankedEnabled; rankedGameBtn.textContent = modes.rankedEnabled ? "بازی امتیازی" : "بازی امتیازی (غیرفعال)"; } else { friendlyGameBtn.disabled = true; rankedGameBtn.disabled = true; friendlyGameBtn.textContent = "بازی دوستانه (ناموجود)"; rankedGameBtn.textContent = "بازی امتیازی (ناموجود)"; } });
+            } else { window.location.href = './login.html'; }
         });
 
         // --- Event Listeners ---
@@ -1364,10 +1329,48 @@
         settingsBtn.addEventListener('click', () => { hideModal(avatarMenuOverlay); showModal(settingsOverlay); });
         settingsOverlay.addEventListener('click', (e) => { if (e.target === settingsOverlay) hideModal(settingsOverlay); });
         cancelSettingsBtn.addEventListener('click', () => { hideModal(settingsOverlay); loadAndApplySettings(); });
-        saveSettingsBtn.addEventListener('click', () => { const newIntensity = animationIntensitySlider.value; localStorage.setItem(ANIMATION_INTENSITY_KEY, newIntensity); applyAnimationSettings(newIntensity); const effectEnabled = visualEffectToggle.checked; localStorage.setItem(VISUAL_EFFECT_KEY, effectEnabled); if(effectEnabled) startParticleEffect(); else stopParticleEffect(); hideModal(settingsOverlay); showCustomAlert("تنظیمات با موفقیت ذخیره شد."); });
-        animationIntensitySlider.addEventListener('input', (e) => { const value = e.target.value; animationIntensityValue.textContent = `${value}%`; applyAnimationSettings(value); });
-        tutorialNextBtn.addEventListener('click', () => { showTutorialStep(currentTutorialStep + 1); });
-        dialogueGuideNextBtn.addEventListener('click', () => { showDialogueStep(currentDialogueStep + 1); });
+        saveSettingsBtn.addEventListener('click', () => {
+            const newIntensity = animationIntensitySlider.value;
+            localStorage.setItem(ANIMATION_INTENSITY_KEY, newIntensity);
+            applyAnimationSettings(newIntensity);
+            const effectEnabled = visualEffectToggle.checked;
+            localStorage.setItem(VISUAL_EFFECT_KEY, effectEnabled);
+            if(effectEnabled) startParticleEffect(); else stopParticleEffect();
+            hideModal(settingsOverlay);
+            showCustomAlert("تنظیمات با موفقیت ذخیره شد.");
+        });
+        animationIntensitySlider.addEventListener('input', (e) => {
+            const value = e.target.value;
+            animationIntensityValue.textContent = `${value}%`;
+            applyAnimationSettings(value); 
+        });
+
+        // رویدادهای راهنمای کاربری (هایلایت)
+        tutorialNextBtn.addEventListener('click', () => {
+            showTutorialStep(currentTutorialStep + 1);
+        });
+
+        // [جدید] رویداد کلیک برای دکمه دیالوگ
+        dialogueGuideButton.addEventListener('click', async () => {
+            hideModal(dialogueGuideOverlay);
+            if (auth.currentUser && currentActiveDialogueId) {
+                try {
+                    const userDocRef = doc(db, 'users', auth.currentUser.uid);
+                    await updateDoc(userDocRef, {
+                        lastSeenDialogueId: currentActiveDialogueId
+                    });
+                    // برای اطمینان از اینکه currentUserData هم آپدیت میشود
+                    if (currentUserData) currentUserData.lastSeenDialogueId = currentActiveDialogueId;
+                } catch (error) {
+                    console.error("خطا در آپدیت شناسه دیالوگ کاربر:", error);
+                }
+            }
+            
+            // پس از بستن دیالوگ، بررسی کن که آیا راهنمای UI باید اجرا شود
+            if (!localStorage.getItem(TUTORIAL_COMPLETED_KEY)) {
+                setTimeout(startTutorial, 500); // تاخیر کوچک برای انتقال روان‌تر
+            }
+        });
 
     </script>
 </body>
