@@ -367,7 +367,7 @@
             border: none;
         }
 
-        /* --- [جدید] استایل‌های راهنمای دیالوگی --- */
+        /* --- استایل‌های راهنمای دیالوگی --- */
         #dialogue-guide-overlay {
             position: fixed;
             top: 0;
@@ -383,11 +383,13 @@
             opacity: 0;
             visibility: hidden;
             transition: all 0.5s ease-in-out;
+            pointer-events: none; /* اجازه عبور کلیک */
         }
 
         #dialogue-guide-overlay.visible {
             opacity: 1;
             visibility: visible;
+            pointer-events: all; /* فعال کردن کلیک وقتی پنل دیده می‌شود */
         }
 
         #dialogue-guide-panel {
@@ -417,6 +419,7 @@
             object-fit: contain;
             flex-shrink: 0;
             filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+            transition: transform 0.3s ease;
         }
 
         .dialogue-content-wrapper {
@@ -762,7 +765,7 @@
         </div>
     </div>
 
-    <!-- [جدید] المان‌های راهنمای دیالوگی -->
+    <!-- المان‌های راهنمای دیالوگی -->
     <div id="dialogue-guide-overlay">
         <div id="dialogue-guide-panel">
             <img id="dialogue-guide-image" src="" alt="راهنما">
@@ -779,7 +782,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, getDoc, onSnapshot, collection, getDocs, updateDoc, query, orderBy, limit, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, onSnapshot, collection, getDocs, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
@@ -885,7 +888,7 @@
         const particleCanvas = document.getElementById('particle-effect-canvas');
         const ctx = particleCanvas.getContext('2d');
 
-        // --- [جدید] المان‌های راهنمای دیالوگی ---
+        // --- المان‌های راهنمای دیالوگی ---
         const dialogueGuideOverlay = document.getElementById('dialogue-guide-overlay');
         const dialogueGuideImage = document.getElementById('dialogue-guide-image');
         const dialogueGuideText = document.getElementById('dialogue-guide-text');
@@ -988,11 +991,12 @@
         window.addEventListener('resize', () => { if(animationFrameId) { resizeCanvas(); initParticles(); } });
         function loadAndApplySettings() { const savedIntensity = localStorage.getItem(ANIMATION_INTENSITY_KEY); const intensity = savedIntensity !== null ? parseInt(savedIntensity, 10) : DEFAULT_ANIMATION_INTENSITY; animationIntensitySlider.value = intensity; animationIntensityValue.textContent = `${intensity}%`; applyAnimationSettings(intensity); const isEffectEnabled = localStorage.getItem(VISUAL_EFFECT_KEY) === 'true'; visualEffectToggle.checked = isEffectEnabled; if (isEffectEnabled) { startParticleEffect(); } else { stopParticleEffect(); } }
 
-        // --- [جدید و تغییر یافته] توابع راهنمای دیالوگی ---
+        // --- توابع راهنمای دیالوگی ---
         const DIALOGUE_GUIDE_SEEN_HASHES_KEY = 'mafia-dialogue-seen-hashes';
         let dialoguesFromServer = [];
         let currentDialogueIndex = -1;
 
+        // یک شناسه منحصر به فرد بر اساس محتوای دیالوگ می سازد
         function createDialogueHash(dialogue) {
             if (!dialogue || !dialogue.text || !dialogue.imageUrl) return null;
             return dialogue.text.trim() + '||' + dialogue.imageUrl.trim();
@@ -1019,11 +1023,17 @@
                 hideDialogueGuide();
                 return;
             }
-
             const dialogue = dialoguesFromServer[index];
-            dialogueGuideNextBtn.classList.remove('visible');
-            dialogueGuideImage.src = dialogue.imageUrl;
+
+            // انیمیشن کوچک برای تعویض عکس
+            dialogueGuideImage.style.transform = 'scale(0.9)';
             
+            setTimeout(() => {
+                dialogueGuideImage.src = dialogue.imageUrl;
+                dialogueGuideImage.style.transform = 'scale(1)';
+            }, 150);
+            
+            dialogueGuideNextBtn.classList.remove('visible');
             typeWriterEffect(dialogueGuideText, dialogue.text, () => {
                 dialogueGuideNextBtn.textContent = (index === dialoguesFromServer.length - 1) ? 'فهمیدم!' : 'بعدی';
                 dialogueGuideNextBtn.classList.add('visible');
@@ -1042,10 +1052,15 @@
                 const docSnap = await getDoc(guideDocRef);
 
                 if (!docSnap.exists() || !docSnap.data().dialogues || docSnap.data().dialogues.length === 0) {
-                    return; // اگر داکیومنت یا آرایه دیالوگ‌ها وجود نداشت، خارج شو
+                    return; 
                 }
 
-                dialoguesFromServer = docSnap.data().dialogues;
+                // [بهبود] فیلتر کردن دیالوگ های ناقص
+                const validDialogues = docSnap.data().dialogues.filter(d => d.text && d.imageUrl);
+                if (validDialogues.length === 0) return;
+                
+                dialoguesFromServer = validDialogues;
+
                 const seenHashes = JSON.parse(localStorage.getItem(DIALOGUE_GUIDE_SEEN_HASHES_KEY)) || [];
                 
                 const firstUnseenIndex = dialoguesFromServer.findIndex(dialogue => {
@@ -1054,9 +1069,8 @@
                 });
                 
                 if (firstUnseenIndex !== -1) {
-                    // یک دیالوگ جدید یا تغییر کرده پیدا شد
                     currentDialogueIndex = firstUnseenIndex;
-                    setTimeout(() => showDialogueStep(currentDialogueIndex), 1000); // تاخیر برای نمایش بهتر
+                    setTimeout(() => showDialogueStep(currentDialogueIndex), 1200); // تاخیر برای نمایش بهتر
                 }
 
             } catch (error) {
@@ -1067,24 +1081,20 @@
         dialogueGuideNextBtn.addEventListener('click', () => {
             if (currentDialogueIndex < 0 || currentDialogueIndex >= dialoguesFromServer.length) return;
 
-            // هش دیالوگ فعلی را به لیست دیده‌شده‌ها اضافه کن
             const currentDialogue = dialoguesFromServer[currentDialogueIndex];
             const currentHash = createDialogueHash(currentDialogue);
 
             let seenHashes = JSON.parse(localStorage.getItem(DIALOGUE_GUIDE_SEEN_HASHES_KEY)) || [];
-            if (!seenHashes.includes(currentHash)) {
+            if (currentHash && !seenHashes.includes(currentHash)) {
                 seenHashes.push(currentHash);
                 localStorage.setItem(DIALOGUE_GUIDE_SEEN_HASHES_KEY, JSON.stringify(seenHashes));
             }
 
-            // برو به دیالوگ بعدی
             currentDialogueIndex++;
             showDialogueStep(currentDialogueIndex);
         });
 
-
         // --- سایر توابع (مدیریت، رده‌بندی و ...) ---
-        // (این توابع بدون تغییر باقی می‌مانند)
         async function loadAndShowUserList() { if (!(await verifyAdminStatus())) return; userListContainer.innerHTML = '<p style="padding: 20px;">در حال بارگذاری لیست کاربران...</p>'; userSearchInput.value = ''; hideModal(adminPanelOverlay); showModal(userListModalOverlay); try { const usersCollection = collection(db, "users"); const querySnapshot = await getDocs(usersCollection); userListContainer.innerHTML = ''; if (querySnapshot.empty) { userListContainer.innerHTML = '<p style="padding: 20px;">هیچ کاربری یافت نشد.</p>'; return; } querySnapshot.forEach(doc => { const userData = doc.data(); const userElement = document.createElement('div'); userElement.classList.add('user-list-item'); userElement.dataset.uid = doc.id; userElement.innerHTML = ` <div class="user-info"> <img src="${userData.avatarUrl || DEFAULT_AVATAR}" alt="avatar"> <div class="user-details"> <span class="name">${userData.displayName || 'بدون نام'}</span> <span class="email">${userData.email || 'بدون ایمیل'}</span> </div> </div> <span class="edit-user-icon">${EDIT_ICON_SVG}</span> `; userListContainer.appendChild(userElement); }); } catch (error) { console.error("خطا در دریافت لیست کاربران: ", error); userListContainer.innerHTML = '<p style="padding: 20px;">خطا در بارگذاری اطلاعات. لطفا دوباره تلاش کنید.</p>'; } }
         async function openEditModalForUser(uid) { if (!(await verifyAdminStatus())) return; try { const userDocRef = doc(db, 'users', uid); const docSnap = await getDoc(userDocRef); if (docSnap.exists()) { const userData = docSnap.data(); editUserNamePreview.textContent = userData.displayName || 'کاربر'; editUserAvatarPreview.src = userData.avatarUrl || DEFAULT_AVATAR; editUserUid.value = uid; editDisplayName.value = userData.displayName || ''; editUserAge.value = userData.old || ''; editUserDiamonds.value = userData.game || 0; hideModal(userListModalOverlay); showModal(editUserModalOverlay); } else { showCustomAlert("کاربر مورد نظر یافت نشد."); } } catch (error) { console.error("خطا در دریافت اطلاعات کاربر برای ویرایش:", error); showCustomAlert("خطا در دریافت اطلاعات کاربر."); } }
         async function handleSaveChanges(e) { e.preventDefault(); if (!(await verifyAdminStatus())) return; const uid = editUserUid.value; const newDisplayName = editDisplayName.value; const newAge = parseInt(editUserAge.value, 10); const newDiamonds = parseInt(editUserDiamonds.value, 10); if (!uid) { showCustomAlert("خطای سیستمی: شناسه کاربر موجود نیست."); return; } if (isNaN(newAge) || isNaN(newDiamonds)) { showCustomAlert("لطفا مقادیر معتبر برای سن و الماس وارد کنید."); return; } saveUserChangesBtn.disabled = true; saveUserChangesBtn.textContent = 'در حال ذخیره...'; try { const userDocRef = doc(db, 'users', uid); await updateDoc(userDocRef, { displayName: newDisplayName, old: newAge, game: newDiamonds }); hideModal(editUserModalOverlay); showCustomAlert("تغییرات با موفقیت ذخیره شد.", async () => { await loadAndShowUserList(); }); } catch (error) { console.error("خطا در بروزرسانی اطلاعات کاربر:", error); showCustomAlert("خطا در ذخیره تغییرات. لطفا دوباره تلاش کنید."); } finally { saveUserChangesBtn.disabled = false; saveUserChangesBtn.textContent = 'ذخیره تغییرات'; } }
@@ -1125,7 +1135,6 @@
                         loadAndApplySettings();
                         isInitialLoad = false;
                         
-                        // [جدید] بررسی و شروع راهنمای دیالوگی
                         checkAndShowDialogueGuide();
                     }
                 }, (error) => {
