@@ -367,7 +367,7 @@
             border: none;
         }
 
-        /* --- [قدیمی] استایل‌های راهنمای کاربری --- */
+        /* --- استایل‌های راهنمای کاربری --- */
         #tutorial-overlay {
             position: fixed;
             top: 0;
@@ -475,7 +475,7 @@
             transition: all 0.4s ease 0.2s; /* تاخیر برای نمایش بعد از تایپ */
         }
         
-        /* --- [جدید و اصلاح شده] استایل‌های راهنمای دیالوگ --- */
+        /* --- استایل‌های راهنمای دیالوگ --- */
         #dialogue-guide-overlay {
             z-index: 1999;
             background-color: transparent;
@@ -872,7 +872,7 @@
         </div>
     </div>
 
-    <!-- [قدیمی] المان‌های راهنمای کاربری -->
+    <!-- المان‌های راهنمای کاربری -->
     <div id="tutorial-overlay">
         <div id="tutorial-highlight-box"></div>
         <div id="tutorial-panel">
@@ -884,7 +884,7 @@
         </div>
     </div>
 
-    <!-- [جدید] راهنمای دیالوگ سرور-محور -->
+    <!-- راهنمای دیالوگ سرور-محور -->
     <div id="dialogue-guide-overlay" class="modal-overlay">
         <div id="dialogue-guide-character-container">
             <img id="dialogue-guide-character-img" src="" alt="راهنما">
@@ -1004,22 +1004,18 @@
         const visualEffectToggle = document.getElementById('visual-effect-toggle');
         const particleCanvas = document.getElementById('particle-effect-canvas');
         const ctx = particleCanvas.getContext('2d');
-
-        // --- المان‌های راهنمای کاربری (قدیمی) ---
         const tutorialOverlay = document.getElementById('tutorial-overlay');
         const tutorialHighlightBox = document.getElementById('tutorial-highlight-box');
         const tutorialPanel = document.getElementById('tutorial-panel');
         const tutorialTitle = document.getElementById('tutorial-title');
         const tutorialText = document.getElementById('tutorial-text');
         const tutorialNextBtn = document.getElementById('tutorial-next-btn');
-        
-        // --- [جدید] المان‌های راهنمای دیالوگ ---
         const dialogueGuideOverlay = document.getElementById('dialogue-guide-overlay');
         const dialogueGuideCharacterImg = document.getElementById('dialogue-guide-character-img');
         const dialogueGuideText = document.getElementById('dialogue-guide-text');
         const dialogueGuideNextBtn = document.getElementById('dialogue-guide-next-btn');
 
-        // متغیرها
+        // --- متغیرها ---
         const MUSIC_URL = "https://raw.githubusercontent.com/abolfazl140122/mafia/main/dark-music-249503.mp3";
         const MUSIC_CACHE_NAME = 'mafia-music-cache-v1';
         const MUSIC_VERSION_KEY = 'mafia-music-version';
@@ -1032,7 +1028,12 @@
         let isInitialLoad = true;
         let currentUserData = null;
         let rankingListenerUnsubscribe = null;
-        let dialogueListenerUnsubscribe = null; // [جدید] برای قطع کردن شنونده دیالوگ
+        
+        // متغیرهای شنونده‌های اصلی
+        let userUnsubscribe = null;
+        let dialogueUnsubscribe = null;
+        let maintenanceUnsubscribe = null;
+        let gameModesUnsubscribe = null;
 
         // --- توابع عمومی ---
         function showModal(modalElement) { modalElement.classList.add('visible'); }
@@ -1134,211 +1135,82 @@
             }, 40);
         }
 
-        // --- [قدیمی] توابع راهنمای کاربری (UI) ---
+        // --- توابع راهنمای کاربری (UI) ---
         const TUTORIAL_COMPLETED_KEY = 'mafia-tutorial-completed';
         let currentTutorialStep = -1;
-
-        const tutorialSteps = [
-            {
-                element: '.profile-section',
-                title: 'به شهر مافیا خوش آمدی!',
-                text: 'اینجا بخش پروفایل توست. با کلیک روی آواتارت، می‌تونی به پروفایل کامل، فروشگاه و تنظیمات دسترسی پیدا کنی.',
-                position: 'bottom-right'
-            },
-            {
-                element: '.menu-buttons',
-                title: 'منوی اصلی',
-                text: 'از این دکمه‌ها برای دیدن رده‌بندی بازیکنان، سازندگان بازی و (اگر مدیر باشی) پنل مدیریت استفاده کن.',
-                position: 'bottom-right'
-            },
-            {
-                element: '#start-game-button',
-                title: 'شروع ماجراجویی',
-                text: 'و اما دکمه اصلی! با زدن این دکمه، وارد لابی می‌شی و می‌تونی بازی رو شروع کنی. آماده‌ای؟',
-                position: 'top-center'
-            }
-        ];
-
+        const tutorialSteps = [ { element: '.profile-section', title: 'به شهر مافیا خوش آمدی!', text: 'اینجا بخش پروفایل توست. با کلیک روی آواتارت، می‌تونی به پروفایل کامل، فروشگاه و تنظیمات دسترسی پیدا کنی.', position: 'bottom-right' }, { element: '.menu-buttons', title: 'منوی اصلی', text: 'از این دکمه‌ها برای دیدن رده‌بندی بازیکنان، سازندگان بازی و (اگر مدیر باشی) پنل مدیریت استفاده کن.', position: 'bottom-right' }, { element: '#start-game-button', title: 'شروع ماجراجویی', text: 'و اما دکمه اصلی! با زدن این دکمه، وارد لابی می‌شی و می‌تونی بازی رو شروع کنی. آماده‌ای؟', position: 'top-center' } ];
         function showTutorialStep(stepIndex) {
-            if (stepIndex >= tutorialSteps.length) {
-                endTutorial();
-                return;
-            }
-
+            if (stepIndex >= tutorialSteps.length) { endTutorial(); return; }
             const step = tutorialSteps[stepIndex];
             const targetElement = document.querySelector(step.element);
-
-            if (!targetElement) {
-                showTutorialStep(stepIndex + 1);
-                return;
-            }
-            
+            if (!targetElement) { showTutorialStep(stepIndex + 1); return; }
             tutorialPanel.classList.remove('visible');
             tutorialNextBtn.classList.remove('visible');
-
             setTimeout(() => {
                 const targetRect = targetElement.getBoundingClientRect();
                 const padding = 10;
-                
                 tutorialHighlightBox.style.width = (targetRect.width + padding) + 'px';
                 tutorialHighlightBox.style.height = (targetRect.height + padding) + 'px';
                 tutorialHighlightBox.style.top = (targetRect.top - padding / 2) + 'px';
                 tutorialHighlightBox.style.left = (targetRect.left - padding / 2) + 'px';
-                
                 tutorialTitle.textContent = step.title;
-                
-                typeWriterEffect(tutorialText, step.text, () => {
-                    tutorialNextBtn.textContent = (stepIndex === tutorialSteps.length - 1) ? 'پایان آموزش' : 'بعدی';
-                    tutorialNextBtn.classList.add('visible');
-                });
-                
+                typeWriterEffect(tutorialText, step.text, () => { tutorialNextBtn.textContent = (stepIndex === tutorialSteps.length - 1) ? 'پایان آموزش' : 'بعدی'; tutorialNextBtn.classList.add('visible'); });
                 const panel = tutorialPanel;
                 panel.style.visibility = 'hidden';
                 panel.style.display = 'block';
                 const panelRect = panel.getBoundingClientRect();
                 panel.style.visibility = '';
                 panel.style.display = '';
-
-                const margin = 20;
-                const edgePadding = 10;
-                const vw = window.innerWidth;
-                const vh = window.innerHeight;
-
+                const margin = 20; const edgePadding = 10; const vw = window.innerWidth; const vh = window.innerHeight;
                 let top, left;
-
-                switch (step.position) {
-                    case 'top-center':
-                        top = targetRect.top - panelRect.height - margin;
-                        left = targetRect.left + targetRect.width / 2 - panelRect.width / 2;
-                        break;
-                    case 'bottom-right':
-                        top = targetRect.bottom + margin;
-                        left = targetRect.right - panelRect.width;
-                        break;
-                    default: 
-                        top = targetRect.bottom + margin;
-                        left = targetRect.left + targetRect.width / 2 - panelRect.width / 2;
-                        break;
-                }
-
-                if (top + panelRect.height > vh - edgePadding) {
-                    let newTop = targetRect.top - panelRect.height - margin;
-                    top = (newTop >= edgePadding) ? newTop : (vh - panelRect.height - edgePadding);
-                }
-                
-                if (top < edgePadding) {
-                    let newTop = targetRect.bottom + margin;
-                    top = (newTop + panelRect.height <= vh - edgePadding) ? newTop : edgePadding;
-                }
-                
-                if (left < edgePadding) {
-                    left = edgePadding;
-                }
-                if (left + panelRect.width > vw - edgePadding) {
-                    left = vw - panelRect.width - edgePadding;
-                }
-                
+                switch (step.position) { case 'top-center': top = targetRect.top - panelRect.height - margin; left = targetRect.left + targetRect.width / 2 - panelRect.width / 2; break; case 'bottom-right': top = targetRect.bottom + margin; left = targetRect.right - panelRect.width; break; default: top = targetRect.bottom + margin; left = targetRect.left + targetRect.width / 2 - panelRect.width / 2; break; }
+                if (top + panelRect.height > vh - edgePadding) { let newTop = targetRect.top - panelRect.height - margin; top = (newTop >= edgePadding) ? newTop : (vh - panelRect.height - edgePadding); }
+                if (top < edgePadding) { let newTop = targetRect.bottom + margin; top = (newTop + panelRect.height <= vh - edgePadding) ? newTop : edgePadding; }
+                if (left < edgePadding) { left = edgePadding; }
+                if (left + panelRect.width > vw - edgePadding) { left = vw - panelRect.width - edgePadding; }
                 panel.style.top = `${top}px`;
                 panel.style.left = `${left}px`;
-                
                 panel.classList.add('visible');
             }, 400);
-
             currentTutorialStep = stepIndex;
         }
-
-        function startTutorial() {
-            tutorialOverlay.classList.add('visible');
-            showTutorialStep(0);
-        }
-
-        function endTutorial() {
-            tutorialOverlay.classList.remove('visible');
-            localStorage.setItem(TUTORIAL_COMPLETED_KEY, 'true');
-        }
+        function startTutorial() { tutorialOverlay.classList.add('visible'); showTutorialStep(0); }
+        function endTutorial() { tutorialOverlay.classList.remove('visible'); localStorage.setItem(TUTORIAL_COMPLETED_KEY, 'true'); }
         
-        // --- [جدید و بازنویسی شده] توابع راهنمای دیالوگ ---
+        // --- توابع راهنمای دیالوگ ---
         let dialogueGuideSteps = [];
         let currentDialogueStep = -1;
         let currentDialogueId = null;
-
-        function initializeDialogueListener() {
-            if (dialogueListenerUnsubscribe) dialogueListenerUnsubscribe(); // قطع شنونده قبلی
-
-            const dialogueDocRef = doc(db, 'settings', 'dialogueGuide');
-            dialogueListenerUnsubscribe = onSnapshot(dialogueDocRef, (docSnap) => {
-                // اگر کاربر لاگین نکرده یا دیتا کامل نیست، کاری نکن
-                if (!auth.currentUser || !currentUserData) return;
-
-                if (docSnap.exists()) {
-                    const serverDialogueData = docSnap.data();
-                    const serverDialogueId = serverDialogueData.dialogueId;
-                    const userLastSeenId = currentUserData.lastSeenDialogueId || null;
-
-                    // بررسی میکنیم که آیا دیالوگ سرور جدید است و کاربر آن را ندیده
-                    if (serverDialogueId && serverDialogueId !== userLastSeenId) {
-                        if (serverDialogueData.dialogues && serverDialogueData.dialogues.length > 0) {
-                            dialogueGuideSteps = serverDialogueData.dialogues;
-                            currentDialogueId = serverDialogueId; // شناسه فعلی را ذخیره میکنیم
-                            startDialogueGuide();
-                        }
-                    }
-                }
-            }, (error) => {
-                console.error("خطا در شنونده دیالوگ:", error);
-            });
-        }
-
         function showDialogueStep(stepIndex) {
-            if (stepIndex >= dialogueGuideSteps.length) {
-                endDialogueGuide();
-                return;
-            }
+            if (stepIndex >= dialogueGuideSteps.length) { endDialogueGuide(); return; }
             currentDialogueStep = stepIndex;
             const step = dialogueGuideSteps[stepIndex];
-
             dialogueGuideNextBtn.classList.remove('visible');
             dialogueGuideCharacterImg.src = step.imageUrl || '';
-
-            typeWriterEffect(dialogueGuideText, step.text, () => {
-                 dialogueGuideNextBtn.classList.add('visible');
-            });
-
+            typeWriterEffect(dialogueGuideText, step.text, () => { dialogueGuideNextBtn.classList.add('visible'); });
             showModal(dialogueGuideOverlay);
         }
-        
         function startDialogueGuide() {
-            // اطمینان از بسته بودن سایر پنل ها
             hideAllAdminModals();
             hideModal(avatarMenuOverlay);
-            // ... بستن سایر پنل ها
-            
+            hideModal(profileModalOverlay);
+            hideModal(gameModeModalOverlay);
             showDialogueStep(0);
         }
-        
         async function endDialogueGuide() {
             hideModal(dialogueGuideOverlay);
-            // [مهم] ذخیره شناسه دیالوگ مشاهده شده در پروفایل کاربر در Firestore
             if (auth.currentUser && currentDialogueId) {
                 try {
                     const userDocRef = doc(db, 'users', auth.currentUser.uid);
-                    await updateDoc(userDocRef, {
-                        lastSeenDialogueId: currentDialogueId
-                    });
-                } catch (error) {
-                    console.error("خطا در آپدیت شناسه دیالوگ کاربر:", error);
-                }
+                    await updateDoc(userDocRef, { lastSeenDialogueId: currentDialogueId });
+                } catch (error) { console.error("خطا در آپدیت شناسه دیالوگ کاربر:", error); }
             }
-
-            // حالا، بررسی می‌کنیم که آیا راهنمای UI باید شروع شود یا نه
             if (!localStorage.getItem(TUTORIAL_COMPLETED_KEY)) {
-                setTimeout(startTutorial, 500); // تاخیر کوچک برای انتقال روان‌تر
+                setTimeout(startTutorial, 500);
             }
         }
 
-
         // --- سایر توابع (مدیریت، رده‌بندی و ...) ---
-        // (این توابع بدون تغییر باقی می‌مانند)
         async function loadAndShowUserList() { if (!(await verifyAdminStatus())) return; userListContainer.innerHTML = '<p style="padding: 20px;">در حال بارگذاری لیست کاربران...</p>'; userSearchInput.value = ''; hideModal(adminPanelOverlay); showModal(userListModalOverlay); try { const usersCollection = collection(db, "users"); const querySnapshot = await getDocs(usersCollection); userListContainer.innerHTML = ''; if (querySnapshot.empty) { userListContainer.innerHTML = '<p style="padding: 20px;">هیچ کاربری یافت نشد.</p>'; return; } querySnapshot.forEach(doc => { const userData = doc.data(); const userElement = document.createElement('div'); userElement.classList.add('user-list-item'); userElement.dataset.uid = doc.id; userElement.innerHTML = ` <div class="user-info"> <img src="${userData.avatarUrl || DEFAULT_AVATAR}" alt="avatar"> <div class="user-details"> <span class="name">${userData.displayName || 'بدون نام'}</span> <span class="email">${userData.email || 'بدون ایمیل'}</span> </div> </div> <span class="edit-user-icon">${EDIT_ICON_SVG}</span> `; userListContainer.appendChild(userElement); }); } catch (error) { console.error("خطا در دریافت لیست کاربران: ", error); userListContainer.innerHTML = '<p style="padding: 20px;">خطا در بارگذاری اطلاعات. لطفا دوباره تلاش کنید.</p>'; } }
         async function openEditModalForUser(uid) { if (!(await verifyAdminStatus())) return; try { const userDocRef = doc(db, 'users', uid); const docSnap = await getDoc(userDocRef); if (docSnap.exists()) { const userData = docSnap.data(); editUserNamePreview.textContent = userData.displayName || 'کاربر'; editUserAvatarPreview.src = userData.avatarUrl || DEFAULT_AVATAR; editUserUid.value = uid; editDisplayName.value = userData.displayName || ''; editUserAge.value = userData.old || ''; editUserDiamonds.value = userData.game || 0; hideModal(userListModalOverlay); showModal(editUserModalOverlay); } else { showCustomAlert("کاربر مورد نظر یافت نشد."); } } catch (error) { console.error("خطا در دریافت اطلاعات کاربر برای ویرایش:", error); showCustomAlert("خطا در دریافت اطلاعات کاربر."); } }
         async function handleSaveChanges(e) { e.preventDefault(); if (!(await verifyAdminStatus())) return; const uid = editUserUid.value; const newDisplayName = editDisplayName.value; const newAge = parseInt(editUserAge.value, 10); const newDiamonds = parseInt(editUserDiamonds.value, 10); if (!uid) { showCustomAlert("خطای سیستمی: شناسه کاربر موجود نیست."); return; } if (isNaN(newAge) || isNaN(newDiamonds)) { showCustomAlert("لطفا مقادیر معتبر برای سن و الماس وارد کنید."); return; } saveUserChangesBtn.disabled = true; saveUserChangesBtn.textContent = 'در حال ذخیره...'; try { const userDocRef = doc(db, 'users', uid); await updateDoc(userDocRef, { displayName: newDisplayName, old: newAge, game: newDiamonds }); hideModal(editUserModalOverlay); showCustomAlert("تغییرات با موفقیت ذخیره شد.", async () => { await loadAndShowUserList(); }); } catch (error) { console.error("خطا در بروزرسانی اطلاعات کاربر:", error); showCustomAlert("خطا در ذخیره تغییرات. لطفا دوباره تلاش کنید."); } finally { saveUserChangesBtn.disabled = false; saveUserChangesBtn.textContent = 'ذخیره تغییرات'; } }
@@ -1357,44 +1229,96 @@
         function clearNameCheckResult() { nameCheckResultContainer.classList.remove('error'); nameCheckResultContainer.innerHTML = ''; }
         async function handleNameChange(e) { e.preventDefault(); if (!auth.currentUser || !currentUserData) return; const newName = newDisplayNameInput.value.trim(); clearNameCheckResult(); if (newName.length < 3 || newName.length > 15) { showNameCheckError("نام باید بین ۳ تا ۱۵ کاراکتر باشد."); return; } if (newName === currentUserData.displayName) { showNameCheckError("این نام در حال حاضر نام شماست."); return; } const validNameRegex = /^[a-zA-Z0-9_.\u0600-\u06FF\s]+$/; if (!validNameRegex.test(newName)) { showNameCheckError("نام شامل کاراکترهای غیرمجاز است."); return; } saveNewNameBtn.disabled = true; saveNewNameBtn.textContent = 'در حال بررسی...'; try { const usersRef = collection(db, "users"); const q = query(usersRef, where("displayName", "==", newName)); const querySnapshot = await getDocs(q); if (querySnapshot.empty) { saveNewNameBtn.textContent = 'در حال ذخیره...'; const userDocRef = doc(db, 'users', auth.currentUser.uid); await updateDoc(userDocRef, { displayName: newName }); hideModal(changeNameOverlay); showCustomAlert("نام شما با موفقیت تغییر کرد."); } else { const existingUserData = querySnapshot.docs[0].data(); nameCheckResultContainer.classList.add('error'); nameCheckResultContainer.innerHTML = `<div class="user-exists-info"><p class="error-message" style="margin-bottom: 10px;">این نام قبلاً ثبت شده و متعلق به کاربر زیر است:</p><img src="${existingUserData.avatarUrl || DEFAULT_AVATAR}" alt="avatar"><span class="name">${existingUserData.displayName}</span></div>`; } } catch (error) { console.error("خطا در تغییر نام:", error); showNameCheckError("خطا در ارتباط با سرور. لطفا دوباره تلاش کنید."); } finally { saveNewNameBtn.disabled = false; saveNewNameBtn.textContent = 'ذخیره تغییرات'; } }
 
-        // --- منطق اصلی و احراز هویت ---
+        // --- [جدید و اصلاح شده] منطق اصلی و احراز هویت ---
         onAuthStateChanged(auth, (user) => {
-            if (user) {
-                const userDocRef = doc(db, 'users', user.uid);
-                onSnapshot(userDocRef, (userDocSnap) => {
-                    if (userDocSnap.exists()) {
-                        currentUserData = userDocSnap.data();
-                        userDisplayName.textContent = currentUserData.displayName || "کاربر ناشناس";
-                        userAvatar.src = currentUserData.avatarUrl || DEFAULT_AVATAR;
-                        adminPanelButton.style.display = currentUserData.isAdmin === true ? 'block' : 'none';
-                    } else {
-                        currentUserData = { email: user.email, displayName: user.displayName };
-                        userDisplayName.textContent = user.displayName || "کاربر ناشناس";
-                        userAvatar.src = DEFAULT_AVATAR;
-                        adminPanelButton.style.display = 'none';
-                    }
-                    if (isInitialLoad) {
-                        document.body.classList.add('loaded');
-                        handleBackgroundMusic();
-                        loadAndApplySettings();
-                        isInitialLoad = false;
-                        
-                        // [جدید] سیستم دو مرحله‌ای راهنما
-                        // 1. ابتدا شنونده دیالوگ سرور-محور را فعال کن
-                        initializeDialogueListener(); 
-                        
-                        // 2. اگر راهنمای UI هنوز انجام نشده، آن را برای اجرا بعد از دیالوگ آماده نگه دار
-                        // (منطق شروع آن داخل endDialogueGuide قرار گرفته است)
+            // اگر کاربر از سیستم خارج شد، تمام شنونده‌ها را پاک کرده و به صفحه لاگین هدایت کن
+            if (!user) {
+                if (userUnsubscribe) userUnsubscribe();
+                if (dialogueUnsubscribe) dialogueUnsubscribe();
+                if (maintenanceUnsubscribe) maintenanceUnsubscribe();
+                if (gameModesUnsubscribe) gameModesUnsubscribe();
+                window.location.href = './login.html';
+                return;
+            }
 
+            // پاک کردن شنونده‌های قبلی برای جلوگیری از اجرای چندباره در صورت تغییر کاربر
+            if (userUnsubscribe) userUnsubscribe();
+            if (dialogueUnsubscribe) dialogueUnsubscribe();
+
+            // 1. شنونده اطلاعات کاربر: وظیفه اصلی این بخش، به‌روز نگه داشتن اطلاعات کاربر است
+            const userDocRef = doc(db, 'users', user.uid);
+            userUnsubscribe = onSnapshot(userDocRef, (userDocSnap) => {
+                if (userDocSnap.exists()) {
+                    currentUserData = userDocSnap.data();
+                    userDisplayName.textContent = currentUserData.displayName || "کاربر ناشناس";
+                    userAvatar.src = currentUserData.avatarUrl || DEFAULT_AVATAR;
+                    adminPanelButton.style.display = currentUserData.isAdmin === true ? 'block' : 'none';
+                } else {
+                    // مدیریت حالتی که داکیومنت کاربر هنوز ساخته نشده
+                    currentUserData = { email: user.email, displayName: user.displayName };
+                    userDisplayName.textContent = user.displayName || "کاربر ناشناس";
+                    userAvatar.src = DEFAULT_AVATAR;
+                    adminPanelButton.style.display = 'none';
+                }
+
+                // اجرای عملیات اولیه فقط یک بار پس از بارگذاری اطلاعات کاربر
+                if (isInitialLoad) {
+                    document.body.classList.add('loaded');
+                    handleBackgroundMusic();
+                    loadAndApplySettings();
+                    isInitialLoad = false;
+                    // بررسی راهنمای UI بعد از اتمام دیالوگ انجام می‌شود
+                }
+            }, (error) => {
+                console.error("خطا در گوش دادن به اطلاعات کاربر:", error);
+                loaderSpinner.style.display = 'none';
+                loadingText.textContent = 'خطا در اتصال به سرور.';
+            });
+
+            // 2. شنونده دیالوگ: این شنونده مستقل است و فقط به تنظیمات دیالوگ گوش می‌دهد
+            const dialogueDocRef = doc(db, 'settings', 'dialogueGuide');
+            dialogueUnsubscribe = onSnapshot(dialogueDocRef, (dialogueDocSnap) => {
+                // اگر اطلاعات کاربر هنوز بارگذاری نشده، کاری نکن
+                if (!currentUserData) return;
+
+                if (dialogueDocSnap.exists()) {
+                    const serverDialogueData = dialogueDocSnap.data();
+                    const serverDialogueId = serverDialogueData.dialogueId;
+                    const userLastSeenId = currentUserData.lastSeenDialogueId || null;
+
+                    // اگر دیالوگ سرور جدید است و کاربر آن را ندیده، نمایش بده
+                    if (serverDialogueId && serverDialogueId !== userLastSeenId) {
+                        if (serverDialogueData.dialogues && serverDialogueData.dialogues.length > 0) {
+                            dialogueGuideSteps = serverDialogueData.dialogues;
+                            currentDialogueId = serverDialogueId;
+                            startDialogueGuide();
+                        }
                     }
-                }, (error) => {
-                    console.error("خطا در گوش دادن به اطلاعات کاربر:", error);
-                    loaderSpinner.style.display = 'none';
-                    loadingText.textContent = 'خطا در اتصال به سرور.';
-                });
-                onSnapshot(doc(db, 'settings', 'maintenance'), (docSnap) => { if (docSnap.exists() && docSnap.data().enabled === true) { showCustomAlert("سرور در حالت بروزرسانی است.", () => { window.location.href = './index.html'; }); } });
-                onSnapshot(doc(db, 'settings', 'gameModes'), (docSnap) => { if (docSnap.exists()) { const modes = docSnap.data(); friendlyGameBtn.disabled = !modes.friendlyEnabled; friendlyGameBtn.textContent = modes.friendlyEnabled ? "بازی دوستانه" : "بازی دوستانه (بزودی)"; rankedGameBtn.disabled = !modes.rankedEnabled; rankedGameBtn.textContent = modes.rankedEnabled ? "بازی امتیازی" : "بازی امتیازی (غیرفعال)"; } else { friendlyGameBtn.disabled = true; rankedGameBtn.disabled = true; friendlyGameBtn.textContent = "بازی دوستانه (ناموجود)"; rankedGameBtn.textContent = "بازی امتیازی (ناموجود)"; } });
-            } else { window.location.href = './login.html'; }
+                }
+            }, (error) => {
+                console.error("خطا در شنونده دیالوگ:", error);
+            });
+
+            // 3. شنونده‌های دیگر (وضعیت سرور و حالت‌های بازی)
+            maintenanceUnsubscribe = onSnapshot(doc(db, 'settings', 'maintenance'), (docSnap) => { 
+                if (docSnap.exists() && docSnap.data().enabled === true) { 
+                    showCustomAlert("سرور در حالت بروزرسانی است.", () => { window.location.href = './index.html'; }); 
+                } 
+            });
+
+            gameModesUnsubscribe = onSnapshot(doc(db, 'settings', 'gameModes'), (docSnap) => { 
+                if (docSnap.exists()) { 
+                    const modes = docSnap.data();
+                    friendlyGameBtn.disabled = !modes.friendlyEnabled; 
+                    friendlyGameBtn.textContent = modes.friendlyEnabled ? "بازی دوستانه" : "بازی دوستانه (بزودی)"; 
+                    rankedGameBtn.disabled = !modes.rankedEnabled; 
+                    rankedGameBtn.textContent = modes.rankedEnabled ? "بازی امتیازی" : "بازی امتیازی (غیرفعال)"; 
+                } else { 
+                    friendlyGameBtn.disabled = true; rankedGameBtn.disabled = true; 
+                    friendlyGameBtn.textContent = "بازی دوستانه (ناموجود)"; 
+                    rankedGameBtn.textContent = "بازی امتیازی (ناموجود)"; 
+                } 
+            });
         });
 
         // --- Event Listeners ---
@@ -1437,46 +1361,15 @@
         changeNameOverlay.addEventListener('click', (e) => { if (e.target === changeNameOverlay) hideModal(changeNameOverlay); });
         cancelNewNameBtn.addEventListener('click', () => { hideModal(changeNameOverlay); });
         changeNameForm.addEventListener('submit', handleNameChange);
-
-        // رویدادهای پنل تنظیمات
-        settingsBtn.addEventListener('click', () => {
-            hideModal(avatarMenuOverlay);
-            showModal(settingsOverlay);
-        });
+        settingsBtn.addEventListener('click', () => { hideModal(avatarMenuOverlay); showModal(settingsOverlay); });
         settingsOverlay.addEventListener('click', (e) => { if (e.target === settingsOverlay) hideModal(settingsOverlay); });
-        cancelSettingsBtn.addEventListener('click', () => {
-             hideModal(settingsOverlay);
-             loadAndApplySettings();
-        });
-        saveSettingsBtn.addEventListener('click', () => {
-            const newIntensity = animationIntensitySlider.value;
-            localStorage.setItem(ANIMATION_INTENSITY_KEY, newIntensity);
-            applyAnimationSettings(newIntensity);
-
-            const effectEnabled = visualEffectToggle.checked;
-            localStorage.setItem(VISUAL_EFFECT_KEY, effectEnabled);
-            if(effectEnabled) startParticleEffect(); else stopParticleEffect();
-
-            hideModal(settingsOverlay);
-            showCustomAlert("تنظیمات با موفقیت ذخیره شد.");
-        });
-        animationIntensitySlider.addEventListener('input', (e) => {
-            const value = e.target.value;
-            animationIntensityValue.textContent = `${value}%`;
-            applyAnimationSettings(value); 
-        });
-
-        // رویدادهای راهنمای کاربری
-        tutorialNextBtn.addEventListener('click', () => {
-            showTutorialStep(currentTutorialStep + 1);
-        });
-
-        // [جدید] رویداد راهنمای دیالوگ
-        dialogueGuideNextBtn.addEventListener('click', () => {
-            showDialogueStep(currentDialogueStep + 1);
-        });
-
+        cancelSettingsBtn.addEventListener('click', () => { hideModal(settingsOverlay); loadAndApplySettings(); });
+        saveSettingsBtn.addEventListener('click', () => { const newIntensity = animationIntensitySlider.value; localStorage.setItem(ANIMATION_INTENSITY_KEY, newIntensity); applyAnimationSettings(newIntensity); const effectEnabled = visualEffectToggle.checked; localStorage.setItem(VISUAL_EFFECT_KEY, effectEnabled); if(effectEnabled) startParticleEffect(); else stopParticleEffect(); hideModal(settingsOverlay); showCustomAlert("تنظیمات با موفقیت ذخیره شد."); });
+        animationIntensitySlider.addEventListener('input', (e) => { const value = e.target.value; animationIntensityValue.textContent = `${value}%`; applyAnimationSettings(value); });
+        tutorialNextBtn.addEventListener('click', () => { showTutorialStep(currentTutorialStep + 1); });
+        dialogueGuideNextBtn.addEventListener('click', () => { showDialogueStep(currentDialogueStep + 1); });
 
     </script>
 </body>
 </html>
+```
