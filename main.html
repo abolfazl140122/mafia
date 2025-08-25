@@ -367,7 +367,7 @@
             border: none;
         }
 
-        /* --- [جدید] استایل‌های راهنمای کاربری --- */
+        /* --- [قدیمی] استایل‌های راهنمای کاربری --- */
         #tutorial-overlay {
             position: fixed;
             top: 0;
@@ -431,13 +431,13 @@
             min-height: 50px; /* برای جلوگیری از پرش در حین تایپ */
         }
 
-        #tutorial-text::after {
+        .typing-text::after {
             content: '|';
             animation: blink 0.7s infinite;
             font-weight: bold;
             color: #ffc947;
         }
-        #tutorial-text.typing-done::after {
+        .typing-text.typing-done::after {
             content: '';
         }
 
@@ -473,6 +473,100 @@
             transform: translateY(0);
             visibility: visible;
             transition: all 0.4s ease 0.2s; /* تاخیر برای نمایش بعد از تایپ */
+        }
+        
+        /* --- [جدید] استایل‌های راهنمای دیالوگ --- */
+        #dialogue-guide-overlay {
+            z-index: 1999; /* زیر راهنمای UI */
+            background-color: transparent;
+            backdrop-filter: none;
+            pointer-events: none;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        #dialogue-guide-overlay.visible {
+            pointer-events: all;
+        }
+
+        #dialogue-guide-character-container {
+            position: absolute;
+            bottom: 0;
+            left: 25%;
+            transform: translateX(-50%);
+            width: 45%;
+            max-width: 280px;
+            height: auto;
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.5s ease;
+            transform-origin: bottom center;
+            opacity: 0;
+            transform: translateX(-50%) translateY(20%);
+        }
+
+        #dialogue-guide-overlay.visible #dialogue-guide-character-container {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        #dialogue-guide-character-img {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            filter: drop-shadow(0px 5px 15px rgba(0,0,0,0.5));
+        }
+
+        #dialogue-guide-box {
+            width: 95%;
+            max-width: 500px;
+            background: linear-gradient(145deg, #2c2217, #1a140e);
+            border: 2px solid #a47d54;
+            border-radius: 16px;
+            padding: 20px 25px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+            position: relative;
+            z-index: 2;
+            text-align: right;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.5s ease 0.2s, transform 0.5s ease 0.2s;
+        }
+
+        #dialogue-guide-overlay.visible #dialogue-guide-box {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #dialogue-guide-text {
+            font-size: 1rem;
+            line-height: 1.7;
+            margin-bottom: 20px;
+            min-height: 50px;
+        }
+        
+        #dialogue-guide-next-btn {
+            padding: 10px 30px;
+            font-size: 1rem;
+            font-weight: 700;
+            background: linear-gradient(145deg, #8c4843, #5a2c2a);
+            border: 1px solid #ffc947;
+            color: #fff;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            opacity: 0;
+            visibility: hidden;
+            float: left;
+        }
+        #dialogue-guide-next-btn:hover {
+             background: linear-gradient(145deg, #a1534d, #6b3431);
+        }
+        #dialogue-guide-next-btn.visible {
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.4s ease 0.2s;
         }
 
 
@@ -759,15 +853,26 @@
         </div>
     </div>
 
-    <!-- [جدید] المان‌های راهنمای کاربری -->
+    <!-- [قدیمی] المان‌های راهنمای کاربری -->
     <div id="tutorial-overlay">
         <div id="tutorial-highlight-box"></div>
         <div id="tutorial-panel">
             <h3 id="tutorial-title"></h3>
-            <p id="tutorial-text"></p>
+            <p id="tutorial-text" class="typing-text"></p>
             <div id="tutorial-button-container">
                 <button id="tutorial-next-btn"></button>
             </div>
+        </div>
+    </div>
+
+    <!-- [جدید] راهنمای دیالوگ سرور-محور -->
+    <div id="dialogue-guide-overlay" class="modal-overlay">
+        <div id="dialogue-guide-character-container">
+            <img id="dialogue-guide-character-img" src="" alt="راهنما">
+        </div>
+        <div id="dialogue-guide-box">
+            <p id="dialogue-guide-text" class="typing-text"></p>
+            <button id="dialogue-guide-next-btn">ادامه</button>
         </div>
     </div>
 
@@ -881,7 +986,7 @@
         const particleCanvas = document.getElementById('particle-effect-canvas');
         const ctx = particleCanvas.getContext('2d');
 
-        // --- [جدید] المان‌های راهنمای کاربری ---
+        // --- المان‌های راهنمای کاربری (قدیمی) ---
         const tutorialOverlay = document.getElementById('tutorial-overlay');
         const tutorialHighlightBox = document.getElementById('tutorial-highlight-box');
         const tutorialPanel = document.getElementById('tutorial-panel');
@@ -889,6 +994,12 @@
         const tutorialText = document.getElementById('tutorial-text');
         const tutorialNextBtn = document.getElementById('tutorial-next-btn');
         
+        // --- [جدید] المان‌های راهنمای دیالوگ ---
+        const dialogueGuideOverlay = document.getElementById('dialogue-guide-overlay');
+        const dialogueGuideCharacterImg = document.getElementById('dialogue-guide-character-img');
+        const dialogueGuideText = document.getElementById('dialogue-guide-text');
+        const dialogueGuideNextBtn = document.getElementById('dialogue-guide-next-btn');
+
         // متغیرها
         const MUSIC_URL = "https://raw.githubusercontent.com/abolfazl140122/mafia/main/dark-music-249503.mp3";
         const MUSIC_CACHE_NAME = 'mafia-music-cache-v1';
@@ -986,7 +1097,24 @@
         window.addEventListener('resize', () => { if(animationFrameId) { resizeCanvas(); initParticles(); } });
         function loadAndApplySettings() { const savedIntensity = localStorage.getItem(ANIMATION_INTENSITY_KEY); const intensity = savedIntensity !== null ? parseInt(savedIntensity, 10) : DEFAULT_ANIMATION_INTENSITY; animationIntensitySlider.value = intensity; animationIntensityValue.textContent = `${intensity}%`; applyAnimationSettings(intensity); const isEffectEnabled = localStorage.getItem(VISUAL_EFFECT_KEY) === 'true'; visualEffectToggle.checked = isEffectEnabled; if (isEffectEnabled) { startParticleEffect(); } else { stopParticleEffect(); } }
 
-        // --- [جدید] توابع راهنمای کاربری ---
+        // --- توابع تایپ متن ---
+        function typeWriterEffect(element, text, callback) {
+            let i = 0;
+            element.innerHTML = '';
+            element.classList.remove('typing-done');
+            const typingInterval = setInterval(() => {
+                if (i < text.length) {
+                    element.innerHTML += text.charAt(i);
+                    i++;
+                } else {
+                    clearInterval(typingInterval);
+                    element.classList.add('typing-done');
+                    if (callback) callback();
+                }
+            }, 40);
+        }
+
+        // --- [قدیمی] توابع راهنمای کاربری (UI) ---
         const TUTORIAL_COMPLETED_KEY = 'mafia-tutorial-completed';
         let currentTutorialStep = -1;
 
@@ -1010,22 +1138,6 @@
                 position: 'top-center'
             }
         ];
-
-        function typeWriterEffect(element, text, callback) {
-            let i = 0;
-            element.innerHTML = '';
-            element.classList.remove('typing-done');
-            const typingInterval = setInterval(() => {
-                if (i < text.length) {
-                    element.innerHTML += text.charAt(i);
-                    i++;
-                } else {
-                    clearInterval(typingInterval);
-                    element.classList.add('typing-done');
-                    if (callback) callback();
-                }
-            }, 40);
-        }
 
         function showTutorialStep(stepIndex) {
             if (stepIndex >= tutorialSteps.length) {
@@ -1060,9 +1172,7 @@
                     tutorialNextBtn.classList.add('visible');
                 });
                 
-                // --- Improved Positioning Logic ---
                 const panel = tutorialPanel;
-                // Temporarily make it visible but off-screen to measure its actual dimensions
                 panel.style.visibility = 'hidden';
                 panel.style.display = 'block';
                 const panelRect = panel.getBoundingClientRect();
@@ -1076,7 +1186,6 @@
 
                 let top, left;
 
-                // Calculate initial desired position based on the step's preference
                 switch (step.position) {
                     case 'top-center':
                         top = targetRect.top - panelRect.height - margin;
@@ -1086,28 +1195,22 @@
                         top = targetRect.bottom + margin;
                         left = targetRect.right - panelRect.width;
                         break;
-                    default: // bottom-center
+                    default: 
                         top = targetRect.bottom + margin;
                         left = targetRect.left + targetRect.width / 2 - panelRect.width / 2;
                         break;
                 }
 
-                // --- Vertical Correction ---
-                // If it overflows the bottom, try to place it on top
                 if (top + panelRect.height > vh - edgePadding) {
                     let newTop = targetRect.top - panelRect.height - margin;
-                    // If it fits on top, use that position. Otherwise, clamp it to the bottom edge.
                     top = (newTop >= edgePadding) ? newTop : (vh - panelRect.height - edgePadding);
                 }
                 
-                // If it overflows the top, try to place it at the bottom
                 if (top < edgePadding) {
                     let newTop = targetRect.bottom + margin;
-                    // If it fits at the bottom, use that position. Otherwise, clamp it to the top edge.
                     top = (newTop + panelRect.height <= vh - edgePadding) ? newTop : edgePadding;
                 }
                 
-                // --- Horizontal Correction ---
                 if (left < edgePadding) {
                     left = edgePadding;
                 }
@@ -1115,7 +1218,6 @@
                     left = vw - panelRect.width - edgePadding;
                 }
                 
-                // Apply the final, safe coordinates
                 panel.style.top = `${top}px`;
                 panel.style.left = `${left}px`;
                 
@@ -1135,9 +1237,64 @@
             localStorage.setItem(TUTORIAL_COMPLETED_KEY, 'true');
         }
 
-        tutorialNextBtn.addEventListener('click', () => {
-            showTutorialStep(currentTutorialStep + 1);
-        });
+        // --- [جدید] توابع راهنمای دیالوگ ---
+        const DIALOGUE_GUIDE_COMPLETED_KEY = 'mafia-dialogue-guide-completed';
+        let dialogueGuideSteps = [];
+        let currentDialogueStep = -1;
+
+        async function fetchDialogueGuideData() {
+            try {
+                const docRef = doc(db, 'settings', 'dialogueGuide');
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists() && docSnap.data().dialogues) {
+                    return docSnap.data().dialogues;
+                }
+                console.warn("Dialogue guide document not found or is empty.");
+                return [];
+            } catch (error) {
+                console.error("Error fetching dialogue guide:", error);
+                return [];
+            }
+        }
+
+        function showDialogueStep(stepIndex) {
+            if (stepIndex >= dialogueGuideSteps.length) {
+                endDialogueGuide();
+                return;
+            }
+            currentDialogueStep = stepIndex;
+            const step = dialogueGuideSteps[stepIndex];
+
+            dialogueGuideNextBtn.classList.remove('visible');
+            dialogueGuideCharacterImg.src = step.imageUrl || '';
+
+            typeWriterEffect(dialogueGuideText, step.text, () => {
+                 dialogueGuideNextBtn.classList.add('visible');
+            });
+
+            showModal(dialogueGuideOverlay);
+        }
+
+        function endDialogueGuide() {
+            hideModal(dialogueGuideOverlay);
+            localStorage.setItem(DIALOGUE_GUIDE_COMPLETED_KEY, 'true');
+
+            // حالا، بررسی می‌کنیم که آیا راهنمای UI باید شروع شود یا نه
+            if (!localStorage.getItem(TUTORIAL_COMPLETED_KEY)) {
+                setTimeout(startTutorial, 500); // تاخیر کوچک برای انتقال روان‌تر
+            }
+        }
+
+        async function startDialogueGuide() {
+            dialogueGuideSteps = await fetchDialogueGuideData();
+            if (dialogueGuideSteps && dialogueGuideSteps.length > 0) {
+                showDialogueStep(0);
+            } else {
+                // اگر اطلاعات راهنما وجود نداشت، آن را تمام شده در نظر گرفته و راهنمای بعدی را چک می‌کنیم
+                endDialogueGuide();
+            }
+        }
+
 
         // --- سایر توابع (مدیریت، رده‌بندی و ...) ---
         // (این توابع بدون تغییر باقی می‌مانند)
@@ -1181,9 +1338,13 @@
                         loadAndApplySettings();
                         isInitialLoad = false;
                         
-                        // [جدید] بررسی و شروع راهنمای کاربری
-                        if (!localStorage.getItem(TUTORIAL_COMPLETED_KEY)) {
-                            setTimeout(startTutorial, 1000); // تاخیر برای اطمینان از بارگذاری کامل صفحه
+                        // [جدید] بررسی و شروع راهنمای کاربری (سیستم دو مرحله‌ای)
+                        if (!localStorage.getItem(DIALOGUE_GUIDE_COMPLETED_KEY)) {
+                            // ابتدا راهنمای دیالوگ-محور را شروع کن
+                            setTimeout(startDialogueGuide, 1000); 
+                        } else if (!localStorage.getItem(TUTORIAL_COMPLETED_KEY)) {
+                            // اگر راهنمای دیالوگ تمام شده ولی راهنمای UI نه، آن را شروع کن
+                            setTimeout(startTutorial, 1000); 
                         }
                     }
                 }, (error) => {
@@ -1264,6 +1425,17 @@
             animationIntensityValue.textContent = `${value}%`;
             applyAnimationSettings(value); 
         });
+
+        // رویدادهای راهنمای کاربری
+        tutorialNextBtn.addEventListener('click', () => {
+            showTutorialStep(currentTutorialStep + 1);
+        });
+
+        // [جدید] رویداد راهنمای دیالوگ
+        dialogueGuideNextBtn.addEventListener('click', () => {
+            showDialogueStep(currentDialogueStep + 1);
+        });
+
 
     </script>
 </body>
