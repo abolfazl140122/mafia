@@ -475,17 +475,19 @@
             transition: all 0.4s ease 0.2s; /* تاخیر برای نمایش بعد از تایپ */
         }
         
-        /* --- [جدید] استایل‌های راهنمای دیالوگ --- */
+        /* --- [جدید و اصلاح شده] استایل‌های راهنمای دیالوگ --- */
         #dialogue-guide-overlay {
-            z-index: 1999; /* زیر راهنمای UI */
+            z-index: 1999;
             background-color: transparent;
             backdrop-filter: none;
             pointer-events: none;
+            display: flex; /* تغییر از کد قبلی */
             flex-direction: column;
             justify-content: flex-end;
             align-items: center;
             padding: 20px;
             box-sizing: border-box;
+            overflow: hidden; /* جلوگیری از سرریز شدن کاراکتر */
         }
 
         #dialogue-guide-overlay.visible {
@@ -494,21 +496,20 @@
 
         #dialogue-guide-character-container {
             position: absolute;
-            bottom: 0;
-            left: 25%;
-            transform: translateX(-50%);
-            width: 45%;
-            max-width: 280px;
+            bottom: 10px; /* فاصله از پایین صفحه */
+            left: 20px; /* فاصله از چپ صفحه */
+            width: 150px; /* عرض ثابت برای کاراکتر */
             height: auto;
+            z-index: 3; /* [مهم] بالاتر از پنل دیالوگ قرار می‌گیرد */
             transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.5s ease;
             transform-origin: bottom center;
             opacity: 0;
-            transform: translateX(-50%) translateY(20%);
+            transform: translateY(30%); /* انیمیشن ورود از پایین */
         }
 
         #dialogue-guide-overlay.visible #dialogue-guide-character-container {
             opacity: 1;
-            transform: translateX(-50%) translateY(0);
+            transform: translateY(0);
         }
 
         #dialogue-guide-character-img {
@@ -519,19 +520,36 @@
         }
 
         #dialogue-guide-box {
-            width: 95%;
+            width: 100%; /* تمام عرض والد */
             max-width: 500px;
             background: linear-gradient(145deg, #2c2217, #1a140e);
             border: 2px solid #a47d54;
             border-radius: 16px;
-            padding: 20px 25px;
+            /* [مهم] پدینگ چپ برای ایجاد فضا برای کاراکتر */
+            padding: 20px 25px 20px 170px; 
             box-shadow: 0 8px 25px rgba(0,0,0,0.6);
             position: relative;
-            z-index: 2;
+            z-index: 2; /* پایین‌تر از کاراکتر */
             text-align: right;
             opacity: 0;
             transform: translateY(30px);
             transition: opacity 0.5s ease 0.2s, transform 0.5s ease 0.2s;
+            min-height: 140px; /* حداقل ارتفاع برای زیبایی بیشتر */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        /* استایل ریسپانسیو برای موبایل های کوچکتر */
+        @media (max-width: 480px) {
+            #dialogue-guide-character-container {
+                width: 120px;
+                left: 10px;
+            }
+            #dialogue-guide-box {
+                padding-right: 20px;
+                padding-left: 140px; /* پدینگ کمتر */
+            }
         }
 
         #dialogue-guide-overlay.visible #dialogue-guide-box {
@@ -558,7 +576,8 @@
             transition: all 0.2s ease;
             opacity: 0;
             visibility: hidden;
-            float: left;
+            float: left; /* دکمه در سمت چپ قرار می‌گیرد */
+            align-self: flex-start; /* برای چیدمان بهتر در فلکس */
         }
         #dialogue-guide-next-btn:hover {
              background: linear-gradient(145deg, #a1534d, #6b3431);
@@ -1013,6 +1032,7 @@
         let isInitialLoad = true;
         let currentUserData = null;
         let rankingListenerUnsubscribe = null;
+        let dialogueListenerUnsubscribe = null; // [جدید] برای قطع کردن شنونده دیالوگ
 
         // --- توابع عمومی ---
         function showModal(modalElement) { modalElement.classList.add('visible'); }
@@ -1236,25 +1256,37 @@
             tutorialOverlay.classList.remove('visible');
             localStorage.setItem(TUTORIAL_COMPLETED_KEY, 'true');
         }
-
-        // --- [جدید] توابع راهنمای دیالوگ ---
-        const DIALOGUE_GUIDE_COMPLETED_KEY = 'mafia-dialogue-guide-completed';
+        
+        // --- [جدید و بازنویسی شده] توابع راهنمای دیالوگ ---
         let dialogueGuideSteps = [];
         let currentDialogueStep = -1;
+        let currentDialogueId = null;
 
-        async function fetchDialogueGuideData() {
-            try {
-                const docRef = doc(db, 'settings', 'dialogueGuide');
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists() && docSnap.data().dialogues) {
-                    return docSnap.data().dialogues;
+        function initializeDialogueListener() {
+            if (dialogueListenerUnsubscribe) dialogueListenerUnsubscribe(); // قطع شنونده قبلی
+
+            const dialogueDocRef = doc(db, 'settings', 'dialogueGuide');
+            dialogueListenerUnsubscribe = onSnapshot(dialogueDocRef, (docSnap) => {
+                // اگر کاربر لاگین نکرده یا دیتا کامل نیست، کاری نکن
+                if (!auth.currentUser || !currentUserData) return;
+
+                if (docSnap.exists()) {
+                    const serverDialogueData = docSnap.data();
+                    const serverDialogueId = serverDialogueData.dialogueId;
+                    const userLastSeenId = currentUserData.lastSeenDialogueId || null;
+
+                    // بررسی میکنیم که آیا دیالوگ سرور جدید است و کاربر آن را ندیده
+                    if (serverDialogueId && serverDialogueId !== userLastSeenId) {
+                        if (serverDialogueData.dialogues && serverDialogueData.dialogues.length > 0) {
+                            dialogueGuideSteps = serverDialogueData.dialogues;
+                            currentDialogueId = serverDialogueId; // شناسه فعلی را ذخیره میکنیم
+                            startDialogueGuide();
+                        }
+                    }
                 }
-                console.warn("Dialogue guide document not found or is empty.");
-                return [];
-            } catch (error) {
-                console.error("Error fetching dialogue guide:", error);
-                return [];
-            }
+            }, (error) => {
+                console.error("خطا در شنونده دیالوگ:", error);
+            });
         }
 
         function showDialogueStep(stepIndex) {
@@ -1274,24 +1306,33 @@
 
             showModal(dialogueGuideOverlay);
         }
-
-        function endDialogueGuide() {
+        
+        function startDialogueGuide() {
+            // اطمینان از بسته بودن سایر پنل ها
+            hideAllAdminModals();
+            hideModal(avatarMenuOverlay);
+            // ... بستن سایر پنل ها
+            
+            showDialogueStep(0);
+        }
+        
+        async function endDialogueGuide() {
             hideModal(dialogueGuideOverlay);
-            localStorage.setItem(DIALOGUE_GUIDE_COMPLETED_KEY, 'true');
+            // [مهم] ذخیره شناسه دیالوگ مشاهده شده در پروفایل کاربر در Firestore
+            if (auth.currentUser && currentDialogueId) {
+                try {
+                    const userDocRef = doc(db, 'users', auth.currentUser.uid);
+                    await updateDoc(userDocRef, {
+                        lastSeenDialogueId: currentDialogueId
+                    });
+                } catch (error) {
+                    console.error("خطا در آپدیت شناسه دیالوگ کاربر:", error);
+                }
+            }
 
             // حالا، بررسی می‌کنیم که آیا راهنمای UI باید شروع شود یا نه
             if (!localStorage.getItem(TUTORIAL_COMPLETED_KEY)) {
                 setTimeout(startTutorial, 500); // تاخیر کوچک برای انتقال روان‌تر
-            }
-        }
-
-        async function startDialogueGuide() {
-            dialogueGuideSteps = await fetchDialogueGuideData();
-            if (dialogueGuideSteps && dialogueGuideSteps.length > 0) {
-                showDialogueStep(0);
-            } else {
-                // اگر اطلاعات راهنما وجود نداشت، آن را تمام شده در نظر گرفته و راهنمای بعدی را چک می‌کنیم
-                endDialogueGuide();
             }
         }
 
@@ -1338,14 +1379,13 @@
                         loadAndApplySettings();
                         isInitialLoad = false;
                         
-                        // [جدید] بررسی و شروع راهنمای کاربری (سیستم دو مرحله‌ای)
-                        if (!localStorage.getItem(DIALOGUE_GUIDE_COMPLETED_KEY)) {
-                            // ابتدا راهنمای دیالوگ-محور را شروع کن
-                            setTimeout(startDialogueGuide, 1000); 
-                        } else if (!localStorage.getItem(TUTORIAL_COMPLETED_KEY)) {
-                            // اگر راهنمای دیالوگ تمام شده ولی راهنمای UI نه، آن را شروع کن
-                            setTimeout(startTutorial, 1000); 
-                        }
+                        // [جدید] سیستم دو مرحله‌ای راهنما
+                        // 1. ابتدا شنونده دیالوگ سرور-محور را فعال کن
+                        initializeDialogueListener(); 
+                        
+                        // 2. اگر راهنمای UI هنوز انجام نشده، آن را برای اجرا بعد از دیالوگ آماده نگه دار
+                        // (منطق شروع آن داخل endDialogueGuide قرار گرفته است)
+
                     }
                 }, (error) => {
                     console.error("خطا در گوش دادن به اطلاعات کاربر:", error);
