@@ -7,28 +7,19 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
-    <!-- افزودن کتابخانه آیکون Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
         :root {
-            /* --- پالت رنگی بهبود یافته --- */
             --primary-gold: #ffc947;
-            --light-gold: #fce5a6;
-            --dark-red: #a13d3d;
-            --darker-red: #7c1f1f;
+            --dark-red: #8c4843;
+            --darker-red: #5a2c2a;
             --text-light: #f0e6d2;
             --text-secondary: #c5a687;
-            --bg-dark: #120e0a;
-            --bg-surface: #1a140e;
+            --bg-dark: #1a140e;
             --border-color: #5c4a3a;
             --green-ready: #2ecc71;
-            --green-glow: rgba(46, 204, 113, 0.6);
-            --gold-glow: rgba(255, 201, 71, 0.7);
             --mic-off-bg: #4a5568;
             --mic-on-bg: #2f855a;
-            --card-bg: linear-gradient(160deg, #2a2118, #1c1611);
-            --card-border: #4a3c2e;
-            --card-shadow: rgba(0, 0, 0, 0.6);
+            --slot-bg: linear-gradient(160deg, #2a2118, var(--bg-dark));
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -42,13 +33,11 @@
             flex-direction: column;
             position: relative;
         }
-        
-        /* --- پس‌زمینه و لودینگ --- */
+
         #background-blurry {
             position: fixed; top: -20px; left: -20px; width: calc(100% + 40px); height: calc(100% + 40px);
             background-image: url('https://up.20script.ir/file/6195-file-000000001500622f9419de6c322df297-1-.jpg');
-            background-size: cover; background-position: center center; filter: blur(10px) brightness(0.5); z-index: -1;
-            transform: scale(1.1);
+            background-size: cover; background-position: center center; filter: blur(8px) brightness(0.6); z-index: -1;
         }
         
         #loading-overlay {
@@ -59,203 +48,116 @@
         .loader {
             border: 6px solid #f3f3f330; border-top: 6px solid var(--primary-gold);
             border-radius: 50%; width: 60px; height: 60px; animation: spin 1.5s linear infinite;
-            box-shadow: 0 0 15px var(--gold-glow);
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         #loading-text { margin-top: 20px; font-size: 1.1rem; font-weight: 700; }
 
-        /* --- ساختار اصلی لابی --- */
         .lobby-container {
             width: 100%; height: 100%; display: flex; flex-direction: column;
-            padding: 12px; gap: 12px;
+            padding: 10px; gap: 10px;
         }
 
         .lobby-header { 
             flex-shrink: 0;
             display: flex; justify-content: space-between; align-items: center;
-            background-color: rgba(0,0,0,0.5); padding: 10px 15px; border-radius: 12px;
-            border: 1px solid var(--border-color); backdrop-filter: blur(5px);
+            background-color: rgba(0,0,0,0.4); padding: 8px 12px; border-radius: 12px; border: 1px solid var(--border-color);
         }
-        #lobby-name { font-size: 1.4rem; font-weight: 900; color: var(--primary-gold); text-shadow: 0 2px 5px var(--card-shadow); }
+        #lobby-name { font-size: 1.3rem; font-weight: 900; color: var(--primary-gold); text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
         .leave-button {
-            background: linear-gradient(145deg, var(--dark-red), var(--darker-red)); border: 1px solid #ff8f8f;
-            color: white; padding: 8px 15px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; 
-            cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 8px;
+            background: linear-gradient(145deg, #a13d3d, #7c1f1f); border: 1px solid #ff8f8f;
+            color: white; padding: 6px 12px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: all 0.2s ease;
         }
-        .leave-button:hover { transform: scale(1.05); box-shadow: 0 4px 12px rgba(220, 50, 50, 0.3); }
+        .leave-button:hover { transform: scale(1.05); box-shadow: 0 2px 10px rgba(0,0,0,0.4); }
 
-        /* --- چیدمان جدید و ریسپانسیو بازیکنان --- */
         .players-area {
-            flex-grow: 1;
-            display: grid;
-            /* این گرید به صورت خودکار تعداد ستون‌ها را بر اساس عرض صفحه تنظیم می‌کند */
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 12px;
-            padding: 5px;
-            overflow-y: auto; /* اسکرول در صورت نیاز */
+            flex-grow: 1; display: grid; grid-template-columns: 1fr 1fr;
+            gap: 10px; padding: 0 5px; overflow: hidden;
         }
-        /* استایل برای اسکرول بار */
-        .players-area::-webkit-scrollbar { width: 6px; }
-        .players-area::-webkit-scrollbar-track { background: transparent; }
-        .players-area::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
-        .players-area::-webkit-scrollbar-thumb:hover { background: var(--primary-gold); }
+        .players-column { display: flex; flex-direction: column; gap: 8px; height: 100%; }
+        @keyframes slot-fade-in { from { opacity: 0; transform: translateY(15px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
-
-        @keyframes card-fade-in { from { opacity: 0; transform: translateY(20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
-        
-        /* --- طراحی جدید کارت بازیکن --- */
         .player-slot {
-            background: var(--card-bg);
-            border: 2px solid var(--card-border);
-            border-radius: 16px;
-            padding: 15px 10px;
-            text-align: center;
-            box-shadow: 0 6px 20px var(--card-shadow), inset 0 0 15px rgba(0,0,0,0.4);
-            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-            position: relative;
-            overflow: hidden;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            animation: card-fade-in 0.6s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
-            aspect-ratio: 3/4; /* نسبت ابعاد کارت */
+            flex: 1; border-radius: 12px; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; padding: 5px; text-align: center; 
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease-in-out, border-color 0.3s ease-in-out; /* CHANGE: Added transition for speaking indicator */
+            position: relative; overflow: hidden; animation: slot-fade-in 0.6s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+            min-height: 0;
         }
-        /* افکت درخشش روی کارت */
-        .player-slot.filled::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -85%;
-            width: 60%; height: 100%;
-            background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0) 100%);
-            transform: skewX(-25deg);
-            transition: left 0.6s ease;
-        }
-        .player-slot.filled:hover::before { left: 125%; }
-
-        .player-slot.empty {
-            background: rgba(0,0,0,0.2);
-            border: 2px dashed var(--border-color);
-            opacity: 0.7;
-            backdrop-filter: blur(2px);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .player-slot.empty:hover { background: rgba(0,0,0,0.4); border-color: var(--primary-gold); opacity: 1; }
+        .player-slot.empty { background: rgba(0,0,0,0.2); border: 2px dashed var(--border-color); opacity: 0.7; backdrop-filter: blur(2px); cursor: default; }
+        .player-slot.empty:hover { background: rgba(0,0,0,0.3); border-color: var(--primary-gold); }
+        .player-slot.filled { background: var(--slot-bg); border: 2px solid var(--border-color); box-shadow: 0 4px 15px rgba(0,0,0,0.5), inset 0 0 10px rgba(0,0,0,0.3); }
         
-        .avatar-frame { position: relative; margin-bottom: 12px; }
         .player-avatar {
-            width: 75px; height: 75px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 4px solid var(--text-secondary);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.7);
-            transition: all 0.3s ease;
+            width: 55%; max-width: 70px; aspect-ratio: 1/1; border-radius: 50%;
+            object-fit: cover; border: 3px solid var(--text-secondary);
+            margin-bottom: 5px; transition: all 0.3s ease; box-shadow: 0 3px 8px rgba(0,0,0,0.5);
         }
         
         .player-name {
-            font-size: clamp(0.8rem, 2.5vw, 1rem); font-weight: 700; width: 100%;
-            white-space: normal; word-break: break-word; line-height: 1.3;
-            padding: 0 5px; text-shadow: 0 2px 4px #000;
+            font-size: clamp(0.65rem, 2.2vw, 0.8rem); font-weight: 700; width: 100%;
+            white-space: normal; word-break: break-word; line-height: 1.2;
+            padding: 0 2px; text-shadow: 0 1px 3px #000; height: 2.5em;
+            display: flex; align-items: center; justify-content: center;
         }
-        .empty-text { font-size: clamp(0.8rem, 3vw, 1rem); color: var(--text-secondary); font-weight: 700; }
+        .empty-text { font-size: clamp(0.7rem, 2.5vw, 0.8rem); color: var(--text-secondary); font-weight: 700; }
+        .host-crown { position: absolute; top: -1px; right: -1px; width: 28px; height: 28px; background-color: var(--primary-gold); color: var(--darker-red); border-radius: 0 10px 0 10px; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 900; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
         
-        .host-crown { 
-            position: absolute; top: -5px; right: -5px; width: 32px; height: 32px; 
-            background-color: var(--primary-gold); color: var(--darker-red); 
-            border-radius: 50%; display: flex; align-items: center; justify-content: center; 
-            font-size: 1.2rem; box-shadow: 0 3px 8px rgba(0,0,0,0.6); border: 2px solid var(--bg-dark);
-        }
-        
-        /* --- انیمیشن جدید برای حالت صحبت کردن --- */
-        @keyframes pulse-speaking {
-            0% { box-shadow: 0 0 8px var(--gold-glow), 0 0 12px var(--gold-glow), inset 0 0 10px rgba(0,0,0,0.3); }
-            50% { box-shadow: 0 0 18px var(--gold-glow), 0 0 28px var(--gold-glow), inset 0 0 10px rgba(0,0,0,0.3); }
-            100% { box-shadow: 0 0 8px var(--gold-glow), 0 0 12px var(--gold-glow), inset 0 0 10px rgba(0,0,0,0.3); }
-        }
+        /* --- CHANGE START: Removed old speaking indicator and added new style for glowing border --- */
         .player-slot.speaking {
             border-color: var(--primary-gold);
-            animation: pulse-speaking 2s infinite;
+            box-shadow: 0 0 15px rgba(255, 201, 71, 0.8), 0 0 25px rgba(255, 201, 71, 0.5), inset 0 0 10px rgba(0,0,0,0.3);
         }
+        /* --- CHANGE END --- */
 
-        /* --- استایل جدید برای حالت آماده --- */
         .ready-indicator {
-            position: absolute; top: 0px; left: 0px; width: 28px; height: 28px;
+            position: absolute; bottom: 4px; right: 4px; width: 18px; height: 18px;
             background-color: var(--green-ready); border-radius: 50%; border: 2px solid var(--bg-dark);
             display: flex; align-items: center; justify-content: center; color: white;
-            font-weight: 900; font-size: 1.1rem; transform: scale(0); 
+            font-weight: 900; font-size: 0.8rem; transform: scale(0); 
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             text-shadow: 0 1px 2px rgba(0,0,0,0.4);
-            z-index: 5;
         }
         .player-slot.ready .ready-indicator { transform: scale(1); }
         .player-slot.ready .player-avatar { border-color: var(--green-ready); }
-        .player-slot.ready { 
-            border-color: var(--green-ready); 
-            box-shadow: 0 0 15px var(--green-glow), 0 0 25px var(--green-glow), inset 0 0 10px rgba(0,0,0,0.3);
-            transform: scale(1.03); 
-        }
+        .player-slot.ready { border-color: var(--green-ready); box-shadow: 0 0 15px rgba(46, 204, 113, 0.7), 0 0 25px rgba(46, 204, 113, 0.4), inset 0 0 10px rgba(0,0,0,0.3); transform: scale(1.02); }
         
-        /* استایل اخراج بازیکن */
-        .player-slot.filled.kickable::after { 
-            content: 'اخراج'; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            background-color: rgba(231, 76, 60, 0.9); color: white; font-size: 1.3rem; 
-            font-weight: 900; opacity: 0; visibility: hidden; transition: all 0.3s ease; 
-            display: flex; align-items: center; justify-content: center; border-radius: 14px; 
-            backdrop-filter: blur(3px); cursor: pointer;
-        }
+        .player-slot.filled.kickable::after { content: 'اخراج'; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(231, 76, 60, 0.85); color: white; font-size: 1.1rem; font-weight: 900; opacity: 0; visibility: hidden; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; border-radius: 10px; }
         .player-slot.filled.kickable:hover::after { opacity: 1; visibility: visible; }
         
-        /* --- فوتر و دکمه‌ها --- */
-        .lobby-footer { 
-            flex-shrink: 0; display: flex; gap: 10px; align-items: center; 
-            padding: 10px; background-color: rgba(0,0,0,0.4); border-radius: 12px;
-            border-top: 1px solid var(--border-color);
-        }
+        .lobby-footer { flex-shrink: 0; display: flex; gap: 10px; align-items: center; padding-top: 10px; }
         .action-button {
             flex-grow: 1; padding: 14px; font-size: 1.2rem; font-weight: 900;
             border-radius: 12px; border: none; cursor: pointer; transition: all 0.3s ease;
-            color: var(--bg-dark); text-shadow: 0 1px 1px rgba(255,255,255,0.3); position: relative; overflow: hidden;
-            border-bottom: 4px solid rgba(0,0,0,0.3);
+            color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.5); position: relative; overflow: hidden;
         }
-        .action-button:not(:disabled):hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); border-bottom-width: 6px; }
-        .action-button:not(:disabled):active { transform: translateY(0); border-bottom-width: 4px; }
-        
-        .action-button.ready-btn { background: linear-gradient(145deg, #2ecc71, #27ae60); border-color: #1f8b4c; }
-        .action-button.unready-btn { background: linear-gradient(145deg, #e74c3c, #c0392b); border-color: #a93226; color: white; }
-        .action-button.start-btn { background: linear-gradient(145deg, var(--primary-gold), #e67e22); border-color: #d35400; }
-        .action-button:disabled { background: linear-gradient(145deg, #7f8c8d, #626567); border-color: #515a5a; cursor: not-allowed; opacity: 0.6; }
-        
+        .action-button::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(to bottom, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 20%); transform: rotate(25deg); }
+        .action-button.ready-btn { background: linear-gradient(145deg, #27ae60, #229954); border: 2px solid #58d68d; }
+        .action-button.unready-btn { background: linear-gradient(145deg, #c0392b, #a93226); border: 2px solid #e67e22; }
+        .action-button.start-btn { background: linear-gradient(145deg, var(--dark-red), var(--darker-red)); border: 2px solid var(--primary-gold); }
+        .action-button:disabled { background: linear-gradient(145deg, #7f8c8d, #626567); border-color: #95a5a6; cursor: not-allowed; opacity: 0.6; }
+        .action-button:not(:disabled):hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
         .action-button.start-btn:not(:disabled) { animation: pulse-start 2s infinite; }
-        @keyframes pulse-start { 
-            0% { box-shadow: 0 0 0 0 var(--gold-glow); } 
-            70% { box-shadow: 0 0 0 12px rgba(255, 201, 71, 0); } 
-            100% { box-shadow: 0 0 0 0 rgba(255, 201, 71, 0); } 
-        }
+        @keyframes pulse-start { 0% { box-shadow: 0 0 0 0 rgba(255, 201, 71, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(255, 201, 71, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 201, 71, 0); } }
 
         #voice-chat-btn {
-            flex-shrink: 0; width: 55px; height: 55px; border-radius: 50%;
-            background-color: var(--mic-off-bg); color: white; border: 2px solid #718096;
+            flex-shrink: 0; width: 50px; height: 50px; border-radius: 50%;
+            background-color: var(--mic-off-bg); color: white; border: none;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
             transition: all 0.3s ease;
         }
-        #voice-chat-btn:hover { transform: scale(1.1); }
-        #voice-chat-btn.mic-on { background-color: var(--mic-on-bg); border-color: #68d391; animation: pulse-mic 1.5s infinite; }
-        #voice-chat-btn svg { width: 26px; height: 26px; fill: currentColor; }
-        @keyframes pulse-mic { 
-            0% { box-shadow: 0 0 0 0 rgba(47, 133, 90, 0.7); } 
-            70% { box-shadow: 0 0 0 10px rgba(47, 133, 90, 0); } 
-            100% { box-shadow: 0 0 0 0 rgba(47, 133, 90, 0); } 
-        }
+        #voice-chat-btn.mic-on { background-color: var(--mic-on-bg); animation: pulse-mic 1.5s infinite; }
+        #voice-chat-btn svg { width: 24px; height: 24px; fill: currentColor; }
+        @keyframes pulse-mic { 0% { box-shadow: 0 0 0 0 rgba(47, 133, 90, 0.7); } 70% { box-shadow: 0 0 0 8px rgba(47, 133, 90, 0); } 100% { box-shadow: 0 0 0 0 rgba(47, 133, 90, 0); } }
 
-        /* --- مودال‌ها --- */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s 0.3s; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.85); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s 0.3s; }
         .modal-overlay.visible { opacity: 1; visibility: visible; transition: opacity 0.3s ease; }
         .modal-content { background: linear-gradient(145deg, #3c3022, var(--bg-dark)); border: 2px solid var(--border-color); border-radius: 16px; padding: 25px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .modal-overlay.visible .modal-content { transform: scale(1); }
         .modal-title { font-size: 1.5rem; font-weight: 900; color: var(--primary-gold); margin-bottom: 20px; }
         .modal-message { font-size: 1rem; line-height: 1.6; margin-bottom: 25px; }
         .modal-buttons { display: flex; gap: 15px; }
-        .modal-button { flex-grow: 1; padding: 12px; font-size: 1rem; font-weight: 700; border-radius: 8px; cursor: pointer; border: 1px solid; transition: all 0.2s ease; }
-        .modal-button:hover { transform: translateY(-2px); }
+        .modal-button { flex-grow: 1; padding: 12px; font-size: 1rem; font-weight: 700; border-radius: 8px; cursor: pointer; border: 1px solid; }
         .modal-button.primary { color: white; background: linear-gradient(145deg, var(--dark-red), var(--darker-red)); border-color: var(--primary-gold); }
         .modal-button.secondary { color: var(--text-light); background: linear-gradient(145deg, #504436, #332a20); border-color: var(--border-color); }
     </style>
@@ -271,14 +173,12 @@
     <div class="lobby-container" style="display: none;">
         <header class="lobby-header">
             <h1 id="lobby-name">نام لابی...</h1>
-            <button id="leave-lobby-btn" class="leave-button">
-                <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                <span>خروج</span>
-            </button>
+            <button id="leave-lobby-btn" class="leave-button">خروج</button>
         </header>
 
-        <main id="players-area" class="players-area">
-            <!-- اسلات‌های بازیکنان به صورت داینامیک اینجا اضافه می‌شوند -->
+        <main class="players-area">
+            <div id="left-players" class="players-column"></div>
+            <div id="right-players" class="players-column"></div>
         </main>
         
         <footer class="lobby-footer">
@@ -322,7 +222,8 @@
         const loadingOverlay = document.getElementById('loading-overlay');
         const lobbyContainer = document.querySelector('.lobby-container');
         const lobbyNameEl = document.getElementById('lobby-name');
-        const playersAreaEl = document.getElementById('players-area'); // تغییر به کانتینر اصلی
+        const leftPlayersEl = document.getElementById('left-players');
+        const rightPlayersEl = document.getElementById('right-players');
         const actionBtn = document.getElementById('action-btn');
         const leaveLobbyBtn = document.getElementById('leave-lobby-btn');
         const voiceChatBtn = document.getElementById('voice-chat-btn');
@@ -339,7 +240,7 @@
         let isHost = false;
         let isReady = false;
         let lastPlayerCount = 0;
-        
+
         // --- متغیرهای چت صوتی ---
         const servers = { iceServers: [{ urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'] }] };
         let localStream = null;
@@ -410,14 +311,20 @@
                 
                 for (const player of players) {
                     if (player.uid !== myId && !connectedPeerIds.has(player.uid)) {
+                        console.log(`New player detected: ${player.displayName}. Creating peer connection.`);
                         peerConnections[player.uid] = createPeerConnection(player.uid);
                         if (myId < player.uid) {
+                            console.log(`My ID is smaller. Sending offer to ${player.displayName}.`);
                             await sendOffer(player.uid);
                         }
                     }
                 }
 
-                for (const peerId of connectedPeerIds) { if (!currentPlayerIds.has(peerId)) closeConnection(peerId); }
+                for (const peerId of connectedPeerIds) {
+                    if (!currentPlayerIds.has(peerId)) {
+                         closeConnection(peerId);
+                    }
+                }
 
                 renderLobby(lobbyData);
                 if (loadingOverlay.style.display !== 'none') {
@@ -432,49 +339,40 @@
             listenToSignals();
         }
 
-        // --- تابع رندر لابی به‌روز شده با طراحی جدید ---
         function renderLobby(data) {
             lobbyNameEl.textContent = data.lobbyName;
             const players = data.players || [];
             isHost = currentUser.uid === data.creatorId;
-            playersAreaEl.innerHTML = ''; // پاک کردن کل محتوا
+            leftPlayersEl.innerHTML = '';
+            rightPlayersEl.innerHTML = '';
             
-            // نمایش بازیکنان موجود
-            players.forEach((player, i) => {
+            for (let i = 0; i < MAX_PLAYERS; i++) {
+                const player = players[i];
                 const slot = document.createElement('div');
-                slot.className = 'player-slot filled';
-                slot.dataset.uid = player.uid; 
-                slot.style.animationDelay = `${i * 60}ms`;
-
-                if (player.isReady) slot.classList.add('ready');
-                if (isHost && player.uid !== currentUser.uid) {
-                    slot.classList.add('kickable');
-                    slot.title = `برای اخراج ${player.displayName} کلیک کنید`;
-                    slot.onclick = () => showKickConfirm(player.displayName, player.uid);
-                }
-
-                const hostCrown = player.uid === data.creatorId ? `<div class="host-crown">👑</div>` : '';
+                slot.className = 'player-slot';
+                slot.style.animationDelay = `${(i % 6) * 70}ms`;
                 
-                slot.innerHTML = `
-                    <div class="avatar-frame">
+                if (player) {
+                    slot.classList.add('filled');
+                    slot.dataset.uid = player.uid; 
+                    if (player.isReady) slot.classList.add('ready');
+                    const hostCrown = player.uid === data.creatorId ? `<div class="host-crown">👑</div>` : '';
+                    slot.innerHTML = `
                         ${hostCrown}
-                        <div class="ready-indicator">✔</div>
                         <img src="${player.avatarUrl || 'https://i.imgur.com/T2bT1tG.png'}" alt="avatar" class="player-avatar">
-                    </div>
-                    <p class="player-name">${player.displayName}</p>
-                `;
-                playersAreaEl.appendChild(slot);
-            });
-
-            // نمایش جایگاه‌های خالی
-            for (let i = players.length; i < MAX_PLAYERS; i++) {
-                const slot = document.createElement('div');
-                slot.className = 'player-slot empty';
-                slot.style.animationDelay = `${i * 60}ms`;
-                slot.innerHTML = `<span class="empty-text">جایگاه خالی</span>`;
-                // Optional: Add invite functionality on click
-                // slot.onclick = () => showInviteModal();
-                playersAreaEl.appendChild(slot);
+                        <p class="player-name">${player.displayName}</p>
+                        <div class="ready-indicator">✔</div>
+                    `;
+                    if (isHost && player.uid !== currentUser.uid) {
+                        slot.classList.add('kickable');
+                        slot.title = `برای اخراج ${player.displayName} کلیک کنید`;
+                        slot.onclick = () => showKickConfirm(player.displayName, player.uid);
+                    }
+                } else {
+                    slot.classList.add('empty');
+                    slot.innerHTML = `<span class="empty-text">جایگاه خالی</span>`;
+                }
+                if (i < 6) leftPlayersEl.appendChild(slot); else rightPlayersEl.appendChild(slot);
             }
             
             const self = players.find(p => p.uid === currentUser.uid);
@@ -492,7 +390,6 @@
             }
         }
 
-        // --- بقیه توابع جاوااسکریپت بدون تغییر در منطق ---
         async function handleActionClick() { if (isHost) { showNotificationModal("شروع بازی!", "بازی در حال آماده سازی است... (در حال حاضر شما به صفحه اصلی منتقل می‌شوید)", () => window.location.href = './main.html'); } else { await toggleReadyStatus(); playSound('sound-ready'); } }
         async function toggleReadyStatus() { const lobbyDocRef = doc(db, "Lobbys_list", lobbyId); await runTransaction(db, async (transaction) => { const lobbyDoc = await transaction.get(lobbyDocRef); if (!lobbyDoc.exists()) throw new Error("لابی یافت نشد!"); let players = lobbyDoc.data().players || []; const playerIndex = players.findIndex(p => p.uid === currentUser.uid); if (playerIndex > -1) { players[playerIndex].isReady = !players[playerIndex].isReady; transaction.update(lobbyDocRef, { players: players }); } }); }
         async function kickPlayer(uidToKick) { const lobbyDocRef = doc(db, "Lobbys_list", lobbyId); await runTransaction(db, async (transaction) => { const lobbyDoc = await transaction.get(lobbyDocRef); if (!lobbyDoc.exists()) return; let players = lobbyDoc.data().players.filter(p => p.uid !== uidToKick); transaction.update(lobbyDocRef, { players: players, playerCount: players.length }); }); }
@@ -500,43 +397,75 @@
         async function handleLeaveLobby() {
             if (unsubscribeLobby) unsubscribeLobby();
             await hangupVoiceChat(); 
+
             const lobbyDocRef = doc(db, "Lobbys_list", lobbyId);
             try {
                 await runTransaction(db, async (transaction) => {
                     const lobbyDoc = await transaction.get(lobbyDocRef);
                     if (!lobbyDoc.exists()) return;
-                    if (isHost) { transaction.delete(lobbyDocRef); } 
-                    else { let players = lobbyDoc.data().players.filter(p => p.uid !== currentUser.uid); transaction.update(lobbyDocRef, { players: players, playerCount: players.length }); }
+                    if (isHost) {
+                        transaction.delete(lobbyDocRef);
+                    } else {
+                        let players = lobbyDoc.data().players.filter(p => p.uid !== currentUser.uid);
+                        transaction.update(lobbyDocRef, { players: players, playerCount: players.length });
+                    }
                 });
-            } finally { window.location.href = './Lobby page.html'; }
+            } finally {
+                window.location.href = './Lobby page.html';
+            }
         }
         
+        // --- توابع چت صوتی (با منطق جدید و بهبود یافته) ---
         async function handleMicClick() {
-            if (isMuted) {
+            if (isMuted) { // Only try to get stream if muted/not started
                 try {
-                    localStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }, video: false });
-                    Object.values(peerConnections).forEach(pc => { localStream.getTracks().forEach(track => pc.addTrack(track, localStream)); });
+                    const audioConstraints = {
+                        audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+                        video: false,
+                    };
+                    const stream = await navigator.mediaDevices.getUserMedia(audioConstraints);
+                    localStream = stream;
+                    
+                    // Add tracks to all existing peer connections
+                    Object.values(peerConnections).forEach(pc => {
+                        stream.getTracks().forEach(track => pc.addTrack(track, stream));
+                    });
+                    
+                    // Since adding tracks requires renegotiation, the offerer should send a new offer
                     const players = (await getDoc(doc(db, "Lobbys_list", lobbyId))).data().players;
-                    for(const player of players) { if(player.uid !== myId && myId < player.uid) { await sendOffer(player.uid); } }
+                    for(const player of players) {
+                        if(player.uid !== myId && myId < player.uid) {
+                            await sendOffer(player.uid);
+                        }
+                    }
+
                     toggleMute(false);
                 } catch (err) {
                     console.error("Mic access error:", err);
                     let message = "برای استفاده از چت صوتی، لطفاً دسترسی به میکروفون را بدهید.";
-                    if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') { message = "شما دسترسی به میکروفون را نداده‌اید. لطفاً در تنظیمات مرورگر، دسترسی را فعال کنید."; } 
-                    else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') { message = "هیچ میکروفونی یافت نشد."; }
+                    if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+                        message = "شما دسترسی به میکروفون را نداده‌اید. لطفاً در تنظیمات مرورگر یا اپلیکیشن، دسترسی را فعال کنید.";
+                    } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+                        message = "هیچ میکروفونی یافت نشد. لطفاً از اتصال صحیح میکروفون خود اطمینان حاصل کنید.";
+                    }
                     showNotificationModal("خطای دسترسی به میکروفون", message, ()=>{});
                 }
-            } else { toggleMute(true); }
+            } else {
+                toggleMute(true);
+            }
         }
         
         function toggleMute(muteState) {
             isMuted = muteState;
-            if (localStream) { localStream.getAudioTracks().forEach(track => track.enabled = !isMuted); }
-            micIcon.innerHTML = isMuted ? MIC_ON_SVG : MIC_MUTED_SVG; // Corrected
+            if (localStream) {
+                localStream.getAudioTracks().forEach(track => track.enabled = !isMuted);
+            }
+            micIcon.innerHTML = isMuted ? MIC_ON_SVG : MIC_MUTED_SVG; // Corrected logic
             voiceChatBtn.title = isMuted ? "وصل کردن صدا" : "قطع کردن صدا";
             voiceChatBtn.classList.toggle('mic-on', !isMuted);
         }
         
+        // --- CHANGE START: New function for speaking indicator ---
         function setupAudioVisualizer(stream, remoteId) {
             try {
                 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -546,24 +475,43 @@
                 analyser.fftSize = 256;
                 const bufferLength = analyser.frequencyBinCount;
                 const dataArray = new Uint8Array(bufferLength);
-                if (peerConnections[remoteId]) { peerConnections[remoteId].visualizer = { audioContext, animationFrameId: null }; }
+                
+                if (peerConnections[remoteId]) {
+                    // Store visualizer components for cleanup
+                    peerConnections[remoteId].visualizer = { audioContext, animationFrameId: null };
+                }
 
                 const draw = () => {
+                    // Check if connection still exists before continuing
                     if (!peerConnections[remoteId] || !peerConnections[remoteId].visualizer) return;
+                    
                     const userSlot = document.querySelector(`.player-slot[data-uid="${remoteId}"]`);
-                    if (!userSlot) { cancelAnimationFrame(peerConnections[remoteId].visualizer.animationFrameId); return; }
+                    if (!userSlot) {
+                        // If user slot is gone, stop the animation loop
+                        cancelAnimationFrame(peerConnections[remoteId].visualizer.animationFrameId);
+                        return;
+                    }
+
                     analyser.getByteFrequencyData(dataArray);
                     let average = dataArray.reduce((a, b) => a + b, 0) / bufferLength;
+                    
+                    // Toggle 'speaking' class based on volume threshold (15 is a good starting point)
                     userSlot.classList.toggle('speaking', average > 15);
+                    
                     peerConnections[remoteId].visualizer.animationFrameId = requestAnimationFrame(draw);
                 };
                 draw();
-            } catch (e) { console.error("Audio visualizer failed:", e); }
+            } catch (e) {
+                console.error("Audio visualizer failed to initialize:", e);
+            }
         }
+        // --- CHANGE END ---
 
         function createPeerConnection(remoteId) {
             const pc = new RTCPeerConnection(servers);
+            
             pc.onicecandidate = e => e.candidate && sendSignal(remoteId, { iceCandidate: e.candidate.toJSON() });
+            
             pc.ontrack = event => {
                 if (event.streams && event.streams[0]) {
                     let remoteAudio = document.getElementById(`audio-${remoteId}`);
@@ -571,19 +519,26 @@
                         remoteAudio = document.createElement('audio');
                         remoteAudio.id = `audio-${remoteId}`;
                         remoteAudio.autoplay = true;
-                        remoteAudio.playsInline = true;
+                        remoteAudio.playsInline = true; // Important for mobile browsers
                         audioContainer.appendChild(remoteAudio);
                     }
                     remoteAudio.srcObject = event.streams[0];
+                    
+                    // --- CHANGE: Setup the visualizer when track is received ---
                     setupAudioVisualizer(event.streams[0], remoteId);
                 }
             };
-            if (localStream) { localStream.getTracks().forEach(track => pc.addTrack(track, localStream)); }
+            
+            if (localStream) { 
+                localStream.getTracks().forEach(track => pc.addTrack(track, localStream)); 
+            }
+            
             return pc;
         }
 
         async function sendOffer(remoteId) {
-            const pc = peerConnections[remoteId]; if (!pc) return;
+            const pc = peerConnections[remoteId];
+            if (!pc) return;
             try {
                 const offer = await pc.createOffer();
                 await pc.setLocalDescription(offer);
@@ -597,29 +552,49 @@
             signalsUnsubscribe = onSnapshot(q, async (snapshot) => {
                  const batch = writeBatch(db);
                  for (const document of snapshot.docs) {
-                     const signalData = document.data(); const remoteId = signalData.from; const pc = peerConnections[remoteId];
+                     const signalData = document.data();
+                     const remoteId = signalData.from;
+                     const pc = peerConnections[remoteId];
+                     
                      if (!pc) { batch.delete(document.ref); continue; }
+
                      try {
-                         if (signalData.offer) { await pc.setRemoteDescription(new RTCSessionDescription(signalData.offer)); const answer = await pc.createAnswer(); await pc.setLocalDescription(answer); await sendSignal(remoteId, { answer: pc.localDescription.toJSON() }); } 
-                         else if (signalData.answer) { await pc.setRemoteDescription(new RTCSessionDescription(signalData.answer)); } 
-                         else if (signalData.iceCandidate) { await pc.addIceCandidate(new RTCIceCandidate(signalData.iceCandidate)); }
-                     } catch (err) { console.error(`Signal Error from ${remoteId}:`, err, signalData); }
+                         if (signalData.offer) {
+                             await pc.setRemoteDescription(new RTCSessionDescription(signalData.offer));
+                             const answer = await pc.createAnswer();
+                             await pc.setLocalDescription(answer);
+                             await sendSignal(remoteId, { answer: pc.localDescription.toJSON() });
+                         } else if (signalData.answer) {
+                             await pc.setRemoteDescription(new RTCSessionDescription(signalData.answer));
+                         } else if (signalData.iceCandidate) {
+                             await pc.addIceCandidate(new RTCIceCandidate(signalData.iceCandidate));
+                         }
+                     } catch (err) { console.error(`Signal Processing Error from ${remoteId}:`, err, signalData); }
                      batch.delete(document.ref);
                  }
                  if (!snapshot.empty) await batch.commit();
             });
         }
 
-        async function sendSignal(toId, data) { await addDoc(collection(db, `Lobbys_list/${lobbyId}/signals`), { ...data, from: myId, to: toId }); }
+        async function sendSignal(toId, data) {
+            const signalsCol = collection(db, `Lobbys_list/${lobbyId}/signals`);
+            await addDoc(signalsCol, { ...data, from: myId, to: toId });
+        }
 
         function closeConnection(remoteId) {
             const pcData = peerConnections[remoteId];
             if (pcData) {
+                // --- CHANGE START: Cleanup for visualizer ---
                 if (pcData.visualizer) {
                     cancelAnimationFrame(pcData.visualizer.animationFrameId);
-                    if (pcData.visualizer.audioContext.state !== 'closed') { pcData.visualizer.audioContext.close().catch(e => console.warn("Error closing audio context", e)); }
+                    // Safely close audio context
+                    if (pcData.visualizer.audioContext.state !== 'closed') {
+                        pcData.visualizer.audioContext.close().catch(e => console.warn("Error closing audio context", e));
+                    }
                 }
-                pcData.close(); delete peerConnections[remoteId];
+                // --- CHANGE END ---
+                pcData.close();
+                delete peerConnections[remoteId];
             }
             document.getElementById(`audio-${remoteId}`)?.remove();
             console.log(`Connection with ${remoteId} closed.`);
@@ -630,13 +605,21 @@
             if (localStream) localStream.getTracks().forEach(track => track.stop());
             Object.keys(peerConnections).forEach(id => closeConnection(id));
             peerConnections = {}; localStream = null;
+
             try {
-                const snapshot = await getDocs(query(collection(db, `Lobbys_list/${lobbyId}/signals`), where("to", "==", myId)));
-                const batch = writeBatch(db); snapshot.forEach(doc => batch.delete(doc.ref)); await batch.commit();
-            } catch (e) { console.warn("Failed to clean up signals:", e); }
+                const signalsCol = collection(db, `Lobbys_list/${lobbyId}/signals`);
+                const q = query(signalsCol, where("to", "==", myId));
+                const snapshot = await getDocs(q);
+                const batch = writeBatch(db);
+                snapshot.forEach(doc => batch.delete(doc.ref));
+                await batch.commit();
+            } catch (e) {
+                console.warn("Failed to clean up signals on exit:", e);
+            }
         }
 
         function setupEventListeners() { actionBtn.addEventListener('click', handleActionClick); leaveLobbyBtn.addEventListener('click', showLeaveConfirm); voiceChatBtn.addEventListener('click', handleMicClick); window.addEventListener('beforeunload', handleLeaveLobby); }
+        
         function showLeaveConfirm() { showConfirmModal("خروج از لابی", "آیا مطمئن هستید؟" + (isHost ? " (چون شما سازنده هستید، لابی حذف خواهد شد)" : ""), handleLeaveLobby); }
         function showKickConfirm(playerName, playerUid) { showConfirmModal(`اخراج ${playerName}`, `آیا از اخراج این بازیکن مطمئن هستید؟`, () => kickPlayer(playerUid)); }
         function showConfirmModal(title, message, onConfirm) { const modal = document.getElementById('confirm-modal'); document.getElementById('confirm-modal-title').textContent = title; document.getElementById('confirm-modal-message').textContent = message; const yesBtn = document.getElementById('confirm-modal-yes-btn'); const newYesBtn = yesBtn.cloneNode(true); yesBtn.parentNode.replaceChild(newYesBtn, yesBtn); newYesBtn.onclick = () => { modal.classList.remove('visible'); onConfirm(); }; document.getElementById('confirm-modal-no-btn').onclick = () => modal.classList.remove('visible'); modal.onclick = (e) => { if (e.target === modal) modal.classList.remove('visible'); }; modal.classList.add('visible'); }
