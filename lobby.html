@@ -9,22 +9,24 @@
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-gold: #ffc947;
-            --dark-red: #8c4843;
-            --darker-red: #5a2c2a;
-            --text-light: #f0e6d2;
-            --text-secondary: #c5a687;
-            --bg-dark: #1a140e;
-            --border-color: #5c4a3a;
+            --bg-dark: #10141c;
+            --bg-light: #1b202c;
+            --primary-gold: #d4af37;
+            --primary-gold-glow: rgba(212, 175, 55, 0.7);
+            --dark-red: #a14c4c;
+            --darker-red: #763a3a;
+            --text-light: #e0d6c5;
+            --text-secondary: #9a8d7a;
+            --border-color: #4a4133;
             --green-ready: #2ecc71;
+            --green-ready-glow: rgba(46, 204, 113, 0.6);
             --mic-off-bg: #4a5568;
             --mic-on-bg: #2f855a;
-            --slot-bg: linear-gradient(160deg, #2a2118, var(--bg-dark));
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-        html, body { height: 100%; overflow: hidden; background-color: var(--bg-dark); }
+        html, body { height: 100dvh; overflow: hidden; background-color: var(--bg-dark); }
 
         body {
             font-family: 'Vazirmatn', sans-serif;
@@ -37,12 +39,15 @@
         #background-blurry {
             position: fixed; top: -20px; left: -20px; width: calc(100% + 40px); height: calc(100% + 40px);
             background-image: url('https://up.20script.ir/file/6195-file-000000001500622f9419de6c322df297-1-.jpg');
-            background-size: cover; background-position: center center; filter: blur(8px) brightness(0.6); z-index: -1;
+            background-size: cover; background-position: center center; 
+            filter: blur(10px) brightness(0.5) saturate(0.8);
+            transform: scale(1.1);
+            z-index: -1;
         }
-        
+
         #loading-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.9); display: flex; flex-direction: column;
+            background-color: rgba(16, 20, 28, 0.95); display: flex; flex-direction: column;
             justify-content: center; align-items: center; z-index: 2000; transition: opacity 0.5s ease;
         }
         .loader {
@@ -50,104 +55,183 @@
             border-radius: 50%; width: 60px; height: 60px; animation: spin 1.5s linear infinite;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        #loading-text { margin-top: 20px; font-size: 1.1rem; font-weight: 700; }
+        #loading-text { margin-top: 20px; font-size: 1.1rem; font-weight: 700; color: var(--primary-gold); }
 
         .lobby-container {
             width: 100%; height: 100%; display: flex; flex-direction: column;
-            padding: 10px; gap: 10px;
+            padding: 15px; gap: 10px; position: relative;
         }
 
         .lobby-header { 
             flex-shrink: 0;
             display: flex; justify-content: space-between; align-items: center;
-            background-color: rgba(0,0,0,0.4); padding: 8px 12px; border-radius: 12px; border: 1px solid var(--border-color);
+            background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent);
+            padding: 10px 20px; border-bottom: 1px solid var(--border-color);
+            position: absolute; top: 0; left: 0; width: 100%; z-index: 100;
         }
-        #lobby-name { font-size: 1.3rem; font-weight: 900; color: var(--primary-gold); text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        #lobby-name { font-size: 1.5rem; font-weight: 900; color: var(--primary-gold); text-shadow: 0 2px 5px #000; }
         .leave-button {
-            background: linear-gradient(145deg, #a13d3d, #7c1f1f); border: 1px solid #ff8f8f;
-            color: white; padding: 6px 12px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: all 0.2s ease;
+            background: linear-gradient(145deg, var(--darker-red), var(--dark-red)); 
+            border: 1px solid #ff9a9a80;
+            color: white; padding: 8px 16px; border-radius: 20px; font-weight: 700; 
+            font-size: 0.9rem; cursor: pointer; transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
         }
-        .leave-button:hover { transform: scale(1.05); box-shadow: 0 2px 10px rgba(0,0,0,0.4); }
+        .leave-button:hover { transform: scale(1.05); box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
 
         .players-area {
-            flex-grow: 1; display: grid; grid-template-columns: 1fr 1fr;
-            gap: 10px; padding: 0 5px; overflow: hidden;
+            flex-grow: 1;
+            position: relative;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 0; /* Fix for flexbox overflow */
         }
-        .players-column { display: flex; flex-direction: column; gap: 8px; height: 100%; }
-        @keyframes slot-fade-in { from { opacity: 0; transform: translateY(15px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+        .player-ring {
+            width: 95vmin; /* Use viewport units for responsive circle */
+            height: 95vmin;
+            max-width: 600px;
+            max-height: 600px;
+            position: relative;
+        }
+        
+        .table-center {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40%; height: 40%;
+            background: rgba(0,0,0,0.3);
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.7);
+            display: flex; justify-content: center; align-items: center;
+        }
+        .table-center::before {
+            content: '';
+            width: 80%; height: 80%;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.05) 0%, rgba(212, 175, 55, 0) 70%);
+            border-radius: 50%;
+        }
+
+
+        @keyframes slot-appear {
+            from { opacity: 0; transform: var(--transform-start) scale(0.5); }
+            to { opacity: 1; transform: var(--transform-end) scale(1); }
+        }
 
         .player-slot {
-            flex: 1; border-radius: 12px; display: flex; flex-direction: column;
+            --slot-size: clamp(70px, 15vmin, 100px);
+            width: var(--slot-size);
+            height: var(--slot-size);
+            border-radius: 20px;
+            display: flex; flex-direction: column;
             align-items: center; justify-content: center; padding: 5px; text-align: center; 
-            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease-in-out, border-color 0.3s ease-in-out; /* CHANGE: Added transition for speaking indicator */
-            position: relative; overflow: hidden; animation: slot-fade-in 0.6s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
-            min-height: 0;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease-in-out, border-color 0.3s ease-in-out;
+            position: absolute;
+            top: 50%; left: 50%;
+            margin: calc(var(--slot-size) / -2) 0 0 calc(var(--slot-size) / -2); /* Center the slot */
+            animation: slot-appear 0.6s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
         }
-        .player-slot.empty { background: rgba(0,0,0,0.2); border: 2px dashed var(--border-color); opacity: 0.7; backdrop-filter: blur(2px); cursor: default; }
+        
+        /* Positioning players in a circle */
+        .player-slot {
+            /* Start from center for animation */
+            --transform-start: rotate(0deg) translate(0) rotate(0deg); 
+        }
+        .player-slot.slot-1 { --transform-end: rotate(0deg) translateY(-47.5vmin) rotate(0deg); }
+        .player-slot.slot-2 { --transform-end: rotate(30deg) translateY(-47.5vmin) rotate(-30deg); }
+        .player-slot.slot-3 { --transform-end: rotate(60deg) translateY(-47.5vmin) rotate(-60deg); }
+        .player-slot.slot-4 { --transform-end: rotate(90deg) translateY(-47.5vmin) rotate(-90deg); }
+        .player-slot.slot-5 { --transform-end: rotate(120deg) translateY(-47.5vmin) rotate(-120deg); }
+        .player-slot.slot-6 { --transform-end: rotate(150deg) translateY(-47.5vmin) rotate(-150deg); }
+        .player-slot.slot-7 { --transform-end: rotate(180deg) translateY(-47.5vmin) rotate(-180deg); }
+        .player-slot.slot-8 { --transform-end: rotate(210deg) translateY(-47.5vmin) rotate(-210deg); }
+        .player-slot.slot-9 { --transform-end: rotate(240deg) translateY(-47.5vmin) rotate(-240deg); }
+        .player-slot.slot-10 { --transform-end: rotate(270deg) translateY(-47.5vmin) rotate(-270deg); }
+        .player-slot.slot-11 { --transform-end: rotate(300deg) translateY(-47.5vmin) rotate(-300deg); }
+        .player-slot.slot-12 { --transform-end: rotate(330deg) translateY(-47.5vmin) rotate(-330deg); }
+
+
+        .player-slot.empty { 
+            background: rgba(0,0,0,0.2); border: 2px dashed var(--border-color); 
+            opacity: 0.7; backdrop-filter: blur(2px); cursor: default; 
+        }
         .player-slot.empty:hover { background: rgba(0,0,0,0.3); border-color: var(--primary-gold); }
-        .player-slot.filled { background: var(--slot-bg); border: 2px solid var(--border-color); box-shadow: 0 4px 15px rgba(0,0,0,0.5), inset 0 0 10px rgba(0,0,0,0.3); }
+        .player-slot.filled { 
+            background: linear-gradient(160deg, #2a2118, var(--bg-dark)); 
+            border: 2px solid var(--border-color); 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5), inset 0 0 10px rgba(0,0,0,0.3);
+        }
         
         .player-avatar {
-            width: 55%; max-width: 70px; aspect-ratio: 1/1; border-radius: 50%;
+            width: 50%; max-width: 45px; aspect-ratio: 1/1; border-radius: 50%;
             object-fit: cover; border: 3px solid var(--text-secondary);
             margin-bottom: 5px; transition: all 0.3s ease; box-shadow: 0 3px 8px rgba(0,0,0,0.5);
         }
         
         .player-name {
-            font-size: clamp(0.65rem, 2.2vw, 0.8rem); font-weight: 700; width: 100%;
+            font-size: clamp(0.6rem, 2vw, 0.75rem); font-weight: 700; width: 100%;
             white-space: normal; word-break: break-word; line-height: 1.2;
             padding: 0 2px; text-shadow: 0 1px 3px #000; height: 2.5em;
             display: flex; align-items: center; justify-content: center;
         }
         .empty-text { font-size: clamp(0.7rem, 2.5vw, 0.8rem); color: var(--text-secondary); font-weight: 700; }
-        .host-crown { position: absolute; top: -1px; right: -1px; width: 28px; height: 28px; background-color: var(--primary-gold); color: var(--darker-red); border-radius: 0 10px 0 10px; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 900; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+        .host-crown { 
+            position: absolute; top: -5px; right: -5px; width: 28px; height: 28px; 
+            background-color: var(--primary-gold); color: var(--bg-dark); 
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+            font-size: 1rem; font-weight: 900; box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
         
-        /* --- CHANGE START: Removed old speaking indicator and added new style for glowing border --- */
         .player-slot.speaking {
             border-color: var(--primary-gold);
-            box-shadow: 0 0 15px rgba(255, 201, 71, 0.8), 0 0 25px rgba(255, 201, 71, 0.5), inset 0 0 10px rgba(0,0,0,0.3);
+            box-shadow: 0 0 15px var(--primary-gold-glow), 0 0 25px var(--primary-gold-glow), inset 0 0 10px rgba(0,0,0,0.3);
         }
-        /* --- CHANGE END --- */
 
         .ready-indicator {
-            position: absolute; bottom: 4px; right: 4px; width: 18px; height: 18px;
-            background-color: var(--green-ready); border-radius: 50%; border: 2px solid var(--bg-dark);
-            display: flex; align-items: center; justify-content: center; color: white;
-            font-weight: 900; font-size: 0.8rem; transform: scale(0); 
+            position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%) scale(0);
+            width: 22px; height: 18px; line-height: 18px;
+            background-color: var(--green-ready); border-radius: 5px; border: 2px solid var(--bg-dark);
+            color: white; font-weight: 900; font-size: 0.8rem; 
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             text-shadow: 0 1px 2px rgba(0,0,0,0.4);
         }
-        .player-slot.ready .ready-indicator { transform: scale(1); }
+        .player-slot.ready .ready-indicator { transform: translateX(-50%) scale(1); }
         .player-slot.ready .player-avatar { border-color: var(--green-ready); }
-        .player-slot.ready { border-color: var(--green-ready); box-shadow: 0 0 15px rgba(46, 204, 113, 0.7), 0 0 25px rgba(46, 204, 113, 0.4), inset 0 0 10px rgba(0,0,0,0.3); transform: scale(1.02); }
+        .player-slot.ready { border-color: var(--green-ready); box-shadow: 0 0 15px var(--green-ready-glow), 0 0 25px var(--green-ready-glow), inset 0 0 10px rgba(0,0,0,0.3); transform: var(--transform-end) scale(1.05); }
         
-        .player-slot.filled.kickable::after { content: 'اخراج'; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(231, 76, 60, 0.85); color: white; font-size: 1.1rem; font-weight: 900; opacity: 0; visibility: hidden; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; border-radius: 10px; }
+        .player-slot.filled.kickable::after { content: 'اخراج'; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(231, 76, 60, 0.85); color: white; font-size: 1.1rem; font-weight: 900; opacity: 0; visibility: hidden; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; border-radius: 18px; }
         .player-slot.filled.kickable:hover::after { opacity: 1; visibility: visible; }
         
-        .lobby-footer { flex-shrink: 0; display: flex; gap: 10px; align-items: center; padding-top: 10px; }
+        .lobby-footer { 
+            flex-shrink: 0; display: flex; gap: 10px; align-items: center;
+            background: linear-gradient(to top, rgba(0,0,0,0.5), transparent);
+            padding: 15px 20px; border-top: 1px solid var(--border-color);
+            position: absolute; bottom: 0; left: 0; width: 100%; z-index: 100;
+        }
         .action-button {
             flex-grow: 1; padding: 14px; font-size: 1.2rem; font-weight: 900;
             border-radius: 12px; border: none; cursor: pointer; transition: all 0.3s ease;
             color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.5); position: relative; overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
         .action-button::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(to bottom, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 20%); transform: rotate(25deg); }
         .action-button.ready-btn { background: linear-gradient(145deg, #27ae60, #229954); border: 2px solid #58d68d; }
         .action-button.unready-btn { background: linear-gradient(145deg, #c0392b, #a93226); border: 2px solid #e67e22; }
-        .action-button.start-btn { background: linear-gradient(145deg, var(--dark-red), var(--darker-red)); border: 2px solid var(--primary-gold); }
+        .action-button.start-btn { background: linear-gradient(145deg, var(--darker-red), var(--dark-red)); border: 2px solid var(--primary-gold); }
         .action-button:disabled { background: linear-gradient(145deg, #7f8c8d, #626567); border-color: #95a5a6; cursor: not-allowed; opacity: 0.6; }
-        .action-button:not(:disabled):hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .action-button:not(:disabled):hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
         .action-button.start-btn:not(:disabled) { animation: pulse-start 2s infinite; }
-        @keyframes pulse-start { 0% { box-shadow: 0 0 0 0 rgba(255, 201, 71, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(255, 201, 71, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 201, 71, 0); } }
+        @keyframes pulse-start { 0% { box-shadow: 0 0 0 0 var(--primary-gold-glow); } 70% { box-shadow: 0 0 0 10px rgba(255, 201, 71, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 201, 71, 0); } }
 
         #voice-chat-btn {
-            flex-shrink: 0; width: 50px; height: 50px; border-radius: 50%;
-            background-color: var(--mic-off-bg); color: white; border: none;
+            flex-shrink: 0; width: 55px; height: 55px; border-radius: 50%;
+            background-color: var(--mic-off-bg); color: white; border: 2px solid #818f9e;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
             transition: all 0.3s ease;
         }
-        #voice-chat-btn.mic-on { background-color: var(--mic-on-bg); animation: pulse-mic 1.5s infinite; }
-        #voice-chat-btn svg { width: 24px; height: 24px; fill: currentColor; }
+        #voice-chat-btn.mic-on { background-color: var(--mic-on-bg); border-color: #58d68d; animation: pulse-mic 1.5s infinite; }
+        #voice-chat-btn svg { width: 28px; height: 28px; fill: currentColor; }
         @keyframes pulse-mic { 0% { box-shadow: 0 0 0 0 rgba(47, 133, 90, 0.7); } 70% { box-shadow: 0 0 0 8px rgba(47, 133, 90, 0); } 100% { box-shadow: 0 0 0 0 rgba(47, 133, 90, 0); } }
 
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.85); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s 0.3s; }
@@ -177,8 +261,10 @@
         </header>
 
         <main class="players-area">
-            <div id="left-players" class="players-column"></div>
-            <div id="right-players" class="players-column"></div>
+            <div class="player-ring" id="player-ring">
+                <!-- Player slots will be generated by JS here -->
+                <div class="table-center"></div>
+            </div>
         </main>
         
         <footer class="lobby-footer">
@@ -222,8 +308,7 @@
         const loadingOverlay = document.getElementById('loading-overlay');
         const lobbyContainer = document.querySelector('.lobby-container');
         const lobbyNameEl = document.getElementById('lobby-name');
-        const leftPlayersEl = document.getElementById('left-players');
-        const rightPlayersEl = document.getElementById('right-players');
+        const playerRingEl = document.getElementById('player-ring'); // *** CHANGE: Target new player ring
         const actionBtn = document.getElementById('action-btn');
         const leaveLobbyBtn = document.getElementById('leave-lobby-btn');
         const voiceChatBtn = document.getElementById('voice-chat-btn');
@@ -343,14 +428,16 @@
             lobbyNameEl.textContent = data.lobbyName;
             const players = data.players || [];
             isHost = currentUser.uid === data.creatorId;
-            leftPlayersEl.innerHTML = '';
-            rightPlayersEl.innerHTML = '';
+
+            // *** CHANGE: Simplified rendering logic for the single player ring
+            playerRingEl.innerHTML = '<div class="table-center"></div>'; // Clear previous slots but keep the center table
             
             for (let i = 0; i < MAX_PLAYERS; i++) {
                 const player = players[i];
                 const slot = document.createElement('div');
                 slot.className = 'player-slot';
-                slot.style.animationDelay = `${(i % 6) * 70}ms`;
+                // Add positioning class for the circular layout
+                slot.classList.add(`slot-${i + 1}`);
                 
                 if (player) {
                     slot.classList.add('filled');
@@ -372,7 +459,7 @@
                     slot.classList.add('empty');
                     slot.innerHTML = `<span class="empty-text">جایگاه خالی</span>`;
                 }
-                if (i < 6) leftPlayersEl.appendChild(slot); else rightPlayersEl.appendChild(slot);
+                playerRingEl.appendChild(slot);
             }
             
             const self = players.find(p => p.uid === currentUser.uid);
@@ -465,7 +552,6 @@
             voiceChatBtn.classList.toggle('mic-on', !isMuted);
         }
         
-        // --- CHANGE START: New function for speaking indicator ---
         function setupAudioVisualizer(stream, remoteId) {
             try {
                 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -477,17 +563,14 @@
                 const dataArray = new Uint8Array(bufferLength);
                 
                 if (peerConnections[remoteId]) {
-                    // Store visualizer components for cleanup
                     peerConnections[remoteId].visualizer = { audioContext, animationFrameId: null };
                 }
 
                 const draw = () => {
-                    // Check if connection still exists before continuing
                     if (!peerConnections[remoteId] || !peerConnections[remoteId].visualizer) return;
                     
                     const userSlot = document.querySelector(`.player-slot[data-uid="${remoteId}"]`);
                     if (!userSlot) {
-                        // If user slot is gone, stop the animation loop
                         cancelAnimationFrame(peerConnections[remoteId].visualizer.animationFrameId);
                         return;
                     }
@@ -495,7 +578,6 @@
                     analyser.getByteFrequencyData(dataArray);
                     let average = dataArray.reduce((a, b) => a + b, 0) / bufferLength;
                     
-                    // Toggle 'speaking' class based on volume threshold (15 is a good starting point)
                     userSlot.classList.toggle('speaking', average > 15);
                     
                     peerConnections[remoteId].visualizer.animationFrameId = requestAnimationFrame(draw);
@@ -505,7 +587,6 @@
                 console.error("Audio visualizer failed to initialize:", e);
             }
         }
-        // --- CHANGE END ---
 
         function createPeerConnection(remoteId) {
             const pc = new RTCPeerConnection(servers);
@@ -519,12 +600,10 @@
                         remoteAudio = document.createElement('audio');
                         remoteAudio.id = `audio-${remoteId}`;
                         remoteAudio.autoplay = true;
-                        remoteAudio.playsInline = true; // Important for mobile browsers
+                        remoteAudio.playsInline = true;
                         audioContainer.appendChild(remoteAudio);
                     }
                     remoteAudio.srcObject = event.streams[0];
-                    
-                    // --- CHANGE: Setup the visualizer when track is received ---
                     setupAudioVisualizer(event.streams[0], remoteId);
                 }
             };
@@ -584,15 +663,12 @@
         function closeConnection(remoteId) {
             const pcData = peerConnections[remoteId];
             if (pcData) {
-                // --- CHANGE START: Cleanup for visualizer ---
                 if (pcData.visualizer) {
                     cancelAnimationFrame(pcData.visualizer.animationFrameId);
-                    // Safely close audio context
                     if (pcData.visualizer.audioContext.state !== 'closed') {
                         pcData.visualizer.audioContext.close().catch(e => console.warn("Error closing audio context", e));
                     }
                 }
-                // --- CHANGE END ---
                 pcData.close();
                 delete peerConnections[remoteId];
             }
