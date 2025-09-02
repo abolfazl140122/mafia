@@ -137,7 +137,7 @@
             background-color: #4a5568; color: white; border: none;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            transition: all 0.3s ease;
+            transition: all 0.3s ease; position: relative;
         }
         #toggle-chat-btn:hover { background-color: #2d3748; transform: scale(1.1); }
         #toggle-chat-btn.new-message::after {
@@ -151,9 +151,9 @@
 
         #chat-panel {
             position: fixed;
-            bottom: 20px; left: 20px;
-            width: 90%; max-width: 350px;
-            height: 50%; max-height: 400px;
+            bottom: 20px; left: 50%; transform: translateX(-50%) translateY(110%);
+            width: 90%; max-width: 400px;
+            height: 60%; max-height: 450px;
             background-color: var(--chat-bg);
             backdrop-filter: blur(8px);
             border: 1px solid var(--border-color);
@@ -162,9 +162,9 @@
             z-index: 999;
             box-shadow: 0 8px 30px rgba(0,0,0,0.6);
             transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
-            transform: translateY(110%); opacity: 0;
+            opacity: 0;
         }
-        #chat-panel.visible { transform: translateY(0); opacity: 1; }
+        #chat-panel.visible { transform: translateX(-50%) translateY(0); opacity: 1; }
         
         .chat-header {
             display: flex; justify-content: space-between; align-items: center;
@@ -186,13 +186,13 @@
         #chat-messages::-webkit-scrollbar-track { background: transparent; }
         #chat-messages::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 3px; }
 
-        .chat-message { display: flex; flex-direction: column; align-items: flex-start; }
-        .chat-message.self { align-items: flex-end; }
+        .chat-message { display: flex; flex-direction: column; align-items: flex-start; max-width: 90%; }
+        .chat-message.self { align-items: flex-end; align-self: flex-end; }
         .chat-message-sender { font-size: 0.8rem; font-weight: 700; color: var(--primary-gold); margin-bottom: 3px; }
-        .chat-message.self .chat-message-sender { color: var(--green-ready); }
+        .chat-message.self .chat-message-sender { color: var(--green-ready); text-align: right; }
         .chat-message-bubble {
             background-color: #332a20; padding: 8px 12px;
-            border-radius: 12px; max-width: 85%;
+            border-radius: 12px;
             font-size: 0.9rem; line-height: 1.5;
             word-wrap: break-word;
         }
@@ -284,7 +284,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, runTransaction, getDoc, collection, where, query, addDoc, writeBatch, deleteDoc, getDocs, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, runTransaction, getDoc, collection, query, addDoc, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         // --- Config & Elements ---
         const MAX_PLAYERS = 12;
@@ -479,6 +479,7 @@
             if (isChatPanelVisible) {
                 toggleChatBtn.classList.remove('new-message');
                 chatInput.focus();
+                chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
             }
         }
 
@@ -497,6 +498,9 @@
                         }
                     }
                 });
+            }, (error) => {
+                console.error("Error listening to chat messages:", error);
+                showNotificationModal("خطای چت", "ارتباط با سیستم چت قطع شد.", () => {});
             });
         }
 
@@ -507,12 +511,16 @@
                 messageDiv.classList.add('self');
             }
 
+            // Simple sanitation to prevent HTML injection
+            const sanitizedText = document.createElement('div');
+            sanitizedText.textContent = data.text;
+
             messageDiv.innerHTML = `
                 <span class="chat-message-sender">${data.senderName}</span>
-                <div class="chat-message-bubble">${data.text}</div>
+                <div class="chat-message-bubble">${sanitizedText.innerHTML}</div>
             `;
             chatMessagesEl.appendChild(messageDiv);
-            chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight; // Auto-scroll
+            chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight; // Auto-scroll to the latest message
         }
         
         async function handleSendMessage(e) {
@@ -521,6 +529,7 @@
             if (messageText === '') return;
 
             chatInput.value = ''; // Clear input immediately for better UX
+            chatInput.focus();
 
             try {
                 const chatCollectionRef = collection(db, `Lobbys_list/${lobbyId}/chat`);
@@ -541,7 +550,9 @@
         function setupEventListeners() { 
             actionBtn.addEventListener('click', handleActionClick); 
             leaveLobbyBtn.addEventListener('click', showLeaveConfirm); 
-            window.addEventListener('beforeunload', handleLeaveLobby); 
+            // We remove the beforeunload listener as it can be disruptive and unreliable.
+            // Explicit leaving is better.
+            // window.addEventListener('beforeunload', handleLeaveLobby); 
             
             // Chat event listeners
             toggleChatBtn.addEventListener('click', toggleChatPanel);
