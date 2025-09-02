@@ -497,10 +497,6 @@
                         }
                     }
                 });
-            }, (error) => {
-                // This is where the error was happening. With new rules, this should not trigger a permission error.
-                console.error("Error listening to chat messages:", error);
-                showNotificationModal("خطای چت", "ارتباط با سیستم چت قطع شد.", ()=>{});
             });
         }
 
