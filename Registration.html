@@ -7,7 +7,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- کتابخانه سوپابیس را اضافه می‌کنیم -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
+        /* تمام استایل‌های CSS شما بدون تغییر در اینجا قرار می‌گیرند */
         * {
             margin: 0;
             padding: 0;
@@ -146,6 +149,7 @@
         .auth-link a { color: #ffc947; font-weight: 700; text-decoration: none; transition: color 0.2s; }
         .auth-link a:hover { color: #fff; }
         .error-message { color: #ffadad; background-color: rgba(217, 83, 79, 0.2); padding: 12px; border-radius: 8px; margin-top: 20px; font-size: 0.9rem; display: none; border: 1px solid #d9534f; }
+        .success-message { color: #a6ffc3; background-color: rgba(46, 204, 113, 0.2); padding: 12px; border-radius: 8px; margin-top: 20px; font-size: 0.9rem; display: none; border: 1px solid #2ecc71; }
     </style>
 </head>
 <body>
@@ -170,7 +174,7 @@
                 <label for="age-input">سن</label>
                 <div class="age-input-wrapper">
                     <button type="button" id="decrement-age" class="age-control-btn">-</button>
-                    <input type="number" id="age-input" class="auth-input" placeholder="سن خود را وارد کنید" required>
+                    <input type="number" id="age-input" class="auth-input" placeholder="سن خود را وارد کنید" required min="8" max="99">
                     <button type="button" id="increment-age" class="age-control-btn">+</button>
                 </div>
             </div>
@@ -184,8 +188,9 @@
 
             <button type="submit" id="register-button" class="auth-button">ساخت حساب</button>
         </form>
-
-        <p id="error-message" class="error-message"></p>
+        
+        <!-- [تغییر] از یک المان برای نمایش خطا و موفقیت استفاده می‌کنیم -->
+        <p id="message-display" class="error-message"></p>
 
         <p class="auth-link">
             حساب کاربری دارید؟ <a href="./login.html">وارد شوید</a>
@@ -193,24 +198,15 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, setDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        // مرحله ۱: اطلاعات اتصال به سوپابیس
+        const SUPABASE_URL = 'https://fraafzyqixuvolutryso.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZyYWFmenlxaXh1dm9sdXRyeXNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc3MDY3MDQsImV4cCI6MjA3MzI4MjcwNH0.USpriGlF3le4pKqpgbXr7Wk5k_nsvyNpT8Eq6TdWJ7A';
 
-        const firebaseConfig = {
-          apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
-          authDomain: "mafia-9fcbf.firebaseapp.com",
-          projectId: "mafia-9fcbf",
-          storageBucket: "mafia-9fcbf.appspot.com",
-          messagingSenderId: "471627157488",
-          appId: "1:471627157488:web:92f008548a5596619a5735",
-          measurementId: "G-0PDHDWC6NV"
-        };
+        // مرحله ۲: ساخت کلاینت سوپابیس
+        const { createClient } = supabase;
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
+        // گرفتن عناصر DOM (بدون تغییر)
         const registrationForm = document.getElementById('registration-form');
         const displayNameInput = document.getElementById('display-name');
         const emailInput = document.getElementById('email');
@@ -219,10 +215,11 @@
         const incrementAgeBtn = document.getElementById('increment-age');
         const decrementAgeBtn = document.getElementById('decrement-age');
         const registerButton = document.getElementById('register-button');
-        const errorMessage = document.getElementById('error-message');
+        const messageDisplay = document.getElementById('message-display');
         const avatarContainer = document.getElementById('avatar-container');
         let selectedAvatarUrl = null;
 
+        // کدهای مربوط به دکمه‌های سن (بدون تغییر)
         incrementAgeBtn.addEventListener('click', () => {
             let currentValue = parseInt(ageInput.value) || 8;
             ageInput.value = Math.min(99, currentValue + 1);
@@ -232,106 +229,122 @@
             ageInput.value = Math.max(8, currentValue - 1);
         });
 
+        // مرحله ۳: بارگذاری آواتارها از سوپابیس
         async function loadFreeAvatars() {
             try {
-                const q = query(collection(db, "avatars"), where("price", "==", 0));
-                const querySnapshot = await getDocs(q);
+                const { data: avatars, error } = await supabaseClient
+                    .from('avatars')      // از جدول 'avatars'
+                    .select('*')         // همه ستون‌ها را انتخاب کن
+                    .eq('price', 0);     // جایی که ستون 'price' برابر با 0 است
+
+                if (error) throw error;
+
                 avatarContainer.innerHTML = '';
-                if (querySnapshot.empty) {
+                if (!avatars || avatars.length === 0) {
                     avatarContainer.innerHTML = '<p class="avatar-loader">آواتار رایگانی یافت نشد!</p>';
                     return;
                 }
-                querySnapshot.forEach((doc) => {
-                    const avatarData = doc.data();
+                avatars.forEach((avatarData) => {
                     const imgElement = document.createElement('img');
-                    imgElement.src = avatarData.imageUrl;
+                    imgElement.src = avatarData.image_url;
                     imgElement.alt = avatarData.name || 'Avatar';
                     imgElement.classList.add('avatar-item');
                     
                     imgElement.addEventListener('click', () => {
-                        const currentSelected = document.querySelector('.avatar-item.selected');
-                        if (currentSelected) {
-                            currentSelected.classList.remove('selected');
-                        }
+                        document.querySelector('.avatar-item.selected')?.classList.remove('selected');
                         imgElement.classList.add('selected');
-                        selectedAvatarUrl = avatarData.imageUrl;
+                        selectedAvatarUrl = avatarData.image_url;
                     });
                     avatarContainer.appendChild(imgElement);
                 });
             } catch (error) {
                 console.error("Error fetching avatars: ", error);
+                showMessage("خطا در بارگذاری آواتارها!", 'error');
                 avatarContainer.innerHTML = '<p class="avatar-loader">خطا در بارگذاری آواتارها!</p>';
             }
         }
         
         loadFreeAvatars();
 
+        // مرحله ۴: منطق اصلی ثبت‌نام با سوپابیس
         registrationForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const displayName = displayNameInput.value.trim();
             const email = emailInput.value.trim();
             const password = passwordInput.value.trim();
-            const age = parseInt(ageInput.value); // نام متغیر داخلی همچنان age است
+            const age = parseInt(ageInput.value);
 
+            // اعتبارسنجی ورودی‌ها (بدون تغییر)
             if (!displayName || !email || !password || !ageInput.value) {
-                showError("لطفاً تمام فیلدها را پر کنید."); return;
+                showMessage("لطفاً تمام فیلدها را پر کنید.", 'error'); return;
             }
             if (!selectedAvatarUrl) {
-                showError("لطفاً یک آواتار انتخاب کنید."); return;
+                showMessage("لطفاً یک آواتار انتخاب کنید.", 'error'); return;
             }
             if (password.length < 6) {
-                showError("رمز عبور باید حداقل ۶ کاراکتر باشد."); return;
+                showMessage("رمز عبور باید حداقل ۶ کاراکتر باشد.", 'error'); return;
             }
             if (/[^a-zA-Z0-9_.]/.test(displayName)) {
-                showError("نام نمایشی فقط می‌تواند شامل حروف و اعداد انگلیسی، نقطه و آندرلاین باشد."); return;
+                showMessage("نام نمایشی فقط می‌تواند شامل حروف و اعداد انگلیسی، نقطه و آندرلاین باشد.", 'error'); return;
             }
             if (isNaN(age) || age < 8 || age > 99) {
-                showError("لطفاً سن معتبری بین ۸ تا ۹۹ سال وارد کنید."); return;
+                showMessage("لطفاً سن معتبری بین ۸ تا ۹۹ سال وارد کنید.", 'error'); return;
             }
 
             registerButton.disabled = true;
             registerButton.textContent = 'در حال ساخت...';
-            errorMessage.style.display = 'none';
+            messageDisplay.style.display = 'none';
 
             try {
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                const user = userCredential.user;
-                
-                await updateProfile(user, { displayName: displayName });
-
-                const userDocRef = doc(db, 'users', user.uid);
-                await setDoc(userDocRef, {
-                    uid: user.uid,
-                    displayName: displayName,
-                    email: user.email,
-                    createdAt: new Date(),
-                    currentStage: 1,
-                    avatarUrl: selectedAvatarUrl,
-                    // *** تغییر اصلی اینجاست: بازگرداندن فیلد به 'old' ***
-                    old: age 
+                // ثبت کاربر جدید در سیستم احراز هویت سوپابیس
+                const { data, error: signUpError } = await supabaseClient.auth.signUp({
+                    email: email,
+                    password: password,
+                    options: {
+                        data: { 
+                            // این اطلاعات به Trigger در دیتابیس فرستاده می‌شود تا پروفایل اولیه را بسازد
+                            display_name: displayName,
+                            avatar_url: selectedAvatarUrl
+                        }
+                    }
                 });
 
-                window.location.href = './index.html'; 
+                if (signUpError) throw signUpError;
+                
+                // Trigger در دیتابیس پروفایل را ساخته، حالا فقط 'سن' را آپدیت می‌کنیم
+                const { error: profileError } = await supabaseClient
+                    .from('profiles')
+                    .update({ old: age })
+                    .eq('id', data.user.id);
+
+                if (profileError) throw profileError;
+
+                // نمایش پیام موفقیت
+                showMessage('ثبت نام موفقیت آمیز بود! لطفاً ایمیل خود را برای تایید حساب چک کنید و سپس وارد شوید.', 'success');
+                registrationForm.reset(); // خالی کردن فرم
+                document.querySelector('.avatar-item.selected')?.classList.remove('selected');
+                selectedAvatarUrl = null;
 
             } catch (error) {
                 let friendlyMessage = "خطایی رخ داد. لطفاً دوباره تلاش کنید.";
-                if (error.code === 'auth/email-already-in-use') {
+                if (error.message.includes('User already registered')) {
                     friendlyMessage = "این ایمیل قبلاً ثبت شده است. لطفاً وارد شوید.";
-                } else if (error.code === 'auth/weak-password') {
+                } else if (error.message.includes('Password should be at least 6 characters')) {
                     friendlyMessage = "رمز عبور ضعیف است. لطفاً رمز قوی‌تری انتخاب کنید.";
                 }
                 console.error("Registration Error:", error);
-                showError(friendlyMessage);
+                showMessage(friendlyMessage, 'error');
             } finally {
                 registerButton.disabled = false;
                 registerButton.textContent = 'ساخت حساب';
             }
         });
 
-        function showError(message) {
-            errorMessage.textContent = message;
-            errorMessage.style.display = 'block';
+        function showMessage(message, type) {
+            messageDisplay.textContent = message;
+            messageDisplay.className = type === 'success' ? 'success-message' : 'error-message';
+            messageDisplay.style.display = 'block';
         }
     </script>
 </body>
