@@ -166,6 +166,26 @@
         }
         #chat-panel.visible { transform: translateY(0); opacity: 1; }
         
+        /* *** NEW *** Scroll to bottom button */
+        #scroll-to-bottom-btn {
+            position: absolute;
+            bottom: 80px; right: 20px;
+            width: 40px; height: 40px;
+            background-color: rgba(255, 201, 71, 0.8);
+            color: var(--darker-red);
+            border: none;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; font-weight: 900;
+            cursor: pointer;
+            transition: opacity 0.3s, transform 0.3s;
+            opacity: 0; transform: scale(0.8);
+            visibility: hidden;
+        }
+        #scroll-to-bottom-btn.visible {
+            opacity: 1; transform: scale(1); visibility: visible;
+        }
+
         .chat-header {
             display: flex; justify-content: space-between; align-items: center;
             padding: 10px 15px; border-bottom: 1px solid var(--border-color);
@@ -173,26 +193,29 @@
         }
         .chat-header h3 { font-size: 1.1rem; color: var(--primary-gold); font-weight: 700; }
         .chat-header-buttons { display: flex; align-items: center; gap: 10px; }
-        #clear-chat-btn { background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 1.2rem; display: none; } /* *** NEW *** */
+        #clear-chat-btn { background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 1.2rem; display: none; }
         #clear-chat-btn:hover { color: #ff7675; }
-        #close-chat-btn {
-            background: none; border: none; color: var(--text-secondary); cursor: pointer;
-            font-size: 1.5rem; line-height: 1; padding: 5px;
-        }
+        #close-chat-btn { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1.5rem; line-height: 1; padding: 5px; }
         #close-chat-btn:hover { color: white; }
 
         #chat-messages {
             flex-grow: 1; overflow-y: auto; padding: 10px 15px;
             display: flex; flex-direction: column; gap: 12px;
+            scroll-behavior: smooth; /* *** NEW *** For smooth scrolling */
         }
         #chat-messages::-webkit-scrollbar { width: 6px; }
         #chat-messages::-webkit-scrollbar-track { background: transparent; }
         #chat-messages::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 3px; }
 
-        .chat-message { display: flex; align-items: flex-start; gap: 10px; } /* *** MODIFIED *** */
-        .chat-message.self { align-self: flex-end; flex-direction: row-reverse; } /* *** MODIFIED *** */
-        .chat-message-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 2px solid var(--border-color); } /* *** NEW *** */
-        .chat-message-content { display: flex; flex-direction: column; max-width: calc(100% - 42px); } /* *** NEW *** */
+        /* *** NEW *** Message enter animation */
+        @keyframes message-slide-in {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .chat-message { display: flex; align-items: flex-start; gap: 10px; animation: message-slide-in 0.3s ease-out; }
+        .chat-message.self { align-self: flex-end; flex-direction: row-reverse; }
+        .chat-message-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 2px solid var(--border-color); }
+        .chat-message-content { display: flex; flex-direction: column; max-width: calc(100% - 42px); }
         .chat-message-sender { font-size: 0.8rem; font-weight: 700; color: var(--primary-gold); margin-bottom: 3px; }
         .chat-message.self .chat-message-sender { color: var(--green-ready); text-align: right; }
         .chat-message-bubble {
@@ -202,34 +225,92 @@
             word-wrap: break-word;
             position: relative;
         }
-        .chat-message.self .chat-message-bubble { 
-            background-color: #2a3a30; 
-            border: 2px solid var(--primary-gold); /* *** NEW: Differentiate self messages *** */
-            box-shadow: 0 0 10px rgba(255, 201, 71, 0.3); /* *** NEW *** */
+        .chat-message.self .chat-message-bubble { background-color: #2a3a30; }
+        
+        /* *** NEW *** Message highlight on scroll */
+        .chat-message.highlight {
+            background-color: rgba(255, 201, 71, 0.2);
+            border-radius: 12px;
+            transition: background-color 0.5s ease;
         }
 
-        .delete-msg-btn { /* *** NEW *** */
-            position: absolute;
-            top: -8px; left: -8px;
-            width: 20px; height: 20px;
-            background-color: #c0392b;
-            color: white;
-            border: none;
-            border-radius: 50%;
+        .message-actions { /* *** NEW *** container for buttons */
+            position: absolute; top: -10px; display: flex; gap: 4px;
+            opacity: 0; transition: all 0.2s ease;
+        }
+        .chat-message:hover .message-actions { opacity: 1; }
+        .chat-message.self .message-actions { left: -12px; flex-direction: row-reverse; }
+        .chat-message:not(.self) .message-actions { right: -12px; }
+
+        .msg-action-btn { /* *** NEW *** base style for action buttons */
+            width: 22px; height: 22px; background-color: #4a5568; color: white;
+            border: none; border-radius: 50%; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; font-size: 14px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+        }
+        .msg-action-btn:hover { transform: scale(1.1); }
+        .delete-msg-btn { background-color: #c0392b; }
+        .reply-msg-btn { background-color: #2980b9; }
+
+        /* *** NEW *** Reply Snippet Style */
+        .reply-snippet {
+            background: rgba(0,0,0,0.2);
+            padding: 6px 10px;
+            margin-bottom: 8px;
+            border-right: 3px solid var(--primary-gold);
+            border-radius: 6px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            opacity: 0;
-            transition: all 0.2s ease;
+            opacity: 0.8;
+            transition: opacity 0.2s;
         }
-        .chat-message.self:hover .delete-msg-btn { opacity: 1; } /* *** NEW *** */
+        .reply-snippet:hover { opacity: 1; }
+        .reply-snippet-sender { font-size: 0.75rem; font-weight: 700; color: var(--primary-gold); }
+        .reply-snippet-text {
+            font-size: 0.8rem; color: var(--text-light);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            display: block; max-width: 180px;
+        }
 
-        #chat-form {
-            display: flex; padding: 10px 15px;
+        /* *** NEW *** Timestamp tooltip on hover */
+        .chat-message-bubble { position: relative; }
+        .message-timestamp {
+            position: absolute; bottom: -20px; right: 0;
+            background-color: #000; color: #fff; padding: 2px 6px;
+            border-radius: 4px; font-size: 0.7rem; white-space: nowrap;
+            opacity: 0; visibility: hidden; transition: all 0.2s; z-index: 10;
+        }
+        .chat-message.self .message-timestamp { right: auto; left: 0; }
+        .chat-message-bubble:hover .message-timestamp {
+            opacity: 1; visibility: visible; bottom: -24px;
+        }
+
+        /* *** NEW *** Reply Preview Panel Style */
+        #reply-preview-panel {
+            padding: 8px 15px;
+            background-color: #2a2118;
             border-top: 1px solid var(--border-color);
-            gap: 10px; flex-shrink: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+        #reply-preview-content {
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        #reply-preview-sender { font-weight: 700; color: var(--primary-gold); }
+        #reply-preview-text { color: var(--text-secondary); }
+        #cancel-reply-btn {
+            background: none; border: none; color: #e74c3c;
+            font-size: 1.5rem; cursor: pointer; padding: 0 5px;
+        }
+
+
+        #chat-form-container {
+            border-top: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+        #chat-form {
+            display: flex; padding: 10px 15px; gap: 10px;
         }
         #chat-input {
             flex-grow: 1; background-color: rgba(0,0,0,0.3);
@@ -290,7 +371,6 @@
         <div class="chat-header">
             <h3>چت لابی</h3>
             <div class="chat-header-buttons">
-                 <!-- *** NEW ***: Clear chat button (for host) -->
                 <button id="clear-chat-btn" title="پاک کردن کل چت">🗑️</button>
                 <button id="close-chat-btn" title="بستن چت">&times;</button>
             </div>
@@ -298,10 +378,22 @@
         <div id="chat-messages">
             <!-- Messages will be inserted here by JavaScript -->
         </div>
-        <form id="chat-form">
-            <input type="text" id="chat-input" placeholder="پیام خود را بنویسید..." autocomplete="off">
-            <button type="submit" id="chat-send-btn">ارسال</button>
-        </form>
+        <!-- *** NEW *** Scroll to bottom button -->
+        <button id="scroll-to-bottom-btn" title="رفتن به آخرین پیام">↓</button>
+        <div id="chat-form-container">
+            <!-- *** NEW *** Reply Preview Panel -->
+            <div id="reply-preview-panel" style="display: none;">
+                <div id="reply-preview-content">
+                    <div id="reply-preview-sender"></div>
+                    <div id="reply-preview-text"></div>
+                </div>
+                <button id="cancel-reply-btn" title="لغو پاسخ">&times;</button>
+            </div>
+            <form id="chat-form">
+                <input type="text" id="chat-input" placeholder="پیام خود را بنویسید..." autocomplete="off">
+                <button type="submit" id="chat-send-btn">ارسال</button>
+            </form>
+        </div>
     </div>
     <!-- END: Chat Panel HTML -->
 
@@ -349,7 +441,10 @@
         const chatMessagesEl = document.getElementById('chat-messages');
         const chatForm = document.getElementById('chat-form');
         const chatInput = document.getElementById('chat-input');
-        const clearChatBtn = document.getElementById('clear-chat-btn'); // *** NEW ***
+        const clearChatBtn = document.getElementById('clear-chat-btn');
+        const scrollToBottomBtn = document.getElementById('scroll-to-bottom-btn'); // *** NEW ***
+        const replyPreviewPanel = document.getElementById('reply-preview-panel'); // *** NEW ***
+        const cancelReplyBtn = document.getElementById('cancel-reply-btn'); // *** NEW ***
         
         let currentUser = null;
         let currentUserData = {};
@@ -360,6 +455,7 @@
         let isReady = false;
         let lastPlayerCount = 0;
         let isChatPanelVisible = false;
+        let currentReplyContext = null; // *** NEW *** State for replying
 
         function playSound(soundId) { try { document.getElementById(soundId).play(); } catch(e) { console.warn("Sound play failed", e); } }
 
@@ -433,7 +529,6 @@
             lobbyNameEl.textContent = data.lobbyName;
             const players = data.players || [];
             isHost = currentUser.uid === data.creatorId;
-            // *** NEW ***: Show/hide clear chat button based on host status
             clearChatBtn.style.display = isHost ? 'block' : 'none';
 
             leftPlayersEl.innerHTML = '';
@@ -488,13 +583,13 @@
         async function kickPlayer(uidToKick) { const lobbyDocRef = doc(db, "Lobbys_list", lobbyId); await runTransaction(db, async (transaction) => { const lobbyDoc = await transaction.get(lobbyDocRef); if (!lobbyDoc.exists()) return; let players = lobbyDoc.data().players.filter(p => p.uid !== uidToKick); transaction.update(lobbyDocRef, { players: players, playerCount: players.length }); }); }
         
         async function handleLeaveLobby() {
-            window.removeEventListener('beforeunload', handleLeaveLobby); // *** NEW ***: prevent double execution
+            window.removeEventListener('beforeunload', handleLeaveLobby);
             if (unsubscribeLobby) unsubscribeLobby();
             if (unsubscribeChat) unsubscribeChat();
 
             const lobbyDocRef = doc(db, "Lobbys_list", lobbyId);
             try {
-                const docSnap = await getDoc(lobbyDocRef); // Use getDoc instead of transaction if we are leaving anyway
+                const docSnap = await getDoc(lobbyDocRef);
                 if (docSnap.exists()) {
                      if (isHost) {
                         await deleteDoc(lobbyDocRef);
@@ -512,7 +607,7 @@
             }
         }
         
-        // --- START: Chat Functions (HEAVILY MODIFIED) ---
+        // --- START: Chat Functions ---
         function toggleChatPanel() {
             isChatPanelVisible = !isChatPanelVisible;
             chatPanel.classList.toggle('visible', isChatPanelVisible);
@@ -530,17 +625,19 @@
             unsubscribeChat = onSnapshot(q, (snapshot) => {
                 snapshot.docChanges().forEach(change => {
                     if (change.type === 'added') {
+                        const isScrolledToBottom = chatMessagesEl.scrollHeight - chatMessagesEl.clientHeight <= chatMessagesEl.scrollTop + 20;
                         renderMessage(change.doc.id, change.doc.data());
+                        if (isScrolledToBottom) {
+                           chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+                        }
                         if (!isChatPanelVisible && change.doc.data().senderUid !== currentUser.uid) {
                             toggleChatBtn.classList.add('new-message');
                             playSound('sound-new-message');
                         }
                     }
-                    if (change.type === 'removed') { // *** NEW ***: Handle message deletion in real-time
+                    if (change.type === 'removed') {
                         const msgElement = chatMessagesEl.querySelector(`[data-id="${change.doc.id}"]`);
-                        if (msgElement) {
-                            msgElement.remove();
-                        }
+                        if (msgElement) msgElement.remove();
                     }
                 });
             });
@@ -548,85 +645,129 @@
 
         function renderMessage(id, data) {
             const messageDiv = document.createElement('div');
-            messageDiv.classList.add('chat-message');
-            messageDiv.dataset.id = id; // *** NEW ***: Store message ID for deletion
+            messageDiv.className = 'chat-message';
+            messageDiv.dataset.id = id;
 
             const isSelf = data.senderUid === currentUser.uid;
-            if (isSelf) {
-                messageDiv.classList.add('self');
+            if (isSelf) messageDiv.classList.add('self');
+            
+            // *** NEW ***: Escape text content for security and to use in JS functions
+            const escapedText = JSON.stringify(data.text);
+            const deleteBtn = isSelf ? `<button class="msg-action-btn delete-msg-btn" onclick="window.handleDeleteMessage('${id}')" title="حذف پیام">×</button>` : '';
+            const replyBtn = `<button class="msg-action-btn reply-msg-btn" onclick='window.setReplyContext(${JSON.stringify(id)}, ${JSON.stringify(data.senderName)}, ${escapedText})' title="پاسخ">↪</button>`;
+
+            // *** NEW ***: Generate reply snippet if it exists
+            let replySnippetHTML = '';
+            if (data.replyTo) {
+                replySnippetHTML = `
+                    <div class="reply-snippet" onclick="window.scrollToMessage('${data.replyTo.messageId}')">
+                        <div class="reply-snippet-sender">${data.replyTo.senderName}</div>
+                        <span class="reply-snippet-text">${data.replyTo.text}</span>
+                    </div>`;
             }
 
-            // *** NEW ***: Delete button for self messages
-            const deleteButton = isSelf ? `<button class="delete-msg-btn" onclick="window.handleDeleteMessage('${id}')" title="حذف پیام">×</button>` : '';
+            // *** NEW ***: Generate timestamp
+            const timestamp = data.timestamp?.toDate().toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' }) || '';
 
             messageDiv.innerHTML = `
                 <img src="${data.senderAvatarUrl || 'https://i.imgur.com/T2bT1tG.png'}" class="chat-message-avatar">
                 <div class="chat-message-content">
                     <span class="chat-message-sender">${data.senderName}</span>
                     <div class="chat-message-bubble">
-                        ${deleteButton}
+                        <div class="message-actions">
+                            ${deleteBtn}
+                            ${replyBtn}
+                        </div>
+                        ${replySnippetHTML}
                         ${data.text}
+                        <div class="message-timestamp">${timestamp}</div>
                     </div>
                 </div>
             `;
             chatMessagesEl.appendChild(messageDiv);
-            chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
         }
         
         async function handleSendMessage(e) {
             e.preventDefault();
             const messageText = chatInput.value.trim();
             if (messageText === '') return;
-            chatInput.disabled = true; // *** NEW *** Prevent spamming
             
+            chatInput.disabled = true;
             const tempMessage = chatInput.value;
             chatInput.value = '';
-
+            
             try {
                 const chatCollectionRef = collection(db, `Lobbys_list/${lobbyId}/chat`);
-                await addDoc(chatCollectionRef, {
+                let newMessageData = {
                     text: messageText,
                     senderName: currentUserData.displayName || "بازیکن",
                     senderUid: currentUser.uid,
-                    senderAvatarUrl: currentUserData.avatarUrl || "https://i.imgur.com/T2bT1tG.png", // *** NEW ***
+                    senderAvatarUrl: currentUserData.avatarUrl || "https://i.imgur.com/T2bT1tG.png",
                     timestamp: serverTimestamp()
-                });
+                };
+
+                // *** NEW ***: Add reply context to the message data
+                if (currentReplyContext) {
+                    newMessageData.replyTo = currentReplyContext;
+                }
+
+                await addDoc(chatCollectionRef, newMessageData);
+
             } catch (error) {
                 console.error("Error sending message:", error);
                 chatInput.value = tempMessage;
-                showNotificationModal("خطا", "ارسال پیام با مشکل مواجه شد. لطفا قوانین سرور را بررسی کنید.", ()=>{});
+                showNotificationModal("خطا", "ارسال پیام با مشکل مواجه شد.", ()=>{});
             } finally {
                 chatInput.disabled = false;
                 chatInput.focus();
-            }
-        }
-
-        // *** NEW ***: Function to delete a single message
-        window.handleDeleteMessage = async function(messageId) {
-            const msgRef = doc(db, `Lobbys_list/${lobbyId}/chat`, messageId);
-            try {
-                await deleteDoc(msgRef);
-            } catch (error) {
-                console.error("Error deleting message:", error);
-                showNotificationModal("خطا", "حذف پیام با مشکل مواجه شد.", ()=>{});
+                clearReplyContext(); // *** NEW ***: Clear reply state after sending
             }
         }
         
-        // *** NEW ***: Function for host to clear all chat messages
+        // --- NEW CHAT FEATURE FUNCTIONS ---
+
+        window.handleDeleteMessage = async function(messageId) {
+            const msgRef = doc(db, `Lobbys_list/${lobbyId}/chat`, messageId);
+            await deleteDoc(msgRef).catch(err => console.error("Error deleting message:", err));
+        }
+        
+        window.setReplyContext = function(messageId, senderName, text) {
+            currentReplyContext = {
+                messageId,
+                senderName,
+                text: text.length > 30 ? text.substring(0, 30) + '...' : text
+            };
+            document.getElementById('reply-preview-sender').textContent = `پاسخ به ${senderName}`;
+            document.getElementById('reply-preview-text').textContent = currentReplyContext.text;
+            replyPreviewPanel.style.display = 'flex';
+            chatInput.focus();
+        }
+
+        function clearReplyContext() {
+            currentReplyContext = null;
+            replyPreviewPanel.style.display = 'none';
+        }
+        
+        window.scrollToMessage = function(messageId) {
+            const messageElement = chatMessagesEl.querySelector(`[data-id="${messageId}"]`);
+            if (messageElement) {
+                messageElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                messageElement.classList.add('highlight');
+                setTimeout(() => {
+                    messageElement.classList.remove('highlight');
+                }, 1500);
+            }
+        }
+
         async function handleClearAllMessages() {
             showConfirmModal('پاک کردن چت', 'آیا از پاک کردن تمام پیام‌های این لابی مطمئن هستید؟ این عمل غیرقابل بازگشت است.', async () => {
                 const chatCollectionRef = collection(db, `Lobbys_list/${lobbyId}/chat`);
-                const q = query(chatCollectionRef);
-                const querySnapshot = await getDocs(q);
-                
+                const querySnapshot = await getDocs(query(chatCollectionRef));
                 if(querySnapshot.empty) return;
-
                 const batch = writeBatch(db);
-                querySnapshot.forEach(doc => {
-                    batch.delete(doc.ref);
-                });
+                querySnapshot.forEach(doc => batch.delete(doc.ref));
                 await batch.commit();
-                chatMessagesEl.innerHTML = ''; // Clear UI immediately
+                chatMessagesEl.innerHTML = '';
             });
         }
         // --- END: Chat Functions ---
@@ -636,10 +777,19 @@
             leaveLobbyBtn.addEventListener('click', showLeaveConfirm); 
             window.addEventListener('beforeunload', handleLeaveLobby); 
             
+            // Chat Listeners
             toggleChatBtn.addEventListener('click', toggleChatPanel);
             closeChatBtn.addEventListener('click', toggleChatPanel);
             chatForm.addEventListener('submit', handleSendMessage);
-            clearChatBtn.addEventListener('click', handleClearAllMessages); // *** NEW ***
+            clearChatBtn.addEventListener('click', handleClearAllMessages);
+            cancelReplyBtn.addEventListener('click', clearReplyContext); // *** NEW ***
+            scrollToBottomBtn.addEventListener('click', () => { // *** NEW ***
+                chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+            });
+            chatMessagesEl.addEventListener('scroll', () => { // *** NEW ***
+                const isNearBottom = chatMessagesEl.scrollHeight - chatMessagesEl.clientHeight - chatMessagesEl.scrollTop < 150;
+                scrollToBottomBtn.classList.toggle('visible', !isNearBottom);
+            });
         }
         
         function showLeaveConfirm() { showConfirmModal("خروج از لابی", "آیا مطمئن هستید؟" + (isHost ? " (چون شما سازنده هستید، لابی حذف خواهد شد)" : ""), handleLeaveLobby); }
