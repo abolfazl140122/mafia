@@ -297,7 +297,6 @@
         #edit-user-cancel-btn, #edit-rank-cancel-btn { background: linear-gradient(145deg, #616161, #3a3a3a); border-color: #777; }
         #edit-user-cancel-btn:hover, #edit-rank-cancel-btn:hover { background: linear-gradient(145deg, #757575, #4f4f4f); }
         
-        /* NEW: Styles for Ban Button and Status */
         #ban-status-section { margin-top: 20px; padding-top: 20px; border-top: 1px solid #5c4a3a; }
         #ban-status-text { font-size: 0.9rem; color: #ffadad; margin-bottom: 10px; font-weight: 700; }
         .ban-button { background: linear-gradient(145deg, #c0392b, #a93226); border-color: #e67e22; }
@@ -782,7 +781,6 @@
                 <button type="submit" id="save-user-changes-btn" class="modal-button">ذخیره تغییرات</button>
                 <button type="button" id="edit-user-cancel-btn" class="modal-button cancel-button">انصراف</button>
             </form>
-            <!-- NEW: Ban Management Section -->
             <div id="ban-status-section">
                 <p id="ban-status-text" style="display:none;"></p>
                 <button id="manage-ban-btn" class="modal-button ban-button">مدیریت مسدودیت</button>
@@ -815,7 +813,6 @@
         </div>
     </div>
     
-    <!-- NEW: Ban User Modal -->
     <div id="ban-user-modal-overlay" class="modal-overlay">
         <div id="ban-user-modal-content" class="modal-content">
             <h2 class="modal-title">مسدود کردن کاربر</h2>
@@ -1071,7 +1068,6 @@
         const dialogueGuideCharacterImg = document.getElementById('dialogue-guide-character-img');
         const dialogueGuideText = document.getElementById('dialogue-guide-text');
         const dialogueGuideButton = document.getElementById('dialogue-guide-button');
-        // NEW: Ban Management Elements
         const banStatusText = document.getElementById('ban-status-text');
         const manageBanBtn = document.getElementById('manage-ban-btn');
         const banUserModalOverlay = document.getElementById('ban-user-modal-overlay');
@@ -1096,7 +1092,7 @@
         let rankingListenerUnsubscribe = null;
         let dialogueListenerUnsubscribe = null;
         let currentActiveDialogueId = null; 
-        let currentlyEditingUser = null; // NEW: Store data of user being edited
+        let currentlyEditingUser = null; 
 
         // --- توابع عمومی ---
         function showModal(modalElement) { modalElement.classList.add('visible'); }
@@ -1106,7 +1102,7 @@
             hideModal(userListModalOverlay);
             hideModal(editUserModalOverlay);
             hideModal(gameModesPanelOverlay);
-            hideModal(banUserModalOverlay); // NEW
+            hideModal(banUserModalOverlay);
         }
         function showCustomAlert(message, onConfirm) {
             customAlertMessage.textContent = message;
@@ -1297,7 +1293,6 @@
         function clearNameCheckResult() { nameCheckResultContainer.classList.remove('error'); nameCheckResultContainer.innerHTML = ''; }
         async function handleNameChange(e) { e.preventDefault(); if (!auth.currentUser || !currentUserData) return; const newName = newDisplayNameInput.value.trim(); clearNameCheckResult(); if (newName.length < 3 || newName.length > 15) { showNameCheckError("نام باید بین ۳ تا ۱۵ کاراکتر باشد."); return; } if (newName === currentUserData.displayName) { showNameCheckError("این نام در حال حاضر نام شماست."); return; } const validNameRegex = /^[a-zA-Z0-9_.\u0600-\u06FF\s]+$/; if (!validNameRegex.test(newName)) { showNameCheckError("نام شامل کاراکترهای غیرمجاز است."); return; } saveNewNameBtn.disabled = true; saveNewNameBtn.textContent = 'در حال بررسی...'; try { const usersRef = collection(db, "users"); const q = query(usersRef, where("displayName", "==", newName)); const querySnapshot = await getDocs(q); if (querySnapshot.empty) { saveNewNameBtn.textContent = 'در حال ذخیره...'; const userDocRef = doc(db, 'users', auth.currentUser.uid); await updateDoc(userDocRef, { displayName: newName }); hideModal(changeNameOverlay); showCustomAlert("نام شما با موفقیت تغییر کرد."); } else { const existingUserData = querySnapshot.docs[0].data(); nameCheckResultContainer.classList.add('error'); nameCheckResultContainer.innerHTML = `<div class="user-exists-info"><p class="error-message" style="margin-bottom: 10px;">این نام قبلاً ثبت شده و متعلق به کاربر زیر است:</p><img src="${existingUserData.avatarUrl || DEFAULT_AVATAR}" alt="avatar"><span class="name">${existingUserData.displayName}</span></div>`; } } catch (error) { console.error("خطا در تغییر نام:", error); showNameCheckError("خطا در ارتباط با سرور. لطفا دوباره تلاش کنید."); } finally { saveNewNameBtn.disabled = false; saveNewNameBtn.textContent = 'ذخیره تغییرات'; } }
         
-        // --- NEW: Ban Management Functions ---
         function updateBanStatusUI() {
             if (!currentlyEditingUser) return;
             const isBanned = currentlyEditingUser.isBanned === true && currentlyEditingUser.banExpiresAt && currentlyEditingUser.banExpiresAt.toDate() > new Date();
@@ -1323,7 +1318,7 @@
                 const userDocRef = doc(db, 'users', currentlyEditingUser.uid);
                 try {
                     await updateDoc(userDocRef, { isBanned: false });
-                    currentlyEditingUser.isBanned = false; // Update local state
+                    currentlyEditingUser.isBanned = false; 
                     updateBanStatusUI();
                     showCustomAlert('کاربر با موفقیت از مسدودیت خارج شد.');
                 } catch (error) {
@@ -1358,9 +1353,8 @@
             const userDocRef = doc(db, 'users', currentlyEditingUser.uid);
             try {
                 await updateDoc(userDocRef, banData);
-                // Update local state to reflect changes immediately
                 currentlyEditingUser.isBanned = true;
-                currentlyEditingUser.banExpiresAt = { toDate: () => expiryDate }; // Mock Firestore Timestamp
+                currentlyEditingUser.banExpiresAt = { toDate: () => expiryDate }; 
                 
                 hideModal(banUserModalOverlay);
                 updateBanStatusUI();
@@ -1379,6 +1373,15 @@
                 onSnapshot(userDocRef, (userDocSnap) => {
                     if (userDocSnap.exists()) {
                         currentUserData = userDocSnap.data();
+
+                        // ---- [تغییر کلیدی] بررسی لحظه‌ای وضعیت مسدودیت ----
+                        if (currentUserData.isBanned === true && currentUserData.banExpiresAt && currentUserData.banExpiresAt.toDate() > new Date()) {
+                            console.log("کاربر مسدود است. در حال انتقال به صفحه لودینگ...");
+                            window.location.href = './index.html'; // یا نام صحیح فایل لودینگ شما
+                            return; // توقف اجرای ادامه کد در این تابع
+                        }
+                        // ----------------------------------------------------
+
                         userDisplayName.textContent = currentUserData.displayName || "کاربر ناشناس";
                         userAvatar.src = currentUserData.avatarUrl || DEFAULT_AVATAR;
                         adminPanelButton.style.display = currentUserData.isAdmin === true ? 'block' : 'none';
@@ -1485,7 +1488,6 @@
             }
         });
         
-        // NEW: Ban Management Event Listeners
         manageBanBtn.addEventListener('click', () => {
             const isBanned = currentlyEditingUser.isBanned === true && currentlyEditingUser.banExpiresAt && currentlyEditingUser.banExpiresAt.toDate() > new Date();
             if (isBanned) {
