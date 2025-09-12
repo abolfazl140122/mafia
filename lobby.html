@@ -186,17 +186,21 @@
         #chat-messages::-webkit-scrollbar-track { background: transparent; }
         #chat-messages::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 3px; }
 
-        .chat-message { display: flex; flex-direction: column; align-items: flex-start; }
-        .chat-message.self { align-items: flex-end; }
+        /* ** شروع تغییرات استایل چت ** */
+        .chat-message { display: flex; align-items: flex-start; gap: 10px; }
+        .chat-message.self { flex-direction: row-reverse; }
+        .chat-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border-color); flex-shrink: 0; }
+        .chat-message-content { display: flex; flex-direction: column; }
         .chat-message-sender { font-size: 0.8rem; font-weight: 700; color: var(--primary-gold); margin-bottom: 3px; }
-        .chat-message.self .chat-message-sender { color: var(--green-ready); }
+        .chat-message.self .chat-message-sender { color: var(--green-ready); text-align: right; }
         .chat-message-bubble {
             background-color: #332a20; padding: 8px 12px;
-            border-radius: 12px; max-width: 85%;
+            border-radius: 12px; max-width: 100%;
             font-size: 0.9rem; line-height: 1.5;
             word-wrap: break-word;
         }
         .chat-message.self .chat-message-bubble { background-color: #2a3a30; }
+        /* ** پایان تغییرات استایل چت ** */
 
         #chat-form {
             display: flex; padding: 10px 15px;
@@ -284,11 +288,12 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, runTransaction, getDoc, collection, where, query, addDoc, writeBatch, deleteDoc, getDocs, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, runTransaction, getDoc, collection, addDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         // --- Config & Elements ---
         const MAX_PLAYERS = 12;
         const MIN_PLAYERS_TO_START = 2;
+        const DEFAULT_AVATAR = "https://i.imgur.com/T2bT1tG.png";
         const firebaseConfig = {
           apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
           authDomain: "mafia-9fcbf.firebaseapp.com",
@@ -363,7 +368,7 @@
                     const playerExists = players.some(p => p.uid === currentUser.uid);
                     if (!playerExists) {
                         if (players.length >= MAX_PLAYERS) throw new Error("لابی پر است!");
-                        players.push({ uid: currentUser.uid, displayName: currentUserData.displayName || "بازیکن", avatarUrl: currentUserData.avatarUrl || "https://i.imgur.com/T2bT1tG.png", isReady: false });
+                        players.push({ uid: currentUser.uid, displayName: currentUserData.displayName || "بازیکن", avatarUrl: currentUserData.avatarUrl || DEFAULT_AVATAR, isReady: false });
                         transaction.update(lobbyDocRef, { players: players, playerCount: players.length });
                     }
                 });
@@ -416,7 +421,7 @@
                     const hostCrown = player.uid === data.creatorId ? `<div class="host-crown">👑</div>` : '';
                     slot.innerHTML = `
                         ${hostCrown}
-                        <img src="${player.avatarUrl || 'https://i.imgur.com/T2bT1tG.png'}" alt="avatar" class="player-avatar">
+                        <img src="${player.avatarUrl || DEFAULT_AVATAR}" alt="avatar" class="player-avatar">
                         <p class="player-name">${player.displayName}</p>
                         <div class="ready-indicator">✔</div>
                     `;
@@ -479,6 +484,7 @@
             if (isChatPanelVisible) {
                 toggleChatBtn.classList.remove('new-message');
                 chatInput.focus();
+                chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
             }
         }
 
@@ -500,6 +506,7 @@
             });
         }
 
+        // *** تغییرات رندر پیام ***
         function renderMessage(data) {
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('chat-message');
@@ -508,13 +515,17 @@
             }
 
             messageDiv.innerHTML = `
-                <span class="chat-message-sender">${data.senderName}</span>
-                <div class="chat-message-bubble">${data.text}</div>
+                <img src="${data.senderAvatar || DEFAULT_AVATAR}" class="chat-avatar" alt="avatar">
+                <div class="chat-message-content">
+                    <span class="chat-message-sender">${data.senderName}</span>
+                    <div class="chat-message-bubble">${data.text}</div>
+                </div>
             `;
             chatMessagesEl.appendChild(messageDiv);
-            chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight; // Auto-scroll
+            chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight; // Auto-scroll to bottom
         }
         
+        // *** تغییرات ارسال پیام ***
         async function handleSendMessage(e) {
             e.preventDefault();
             const messageText = chatInput.value.trim();
@@ -528,12 +539,13 @@
                     text: messageText,
                     senderName: currentUserData.displayName || "بازیکن",
                     senderUid: currentUser.uid,
+                    senderAvatar: currentUserData.avatarUrl || DEFAULT_AVATAR, // ارسال آواتار
                     timestamp: serverTimestamp()
                 });
             } catch (error) {
                 console.error("Error sending message:", error);
                 chatInput.value = messageText; // Restore text if sending failed
-                showNotificationModal("خطا", "ارسال پیام با مشکل مواجه شد.", ()=>{});
+                showNotificationModal("خطا", "ارسال پیام با مشکل مواجه شد. لطفاً قوانین سرور را بررسی کنید.", ()=>{});
             }
         }
         // --- END: Chat Functions ---
