@@ -172,6 +172,9 @@
             flex-shrink: 0;
         }
         .chat-header h3 { font-size: 1.1rem; color: var(--primary-gold); font-weight: 700; }
+        .chat-header-buttons { display: flex; align-items: center; gap: 10px; }
+        #clear-chat-btn { background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 1.2rem; display: none; } /* *** NEW *** */
+        #clear-chat-btn:hover { color: #ff7675; }
         #close-chat-btn {
             background: none; border: none; color: var(--text-secondary); cursor: pointer;
             font-size: 1.5rem; line-height: 1; padding: 5px;
@@ -186,21 +189,42 @@
         #chat-messages::-webkit-scrollbar-track { background: transparent; }
         #chat-messages::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 3px; }
 
-        /* ** شروع تغییرات استایل چت ** */
-        .chat-message { display: flex; align-items: flex-start; gap: 10px; }
-        .chat-message.self { flex-direction: row-reverse; }
-        .chat-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border-color); flex-shrink: 0; }
-        .chat-message-content { display: flex; flex-direction: column; }
+        .chat-message { display: flex; align-items: flex-start; gap: 10px; } /* *** MODIFIED *** */
+        .chat-message.self { align-self: flex-end; flex-direction: row-reverse; } /* *** MODIFIED *** */
+        .chat-message-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 2px solid var(--border-color); } /* *** NEW *** */
+        .chat-message-content { display: flex; flex-direction: column; max-width: calc(100% - 42px); } /* *** NEW *** */
         .chat-message-sender { font-size: 0.8rem; font-weight: 700; color: var(--primary-gold); margin-bottom: 3px; }
         .chat-message.self .chat-message-sender { color: var(--green-ready); text-align: right; }
         .chat-message-bubble {
             background-color: #332a20; padding: 8px 12px;
-            border-radius: 12px; max-width: 100%;
+            border-radius: 12px;
             font-size: 0.9rem; line-height: 1.5;
             word-wrap: break-word;
+            position: relative;
         }
-        .chat-message.self .chat-message-bubble { background-color: #2a3a30; }
-        /* ** پایان تغییرات استایل چت ** */
+        .chat-message.self .chat-message-bubble { 
+            background-color: #2a3a30; 
+            border: 2px solid var(--primary-gold); /* *** NEW: Differentiate self messages *** */
+            box-shadow: 0 0 10px rgba(255, 201, 71, 0.3); /* *** NEW *** */
+        }
+
+        .delete-msg-btn { /* *** NEW *** */
+            position: absolute;
+            top: -8px; left: -8px;
+            width: 20px; height: 20px;
+            background-color: #c0392b;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            opacity: 0;
+            transition: all 0.2s ease;
+        }
+        .chat-message.self:hover .delete-msg-btn { opacity: 1; } /* *** NEW *** */
 
         #chat-form {
             display: flex; padding: 10px 15px;
@@ -265,7 +289,11 @@
     <div id="chat-panel">
         <div class="chat-header">
             <h3>چت لابی</h3>
-            <button id="close-chat-btn" title="بستن چت">&times;</button>
+            <div class="chat-header-buttons">
+                 <!-- *** NEW ***: Clear chat button (for host) -->
+                <button id="clear-chat-btn" title="پاک کردن کل چت">🗑️</button>
+                <button id="close-chat-btn" title="بستن چت">&times;</button>
+            </div>
         </div>
         <div id="chat-messages">
             <!-- Messages will be inserted here by JavaScript -->
@@ -288,12 +316,11 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, runTransaction, getDoc, collection, addDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, runTransaction, getDoc, collection, addDoc, writeBatch, deleteDoc, getDocs, serverTimestamp, orderBy, query } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         // --- Config & Elements ---
         const MAX_PLAYERS = 12;
         const MIN_PLAYERS_TO_START = 2;
-        const DEFAULT_AVATAR = "https://i.imgur.com/T2bT1tG.png";
         const firebaseConfig = {
           apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
           authDomain: "mafia-9fcbf.firebaseapp.com",
@@ -322,12 +349,13 @@
         const chatMessagesEl = document.getElementById('chat-messages');
         const chatForm = document.getElementById('chat-form');
         const chatInput = document.getElementById('chat-input');
+        const clearChatBtn = document.getElementById('clear-chat-btn'); // *** NEW ***
         
         let currentUser = null;
         let currentUserData = {};
         let lobbyId = null;
         let unsubscribeLobby = null;
-        let unsubscribeChat = null; // Listener for chat
+        let unsubscribeChat = null;
         let isHost = false;
         let isReady = false;
         let lastPlayerCount = 0;
@@ -350,7 +378,7 @@
                     currentUserData = userDocSnap.exists() ? userDocSnap.data() : { displayName: user.displayName, avatarUrl: user.photoURL };
                     await joinLobby();
                     listenToLobbyChanges();
-                    listenToChatMessages(); // Start listening for chat messages
+                    listenToChatMessages();
                     setupEventListeners();
                 } else {
                     window.location.href = './login.html';
@@ -368,7 +396,7 @@
                     const playerExists = players.some(p => p.uid === currentUser.uid);
                     if (!playerExists) {
                         if (players.length >= MAX_PLAYERS) throw new Error("لابی پر است!");
-                        players.push({ uid: currentUser.uid, displayName: currentUserData.displayName || "بازیکن", avatarUrl: currentUserData.avatarUrl || DEFAULT_AVATAR, isReady: false });
+                        players.push({ uid: currentUser.uid, displayName: currentUserData.displayName || "بازیکن", avatarUrl: currentUserData.avatarUrl || "https://i.imgur.com/T2bT1tG.png", isReady: false });
                         transaction.update(lobbyDocRef, { players: players, playerCount: players.length });
                     }
                 });
@@ -405,6 +433,9 @@
             lobbyNameEl.textContent = data.lobbyName;
             const players = data.players || [];
             isHost = currentUser.uid === data.creatorId;
+            // *** NEW ***: Show/hide clear chat button based on host status
+            clearChatBtn.style.display = isHost ? 'block' : 'none';
+
             leftPlayersEl.innerHTML = '';
             rightPlayersEl.innerHTML = '';
             
@@ -421,7 +452,7 @@
                     const hostCrown = player.uid === data.creatorId ? `<div class="host-crown">👑</div>` : '';
                     slot.innerHTML = `
                         ${hostCrown}
-                        <img src="${player.avatarUrl || DEFAULT_AVATAR}" alt="avatar" class="player-avatar">
+                        <img src="${player.avatarUrl || 'https://i.imgur.com/T2bT1tG.png'}" alt="avatar" class="player-avatar">
                         <p class="player-name">${player.displayName}</p>
                         <div class="ready-indicator">✔</div>
                     `;
@@ -457,34 +488,38 @@
         async function kickPlayer(uidToKick) { const lobbyDocRef = doc(db, "Lobbys_list", lobbyId); await runTransaction(db, async (transaction) => { const lobbyDoc = await transaction.get(lobbyDocRef); if (!lobbyDoc.exists()) return; let players = lobbyDoc.data().players.filter(p => p.uid !== uidToKick); transaction.update(lobbyDocRef, { players: players, playerCount: players.length }); }); }
         
         async function handleLeaveLobby() {
+            window.removeEventListener('beforeunload', handleLeaveLobby); // *** NEW ***: prevent double execution
             if (unsubscribeLobby) unsubscribeLobby();
-            if (unsubscribeChat) unsubscribeChat(); // Unsubscribe from chat listener
+            if (unsubscribeChat) unsubscribeChat();
 
             const lobbyDocRef = doc(db, "Lobbys_list", lobbyId);
             try {
-                await runTransaction(db, async (transaction) => {
-                    const lobbyDoc = await transaction.get(lobbyDocRef);
-                    if (!lobbyDoc.exists()) return;
-                    if (isHost) {
-                        transaction.delete(lobbyDocRef);
-                    } else {
-                        let players = lobbyDoc.data().players.filter(p => p.uid !== currentUser.uid);
-                        transaction.update(lobbyDocRef, { players: players, playerCount: players.length });
-                    }
-                });
+                const docSnap = await getDoc(lobbyDocRef); // Use getDoc instead of transaction if we are leaving anyway
+                if (docSnap.exists()) {
+                     if (isHost) {
+                        await deleteDoc(lobbyDocRef);
+                     } else {
+                        await runTransaction(db, async (transaction) => {
+                            const lobbyDoc = await transaction.get(lobbyDocRef);
+                            if (!lobbyDoc.exists()) return;
+                            let players = lobbyDoc.data().players.filter(p => p.uid !== currentUser.uid);
+                            transaction.update(lobbyDocRef, { players: players, playerCount: players.length });
+                        });
+                     }
+                }
             } finally {
                 window.location.href = './Lobby page.html';
             }
         }
         
-        // --- START: Chat Functions ---
+        // --- START: Chat Functions (HEAVILY MODIFIED) ---
         function toggleChatPanel() {
             isChatPanelVisible = !isChatPanelVisible;
             chatPanel.classList.toggle('visible', isChatPanelVisible);
             if (isChatPanelVisible) {
                 toggleChatBtn.classList.remove('new-message');
-                chatInput.focus();
                 chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+                chatInput.focus();
             }
         }
 
@@ -495,43 +530,57 @@
             unsubscribeChat = onSnapshot(q, (snapshot) => {
                 snapshot.docChanges().forEach(change => {
                     if (change.type === 'added') {
-                        const messageData = change.data();
-                        renderMessage(messageData);
-                        if (!isChatPanelVisible && messageData.senderUid !== currentUser.uid) {
+                        renderMessage(change.doc.id, change.doc.data());
+                        if (!isChatPanelVisible && change.doc.data().senderUid !== currentUser.uid) {
                             toggleChatBtn.classList.add('new-message');
                             playSound('sound-new-message');
+                        }
+                    }
+                    if (change.type === 'removed') { // *** NEW ***: Handle message deletion in real-time
+                        const msgElement = chatMessagesEl.querySelector(`[data-id="${change.doc.id}"]`);
+                        if (msgElement) {
+                            msgElement.remove();
                         }
                     }
                 });
             });
         }
 
-        // *** تغییرات رندر پیام ***
-        function renderMessage(data) {
+        function renderMessage(id, data) {
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('chat-message');
-            if (data.senderUid === currentUser.uid) {
+            messageDiv.dataset.id = id; // *** NEW ***: Store message ID for deletion
+
+            const isSelf = data.senderUid === currentUser.uid;
+            if (isSelf) {
                 messageDiv.classList.add('self');
             }
 
+            // *** NEW ***: Delete button for self messages
+            const deleteButton = isSelf ? `<button class="delete-msg-btn" onclick="window.handleDeleteMessage('${id}')" title="حذف پیام">×</button>` : '';
+
             messageDiv.innerHTML = `
-                <img src="${data.senderAvatar || DEFAULT_AVATAR}" class="chat-avatar" alt="avatar">
+                <img src="${data.senderAvatarUrl || 'https://i.imgur.com/T2bT1tG.png'}" class="chat-message-avatar">
                 <div class="chat-message-content">
                     <span class="chat-message-sender">${data.senderName}</span>
-                    <div class="chat-message-bubble">${data.text}</div>
+                    <div class="chat-message-bubble">
+                        ${deleteButton}
+                        ${data.text}
+                    </div>
                 </div>
             `;
             chatMessagesEl.appendChild(messageDiv);
-            chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight; // Auto-scroll to bottom
+            chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
         }
         
-        // *** تغییرات ارسال پیام ***
         async function handleSendMessage(e) {
             e.preventDefault();
             const messageText = chatInput.value.trim();
             if (messageText === '') return;
-
-            chatInput.value = ''; // Clear input immediately for better UX
+            chatInput.disabled = true; // *** NEW *** Prevent spamming
+            
+            const tempMessage = chatInput.value;
+            chatInput.value = '';
 
             try {
                 const chatCollectionRef = collection(db, `Lobbys_list/${lobbyId}/chat`);
@@ -539,14 +588,46 @@
                     text: messageText,
                     senderName: currentUserData.displayName || "بازیکن",
                     senderUid: currentUser.uid,
-                    senderAvatar: currentUserData.avatarUrl || DEFAULT_AVATAR, // ارسال آواتار
+                    senderAvatarUrl: currentUserData.avatarUrl || "https://i.imgur.com/T2bT1tG.png", // *** NEW ***
                     timestamp: serverTimestamp()
                 });
             } catch (error) {
                 console.error("Error sending message:", error);
-                chatInput.value = messageText; // Restore text if sending failed
-                showNotificationModal("خطا", "ارسال پیام با مشکل مواجه شد. لطفاً قوانین سرور را بررسی کنید.", ()=>{});
+                chatInput.value = tempMessage;
+                showNotificationModal("خطا", "ارسال پیام با مشکل مواجه شد. لطفا قوانین سرور را بررسی کنید.", ()=>{});
+            } finally {
+                chatInput.disabled = false;
+                chatInput.focus();
             }
+        }
+
+        // *** NEW ***: Function to delete a single message
+        window.handleDeleteMessage = async function(messageId) {
+            const msgRef = doc(db, `Lobbys_list/${lobbyId}/chat`, messageId);
+            try {
+                await deleteDoc(msgRef);
+            } catch (error) {
+                console.error("Error deleting message:", error);
+                showNotificationModal("خطا", "حذف پیام با مشکل مواجه شد.", ()=>{});
+            }
+        }
+        
+        // *** NEW ***: Function for host to clear all chat messages
+        async function handleClearAllMessages() {
+            showConfirmModal('پاک کردن چت', 'آیا از پاک کردن تمام پیام‌های این لابی مطمئن هستید؟ این عمل غیرقابل بازگشت است.', async () => {
+                const chatCollectionRef = collection(db, `Lobbys_list/${lobbyId}/chat`);
+                const q = query(chatCollectionRef);
+                const querySnapshot = await getDocs(q);
+                
+                if(querySnapshot.empty) return;
+
+                const batch = writeBatch(db);
+                querySnapshot.forEach(doc => {
+                    batch.delete(doc.ref);
+                });
+                await batch.commit();
+                chatMessagesEl.innerHTML = ''; // Clear UI immediately
+            });
         }
         // --- END: Chat Functions ---
 
@@ -555,10 +636,10 @@
             leaveLobbyBtn.addEventListener('click', showLeaveConfirm); 
             window.addEventListener('beforeunload', handleLeaveLobby); 
             
-            // Chat event listeners
             toggleChatBtn.addEventListener('click', toggleChatPanel);
             closeChatBtn.addEventListener('click', toggleChatPanel);
             chatForm.addEventListener('submit', handleSendMessage);
+            clearChatBtn.addEventListener('click', handleClearAllMessages); // *** NEW ***
         }
         
         function showLeaveConfirm() { showConfirmModal("خروج از لابی", "آیا مطمئن هستید؟" + (isHost ? " (چون شما سازنده هستید، لابی حذف خواهد شد)" : ""), handleLeaveLobby); }
