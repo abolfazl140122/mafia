@@ -23,7 +23,7 @@
             --progress-bar-fill-end: #ffc947;
             --countdown-bg: rgba(0,0,0,0.3);
             --panel-glow: rgba(255, 201, 71, 0.5);
-            /* NEW: Suspension styles */
+            /* Suspension styles */
             --suspension-red: #e74c3c;
             --suspension-border: #c0392b;
             --suspension-glow: rgba(231, 76, 60, 0.5);
@@ -43,23 +43,36 @@
         #progress-bar-fill { width: 0%; height: 100%; border-radius: 7px; background: linear-gradient(90deg, var(--progress-bar-fill-start), var(--progress-bar-fill-end)); transition: width 0.4s cubic-bezier(0.65, 0, 0.35, 1); }
         #status-message { font-size: 1rem; font-weight: 700; min-height: 24px; }
         
-        #maintenance-panel, #suspension-panel { box-shadow: 0 0 25px var(--panel-glow), 0 15px 45px rgba(0, 0, 0, 0.7); padding: 25px; }
+        #maintenance-panel { box-shadow: 0 0 25px var(--panel-glow), 0 15px 45px rgba(0, 0, 0, 0.7); padding: 25px; }
         #maintenance-banner-container { width: 100%; margin-bottom: 25px; border-radius: 16px; overflow: hidden; background-color: rgba(0,0,0,0.2); border: 1px solid var(--panel-border); }
         #maintenance-banner { width: 100%; height: auto; display: block; }
         #maintenance-title { font-size: 2rem; font-weight: 900; color: var(--text-gold); margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; }
         #maintenance-message { font-size: 1rem; line-height: 1.8; margin-bottom: 30px; color: var(--text-light); padding: 0 15px; }
-        #countdown-timer { display: flex; flex-direction: row-reverse; justify-content: center; gap: 15px; }
+        
+        .countdown-timer { display: flex; flex-direction: row-reverse; justify-content: center; gap: 15px; }
         .time-block { background-color: var(--countdown-bg); padding: 15px; border-radius: 12px; border: 1px solid var(--panel-border); min-width: 80px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .time-value { font-size: 3rem; font-weight: 900; color: white; line-height: 1; }
         .time-label { font-size: 0.8rem; font-weight: 400; color: var(--text-light); margin-top: 8px; }
 
-        /* NEW: Suspension Panel Styles */
-        #suspension-panel { border-color: var(--suspension-border); box-shadow: 0 0 25px var(--suspension-glow), 0 15px 45px rgba(0, 0, 0, 0.7); }
-        #suspension-title { font-size: 1.8rem; color: var(--suspension-red); margin-bottom: 15px; }
-        #suspension-reason { font-size: 1.1rem; margin-bottom: 10px; padding: 10px; background-color: rgba(0,0,0,0.2); border-radius: 8px; font-style: italic; }
-        #suspension-message { margin-bottom: 25px; }
-        #logout-btn { background: linear-gradient(145deg, #616161, #3a3a3a); border: 1px solid #777; color: var(--text-light); padding: 10px 25px; border-radius: 8px; font-size: 1rem; cursor: pointer; transition: all 0.2s; margin-top: 30px; }
-        #logout-btn:hover { background: linear-gradient(145deg, #757575, #4f4f4f); }
+        /* --- [NEW] Suspension Panel Styles --- */
+        #suspension-panel { border-color: var(--suspension-border); box-shadow: 0 0 25px var(--suspension-glow), 0 15px 45px rgba(0, 0, 0, 0.7); padding: 35px; }
+        
+        #suspension-user-info { display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; }
+        #suspension-avatar { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 3px solid var(--suspension-red); box-shadow: 0 5px 15px rgba(0,0,0,0.5); margin-bottom: 15px; }
+        #suspension-username { font-size: 1.5rem; font-weight: 700; color: var(--text-light); text-shadow: 1px 1px 3px #000; }
+        
+        #suspension-title { font-size: 2rem; color: var(--suspension-red); margin-bottom: 15px; font-weight: 900; }
+        #suspension-reason { font-size: 1.1rem; margin-bottom: 25px; padding: 12px; background-color: rgba(0,0,0,0.3); border-radius: 8px; font-style: italic; border: 1px solid rgba(255,255,255,0.1); }
+        #suspension-message { margin-bottom: 20px; font-size: 1rem; color: var(--text-light); }
+        
+        #suspension-countdown-timer { margin-bottom: 35px; }
+        #suspension-countdown-timer .time-block { border-color: var(--suspension-border); background-color: rgba(231, 76, 60, 0.1); }
+        #suspension-countdown-timer .time-value { color: #f8d7da; }
+        #suspension-countdown-timer .time-label { color: #f5c6cb; }
+
+        #logout-btn { background: linear-gradient(145deg, #616161, #3a3a3a); border: 1px solid #777; color: var(--text-light); padding: 12px 30px; border-radius: 8px; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+        #logout-btn:hover { background: linear-gradient(145deg, #757575, #4f4f4f); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
+        #logout-btn:active { transform: translateY(0); }
     </style>
 </head>
 <body>
@@ -75,7 +88,7 @@
         <div id="maintenance-banner-container"><img id="maintenance-banner" src="" alt="بنر بروزرسانی"></div>
         <h1 id="maintenance-title"></h1>
         <p id="maintenance-message"></p>
-        <div id="countdown-timer">
+        <div class="countdown-timer">
             <div class="time-block"><div id="days" class="time-value">00</div><div class="time-label">روز</div></div>
             <div class="time-block"><div id="hours" class="time-value">00</div><div class="time-label">ساعت</div></div>
             <div class="time-block"><div id="minutes" class="time-value">00</div><div class="time-label">دقیقه</div></div>
@@ -83,8 +96,12 @@
         </div>
     </div>
 
-    <!-- NEW: Suspension Panel -->
+    <!-- [NEW] Improved Suspension Panel -->
     <div id="suspension-panel" class="panel" style="display: none;">
+        <div id="suspension-user-info">
+            <img id="suspension-avatar" src="" alt="آواتار کاربر">
+            <h3 id="suspension-username"></h3>
+        </div>
         <h1 id="suspension-title">حساب کاربری مسدود است</h1>
         <p id="suspension-reason"></p>
         <p id="suspension-message">زمان باقی‌مانده تا رفع مسدودیت:</p>
@@ -122,10 +139,11 @@
         const suspensionPanel = document.getElementById('suspension-panel');
         const logoutBtn = document.getElementById('logout-btn');
         
-        // --- Music Management System ---
+        // --- Constants ---
         const MUSIC_URL = "https://raw.githubusercontent.com/abolfazl140122/mafia/main/dark-music-249503.mp3";
         const MUSIC_CACHE_NAME = 'mafia-music-cache-v1';
         const MUSIC_VERSION_KEY = 'mafia-music-version';
+        const DEFAULT_AVATAR = 'https://i.imgur.com/T2bT1tG.png';
 
         // --- Helper Functions ---
         const updateProgress = (percentage, message) => {
@@ -166,12 +184,18 @@
             } catch (error) { console.error('فرایند مدیریت موسیقی با خطا مواجه شد:', error); statusMessage.textContent = 'خطا در دریافت موسیقی پس‌زمینه.'; }
         }
         
-        // --- NEW: Suspension Panel Functions ---
+        // --- [NEW] Suspension Panel Functions ---
         function showSuspensionPanel(config, auth) {
             loadingPanel.style.display = 'none';
             suspensionPanel.style.display = 'block';
+
+            // Populate user info
+            document.getElementById('suspension-avatar').src = config.avatarUrl || DEFAULT_AVATAR;
+            document.getElementById('suspension-username').textContent = config.displayName || 'کاربر';
             document.getElementById('suspension-reason').textContent = `دلیل: ${config.banReason || 'نامشخص'}`;
+            
             startSuspensionCountdown(config.banExpiresAt.toDate(), auth);
+            
             logoutBtn.onclick = () => {
                 signOut(auth).then(() => {
                     window.location.href = './login.html';
@@ -187,7 +211,6 @@
                 const distance = targetDate.getTime() - new Date().getTime();
                 if (distance < 0) {
                     clearInterval(interval);
-                    // Automatically unban the user
                     try {
                         const userDocRef = doc(getFirestore(), 'users', auth.currentUser.uid);
                         await updateDoc(userDocRef, { isBanned: false });
@@ -195,7 +218,6 @@
                     } catch(e) {
                         console.error("خطا در رفع خودکار مسدودیت:", e);
                     }
-                    // Reload the page to re-check status
                     window.location.reload();
                     return;
                 }
@@ -216,11 +238,12 @@
                         try {
                             const userDocRef = doc(db, 'users', user.uid);
                             const userDocSnap = await getDoc(userDocRef);
-                            // CRITICAL CHANGE: Check for ban before resolving
+                            
                             if (userDocSnap.exists()) {
                                 const userData = userDocSnap.data();
                                 if (userData.isBanned === true && userData.banExpiresAt && userData.banExpiresAt.toDate() > new Date()) {
-                                    reject({ type: 'BANNED', config: userData }); // Reject with a specific error type
+                                    // Reject with user data to show in suspension panel
+                                    reject({ type: 'BANNED', config: userData }); 
                                     return;
                                 }
                             }
@@ -266,7 +289,7 @@
             const messageEl = document.getElementById('maintenance-message');
             messageEl.textContent = config.message || "به زودی باز خواهیم گشت.";
             if (config.textColor) { messageEl.style.color = config.textColor; }
-            if (config.endTime && typeof config.endTime.toDate === 'function') { startCountdown(config.endTime.toDate(), auth, db); } else { document.getElementById('countdown-timer').innerHTML = "<p>زمان پایان مشخص نشده است.</p>"; }
+            if (config.endTime && typeof config.endTime.toDate === 'function') { startCountdown(config.endTime.toDate(), auth, db); } else { document.querySelector('#maintenance-panel .countdown-timer').innerHTML = "<p>زمان پایان مشخص نشده است.</p>"; }
         }
         function startCountdown(targetDate, auth, db) {
             const countdownElements = { days: document.getElementById('days'), hours: document.getElementById('hours'), minutes: document.getElementById('minutes'), seconds: document.getElementById('seconds') };
