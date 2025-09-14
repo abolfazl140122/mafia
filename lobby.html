@@ -173,7 +173,7 @@
         }
         .chat-header h3 { font-size: 1.1rem; color: var(--primary-gold); font-weight: 700; }
         .chat-header-buttons { display: flex; align-items: center; gap: 10px; }
-        #clear-chat-btn { background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 1.2rem; display: none; } /* *** NEW *** */
+        #clear-chat-btn { background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 1.2rem; display: none; }
         #clear-chat-btn:hover { color: #ff7675; }
         #close-chat-btn {
             background: none; border: none; color: var(--text-secondary); cursor: pointer;
@@ -189,10 +189,10 @@
         #chat-messages::-webkit-scrollbar-track { background: transparent; }
         #chat-messages::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 3px; }
 
-        .chat-message { display: flex; align-items: flex-start; gap: 10px; } /* *** MODIFIED *** */
-        .chat-message.self { align-self: flex-end; flex-direction: row-reverse; } /* *** MODIFIED *** */
-        .chat-message-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 2px solid var(--border-color); } /* *** NEW *** */
-        .chat-message-content { display: flex; flex-direction: column; max-width: calc(100% - 42px); } /* *** NEW *** */
+        .chat-message { display: flex; align-items: flex-start; gap: 10px; }
+        .chat-message.self { align-self: flex-end; flex-direction: row-reverse; }
+        .chat-message-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 2px solid var(--border-color); }
+        .chat-message-content { display: flex; flex-direction: column; max-width: calc(100% - 42px); }
         .chat-message-sender { font-size: 0.8rem; font-weight: 700; color: var(--primary-gold); margin-bottom: 3px; }
         .chat-message.self .chat-message-sender { color: var(--green-ready); text-align: right; }
         .chat-message-bubble {
@@ -204,11 +204,11 @@
         }
         .chat-message.self .chat-message-bubble { 
             background-color: #2a3a30; 
-            border: 2px solid var(--primary-gold); /* *** NEW: Differentiate self messages *** */
-            box-shadow: 0 0 10px rgba(255, 201, 71, 0.3); /* *** NEW *** */
+            border: 2px solid var(--primary-gold);
+            box-shadow: 0 0 10px rgba(255, 201, 71, 0.3);
         }
 
-        .delete-msg-btn { /* *** NEW *** */
+        .delete-msg-btn {
             position: absolute;
             top: -8px; left: -8px;
             width: 20px; height: 20px;
@@ -224,7 +224,7 @@
             opacity: 0;
             transition: all 0.2s ease;
         }
-        .chat-message.self:hover .delete-msg-btn { opacity: 1; } /* *** NEW *** */
+        .chat-message.self:hover .delete-msg-btn { opacity: 1; }
 
         #chat-form {
             display: flex; padding: 10px 15px;
@@ -285,25 +285,21 @@
         </footer>
     </div>
     
-    <!-- START: Chat Panel HTML -->
     <div id="chat-panel">
         <div class="chat-header">
             <h3>چت لابی</h3>
             <div class="chat-header-buttons">
-                 <!-- *** NEW ***: Clear chat button (for host) -->
                 <button id="clear-chat-btn" title="پاک کردن کل چت">🗑️</button>
                 <button id="close-chat-btn" title="بستن چت">&times;</button>
             </div>
         </div>
         <div id="chat-messages">
-            <!-- Messages will be inserted here by JavaScript -->
         </div>
         <form id="chat-form">
             <input type="text" id="chat-input" placeholder="پیام خود را بنویسید..." autocomplete="off">
             <button type="submit" id="chat-send-btn">ارسال</button>
         </form>
     </div>
-    <!-- END: Chat Panel HTML -->
 
     <div id="confirm-modal" class="modal-overlay"> <div class="modal-content"> <h2 id="confirm-modal-title" class="modal-title"></h2> <p id="confirm-modal-message" class="modal-message"></p> <div class="modal-buttons"> <button id="confirm-modal-yes-btn" class="modal-button primary">بله</button> <button id="confirm-modal-no-btn" class="modal-button secondary">خیر</button> </div> </div> </div>
     <div id="notification-modal" class="modal-overlay"> <div class="modal-content"> <h2 id="notification-modal-title" class="modal-title">توجه</h2> <p id="notification-modal-message" class="modal-message"></p> <div class="modal-buttons"> <button id="notification-modal-ok-btn" class="modal-button primary">متوجه شدم</button> </div> </div> </div>
@@ -342,14 +338,13 @@
         const actionBtn = document.getElementById('action-btn');
         const leaveLobbyBtn = document.getElementById('leave-lobby-btn');
         
-        // --- Chat Elements ---
         const toggleChatBtn = document.getElementById('toggle-chat-btn');
         const chatPanel = document.getElementById('chat-panel');
         const closeChatBtn = document.getElementById('close-chat-btn');
         const chatMessagesEl = document.getElementById('chat-messages');
         const chatForm = document.getElementById('chat-form');
         const chatInput = document.getElementById('chat-input');
-        const clearChatBtn = document.getElementById('clear-chat-btn'); // *** NEW ***
+        const clearChatBtn = document.getElementById('clear-chat-btn');
         
         let currentUser = null;
         let currentUserData = {};
@@ -360,6 +355,7 @@
         let isReady = false;
         let lastPlayerCount = 0;
         let isChatPanelVisible = false;
+        let isCurrentUserInLobby = true; // *** NEW ***: State to track if user is still in lobby
 
         function playSound(soundId) { try { document.getElementById(soundId).play(); } catch(e) { console.warn("Sound play failed", e); } }
 
@@ -405,6 +401,7 @@
             }
         }
         
+        // *** MODIFIED FUNCTION ***: Added kick detection logic
         function listenToLobbyChanges() {
             const lobbyDocRef = doc(db, "Lobbys_list", lobbyId);
             unsubscribeLobby = onSnapshot(lobbyDocRef, async (docSnap) => {
@@ -414,6 +411,31 @@
                 }
                 const lobbyData = docSnap.data();
                 const players = lobbyData.players || [];
+                
+                // *** NEW LOGIC FOR KICK DETECTION ***
+                const wasInLobby = isCurrentUserInLobby;
+                isCurrentUserInLobby = players.some(p => p.uid === currentUser.uid);
+
+                if (wasInLobby && !isCurrentUserInLobby) {
+                    // User was in the lobby, but now is not -> KICKED
+                    if (unsubscribeLobby) unsubscribeLobby();
+                    if (unsubscribeChat) unsubscribeChat();
+                    window.removeEventListener('beforeunload', handleLeaveLobby);
+
+                    actionBtn.disabled = true;
+                    leaveLobbyBtn.disabled = true;
+                    chatInput.disabled = true;
+                    chatInput.placeholder = "شما از لابی اخراج شده‌اید.";
+
+                    showNotificationModal(
+                        "شما اخراج شدید", 
+                        "شما توسط سازنده لابی از بازی اخراج شدید.", 
+                        () => { window.location.href = './Lobby page.html'; }
+                    );
+                    return; // Stop further processing
+                }
+                // *** END OF NEW LOGIC ***
+
                 if(players.length > lastPlayerCount) playSound('sound-player-join');
                 else if(players.length < lastPlayerCount) playSound('sound-player-leave');
                 lastPlayerCount = players.length;
@@ -433,7 +455,6 @@
             lobbyNameEl.textContent = data.lobbyName;
             const players = data.players || [];
             isHost = currentUser.uid === data.creatorId;
-            // *** NEW ***: Show/hide clear chat button based on host status
             clearChatBtn.style.display = isHost ? 'block' : 'none';
 
             leftPlayersEl.innerHTML = '';
@@ -488,13 +509,18 @@
         async function kickPlayer(uidToKick) { const lobbyDocRef = doc(db, "Lobbys_list", lobbyId); await runTransaction(db, async (transaction) => { const lobbyDoc = await transaction.get(lobbyDocRef); if (!lobbyDoc.exists()) return; let players = lobbyDoc.data().players.filter(p => p.uid !== uidToKick); transaction.update(lobbyDocRef, { players: players, playerCount: players.length }); }); }
         
         async function handleLeaveLobby() {
-            window.removeEventListener('beforeunload', handleLeaveLobby); // *** NEW ***: prevent double execution
+            window.removeEventListener('beforeunload', handleLeaveLobby);
+            if (!isCurrentUserInLobby) { // *** NEW ***: If already kicked, just redirect
+                 window.location.href = './Lobby page.html';
+                 return;
+            }
+
             if (unsubscribeLobby) unsubscribeLobby();
             if (unsubscribeChat) unsubscribeChat();
 
             const lobbyDocRef = doc(db, "Lobbys_list", lobbyId);
             try {
-                const docSnap = await getDoc(lobbyDocRef); // Use getDoc instead of transaction if we are leaving anyway
+                const docSnap = await getDoc(lobbyDocRef);
                 if (docSnap.exists()) {
                      if (isHost) {
                         await deleteDoc(lobbyDocRef);
@@ -512,7 +538,6 @@
             }
         }
         
-        // --- START: Chat Functions (HEAVILY MODIFIED) ---
         function toggleChatPanel() {
             isChatPanelVisible = !isChatPanelVisible;
             chatPanel.classList.toggle('visible', isChatPanelVisible);
@@ -536,11 +561,9 @@
                             playSound('sound-new-message');
                         }
                     }
-                    if (change.type === 'removed') { // *** NEW ***: Handle message deletion in real-time
+                    if (change.type === 'removed') {
                         const msgElement = chatMessagesEl.querySelector(`[data-id="${change.doc.id}"]`);
-                        if (msgElement) {
-                            msgElement.remove();
-                        }
+                        if (msgElement) msgElement.remove();
                     }
                 });
             });
@@ -549,14 +572,11 @@
         function renderMessage(id, data) {
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('chat-message');
-            messageDiv.dataset.id = id; // *** NEW ***: Store message ID for deletion
+            messageDiv.dataset.id = id;
 
             const isSelf = data.senderUid === currentUser.uid;
-            if (isSelf) {
-                messageDiv.classList.add('self');
-            }
+            if (isSelf) messageDiv.classList.add('self');
 
-            // *** NEW ***: Delete button for self messages
             const deleteButton = isSelf ? `<button class="delete-msg-btn" onclick="window.handleDeleteMessage('${id}')" title="حذف پیام">×</button>` : '';
 
             messageDiv.innerHTML = `
@@ -573,11 +593,19 @@
             chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
         }
         
+        // *** MODIFIED FUNCTION ***: Added check before sending message
         async function handleSendMessage(e) {
             e.preventDefault();
+            
+            // *** NEW ***: Prevent kicked users from chatting
+            if (!isCurrentUserInLobby) {
+                showNotificationModal("امکان ارسال پیام نیست", "شما توسط سازنده لابی کیک شده اید و دیگر نمی‌توانید پیام ارسال کنید.", ()=>{});
+                return;
+            }
+
             const messageText = chatInput.value.trim();
             if (messageText === '') return;
-            chatInput.disabled = true; // *** NEW *** Prevent spamming
+            chatInput.disabled = true;
             
             const tempMessage = chatInput.value;
             chatInput.value = '';
@@ -588,7 +616,7 @@
                     text: messageText,
                     senderName: currentUserData.displayName || "بازیکن",
                     senderUid: currentUser.uid,
-                    senderAvatarUrl: currentUserData.avatarUrl || "https://i.imgur.com/T2bT1tG.png", // *** NEW ***
+                    senderAvatarUrl: currentUserData.avatarUrl || "https://i.imgur.com/T2bT1tG.png",
                     timestamp: serverTimestamp()
                 });
             } catch (error) {
@@ -601,45 +629,31 @@
             }
         }
 
-        // *** NEW ***: Function to delete a single message
         window.handleDeleteMessage = async function(messageId) {
             const msgRef = doc(db, `Lobbys_list/${lobbyId}/chat`, messageId);
-            try {
-                await deleteDoc(msgRef);
-            } catch (error) {
-                console.error("Error deleting message:", error);
-                showNotificationModal("خطا", "حذف پیام با مشکل مواجه شد.", ()=>{});
-            }
+            try { await deleteDoc(msgRef); } catch (error) { console.error("Error deleting message:", error); showNotificationModal("خطا", "حذف پیام با مشکل مواجه شد.", ()=>{}); }
         }
         
-        // *** NEW ***: Function for host to clear all chat messages
         async function handleClearAllMessages() {
             showConfirmModal('پاک کردن چت', 'آیا از پاک کردن تمام پیام‌های این لابی مطمئن هستید؟ این عمل غیرقابل بازگشت است.', async () => {
                 const chatCollectionRef = collection(db, `Lobbys_list/${lobbyId}/chat`);
-                const q = query(chatCollectionRef);
-                const querySnapshot = await getDocs(q);
-                
+                const querySnapshot = await getDocs(query(chatCollectionRef));
                 if(querySnapshot.empty) return;
-
                 const batch = writeBatch(db);
-                querySnapshot.forEach(doc => {
-                    batch.delete(doc.ref);
-                });
+                querySnapshot.forEach(doc => batch.delete(doc.ref));
                 await batch.commit();
-                chatMessagesEl.innerHTML = ''; // Clear UI immediately
+                chatMessagesEl.innerHTML = '';
             });
         }
-        // --- END: Chat Functions ---
 
         function setupEventListeners() { 
             actionBtn.addEventListener('click', handleActionClick); 
             leaveLobbyBtn.addEventListener('click', showLeaveConfirm); 
             window.addEventListener('beforeunload', handleLeaveLobby); 
-            
             toggleChatBtn.addEventListener('click', toggleChatPanel);
             closeChatBtn.addEventListener('click', toggleChatPanel);
             chatForm.addEventListener('submit', handleSendMessage);
-            clearChatBtn.addEventListener('click', handleClearAllMessages); // *** NEW ***
+            clearChatBtn.addEventListener('click', handleClearAllMessages);
         }
         
         function showLeaveConfirm() { showConfirmModal("خروج از لابی", "آیا مطمئن هستید؟" + (isHost ? " (چون شما سازنده هستید، لابی حذف خواهد شد)" : ""), handleLeaveLobby); }
