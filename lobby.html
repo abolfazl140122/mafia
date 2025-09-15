@@ -7,6 +7,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- [جدید] اضافه کردن کتابخانه PeerJS برای ویس چت -->
+    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
     <style>
         :root {
             --primary-gold: #ffc947;
@@ -21,6 +23,9 @@
             --green-join-darker: #229954;
             --slot-bg: linear-gradient(160deg, #2a2118, var(--bg-dark));
             --chat-bg: rgba(26, 20, 14, 0.9);
+            /* [جدید] رنگ‌های دکمه میکروفون */
+            --mic-on-bg: #2ecc71;
+            --mic-off-bg: #e74c3c;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -77,6 +82,12 @@
         #toggle-chat-btn.new-message::after { content: ''; position: absolute; bottom: 0; right: 0; width: 14px; height: 14px; background-color: #e53e3e; border-radius: 50%; border: 2px solid var(--bg-dark); animation: pulse-new-message 1.5s infinite; }
         @keyframes pulse-new-message { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
         #toggle-chat-btn svg { width: 24px; height: 24px; fill: currentColor; }
+
+        /* [جدید] استایل‌های دکمه میکروفون */
+        #toggle-mic-btn { flex-shrink: 0; width: 50px; height: 50px; border-radius: 50%; background-color: var(--mic-on-bg); color: white; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: all 0.3s ease; font-size: 1.5rem; }
+        #toggle-mic-btn:hover { transform: scale(1.1); }
+        #toggle-mic-btn.muted { background-color: var(--mic-off-bg); }
+
 
         #chat-panel { position: fixed; bottom: 20px; left: 20px; width: 90%; max-width: 350px; height: 50%; max-height: 400px; background-color: var(--chat-bg); backdrop-filter: blur(8px); border: 1px solid var(--border-color); border-radius: 16px; display: flex; flex-direction: column; z-index: 999; box-shadow: 0 8px 30px rgba(0,0,0,0.6); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease; transform: translateY(110%); opacity: 0; }
         #chat-panel.visible { transform: translateY(0); opacity: 1; }
@@ -169,6 +180,8 @@
         </main>
         
         <footer class="lobby-footer">
+            <!-- [جدید] دکمه میکروفون اضافه شد -->
+            <button id="toggle-mic-btn" title="قطع/وصل میکروفون">🎤</button>
             <button id="toggle-chat-btn" title="باز کردن چت">
                 <svg viewBox="0 0 24 24"><path d="M20,2H4A2,2,0,0,0,2,4V22l4-4H20a2,2,0,0,0,2-2V4A2,2,0,0,0,20,2Z"/></svg>
             </button>
@@ -203,6 +216,9 @@
     <audio id="sound-player-leave" src="https://assets.mixkit.co/sfx/preview/mixkit-player-losing-or-failing-2042.mp3" preload="auto"></audio>
     <audio id="sound-ready" src="https://assets.mixkit.co/sfx/preview/mixkit-quick-positive-video-game-notification-interface-265.mp3" preload="auto"></audio>
     <audio id="sound-new-message" src="https://assets.mixkit.co/sfx/preview/mixkit-message-pop-alert-2354.mp3" preload="auto"></audio>
+
+    <!-- [جدید] محفظه مخفی برای پخش صداهای ورودی -->
+    <div id="voice-chat-container" style="display: none;"></div>
     
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -233,6 +249,15 @@
         const chatInput = document.getElementById('chat-input');
         const clearChatBtn = document.getElementById('clear-chat-btn');
         
+        // --- [جدید] المان‌های ویس چت ---
+        const toggleMicBtn = document.getElementById('toggle-mic-btn');
+        const voiceChatContainer = document.getElementById('voice-chat-container');
+        
+        // --- [جدید] متغیرهای ویس چت ---
+        let peer = null;
+        let myStream = null;
+        let calls = {}; // برای نگهداری تماس‌های صوتی فعال
+
         let currentUser = null;
         let currentUserData = {};
         let lobbyId = null;
@@ -246,7 +271,7 @@
         let isChatPanelVisible = false;
         let isCurrentUserInLobby = true;
         let targetUserForAction = null;
-        let currentLobbyData = null; // Store current lobby data for UI updates
+        let currentLobbyData = null; 
 
         function playSound(soundId) { try { document.getElementById(soundId).play(); } catch(e) { console.warn("Sound play failed", e); } }
 
@@ -332,6 +357,16 @@
                 lastPlayerCount = visiblePlayerCount;
                 
                 renderLobby(currentLobbyData);
+
+                // --- [جدید] راه‌اندازی یا به‌روزرسانی ویس چت ---
+                if (!peer) { // فقط بار اول اجرا شود تا ویس چت راه‌اندازی شود
+                    initializeVoiceChat();
+                } else {
+                    // در آپدیت‌های بعدی، فقط تماس‌ها را با لیست بازیکنان همگام‌سازی می‌کنیم
+                    callOtherPlayers();
+                    cleanupOldCalls();
+                }
+                
                 if (loadingOverlay.style.display !== 'none') {
                     loadingOverlay.style.opacity = '0';
                     setTimeout(() => { loadingOverlay.style.display = 'none'; lobbyContainer.style.display = 'flex'; }, 500);
@@ -341,6 +376,109 @@
                 showNotificationModal("خطای ارتباط", "ارتباط با لابی قطع شد.", () => window.location.reload());
             });
         }
+
+        // --- [جدید] تمام توابع مربوط به ویس چت ---
+
+        function initializeVoiceChat() {
+            // از شناسه کاربری Firebase به عنوان شناسه PeerJS استفاده می‌کنیم. این کلید اصلی است.
+            peer = new Peer(currentUser.uid, {
+                host: '0.peerjs.com',
+                port: 443,
+                path: '/',
+                secure: true
+            });
+
+            peer.on('open', (id) => {
+                console.log('ویس چت آماده است. شناسه شما:', id);
+
+                // دسترسی به میکروفون
+                navigator.mediaDevices.getUserMedia({ video: false, audio: true })
+                    .then(stream => {
+                        myStream = stream;
+                        // به محض دریافت دسترسی به میکروفون، به تماس‌های ورودی گوش می‌دهیم
+                        peer.on('call', handleIncomingCall);
+                        // و با دیگر بازیکنان حاضر در لابی تماس می‌گیریم
+                        callOtherPlayers();
+                    }).catch(err => {
+                        console.error("خطا در دسترسی به میکروفون:", err);
+                        showNotificationModal("دسترسی به میکروفون", "برای استفاده از چت صوتی، لطفاً به میکروفون دسترسی بدهید و صفحه را رفرش کنید.");
+                    });
+            });
+            
+            peer.on('error', (err) => console.error('PeerJS Error:', err));
+        }
+
+        function handleIncomingCall(call) {
+            console.log(`تماس ورودی از طرف ${call.peer}`);
+            calls[call.peer] = call; // تماس را در لیست تماس‌های فعال ذخیره می‌کنیم
+
+            // به تماس پاسخ می‌دهیم و صدای میکروفون خود را برایش می‌فرستیم
+            call.answer(myStream);
+
+            call.on('stream', (remoteStream) => {
+                playRemoteAudio(call.peer, remoteStream);
+            });
+
+            call.on('close', () => {
+                removeRemoteAudio(call.peer);
+            });
+        }
+
+        function callOtherPlayers() {
+            if (!currentLobbyData || !myStream) return;
+            
+            const otherPlayers = currentLobbyData.players.filter(p => p.uid !== currentUser.uid && !p.isSpectator);
+            otherPlayers.forEach(player => {
+                // فقط در صورتی تماس می‌گیریم که قبلاً با این بازیکن تماسی برقرار نکرده باشیم
+                if (!calls[player.uid]) { 
+                    console.log(`در حال تماس با ${player.displayName}...`);
+                    const call = peer.call(player.uid, myStream);
+                    if (!call) return; // اگر تماس برقرار نشد، ادامه نده
+                    calls[player.uid] = call; // تماس را ذخیره می‌کنیم
+
+                    call.on('stream', (remoteStream) => {
+                        playRemoteAudio(player.uid, remoteStream);
+                    });
+                    
+                    call.on('close', () => {
+                        removeRemoteAudio(player.uid);
+                    });
+                }
+            });
+        }
+
+        function playRemoteAudio(peerId, stream) {
+            let audioEl = document.getElementById(`audio-${peerId}`);
+            if (!audioEl) {
+                audioEl = document.createElement('audio');
+                audioEl.id = `audio-${peerId}`;
+                audioEl.autoplay = true;
+                voiceChatContainer.appendChild(audioEl);
+            }
+            audioEl.srcObject = stream;
+        }
+
+        function removeRemoteAudio(peerId) {
+            let audioEl = document.getElementById(`audio-${peerId}`);
+            if (audioEl) {
+                audioEl.remove();
+            }
+            delete calls[peerId];
+            console.log(`تماس با ${peerId} قطع شد.`);
+        }
+
+        function cleanupOldCalls() {
+            if (!currentLobbyData) return;
+            const currentPlayerIds = currentLobbyData.players.map(p => p.uid);
+            for (const peerId in calls) {
+                if (!currentPlayerIds.includes(peerId)) {
+                    calls[peerId].close(); // تماس را می‌بندیم
+                    removeRemoteAudio(peerId);
+                }
+            }
+        }
+        // --- پایان توابع ویس چت ---
+
 
         function listenToSelfChanges() {
             if (unsubscribeSelf) unsubscribeSelf();
@@ -396,6 +534,7 @@
 
             if (self && !self.isSpectator) {
                 actionBtn.style.display = 'block';
+                toggleMicBtn.style.display = 'flex'; // [جدید] نمایش دکمه میکروفون
                 if (isHost) {
                     const allReady = visiblePlayers.length >= MIN_PLAYERS_TO_START && visiblePlayers.every(p => p.uid === currentUser.uid || p.isReady);
                     actionBtn.textContent = 'شروع بازی';
@@ -408,6 +547,7 @@
                 }
             } else {
                 actionBtn.style.display = 'none';
+                toggleMicBtn.style.display = 'none'; // [جدید] مخفی کردن دکمه میکروفون برای تماشاچیان
             }
             updateAdminUI(allPlayers);
         }
@@ -419,6 +559,7 @@
             const isSpectating = self && self.isSpectator;
             if (isCurrentUserAdmin && isSpectating) {
                 adminJoinBtn.style.display = 'block';
+                toggleMicBtn.style.display = 'none'; // [جدید] ادمین تماشاچی دکمه میکروفون ندارد
             } else {
                 adminJoinBtn.style.display = 'none';
             }
@@ -557,6 +698,12 @@
             if (unsubscribeChat) unsubscribeChat();
             if (unsubscribeSelf) unsubscribeSelf();
             window.removeEventListener('beforeunload', handleLeaveLobbyOnExit);
+            
+            // [جدید] قطع کامل ویس چت
+            if (peer) {
+                peer.destroy();
+                peer = null;
+            }
 
             actionBtn.disabled = true;
             leaveLobbyBtn.disabled = true;
@@ -568,6 +715,12 @@
         
         async function handleLeaveLobbyOnExit() {
             window.removeEventListener('beforeunload', handleLeaveLobbyOnExit);
+
+            // [جدید] قطع ویس چت قبل از خروج
+            if (peer) {
+                peer.destroy();
+            }
+
             if (!isCurrentUserInLobby) return;
             const lobbyDocRef = doc(db, "Lobbys_list", lobbyId);
             try {
@@ -597,6 +750,21 @@
             clearChatBtn.addEventListener('click', handleClearAllMessages);
             document.getElementById('ban-user-form').addEventListener('submit', handleBanFormSubmit);
             document.getElementById('admin-join-btn').addEventListener('click', handleAdminJoinGame);
+            // [جدید] رویداد کلیک برای دکمه میکروفون
+            toggleMicBtn.addEventListener('click', () => {
+                if (myStream) {
+                    const audioTrack = myStream.getAudioTracks()[0];
+                    if (audioTrack.enabled) {
+                        audioTrack.enabled = false;
+                        toggleMicBtn.innerHTML = '🔇';
+                        toggleMicBtn.classList.add('muted');
+                    } else {
+                        audioTrack.enabled = true;
+                        toggleMicBtn.innerHTML = '🎤';
+                        toggleMicBtn.classList.remove('muted');
+                    }
+                }
+            });
         }
         
         async function kickPlayer(uidToKick) { const lobbyDocRef = doc(db, "Lobbys_list", lobbyId); await runTransaction(db, async (transaction) => { const lobbyDoc = await transaction.get(lobbyDocRef); if (!lobbyDoc.exists()) return; let players = lobbyDoc.data().players.filter(p => p.uid !== uidToKick); transaction.update(lobbyDocRef, { players: players, playerCount: players.length }); }); }
