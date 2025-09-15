@@ -56,10 +56,6 @@
         .empty-text { font-size: clamp(0.7rem, 2.5vw, 0.8rem); color: var(--text-secondary); font-weight: 700; }
         .host-crown { position: absolute; top: -1px; right: -1px; width: 28px; height: 28px; background-color: var(--primary-gold); color: var(--darker-red); border-radius: 0 10px 0 10px; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 900; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
         
-        .mic-indicator { position: absolute; top: 4px; left: 4px; width: 20px; height: 20px; background-color: var(--green-ready); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.8rem; opacity: 0; transform: scale(0.8); transition: opacity 0.3s ease, transform 0.3s ease; box-shadow: 0 0 8px var(--green-ready); animation: pulse-mic 2s infinite; }
-        .player-slot.on-mic .mic-indicator { opacity: 1; transform: scale(1); }
-        @keyframes pulse-mic { 0% { box-shadow: 0 0 5px rgba(46, 204, 113, 0.5); } 50% { box-shadow: 0 0 15px rgba(46, 204, 113, 1); } 100% { box-shadow: 0 0 5px rgba(46, 204, 113, 0.5); } }
-
         .ready-indicator { position: absolute; bottom: 4px; right: 4px; width: 18px; height: 18px; background-color: var(--green-ready); border-radius: 50%; border: 2px solid var(--bg-dark); display: flex; align-items: center; justify-content: center; color: white; font-weight: 900; font-size: 0.8rem; transform: scale(0); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); text-shadow: 0 1px 2px rgba(0,0,0,0.4); }
         .player-slot.ready .ready-indicator { transform: scale(1); }
         .player-slot.ready .player-avatar { border-color: var(--green-ready); }
@@ -76,11 +72,8 @@
         .action-button.start-btn:not(:disabled) { animation: pulse-start 2s infinite; }
         @keyframes pulse-start { 0% { box-shadow: 0 0 0 0 rgba(255, 201, 71, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(255, 201, 71, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 201, 71, 0); } }
 
-        .footer-icon-btn { flex-shrink: 0; width: 50px; height: 50px; border-radius: 50%; background-color: #4a5568; color: white; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: all 0.3s ease; font-size: 1.5rem; }
-        .footer-icon-btn:hover { background-color: #2d3748; transform: scale(1.1); }
-        #toggle-mic-btn.mic-on { background-color: var(--green-ready); }
-        #toggle-mic-btn.mic-off { background-color: #e74c3c; }
-
+        #toggle-chat-btn { flex-shrink: 0; width: 50px; height: 50px; border-radius: 50%; background-color: #4a5568; color: white; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: all 0.3s ease; }
+        #toggle-chat-btn:hover { background-color: #2d3748; transform: scale(1.1); }
         #toggle-chat-btn.new-message::after { content: ''; position: absolute; bottom: 0; right: 0; width: 14px; height: 14px; background-color: #e53e3e; border-radius: 50%; border: 2px solid var(--bg-dark); animation: pulse-new-message 1.5s infinite; }
         @keyframes pulse-new-message { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
         #toggle-chat-btn svg { width: 24px; height: 24px; fill: currentColor; }
@@ -176,11 +169,10 @@
         </main>
         
         <footer class="lobby-footer">
-            <button id="toggle-mic-btn" class="footer-icon-btn mic-on" title="قطع/وصل میکروفون">🎤</button>
-            <button id="action-btn" class="action-button ready-btn">آماده</button>
-            <button id="toggle-chat-btn" class="footer-icon-btn" title="باز کردن چت">
+            <button id="toggle-chat-btn" title="باز کردن چت">
                 <svg viewBox="0 0 24 24"><path d="M20,2H4A2,2,0,0,0,2,4V22l4-4H20a2,2,0,0,0,2-2V4A2,2,0,0,0,20,2Z"/></svg>
             </button>
+            <button id="action-btn" class="action-button ready-btn">آماده</button>
         </footer>
     </div>
     
@@ -212,12 +204,10 @@
     <audio id="sound-ready" src="https://assets.mixkit.co/sfx/preview/mixkit-quick-positive-video-game-notification-interface-265.mp3" preload="auto"></audio>
     <audio id="sound-new-message" src="https://assets.mixkit.co/sfx/preview/mixkit-message-pop-alert-2354.mp3" preload="auto"></audio>
     
-    <div id="voice-chat-container" style="display: none;"></div>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, runTransaction, getDoc, collection, addDoc, writeBatch, deleteDoc, getDocs, serverTimestamp, orderBy, query, updateDoc, collectionGroup, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, runTransaction, getDoc, collection, addDoc, writeBatch, deleteDoc, getDocs, serverTimestamp, orderBy, query, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         // --- Config & Elements ---
         const MAX_PLAYERS = 12;
@@ -243,9 +233,6 @@
         const chatInput = document.getElementById('chat-input');
         const clearChatBtn = document.getElementById('clear-chat-btn');
         
-        const toggleMicBtn = document.getElementById('toggle-mic-btn');
-        const voiceChatContainer = document.getElementById('voice-chat-container');
-
         let currentUser = null;
         let currentUserData = {};
         let lobbyId = null;
@@ -259,24 +246,7 @@
         let isChatPanelVisible = false;
         let isCurrentUserInLobby = true;
         let targetUserForAction = null;
-        let currentLobbyData = null;
-
-        // --- WebRTC & Voice Chat Variables ---
-        let localStream = null;
-        let peerConnections = {}; // Key: peerUID, Value: RTCPeerConnection
-        let signalingUnsubscribes = {}; // To stop listening for signals
-        let isMicOn = true;
-        // Configuration for STUN servers
-        const peerConnectionConfig = {
-            iceServers: [
-                { urls: 'stun:stun.l.google.com:19302' },
-                { urls: 'stun:stun1.l.google.com:19302' },
-                { urls: 'stun:stun2.l.google.com:19302' },
-                { urls: 'stun:stun3.l.google.com:19302' },
-                { urls: 'stun:stun4.l.google.com:19302' }
-            ]
-        };
-        // --- End of WebRTC Variables ---
+        let currentLobbyData = null; // Store current lobby data for UI updates
 
         function playSound(soundId) { try { document.getElementById(soundId).play(); } catch(e) { console.warn("Sound play failed", e); } }
 
@@ -304,7 +274,6 @@
                     listenToLobbyChanges();
                     listenToChatMessages();
                     setupEventListeners();
-                    await initializeVoiceChat();
                 } else {
                     window.location.href = './login.html';
                 }
@@ -327,8 +296,7 @@
                             displayName: currentUserData.displayName || "بازیکن",
                             avatarUrl: currentUserData.avatarUrl || "https://up.20script.ir/file/1d50-defult.png",
                             isReady: false,
-                            isSpectator: isCurrentUserAdmin,
-                            isMicOn: true
+                            isSpectator: isCurrentUserAdmin
                         };
                         players.push(newPlayer);
                         transaction.update(lobbyDocRef, { players: players, playerCount: players.length });
@@ -344,14 +312,12 @@
             unsubscribeLobby = onSnapshot(lobbyDocRef, (docSnap) => {
                 if (!isCurrentUserInLobby) return;
                 if (!docSnap.exists()) {
-                    cleanUpAndLeave("این لابی توسط سازنده حذف شده است.", './Lobby page.html');
+                    if (unsubscribeLobby) unsubscribeLobby();
+                    showNotificationModal("لابی حذف شد", "این لابی توسط سازنده حذف شده است.", () => window.location.href = './Lobby page.html');
                     return;
                 }
-                const oldPlayerIds = currentLobbyData ? currentLobbyData.players.map(p => p.uid) : [];
                 currentLobbyData = docSnap.data();
                 const players = currentLobbyData.players || [];
-                const newPlayerIds = players.map(p => p.uid);
-
                 const wasInLobby = isCurrentUserInLobby;
                 isCurrentUserInLobby = players.some(p => p.uid === currentUser.uid);
 
@@ -366,163 +332,14 @@
                 lastPlayerCount = visiblePlayerCount;
                 
                 renderLobby(currentLobbyData);
-
-                // Voice chat connections management
-                const newlyJoined = newPlayerIds.filter(id => !oldPlayerIds.includes(id) && id !== currentUser.uid);
-                const left = oldPlayerIds.filter(id => !newPlayerIds.includes(id) && id !== currentUser.uid);
-                
-                newlyJoined.forEach(uid => createOffer(uid));
-                left.forEach(uid => closePeerConnection(uid));
-
                 if (loadingOverlay.style.display !== 'none') {
                     loadingOverlay.style.opacity = '0';
                     setTimeout(() => { loadingOverlay.style.display = 'none'; lobbyContainer.style.display = 'flex'; }, 500);
                 }
+            }, (error) => {
+                console.error("Firestore listen error:", error);
+                showNotificationModal("خطای ارتباط", "ارتباط با لابی قطع شد.", () => window.location.reload());
             });
-        }
-        
-        async function initializeVoiceChat() {
-            try {
-                localStream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
-                console.log("دسترسی به میکروفون موفق بود.");
-                
-                const signalingCol = collection(db, `lobbies/${lobbyId}/peers/${currentUser.uid}/connections`);
-                const q = query(signalingCol);
-
-                signalingUnsubscribes['main'] = onSnapshot(q, (snapshot) => {
-                    snapshot.docChanges().forEach(async (change) => {
-                        if (change.type === 'added') {
-                            const data = change.doc.data();
-                            if (data.offer) {
-                                await handleOffer(change.doc.id, data.offer);
-                            } else if (data.answer) {
-                                await handleAnswer(change.doc.id, data.answer);
-                            } else if (data.iceCandidate) {
-                                handleIceCandidate(change.doc.id, data.iceCandidate);
-                            }
-                        }
-                    });
-                });
-            } catch (error) {
-                console.error("خطا در شروع ویس چت یا دسترسی به میکروفون:", error);
-                showNotificationModal("خطای میکروفون", "برای استفاده از چت صوتی، باید به میکروفون دسترسی بدهید. لطفاً صفحه را رفرش کرده و اجازه دسترسی را تایید کنید.");
-                toggleMicBtn.disabled = true;
-            }
-        }
-
-        async function createPeerConnection(peerUID) {
-            if (peerConnections[peerUID]) return peerConnections[peerUID];
-
-            const pc = new RTCPeerConnection(peerConnectionConfig);
-            peerConnections[peerUID] = pc;
-
-            localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
-
-            pc.onicecandidate = event => {
-                if (event.candidate) {
-                    const signalingDoc = doc(collection(db, `lobbies/${lobbyId}/peers/${peerUID}/connections`));
-                    setDoc(signalingDoc, { from: currentUser.uid, iceCandidate: event.candidate.toJSON() });
-                }
-            };
-
-            pc.ontrack = event => {
-                const remoteStream = event.streams[0];
-                let audioEl = document.getElementById(`audio-${peerUID}`);
-                if (!audioEl) {
-                    audioEl = document.createElement('audio');
-                    audioEl.id = `audio-${peerUID}`;
-                    audioEl.autoplay = true;
-                    voiceChatContainer.appendChild(audioEl);
-                }
-                audioEl.srcObject = remoteStream;
-            };
-
-            pc.onconnectionstatechange = () => {
-                if (pc.connectionState === 'disconnected' || pc.connectionState === 'closed' || pc.connectionState === 'failed') {
-                    closePeerConnection(peerUID);
-                }
-            };
-
-            return pc;
-        }
-
-        async function createOffer(peerUID) {
-            const pc = await createPeerConnection(peerUID);
-            const offer = await pc.createOffer();
-            await pc.setLocalDescription(offer);
-
-            const signalingDoc = doc(collection(db, `lobbies/${lobbyId}/peers/${peerUID}/connections`));
-            await setDoc(signalingDoc, { from: currentUser.uid, offer: { sdp: offer.sdp, type: offer.type } });
-        }
-
-        async function handleOffer(peerUID, offer) {
-            const pc = await createPeerConnection(peerUID);
-            await pc.setRemoteDescription(new RTCSessionDescription(offer));
-            
-            const answer = await pc.createAnswer();
-            await pc.setLocalDescription(answer);
-
-            const signalingDoc = doc(collection(db, `lobbies/${lobbyId}/peers/${peerUID}/connections`));
-            await setDoc(signalingDoc, { from: currentUser.uid, answer: { sdp: answer.sdp, type: answer.type } });
-        }
-
-        async function handleAnswer(peerUID, answer) {
-            const pc = peerConnections[peerUID];
-            if (pc && pc.signalingState !== 'stable') {
-                await pc.setRemoteDescription(new RTCSessionDescription(answer));
-            }
-        }
-
-        function handleIceCandidate(peerUID, iceCandidate) {
-            const pc = peerConnections[peerUID];
-            if (pc) {
-                pc.addIceCandidate(new RTCIceCandidate(iceCandidate));
-            }
-        }
-        
-        async function toggleMic() {
-            if (!localStream) return;
-            isMicOn = !isMicOn;
-            localStream.getAudioTracks()[0].enabled = isMicOn;
-
-            toggleMicBtn.innerHTML = isMicOn ? '🎤' : '🔇';
-            toggleMicBtn.classList.toggle('mic-on', isMicOn);
-            toggleMicBtn.classList.toggle('mic-off', !isMicOn);
-            
-            const lobbyDocRef = doc(db, "Lobbys_list", lobbyId);
-            try {
-                await runTransaction(db, async (transaction) => {
-                    const lobbyDoc = await transaction.get(lobbyDocRef);
-                    if (!lobbyDoc.exists()) return;
-                    let players = lobbyDoc.data().players;
-                    const playerIndex = players.findIndex(p => p.uid === currentUser.uid);
-                    if (playerIndex > -1) {
-                        players[playerIndex].isMicOn = isMicOn;
-                        transaction.update(lobbyDocRef, { players: players });
-                    }
-                });
-            } catch (error) { console.error("Error updating mic status:", error); }
-        }
-
-        function closePeerConnection(peerUID) {
-            if (peerConnections[peerUID]) {
-                peerConnections[peerUID].close();
-                delete peerConnections[peerUID];
-            }
-            let audioEl = document.getElementById(`audio-${peerUID}`);
-            if (audioEl) audioEl.remove();
-        }
-
-        function cleanupAndDisconnectVoice() {
-            if (localStream) {
-                localStream.getTracks().forEach(track => track.stop());
-            }
-            for (const uid in peerConnections) {
-                closePeerConnection(uid);
-            }
-            for (const unsub in signalingUnsubscribes) {
-                signalingUnsubscribes[unsub]();
-            }
         }
 
         function listenToSelfChanges() {
@@ -562,13 +379,11 @@
                 if (player) {
                     slot.classList.add('filled');
                     slot.dataset.uid = player.uid;
-                    if (player.isMicOn) slot.classList.add('on-mic'); else slot.classList.remove('on-mic');
                     if (player.uid !== currentUser.uid) slot.onclick = () => showPlayerActionModal(player);
                     else slot.style.cursor = 'default';
                     if (player.isReady) slot.classList.add('ready');
                     const hostCrown = player.uid === data.creatorId ? `<div class="host-crown">👑</div>` : '';
-                    const micIndicator = `<div class="mic-indicator">🎤</div>`;
-                    slot.innerHTML = `${hostCrown}${micIndicator}<img src="${player.avatarUrl || 'https://up.20script.ir/file/1d50-defult.png'}" alt="avatar" class="player-avatar" onerror="this.src='https://up.20script.ir/file/1d50-defult.png';"><p class="player-name">${player.displayName}</p><div class="ready-indicator">✔</div>`;
+                    slot.innerHTML = `${hostCrown}<img src="${player.avatarUrl || 'https://up.20script.ir/file/1d50-defult.png'}" alt="avatar" class="player-avatar" onerror="this.src='https://up.20script.ir/file/1d50-defult.png';"><p class="player-name">${player.displayName}</p><div class="ready-indicator">✔</div>`;
                 } else {
                     slot.classList.add('empty');
                     slot.innerHTML = `<span class="empty-text">جایگاه خالی</span>`;
@@ -738,7 +553,6 @@
         }
 
         function cleanUpAndLeave(notificationMessage, redirectUrl) {
-            cleanupAndDisconnectVoice();
             if (unsubscribeLobby) unsubscribeLobby();
             if (unsubscribeChat) unsubscribeChat();
             if (unsubscribeSelf) unsubscribeSelf();
@@ -753,7 +567,6 @@
         }
         
         async function handleLeaveLobbyOnExit() {
-            cleanupAndDisconnectVoice();
             window.removeEventListener('beforeunload', handleLeaveLobbyOnExit);
             if (!isCurrentUserInLobby) return;
             const lobbyDocRef = doc(db, "Lobbys_list", lobbyId);
@@ -784,7 +597,6 @@
             clearChatBtn.addEventListener('click', handleClearAllMessages);
             document.getElementById('ban-user-form').addEventListener('submit', handleBanFormSubmit);
             document.getElementById('admin-join-btn').addEventListener('click', handleAdminJoinGame);
-            toggleMicBtn.addEventListener('click', toggleMic);
         }
         
         async function kickPlayer(uidToKick) { const lobbyDocRef = doc(db, "Lobbys_list", lobbyId); await runTransaction(db, async (transaction) => { const lobbyDoc = await transaction.get(lobbyDocRef); if (!lobbyDoc.exists()) return; let players = lobbyDoc.data().players.filter(p => p.uid !== uidToKick); transaction.update(lobbyDocRef, { players: players, playerCount: players.length }); }); }
