@@ -244,13 +244,12 @@
             display: flex; justify-content: space-between; align-items: center;
         }
         
-        /* [اصلاح کامل] بخش پایینی کارت برای حل مشکل چیدمان و بهبود ظاهر */
         .lobby-card-footer {
             display: flex;
-            flex-wrap: wrap; /* مهم‌ترین تغییر: آیتم‌ها در صورت کمبود جا به خط بعدی می‌روند */
+            flex-wrap: wrap; 
             justify-content: space-between;
-            align-items: flex-end; /* تراز کردن آیتم‌ها به پایین */
-            gap: 12px; /* فاصله بین آیتم‌ها */
+            align-items: flex-end; 
+            gap: 12px; 
         }
         
         .lobby-card-body {
@@ -284,12 +283,11 @@
         .player-count span { animation: pulse 2s infinite ease-in-out; }
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
         
-        /* [اصلاح] استایل برای بخش سازنده */
         .creator-info { 
             display: flex; 
             align-items: center; 
             gap: 10px;
-            min-width: 180px; /* حداقل عرض قبل از شکستن خط */
+            min-width: 180px;
         }
         .creator-avatar {
             width: 40px;
@@ -333,16 +331,15 @@
             padding-left: 8px;
         }
         
-        /* [اصلاح] استایل برای دکمه‌ها */
         .lobby-actions { 
             display: flex; 
             gap: 10px;
-            flex-grow: 1; /* اجازه می‌دهد در فضای خالی رشد کند تا به انتهای کادر بچسبد */
-            justify-content: flex-end; /* دکمه‌ها را به سمت راست (در RTL به چپ) می‌چسباند */
+            flex-grow: 1;
+            justify-content: flex-end;
         }
         .lobby-btn {
-            padding: 10px 15px; /* پدینگ متعادل‌تر */
-            font-size: 0.9rem; /* کمی کوچک‌تر برای جا شدن بهتر */
+            padding: 10px 15px;
+            font-size: 0.9rem;
             font-weight: 700;
             border-radius: 8px; 
             cursor: pointer; 
@@ -351,8 +348,8 @@
             font-family: 'Vazirmatn', sans-serif;
             text-shadow: 0 1px 2px rgba(0,0,0,0.4);
             text-align: center;
-            white-space: nowrap; /* جلوگیری از شکستن متن دکمه */
-            flex-shrink: 0; /* جلوگیری از کوچک شدن بیش از حد دکمه‌ها */
+            white-space: nowrap;
+            flex-shrink: 0;
         }
         .btn-join {
             color: white; background: linear-gradient(145deg, var(--dark-red), var(--darker-red));
@@ -450,6 +447,13 @@
             border-color: var(--primary-gold);
         }
         .modal-button.primary:hover { background: linear-gradient(145deg, #a1534d, #6b3431); }
+        /* [اصلاح] استایل برای دکمه غیرفعال */
+        .modal-button.primary:disabled {
+            background: #555;
+            border-color: #777;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
         .modal-button.secondary {
             color: var(--text-light); background: linear-gradient(145deg, #504436, #332a20);
             border-color: var(--border-color);
@@ -638,6 +642,9 @@
         let currentUser = null;
         let currentUserIsAdmin = false;
         let allLobbiesData = new Map();
+        
+        // [اصلاح] اضافه کردن یک فلگ برای جلوگیری از ساخت لابی‌های تکراری
+        let isCreatingLobby = false;
 
         let isMusicPlaying = false;
         const MUSIC_URL = "https://raw.githubusercontent.com/abolfazl140122/mafia/main/mysterious-dark-background-310162%20(1).mp3";
@@ -988,6 +995,9 @@
         }
         
         async function createLobby() {
+            // [اصلاح] اگر در حال ساخت لابی هستیم، درخواست جدید را نادیده بگیر
+            if (isCreatingLobby) return;
+            
             const lobbyName = lobbyNameInput.value.trim();
             const description = lobbyDescriptionInput.value.trim();
             const scenario = lobbyScenarioSelect.value;
@@ -1002,45 +1012,49 @@
                 showCustomAlert('خطا', 'برای لابی خصوصی باید رمز عبور تعیین کنید.', [{ text: 'باشه', class: 'primary' }]);
                 return;
             }
-
             if (!currentUser) return;
 
-            const lobbiesRef = collection(db, 'Lobbys_list');
-            const q = query(lobbiesRef, where("creatorId", "==", currentUser.uid));
-            const querySnapshot = await getDocs(q);
-
-            if (!querySnapshot.empty) {
-                hideModal(createLobbyModal);
-                showCustomAlert('خطا', 'شما قبلاً یک لابی ایجاد کرده‌اید. برای ساخت لابی جدید، ابتدا لابی قبلی خود را حذف کنید.', [
-                    { text: 'باشه', class: 'primary' }
-                ]);
-                return;
-            }
-
-            const userDocRef = doc(db, 'users', currentUser.uid);
-            const userDocSnap = await getDoc(userDocRef);
-            let creatorAvatarUrl = null;
-            if (userDocSnap.exists()) {
-                creatorAvatarUrl = userDocSnap.data().avatarUrl;
-            }
+            // [اصلاح] دکمه را غیرفعال کن و فلگ را تنظیم کن
+            isCreatingLobby = true;
+            createLobbyConfirmBtn.disabled = true;
+            createLobbyConfirmBtn.textContent = 'در حال ساخت...';
             
-            const lobbyData = {
-                lobbyName: lobbyName,
-                description: description,
-                scenario: scenario,
-                creatorId: currentUser.uid,
-                creatorName: currentUser.displayName || 'کاربر ناشناس',
-                creatorAvatarUrl: creatorAvatarUrl,
-                createdAt: serverTimestamp(),
-                playerCount: 1,
-                maxPlayers: 12
-            };
-            
-            if (isPrivate) {
-                lobbyData.password = password;
-            }
-
             try {
+                const lobbiesRef = collection(db, 'Lobbys_list');
+                const q = query(lobbiesRef, where("creatorId", "==", currentUser.uid));
+                const querySnapshot = await getDocs(q);
+
+                if (!querySnapshot.empty) {
+                    hideModal(createLobbyModal);
+                    showCustomAlert('خطا', 'شما قبلاً یک لابی ایجاد کرده‌اید. برای ساخت لابی جدید، ابتدا لابی قبلی خود را حذف کنید.', [
+                        { text: 'باشه', class: 'primary' }
+                    ]);
+                    return; // چون return میکنیم، به finally میرود و دکمه فعال میشود
+                }
+
+                const userDocRef = doc(db, 'users', currentUser.uid);
+                const userDocSnap = await getDoc(userDocRef);
+                let creatorAvatarUrl = null;
+                if (userDocSnap.exists()) {
+                    creatorAvatarUrl = userDocSnap.data().avatarUrl;
+                }
+                
+                const lobbyData = {
+                    lobbyName: lobbyName,
+                    description: description,
+                    scenario: scenario,
+                    creatorId: currentUser.uid,
+                    creatorName: currentUser.displayName || 'کاربر ناشناس',
+                    creatorAvatarUrl: creatorAvatarUrl,
+                    createdAt: serverTimestamp(),
+                    playerCount: 1,
+                    maxPlayers: 12
+                };
+                
+                if (isPrivate) {
+                    lobbyData.password = password;
+                }
+
                 await addDoc(lobbiesRef, lobbyData);
                 hideModal(createLobbyModal);
                 lobbyNameInput.value = '';
@@ -1049,9 +1063,15 @@
                 privateLobbyToggle.checked = false;
                 lobbyPasswordInput.style.display = 'none';
                 showCustomAlert('موفقیت!', 'لابی شما با موفقیت ساخته شد.', [{ text: 'عالی', class: 'primary' }]);
+
             } catch (error) {
                 console.error("Error creating lobby:", error);
                 showCustomAlert('خطای سرور', 'مشکلی در ساخت لابی پیش آمد.', [{ text: 'باشه', class: 'primary' }]);
+            } finally {
+                // [اصلاح] در هر صورت (موفقیت یا خطا)، دکمه را فعال و فلگ را ریست کن
+                isCreatingLobby = false;
+                createLobbyConfirmBtn.disabled = false;
+                createLobbyConfirmBtn.textContent = 'ساختن';
             }
         }
 
