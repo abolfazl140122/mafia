@@ -14,6 +14,9 @@
             --darker-red: #5a2c2a;
             --admin-red: #c0392b;
             --admin-red-hover: #e74c3c;
+            /* [جدید] استایل دکمه تماشا */
+            --admin-spectate-blue: #2980b9;
+            --admin-spectate-blue-hover: #3498db;
             --admin-edit-bg: #504436; 
             --admin-edit-bg-hover: #615342;
             --admin-edit-border: #c5a687;
@@ -380,6 +383,16 @@
             background: linear-gradient(145deg, var(--admin-red-hover), var(--admin-red));
             transform: translateY(-2px);
         }
+        /* [جدید] استایل دکمه تماشای لابی */
+        .btn-spectate {
+            background: linear-gradient(145deg, var(--admin-spectate-blue), #20638f);
+            color: white; border: 1px solid #7dc2f1;
+        }
+        .btn-spectate:hover {
+            background: linear-gradient(145deg, var(--admin-spectate-blue-hover), var(--admin-spectate-blue));
+            transform: translateY(-2px);
+        }
+
 
         /* --- دکمه شناور --- */
         #create-lobby-fab {
@@ -447,7 +460,6 @@
             border-color: var(--primary-gold);
         }
         .modal-button.primary:hover { background: linear-gradient(145deg, #a1534d, #6b3431); }
-        /* [اصلاح] استایل برای دکمه غیرفعال */
         .modal-button.primary:disabled {
             background: #555;
             border-color: #777;
@@ -643,7 +655,6 @@
         let currentUserIsAdmin = false;
         let allLobbiesData = new Map();
         
-        // [اصلاح] اضافه کردن یک فلگ برای جلوگیری از ساخت لابی‌های تکراری
         let isCreatingLobby = false;
 
         let isMusicPlaying = false;
@@ -825,6 +836,12 @@
             const creatorAvatar = lobbyData.creatorAvatarUrl || 'https://up.20script.ir/file/1d50-defult.png';
 
             let actionButtonsHTML = '';
+            
+            // [جدید] دکمه تماشای لابی برای ادمین
+            if (currentUserIsAdmin) {
+                actionButtonsHTML += `<button class="lobby-btn btn-spectate" data-action="spectate">تماشای لابی</button>`;
+            }
+
             if (isOwner) {
                 actionButtonsHTML += `<button class="lobby-btn btn-delete" data-action="delete">حذف لابی</button>`;
             } else if (canAdminDelete) {
@@ -909,6 +926,21 @@
                 promptForPasswordChange(lobbyData);
             });
 
+            // [جدید] رویداد کلیک برای دکمه تماشای لابی
+            card.querySelector('[data-action="spectate"]')?.addEventListener('click', () => {
+                showCustomAlert(
+                    'تایید تماشا',
+                    `آیا می‌خواهید به صورت مخفیانه به عنوان تماشاگر وارد لابی "${lobbyData.lobbyName}" شوید؟`,
+                    [
+                        { text: 'بله، تماشا می‌کنم', class: 'primary', action: () => {
+                            // هدایت به لابی با پارامتر تماشاگر
+                            window.location.href = `./lobby.html?id=${lobbyData.id}&spectate=true`;
+                        }},
+                        { text: 'خیر', class: 'secondary' }
+                    ]
+                );
+            });
+
             return card;
         }
         
@@ -933,11 +965,13 @@
 
                 const userDocRef = doc(db, 'users', user.uid);
                 
+                // این بخش به صورت لحظه‌ای وضعیت ادمین را چک می‌کند
                 onSnapshot(userDocRef, (docSnap) => {
                     if (docSnap.exists()) {
                         const userData = docSnap.data();
                         const newAdminStatus = userData && userData.isAdmin === true;
                         
+                        // اگر وضعیت ادمین تغییر کرده باشد، کل لیست را دوباره رندر می‌کند
                         if (newAdminStatus !== currentUserIsAdmin) {
                             currentUserIsAdmin = newAdminStatus;
                             rerenderAllLobbyCards(); 
@@ -995,7 +1029,6 @@
         }
         
         async function createLobby() {
-            // [اصلاح] اگر در حال ساخت لابی هستیم، درخواست جدید را نادیده بگیر
             if (isCreatingLobby) return;
             
             const lobbyName = lobbyNameInput.value.trim();
@@ -1014,7 +1047,6 @@
             }
             if (!currentUser) return;
 
-            // [اصلاح] دکمه را غیرفعال کن و فلگ را تنظیم کن
             isCreatingLobby = true;
             createLobbyConfirmBtn.disabled = true;
             createLobbyConfirmBtn.textContent = 'در حال ساخت...';
@@ -1029,7 +1061,7 @@
                     showCustomAlert('خطا', 'شما قبلاً یک لابی ایجاد کرده‌اید. برای ساخت لابی جدید، ابتدا لابی قبلی خود را حذف کنید.', [
                         { text: 'باشه', class: 'primary' }
                     ]);
-                    return; // چون return میکنیم، به finally میرود و دکمه فعال میشود
+                    return;
                 }
 
                 const userDocRef = doc(db, 'users', currentUser.uid);
@@ -1068,7 +1100,6 @@
                 console.error("Error creating lobby:", error);
                 showCustomAlert('خطای سرور', 'مشکلی در ساخت لابی پیش آمد.', [{ text: 'باشه', class: 'primary' }]);
             } finally {
-                // [اصلاح] در هر صورت (موفقیت یا خطا)، دکمه را فعال و فلگ را ریست کن
                 isCreatingLobby = false;
                 createLobbyConfirmBtn.disabled = false;
                 createLobbyConfirmBtn.textContent = 'ساختن';
