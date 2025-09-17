@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>شهر مافیا - آموزش نقش‌ها</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* --- استایل‌های اصلی کپی شده از صفحه اصلی --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: #0c0a09; 
+            color: #f0e6d2;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; /* تغییر برای چیدمان از بالا */
+            align-items: center;
+            padding: 20px;
+        }
+
+        #background-animation-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; 
+            background-image: url('https://up.20script.ir/file/6195-file-000000001500622f9419de6c322df297-1-.jpg');
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            animation: kenBurnsEffect 30s ease-in-out infinite alternate;
+        }
+
+        @keyframes kenBurnsEffect {
+            0% {
+                transform: scale(1.0) translate(0, 0);
+                transform-origin: 50% 50%;
+            }
+            100% {
+                transform: scale(1.15) translate(-2%, 2%);
+                transform-origin: 30% 80%;
+            }
+        }
+        
+        .main-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            position: relative; 
+            z-index: 1;
+            gap: 20px;
+        }
+
+        .header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background-color: rgba(0,0,0,0.4);
+            border-bottom: 2px solid #5c4a3a;
+            border-image: linear-gradient(to right, transparent, #ffc947, transparent) 1;
+        }
+
+        .header-title {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #ffc947;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.7);
+        }
+
+        .back-button { 
+            background: linear-gradient(145deg, rgba(80, 50, 48, 0.8), rgba(56, 33, 32, 0.9)); color: #e0dacc; border: 1px solid #c5a687; padding: 10px 20px; border-radius: 8px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; text-decoration: none; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); box-shadow: 0 2px 5px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05); 
+        }
+        .back-button:hover { 
+            background: linear-gradient(145deg, rgba(100, 65, 63, 0.9), rgba(74, 44, 42, 1)); border-color: #ffc947; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1); 
+        }
+
+        /* --- استایل‌های جدید برای صفحه آموزش --- */
+
+        .roles-container {
+            display: flex;
+            width: 100%;
+            max-width: 1200px;
+            height: calc(100% - 100px); /* ارتفاع باقی‌مانده پس از هدر */
+            gap: 20px;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            border-radius: 16px;
+            border: 2px solid #5c4a3a;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        #roles-list {
+            width: 30%;
+            max-width: 300px;
+            height: 100%;
+            overflow-y: auto;
+            border-left: 1px solid #5c4a3a;
+            padding-left: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        #roles-list::-webkit-scrollbar { width: 8px; }
+        #roles-list::-webkit-scrollbar-track { background: #1e170f; border-radius: 10px; }
+        #roles-list::-webkit-scrollbar-thumb { background: #8c4843; border-radius: 10px; }
+        #roles-list::-webkit-scrollbar-thumb:hover { background: #a1534d; }
+
+        .role-list-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid #5c4a3a;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .role-list-item:hover {
+            background-color: rgba(255, 201, 71, 0.1);
+            border-color: #c5a687;
+        }
+
+        .role-list-item.active {
+            background-color: rgba(255, 201, 71, 0.15);
+            border-color: #ffc947;
+            box-shadow: 0 0 10px rgba(255, 201, 71, 0.2);
+        }
+
+        .role-list-item img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #a47d54;
+        }
+
+        .role-list-item span {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        #role-details {
+            flex-grow: 1;
+            height: 100%;
+            overflow-y: auto;
+            padding: 10px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        #role-details::-webkit-scrollbar { display: none; } /* مخفی کردن اسکرولبار برای زیبایی */
+
+
+        #role-details-placeholder {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            opacity: 0.7;
+        }
+
+        #role-details-placeholder .placeholder-icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 10px #000);
+        }
+
+        #role-details-placeholder .placeholder-text {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #c5a687;
+        }
+
+        .role-details-content {
+            display: none; /* در ابتدا مخفی است */
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        #role-details-image {
+            width: 200px;
+            height: 200px;
+            max-width: 100%;
+            border-radius: 16px;
+            object-fit: cover;
+            margin-bottom: 25px;
+            border: 4px solid #a47d54;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.6);
+        }
+
+        #role-details-name {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #ffc947;
+            margin-bottom: 20px;
+            text-shadow: 0 3px 6px rgba(0,0,0,0.8);
+        }
+
+        #role-details-description {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            max-width: 500px;
+            background-color: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #5c4a3a;
+        }
+        
+        #role-details-description strong {
+            color: #ffc947;
+            font-weight: 900;
+        }
+
+        /* --- استایل‌های واکنش‌گرا (Responsive) --- */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            .header-title {
+                font-size: 1.4rem;
+            }
+            .back-button {
+                padding: 8px 15px;
+                font-size: 0.9rem;
+            }
+            .roles-container {
+                flex-direction: column;
+                height: calc(100% - 80px);
+                padding: 10px;
+            }
+            #roles-list {
+                width: 100%;
+                max-width: none;
+                flex-direction: row;
+                overflow-x: auto;
+                overflow-y: hidden;
+                border-left: none;
+                border-bottom: 1px solid #5c4a3a;
+                padding-left: 0;
+                padding-bottom: 15px;
+                height: auto; /* ارتفاع خودکار */
+                flex-shrink: 0;
+            }
+            .role-list-item {
+                flex-direction: column;
+                gap: 8px;
+                min-width: 100px; /* حداقل عرض برای هر آیتم */
+            }
+            .role-list-item img {
+                width: 60px;
+                height: 60px;
+            }
+            .role-list-item span {
+                font-size: 0.9rem;
+            }
+            #role-details {
+                padding: 15px 5px;
+            }
+            #role-details-image {
+                width: 150px;
+                height: 150px;
+            }
+            #role-details-name {
+                font-size: 2rem;
+            }
+            #role-details-description {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <div id="background-animation-container"></div>
+
+    <div class="main-content">
+        <header class="header">
+            <h1 class="header-title">آموزش نقش‌ها</h1>
+            <a href="./صفه اصلی نوین مافیا.html" class="back-button">بازگشت</a>
+        </header>
+
+        <div class="roles-container">
+            <div id="roles-list">
+                <!-- لیست نقش‌ها توسط جاوااسکریپت اینجا ساخته می‌شود -->
+            </div>
+            <div id="role-details">
+                <div id="role-details-placeholder">
+                    <span class="placeholder-icon">🎭</span>
+                    <p class="placeholder-text">نقشی را برای مشاهده جزئیات انتخاب کنید</p>
+                </div>
+
+                <div class="role-details-content">
+                    <img id="role-details-image" src="" alt="تصویر نقش">
+                    <h2 id="role-details-name"></h2>
+                    <p id="role-details-description"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- اطلاعات نقش‌ها ---
+            // نکته: لینک اول شما یک صفحه نمایش بود، من آن را با لینک مستقیم تصویر جایگزین کردم.
+            const roles = [
+                {
+                    name: "هوش سیاه",
+                    image: "https://i.imgurl.ir/uploads/r896087_IMG_20250915_124344_374.jpg",
+                    description: "<strong>[شلیک]:</strong> در شب میتواند یک پلیر را انتخاب کند و به او شلیک کند."
+                },
+                {
+                    name: "آموبات",
+                    image: "https://cdn.imgurl.ir/uploads/l704521_IMG_20250915_124344_374.jpg",
+                    description: "<strong>[گروگان گیری]:</strong> هر شب بیدار میشود و در صورت اینکه دکتر را انتخاب کند، دکتر ابیلیتی خودش را در آن شب از دست می‌دهد."
+                },
+                {
+                    name: "تبدیل شونده",
+                    image: "https://cdn.imgurl.ir/uploads/i33966_IMG_20250915_124344_374.jpg",
+                    description: "<strong>[قانون لغو]:</strong> یکبار در طول بازی میتواند تصویب قانون برای فردا را لغو کند."
+                },
+                {
+                    name: "شهروند ساده",
+                    image: "https://cdn.imgurl.ir/uploads/n521205_IMG_20250915_125022_878.jpg",
+                    description: "او هیچ ابیلیتی (قابلیت خاصی) داخل بازی ندارد و باید در روز با ذهن و استدلال خود به پیروزی شهر کمک کند."
+                },
+                {
+                    name: "پزشک",
+                    image: "https://cdn.imgurl.ir/uploads/g74269_IMG_20250915_140001_151.jpg",
+                    description: "<strong>[نجات دادن]:</strong> هر شب میتواند یک پلیر را از شلیک ربات‌ها (مافیا) نجات دهد."
+                },
+                {
+                    name: "شهردار",
+                    image: "https://cdn.imgurl.ir/uploads/q806114_IMG_20250915_140136_690.jpg",
+                    description: "<strong>[قانون گذار]:</strong> میتواند یکبار در بازی یک قانون را بدون رأی‌گیری تصویب کند یا اینکه رأی‌گیری آن روز را به طور کامل لغو کند."
+                },
+                {
+                    name: "بادیگارد",
+                    image: "https://cdn.imgurl.ir/uploads/r217495_IMG_20250915_140411_337.jpg",
+                    description: "<strong>[امنیت]:</strong> در صورت تشخیص درست دکتر، میتواند آن را از گروگان‌گیری آموبات نجات دهد."
+                },
+                {
+                    name: "چند چهره",
+                    image: "https://cdn.imgurl.ir/uploads/u49895_IMG_20250915_140657_127.jpg",
+                    description: "<strong>[برد برد]:</strong> او هیچ قدرت خاصی ندارد، اما با برد ساید مافیا یا با برد ساید شهروند، برنده بازی محسوب می‌شود."
+                }
+            ];
+
+            // --- دسترسی به المان‌های DOM ---
+            const rolesListContainer = document.getElementById('roles-list');
+            const placeholder = document.getElementById('role-details-placeholder');
+            const detailsContent = document.querySelector('.role-details-content');
+            const detailsImage = document.getElementById('role-details-image');
+            const detailsName = document.getElementById('role-details-name');
+            const detailsDescription = document.getElementById('role-details-description');
+
+            // --- تابع برای نمایش جزئیات یک نقش ---
+            function displayRoleDetails(role) {
+                placeholder.style.display = 'none';
+                detailsContent.style.display = 'flex';
+
+                detailsImage.src = role.image;
+                detailsImage.alt = role.name;
+                detailsName.textContent = role.name;
+                detailsDescription.innerHTML = role.description;
+            }
+
+            // --- ساخت و نمایش لیست نقش‌ها ---
+            roles.forEach((role, index) => {
+                const roleItem = document.createElement('div');
+                roleItem.className = 'role-list-item';
+                roleItem.dataset.index = index; // برای شناسایی نقش کلیک شده
+
+                roleItem.innerHTML = `
+                    <img src="${role.image}" alt="${role.name}">
+                    <span>${role.name}</span>
+                `;
+
+                // افزودن Event Listener برای هر آیتم
+                roleItem.addEventListener('click', () => {
+                    // حذف کلاس active از تمام آیتم‌ها
+                    document.querySelectorAll('.role-list-item').forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    // افزودن کلاس active به آیتم کلیک شده
+                    roleItem.classList.add('active');
+
+                    // نمایش جزئیات نقش مربوطه
+                    const selectedRole = roles[index];
+                    displayRoleDetails(selectedRole);
+                });
+
+                rolesListContainer.appendChild(roleItem);
+            });
+            
+            // نمایش نقش اول به صورت پیش‌فرض
+            if (roles.length > 0) {
+                const firstRoleItem = rolesListContainer.querySelector('.role-list-item');
+                firstRoleItem.classList.add('active');
+                displayRoleDetails(roles[0]);
+            }
+
+        });
+    </script>
+</body>
+</html>
