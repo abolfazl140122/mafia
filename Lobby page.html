@@ -14,7 +14,6 @@
             --darker-red: #5a2c2a;
             --admin-red: #c0392b;
             --admin-red-hover: #e74c3c;
-            /* [جدید] استایل دکمه تماشا */
             --admin-spectate-blue: #2980b9;
             --admin-spectate-blue-hover: #3498db;
             --admin-edit-bg: #504436; 
@@ -60,7 +59,6 @@
             z-index: -1;
         }
         
-        /* --- لودینگ حرفه‌ای و جدید --- */
         #loading-overlay {
             position: fixed;
             top: 0;
@@ -119,7 +117,6 @@
             text-shadow: 1px 1px 3px #000;
         }
         
-        /* --- پنل دانلود موسیقی --- */
         #music-download-overlay {
             position: fixed;
             top: 0;
@@ -176,7 +173,6 @@
             color: var(--text-light);
         }
 
-        /* --- محتوای اصلی --- */
         .main-container {
             width: 100%;
             height: 100%;
@@ -217,7 +213,6 @@
             line-height: 1; transform: scaleX(-1);
         }
 
-        /* --- لیست لابی‌ها --- */
         #lobby-list {
             flex-grow: 1; overflow-y: auto; display: flex;
             flex-direction: column; gap: 15px; padding-right: 5px;
@@ -383,7 +378,6 @@
             background: linear-gradient(145deg, var(--admin-red-hover), var(--admin-red));
             transform: translateY(-2px);
         }
-        /* [جدید] استایل دکمه تماشای لابی */
         .btn-spectate {
             background: linear-gradient(145deg, var(--admin-spectate-blue), #20638f);
             color: white; border: 1px solid #7dc2f1;
@@ -393,8 +387,6 @@
             transform: translateY(-2px);
         }
 
-
-        /* --- دکمه شناور --- */
         #create-lobby-fab {
             position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
             width: 60px; height: 60px;
@@ -410,7 +402,6 @@
         }
         #create-lobby-fab:active { transform: translateX(-50%) scale(0.95); }
 
-        /* --- پنل‌های مودال (Modal) --- */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(0, 0, 0, 0.85); 
@@ -472,7 +463,6 @@
         }
         .modal-button.secondary:hover { background: linear-gradient(145deg, #615342, #403529); }
         
-        /* استایل‌های رمز لابی */
         .password-toggle-group {
             display: flex;
             align-items: center;
@@ -833,11 +823,12 @@
             const canAdminDelete = currentUserIsAdmin && !isOwner;
             const isLobbyFull = (lobbyData.playerCount || 1) >= (lobbyData.maxPlayers || 12);
             const isPrivate = lobbyData.password && lobbyData.password.length > 0;
+            // [تغییر] بررسی اینکه آیا کاربر فعلی در لیست اخراجی‌های این لابی هست یا نه
+            const isKicked = lobbyData.kickedPlayers && lobbyData.kickedPlayers.includes(currentUser.uid);
             const creatorAvatar = lobbyData.creatorAvatarUrl || 'https://up.20script.ir/file/1d50-defult.png';
 
             let actionButtonsHTML = '';
             
-            // [جدید] دکمه تماشای لابی برای ادمین
             if (currentUserIsAdmin) {
                 actionButtonsHTML += `<button class="lobby-btn btn-spectate" data-action="spectate">تماشای لابی</button>`;
             }
@@ -848,8 +839,11 @@
                 actionButtonsHTML += `<button class="lobby-btn btn-admin-delete" data-action="admin-delete">بستن لابی</button>`;
             }
             
+            // [تغییر] منطق دکمه پیوستن برای در نظر گرفتن وضعیت اخراج شدن
             if (isLobbyFull) {
                 actionButtonsHTML += `<button class="lobby-btn btn-join" disabled>لابی پر است</button>`;
+            } else if (isKicked) {
+                actionButtonsHTML += `<button class="lobby-btn btn-join" disabled>شما اخراج شده‌اید</button>`;
             } else {
                 actionButtonsHTML += `<button class="lobby-btn btn-join" data-action="join">پیوستن</button>`;
             }
@@ -896,6 +890,12 @@
             `;
             
             card.querySelector('[data-action="join"]')?.addEventListener('click', () => {
+                // [تغییر] اضافه کردن یک لایه امنیتی دیگر برای جلوگیری از ورود در صورت کلیک سریع
+                if (lobbyData.kickedPlayers && lobbyData.kickedPlayers.includes(currentUser.uid)) {
+                    showCustomAlert('دسترسی ممنوع', 'شما از این لابی اخراج شده‌اید و نمی‌توانید وارد شوید.', [{ text: 'باشه', class: 'primary' }]);
+                    return;
+                }
+
                 if ((lobbyData.playerCount || 1) >= (lobbyData.maxPlayers || 12)) {
                     showCustomAlert('لابی پر است', 'ظرفیت این لابی تکمیل شده است.', [{ text: 'باشه', class: 'primary' }]);
                     return;
@@ -926,14 +926,12 @@
                 promptForPasswordChange(lobbyData);
             });
 
-            // [جدید] رویداد کلیک برای دکمه تماشای لابی
             card.querySelector('[data-action="spectate"]')?.addEventListener('click', () => {
                 showCustomAlert(
                     'تایید تماشا',
                     `آیا می‌خواهید به صورت مخفیانه به عنوان تماشاگر وارد لابی "${lobbyData.lobbyName}" شوید؟`,
                     [
                         { text: 'بله، تماشا می‌کنم', class: 'primary', action: () => {
-                            // هدایت به لابی با پارامتر تماشاگر
                             window.location.href = `./lobby.html?id=${lobbyData.id}&spectate=true`;
                         }},
                         { text: 'خیر', class: 'secondary' }
@@ -965,13 +963,11 @@
 
                 const userDocRef = doc(db, 'users', user.uid);
                 
-                // این بخش به صورت لحظه‌ای وضعیت ادمین را چک می‌کند
                 onSnapshot(userDocRef, (docSnap) => {
                     if (docSnap.exists()) {
                         const userData = docSnap.data();
                         const newAdminStatus = userData && userData.isAdmin === true;
                         
-                        // اگر وضعیت ادمین تغییر کرده باشد، کل لیست را دوباره رندر می‌کند
                         if (newAdminStatus !== currentUserIsAdmin) {
                             currentUserIsAdmin = newAdminStatus;
                             rerenderAllLobbyCards(); 
@@ -1080,7 +1076,8 @@
                     creatorAvatarUrl: creatorAvatarUrl,
                     createdAt: serverTimestamp(),
                     playerCount: 1,
-                    maxPlayers: 12
+                    maxPlayers: 12,
+                    kickedPlayers: [] // [تغییر] اضافه کردن فیلد لیست اخراجی‌ها هنگام ساخت لابی
                 };
                 
                 if (isPrivate) {
