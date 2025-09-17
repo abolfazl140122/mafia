@@ -136,6 +136,24 @@
         .stat-label span:first-child { font-size: 1.4rem; line-height: 1; }
         .stat-value { font-weight: 400; color: #e0dacc; direction: ltr; text-align: right; font-size: 1.1rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
 
+        /* --- START: استایل‌های اضافه شده برای سطح --- */
+        .stat-value.stat-value-admin {
+            font-weight: 900;
+            color: var(--primary-gold);
+            text-shadow: 0 0 8px rgba(255, 201, 71, 0.6), 0 1px 2px rgba(0,0,0,0.8);
+            animation: admin-glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes admin-glow {
+            from {
+                text-shadow: 0 0 6px rgba(255, 201, 71, 0.5), 0 1px 2px rgba(0,0,0,0.8);
+            }
+            to {
+                text-shadow: 0 0 12px rgba(255, 201, 71, 0.8), 0 1px 3px rgba(0,0,0,0.9);
+            }
+        }
+        /* --- END: استایل‌های اضافه شده برای سطح --- */
+
         #lobby-ban-user-modal-content .form-group { display: flex; flex-direction: column; gap: 5px; text-align: right; margin-bottom: 15px; }
         #lobby-ban-user-modal-content .form-label { font-weight: 700; color: var(--text-secondary); font-size: 0.9rem; }
         #lobby-ban-user-modal-content .form-input, #lobby-ban-user-modal-content .form-select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); background-color: var(--bg-dark); color: var(--text-light); font-family: 'Vazirmatn', sans-serif; font-size: 1rem; transition: all 0.3s ease; }
@@ -195,7 +213,16 @@
     <div id="confirm-modal" class="modal-overlay"> <div class="modal-content"> <h2 id="confirm-modal-title" class="modal-title"></h2> <p id="confirm-modal-message" class="modal-message"></p> <div class="modal-buttons" style="flex-direction: row;"> <button id="confirm-modal-yes-btn" class="modal-button primary" style="width: 50%;">بله</button> <button id="confirm-modal-no-btn" class="modal-button secondary" style="width: 50%;">خیر</button> </div> </div> </div>
     <div id="notification-modal" class="modal-overlay"> <div class="modal-content"> <h2 id="notification-modal-title" class="modal-title">توجه</h2> <p id="notification-modal-message" class="modal-message"></p> <div class="modal-buttons"> <button id="notification-modal-ok-btn" class="modal-button primary">متوجه شدم</button> </div> </div> </div>
     <div id="player-action-modal" class="modal-overlay"> <div class="modal-content"> <h2 id="player-action-title" class="modal-title"></h2> <div id="player-action-buttons" class="modal-buttons"></div> </div> </div>
-    <div id="view-profile-modal-overlay" class="modal-overlay"> <div id="view-profile-modal-content" class="modal-content"> <div class="profile-header"> <span id="profile-modal-close-btn" class="modal-close-btn">&times;</span> <img id="profile-modal-avatar" src="" alt="آواتار پروفایل"> <div class="profile-name-banner"> <h2 id="profile-modal-name"></h2> </div> </div> <div class="profile-body"> <div class="profile-stat-item"> <span class="stat-label"><span>📜</span><span>تاریخ ثبت نام:</span></span> <span id="profile-stat-date" class="stat-value"></span> </div> <div class="profile-stat-item"> <span class="stat-label"><span>🎂</span><span>سن:</span></span> <span id="profile-stat-age" class="stat-value"></span> </div> <div class="profile-stat-item" id="profile-stat-diamonds-container"> <span class="stat-label"><span>💎</span><span>تعداد الماس:</span></span> <span id="profile-stat-diamonds" class="stat-value"></span> </div> <div class="profile-stat-item" id="profile-stat-email-container"> <span class="stat-label"><span>📧</span><span>ایمیل:</span></span> <span id="profile-stat-email" class="stat-value"></span> </div> </div> </div> </div>
+    <div id="view-profile-modal-overlay" class="modal-overlay"> <div id="view-profile-modal-content" class="modal-content"> <div class="profile-header"> <span id="profile-modal-close-btn" class="modal-close-btn">&times;</span> <img id="profile-modal-avatar" src="" alt="آواتار پروفایل"> <div class="profile-name-banner"> <h2 id="profile-modal-name"></h2> </div> </div> <div class="profile-body"> 
+    
+    <!-- START: بخش اضافه شده برای سطح -->
+    <div class="profile-stat-item"> 
+        <span class="stat-label"><span>👑</span><span>سطح:</span></span> 
+        <span id="profile-stat-level" class="stat-value"></span> 
+    </div> 
+    <!-- END: بخش اضافه شده برای سطح -->
+    
+    <div class="profile-stat-item"> <span class="stat-label"><span>📜</span><span>تاریخ ثبت نام:</span></span> <span id="profile-stat-date" class="stat-value"></span> </div> <div class="profile-stat-item"> <span class="stat-label"><span>🎂</span><span>سن:</span></span> <span id="profile-stat-age" class="stat-value"></span> </div> <div class="profile-stat-item" id="profile-stat-diamonds-container"> <span class="stat-label"><span>💎</span><span>تعداد الماس:</span></span> <span id="profile-stat-diamonds" class="stat-value"></span> </div> <div class="profile-stat-item" id="profile-stat-email-container"> <span class="stat-label"><span>📧</span><span>ایمیل:</span></span> <span id="profile-stat-email" class="stat-value"></span> </div> </div> </div> </div>
     <div id="lobby-ban-user-modal-overlay" class="modal-overlay"> <div id="lobby-ban-user-modal-content" class="modal-content"> <h2 class="modal-title">مسدود کردن کاربر</h2> <form id="ban-user-form"> <div class="form-group"> <label for="ban-reason" class="form-label">دلیل مسدودیت:</label> <input type="text" id="ban-reason" class="form-input" required placeholder="مثال: استفاده از الفاظ نامناسب"> </div> <div class="form-group form-group-horizontal"> <label class="form-label">مدت زمان:</label> <input type="number" id="ban-duration" class="form-input" required value="1"> <select id="ban-unit" class="form-select"> <option value="hours">ساعت</option> <option value="days">روز</option> <option value="weeks">هفته</option> </select> </div> <div class="confirm-buttons-container"> <button type="button" id="ban-cancel-btn" class="modal-button secondary" style="width: 50%;">انصراف</button> <button type="submit" class="modal-button danger" style="width: 50%;">اعمال مسدودیت</button> </div> </form> </div> </div>
     
     <!-- Audio Elements -->
@@ -491,6 +518,18 @@
             
             document.getElementById('profile-modal-avatar').src = userData.avatarUrl || 'https://up.20script.ir/file/1d50-defult.png';
             document.getElementById('profile-modal-name').textContent = userData.displayName || "کاربر ناشناس";
+            
+            // --- START: منطق اضافه شده برای نمایش سطح ---
+            const profileStatLevel = document.getElementById('profile-stat-level');
+            if (userData.isAdmin === true) {
+                profileStatLevel.textContent = "ادمین";
+                profileStatLevel.classList.add('stat-value-admin');
+            } else {
+                profileStatLevel.textContent = "کاربر";
+                profileStatLevel.classList.remove('stat-value-admin');
+            }
+            // --- END: منطق اضافه شده برای نمایش سطح ---
+            
             document.getElementById('profile-stat-age').textContent = userData.old || "نامشخص";
             if (userData.createdAt && typeof userData.createdAt.toDate === 'function') {
                 const date = userData.createdAt.toDate();
