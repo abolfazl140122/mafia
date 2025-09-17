@@ -168,11 +168,13 @@
         .top-right-container { width: 100%; display: flex; justify-content: flex-end; align-items: flex-start; }
         .profile-and-menu-wrapper { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
         
+        /* --- START: کانتینر جدید برای پنل‌های بالا --- */
         .top-panel-container {
             display: flex;
             gap: 10px;
             align-items: center;
         }
+        /* --- END: کانتینر جدید برای پنل‌های بالا --- */
 
         .profile-section { display: flex; align-items: center; background-color: rgba(0, 0, 0, 0.5); padding: 10px 15px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 3px 8px rgba(0,0,0,0.3); }
         .avatar-container { display: flex; align-items: center; gap: 12px; }
@@ -184,30 +186,30 @@
         .gems-section {
             display: flex;
             align-items: center;
-            gap: 6px; /* کاهش فاصله */
+            gap: 8px;
             background-color: rgba(0, 0, 0, 0.5);
             padding: 10px 15px;
             border-radius: 12px;
             border: 1px solid rgba(255, 255, 255, 0.2);
             box-shadow: 0 3px 8px rgba(0,0,0,0.3);
             transition: all 0.3s ease;
-            flex-shrink: 0; 
+            flex-shrink: 0; /* جلوگیری از فشرده شدن پنل */
         }
         .gems-section:hover {
             border-color: #ffc947;
             box-shadow: 0 0 12px rgba(255, 201, 71, 0.3);
         }
         .gems-icon {
-            font-size: 1.4rem; /* کوچک‌تر کردن آیکون */
+            font-size: 1.5rem;
             line-height: 1;
             filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
         }
         #user-gems-count {
-            font-size: 1.2rem; 
+            font-size: 1.2rem; /* اندازه فونت پایه */
             font-weight: 900;
             color: #ffc947;
             text-shadow: 0 1px 4px rgba(0,0,0,0.6);
-            white-space: nowrap; 
+            white-space: nowrap; /* جلوگیری از شکستن عدد به خط بعدی */
         }
         /* --- END: استایل‌های جدید برای پنل الماس --- */
 
@@ -437,11 +439,14 @@
     <div class="main-content">
         <div class="top-right-container">
             <div class="profile-and-menu-wrapper">
+                <!-- START: کانتینر جدید برای قرار دادن پنل پروفایل و الماس در کنار هم -->
                 <div class="top-panel-container">
-                    <div id="gems-panel" class="gems-section"> <!-- ID added for ResizeObserver -->
+                    <!-- START: پنل نمایش الماس -->
+                    <div class="gems-section">
                         <span class="gems-icon">💎</span>
                         <span id="user-gems-count">0</span>
                     </div>
+                    <!-- END: پنل نمایش الماس -->
                     <div class="profile-section">
                         <div class="avatar-container">
                             <img id="user-avatar" src="" alt="آواتار کاربر">
@@ -449,6 +454,7 @@
                         </div>
                     </div>
                 </div>
+                <!-- END: کانتینر جدید -->
                 <div class="menu-buttons">
                     <button class="menu-button">سازندگان</button>
                     <button id="ranking-button" class="menu-button">رده بندی</button>
@@ -503,8 +509,9 @@
         // --- DOM Elements ---
         const userDisplayName = document.getElementById('user-display-name');
         const userAvatar = document.getElementById('user-avatar');
+        // START: المان جدید برای نمایش الماس
         const userGemsCount = document.getElementById('user-gems-count');
-        const gemsPanel = document.getElementById('gems-panel');
+        // END: المان جدید برای نمایش الماس
         const startGameButton = document.getElementById('start-game-button');
         const menuButtons = document.querySelectorAll('.menu-button');
         const loadingOverlay = document.getElementById('loading-overlay');
@@ -628,54 +635,26 @@
         let dialogueListenerUnsubscribe = null;
         let currentActiveDialogueId = null; 
         let currentlyEditingUser = null; 
-        let previousGemsCount = 0; // متغیر برای نگهداری تعداد قبلی الماس
 
-        // --- تابع برای تنظیم اندازه فونت الماس ---
+        // --- START: تابع جدید برای تنظیم اندازه فونت الماس ---
         function adjustGemFontSize(element) {
             const container = element.parentElement;
+            // فضای اشغال شده توسط آیکون و فاصله‌ها
             const reservedSpace = container.querySelector('.gems-icon').offsetWidth + 20; 
             const maxTextWidth = container.clientWidth - reservedSpace;
             
+            // بازنشانی فونت به حالت اولیه برای محاسبه مجدد
             element.style.fontSize = '1.2rem';
             let currentFontSize = 1.2;
             const minFontSize = 0.6; 
 
+            // کوچک کردن فونت تا زمانی که متن در کانتینر جا شود
             while (element.scrollWidth > maxTextWidth && currentFontSize > minFontSize) {
                 currentFontSize -= 0.05;
                 element.style.fontSize = `${currentFontSize}rem`;
             }
         }
-        
-        // --- START: تابع جدید برای انیمیشن شمارش عدد ---
-        function animateCountUp(element, start, end, duration) {
-            let startTime = null;
-            const range = end - start;
-
-            // تابع کمکی برای ایجاد حس نرمی در انیمیشن (شروع سریع، پایان آهسته)
-            const easeOutCubic = progress => 1 - Math.pow(1 - progress, 3);
-            
-            const step = (timestamp) => {
-                if (!startTime) startTime = timestamp;
-                const progress = Math.min((timestamp - startTime) / duration, 1);
-                const easedProgress = easeOutCubic(progress);
-                const currentValue = Math.floor(easedProgress * range + start);
-                
-                element.textContent = currentValue.toLocaleString('fa-IR');
-                adjustGemFontSize(element); // **مهم:** تنظیم فونت در هر فریم
-                
-                if (progress < 1) {
-                    requestAnimationFrame(step);
-                } else {
-                    // اطمینان از نمایش عدد نهایی
-                    element.textContent = end.toLocaleString('fa-IR');
-                    adjustGemFontSize(element);
-                }
-            };
-            
-            requestAnimationFrame(step);
-        }
-        // --- END: تابع جدید برای انیمیشن شمارش عدد ---
-
+        // --- END: تابع جدید برای تنظیم اندازه فونت الماس ---
 
         // --- توابع عمومی ---
         function showModal(modalElement) { modalElement.classList.add('visible'); }
@@ -687,7 +666,7 @@
         async function checkMaintenanceAndProceed(actionCallback) { const maintenanceDocRef = doc(db, 'settings', 'maintenance'); try { const docSnap = await getDoc(maintenanceDocRef); if (docSnap.exists() && docSnap.data().enabled === true) { showCustomAlert("سرور در حالت بروزرسانی قرار دارد. شما به صفحه اصلی منتقل می‌شوید.", () => { window.location.href = './index.html'; }); } else { actionCallback(); } } catch (error) { console.error("خطا در بررسی وضعیت بروزرسانی:", error); showCustomAlert("خطا در ارتباط با سرور.", () => {}); } }
         async function verifyAdminStatus() { const user = auth.currentUser; if (!user) return false; try { const userDocRef = doc(db, 'users', user.uid); const docSnap = await getDoc(userDocRef); if (docSnap.exists() && docSnap.data().isAdmin === true) { return true; } else { showCustomAlert("دسترسی شما به این بخش محدود است.", hideAllAdminModals); return false; } } catch (error) { console.error("خطا در بررسی وضعیت ادمین:", error); showCustomAlert("خطا در ارتباط با سرور برای تایید دسترسی.", hideAllAdminModals); return false; } }
         function populateProfileModal() { if (!currentUserData) return; profileModalAvatar.src = currentUserData.avatarUrl || DEFAULT_AVATAR; profileModalName.textContent = currentUserData.displayName || "کاربر ناشناس"; if (currentUserData.isAdmin === true) { profileStatLevel.textContent = "ادمین"; profileStatLevel.classList.add('stat-value-admin'); } else { profileStatLevel.textContent = "کاربر"; profileStatLevel.classList.remove('stat-value-admin'); }
-            profileStatAge.textContent = currentUserData.old || "نامشخص"; profileStatAvatars.textContent = (currentUserData.ownedAvatars?.length || 0) + " عدد"; profileStatDiamonds.textContent = (currentUserData.game || 0).toLocaleString('fa-IR'); profileStatEmail.textContent = currentUserData.email || "ثبت نشده"; if (currentUserData.createdAt && typeof currentUserData.createdAt.toDate === 'function') { const date = currentUserData.createdAt.toDate(); profileStatDate.textContent = new Intl.DateTimeFormat('fa-IR', { year: 'numeric', month: 'long', day: 'numeric' }).format(date); } else { profileStatDate.textContent = "نامشخص"; } }
+            profileStatAge.textContent = currentUserData.old || "نامشخص"; profileStatAvatars.textContent = (currentUserData.ownedAvatars?.length || 0) + " عدد"; profileStatDiamonds.textContent = currentUserData.game || 0; profileStatEmail.textContent = currentUserData.email || "ثبت نشده"; if (currentUserData.createdAt && typeof currentUserData.createdAt.toDate === 'function') { const date = currentUserData.createdAt.toDate(); profileStatDate.textContent = new Intl.DateTimeFormat('fa-IR', { year: 'numeric', month: 'long', day: 'numeric' }).format(date); } else { profileStatDate.textContent = "نامشخص"; } }
         const playMusicAfterUserInteraction = () => { if (!isMusicPlaying && backgroundMusic.src && backgroundMusic.paused) { backgroundMusic.play().then(() => { isMusicPlaying = true; document.body.removeEventListener('click', playMusicAfterUserInteraction, true); document.body.removeEventListener('keydown', playMusicAfterUserInteraction, true); }).catch(e => console.error("خطا در پخش موسیقی.", e)); } else { document.body.removeEventListener('click', playMusicAfterUserInteraction, true); document.body.removeEventListener('keydown', playMusicAfterUserInteraction, true); } };
         function playMusicFromBlob(blob) { const objectUrl = URL.createObjectURL(blob); backgroundMusic.src = objectUrl; backgroundMusic.volume = 0.4; const playPromise = backgroundMusic.play(); if (playPromise !== undefined) { playPromise.then(() => { isMusicPlaying = true; }).catch(error => { console.warn("پخش خودکار موسیقی مسدود شد.", error); isMusicPlaying = false; document.body.addEventListener('click', playMusicAfterUserInteraction, true); document.body.addEventListener('keydown', playMusicAfterUserInteraction, true); }); } }
         function downloadAndCacheMusic() { return new Promise((resolve, reject) => { musicDownloadOverlay.classList.add('visible'); const xhr = new XMLHttpRequest(); xhr.open('GET', MUSIC_URL, true); xhr.responseType = 'blob'; xhr.onprogress = (event) => { if (event.lengthComputable) { const percentComplete = Math.round((event.loaded / event.total) * 100); progressBar.style.width = percentComplete + '%'; progressText.textContent = `در حال دانلود... ${percentComplete}%`; } }; xhr.onload = async () => { if (xhr.status === 200) { const musicBlob = xhr.response; try { const cache = await caches.open(MUSIC_CACHE_NAME); await cache.put(MUSIC_URL, new Response(musicBlob)); localStorage.setItem(MUSIC_VERSION_KEY, MUSIC_URL); musicDownloadOverlay.classList.remove('visible'); resolve(musicBlob); } catch (cacheError) { reject(cacheError); } } else { reject(new Error(`خطای شبکه: ${xhr.statusText}`)); } }; xhr.onerror = () => { musicDownloadOverlay.classList.remove('visible'); showCustomAlert("دانلود موسیقی پس‌زمینه با خطا مواجه شد.", () => {}); reject(new Error('خطای شبکه در دانلود موسیقی.')); }; xhr.send(); }); }
@@ -728,7 +707,7 @@
         function filterUserList() { const searchTerm = userSearchInput.value.toLowerCase(); const allUsers = userListContainer.querySelectorAll('.user-list-item'); allUsers.forEach(userItem => { const name = userItem.querySelector('.user-details .name')?.textContent.toLowerCase() || ''; const email = userItem.querySelector('.user-details .email')?.textContent.toLowerCase() || ''; if (name.includes(searchTerm) || email.includes(searchTerm)) { userItem.style.display = 'flex'; } else { userItem.style.display = 'none'; } }); }
         async function openGameModesPanel() { if (!(await verifyAdminStatus())) return; hideModal(adminPanelOverlay); showModal(gameModesPanelOverlay); friendlyModeToggle.disabled = true; rankedModeToggle.disabled = true; gameModesSaveBtn.disabled = true; try { const gameModesDocRef = doc(db, 'settings', 'gameModes'); const docSnap = await getDoc(gameModesDocRef); if (docSnap.exists()) { const modes = docSnap.data(); friendlyModeToggle.checked = modes.friendlyEnabled || false; rankedModeToggle.checked = modes.rankedEnabled || false; } } catch (error) { console.error("خطا در خواندن تنظیمات ورودی بازی: ", error); showCustomAlert("خطا در دریافت اطلاعات. لطفا دوباره تلاش کنید.", () => { hideModal(gameModesPanelOverlay); showModal(adminPanelOverlay); }); } finally { friendlyModeToggle.disabled = false; rankedModeToggle.disabled = false; gameModesSaveBtn.disabled = false; } }
         async function handleSaveGameModes() { if (!(await verifyAdminStatus())) return; gameModesSaveBtn.disabled = true; gameModesSaveBtn.textContent = 'در حال ذخیره...'; const newSettings = { friendlyEnabled: friendlyModeToggle.checked, rankedEnabled: rankedModeToggle.checked }; try { const gameModesDocRef = doc(db, 'settings', 'gameModes'); await updateDoc(gameModesDocRef, newSettings); showCustomAlert("تنظیمات ورودی بازی با موفقیت ذخیره شد."); hideModal(gameModesPanelOverlay); } catch (error) { console.error("خطا در ذخیره تنظیمات ورودی بازی: ", error); showCustomAlert("خطا در ذخیره تغییرات. لطفا دوباره تلاش کنید."); } finally { gameModesSaveBtn.disabled = false; gameModesSaveBtn.textContent = 'ذخیره'; } }
-        function renderRankings(allUsers) { const currentUser = auth.currentUser; if (!currentUser) return; const isAdmin = currentUserData?.isAdmin === true; rankingAdminFeatures.forEach(el => { el.style.display = isAdmin ? 'block' : 'none' }); const rankedUsers = allUsers.filter(user => !user.isBannedFromRanking && user.game > 0).sort((a, b) => (b.game || 0) - (a.game || 0)).slice(0, 100); const bannedUsers = allUsers.filter(user => user.isBannedFromRanking); rankingListContainer.innerHTML = ''; if (rankedUsers.length === 0) { rankingListContainer.innerHTML = '<p style="padding: 20px; text-align: center;">هنوز بازیکنی در رده‌بندی وجود ندارد.</p>'; } else { rankedUsers.forEach((userData, index) => { const rank = index + 1; const userElement = document.createElement('div'); userElement.classList.add('ranking-list-item'); if(userData.id === currentUser.uid) userElement.classList.add('current-user-rank'); const adminControlsHTML = isAdmin ? `<div class="ranking-admin-controls" data-uid="${userData.id}" data-name="${userData.displayName || 'کاربر'}" data-avatar="${userData.avatarUrl || DEFAULT_AVATAR}" data-gems="${userData.game || 0}"><button class="edit-rank-btn" title="ویرایش امتیاز">${RANK_EDIT_SVG}</button><button class="ban-rank-btn" title="حذف از رده‌بندی">${RANK_BAN_SVG}</button></div>` : ''; userElement.innerHTML = `<span class="rank-number">${rank}</span><div class="user-info"><img src="${userData.avatarUrl || DEFAULT_AVATAR}" alt="avatar"><div class="user-details"> <span class="name">${userData.displayName || 'بدون نام'}</span> </div></div><div class="gems-count"> <span>${(userData.game || 0).toLocaleString('fa-IR')}</span> </div>${adminControlsHTML}`; rankingListContainer.appendChild(userElement); }); }
+        function renderRankings(allUsers) { const currentUser = auth.currentUser; if (!currentUser) return; const isAdmin = currentUserData?.isAdmin === true; rankingAdminFeatures.forEach(el => { el.style.display = isAdmin ? 'block' : 'none' }); const rankedUsers = allUsers.filter(user => !user.isBannedFromRanking && user.game > 0).sort((a, b) => (b.game || 0) - (a.game || 0)).slice(0, 100); const bannedUsers = allUsers.filter(user => user.isBannedFromRanking); rankingListContainer.innerHTML = ''; if (rankedUsers.length === 0) { rankingListContainer.innerHTML = '<p style="padding: 20px; text-align: center;">هنوز بازیکنی در رده‌بندی وجود ندارد.</p>'; } else { rankedUsers.forEach((userData, index) => { const rank = index + 1; const userElement = document.createElement('div'); userElement.classList.add('ranking-list-item'); if(userData.id === currentUser.uid) userElement.classList.add('current-user-rank'); const adminControlsHTML = isAdmin ? `<div class="ranking-admin-controls" data-uid="${userData.id}" data-name="${userData.displayName || 'کاربر'}" data-avatar="${userData.avatarUrl || DEFAULT_AVATAR}" data-gems="${userData.game || 0}"><button class="edit-rank-btn" title="ویرایش امتیاز">${RANK_EDIT_SVG}</button><button class="ban-rank-btn" title="حذف از رده‌بندی">${RANK_BAN_SVG}</button></div>` : ''; userElement.innerHTML = `<span class="rank-number">${rank}</span><div class="user-info"><img src="${userData.avatarUrl || DEFAULT_AVATAR}" alt="avatar"><div class="user-details"> <span class="name">${userData.displayName || 'بدون نام'}</span> </div></div><div class="gems-count"> <span>${userData.game || 0}</span> </div>${adminControlsHTML}`; rankingListContainer.appendChild(userElement); }); }
             if(isAdmin) { bannedRankingListContainer.innerHTML = ''; if (bannedUsers.length === 0) { bannedRankingListContainer.innerHTML = '<p style="padding: 15px; text-align: center; color: #999;">لیست خالی است.</p>'; } else { bannedUsers.forEach(userData => { const userElement = document.createElement('div'); userElement.classList.add('user-list-item'); userElement.innerHTML = `<div class="user-info" style="flex-grow: 1;"><img src="${userData.avatarUrl || DEFAULT_AVATAR}" alt="avatar"><div class="user-details"> <span class="name">${userData.displayName || 'بدون نام'}</span> </div></div><button class="restore-rank-btn" title="بازگردانی به رده‌بندی" data-uid="${userData.id}" data-name="${userData.displayName || 'کاربر'}">${RANK_RESTORE_SVG}<span>بازگردانی</span></button>`; bannedRankingListContainer.appendChild(userElement); }); } } }
         function startRankingListener() { if (rankingListenerUnsubscribe) { rankingListenerUnsubscribe(); }
             const usersRef = collection(db, "users"); rankingListenerUnsubscribe = onSnapshot(usersRef, (querySnapshot) => { let allUsers = []; querySnapshot.forEach(doc => { allUsers.push({ id: doc.id, ...doc.data() }); }); renderRankings(allUsers); }, (error) => { console.error("خطا در شنونده زنده رده‌بندی:", error); rankingListContainer.innerHTML = '<p style="padding: 20px; text-align: center;">خطا در دریافت اطلاعات زنده.</p>'; showCustomAlert("خطا در بارگذاری زنده رده‌بندی."); }); }
@@ -762,26 +741,18 @@
                         userDisplayName.textContent = currentUserData.displayName || "کاربر ناشناس";
                         userAvatar.src = currentUserData.avatarUrl || DEFAULT_AVATAR;
                         
-                        // --- START: منطق جدید برای نمایش و انیمیشن الماس ---
-                        const targetGems = currentUserData.game || 0;
-                        if (isInitialLoad) {
-                            // در بارگذاری اولیه، فقط عدد را نمایش بده بدون انیمیشن
-                            userGemsCount.textContent = targetGems.toLocaleString('fa-IR');
-                            adjustGemFontSize(userGemsCount);
-                            previousGemsCount = targetGems;
-                        } else if (targetGems !== previousGemsCount) {
-                            // اگر کاربر در صفحه حضور دارد و الماس تغییر کرده، انیمیشن را اجرا کن
-                            animateCountUp(userGemsCount, previousGemsCount, targetGems, 1500); // 1.5 ثانیه
-                            previousGemsCount = targetGems;
-                        }
-                        // --- END: منطق جدید ---
+                        // --- START: به‌روزرسانی تعداد الماس و تنظیم فونت ---
+                        const gems = currentUserData.game || 0;
+                        userGemsCount.textContent = gems.toLocaleString('fa-IR');
+                        adjustGemFontSize(userGemsCount); // فراخوانی تابع برای تنظیم اندازه فونت
+                        // --- END: به‌روزرسانی تعداد الماس و تنظیم فونت ---
 
                         adminPanelButton.style.display = currentUserData.isAdmin === true ? 'block' : 'none';
                     } else {
                         currentUserData = { email: user.email, displayName: user.displayName };
                         userDisplayName.textContent = user.displayName || "کاربر ناشناس";
                         userAvatar.src = DEFAULT_AVATAR;
-                        userGemsCount.textContent = "۰"; // مقدار پیش‌فرض برای کاربر جدید
+                        userGemsCount.textContent = "0"; // مقدار پیش‌فرض برای کاربر جدید
                         adminPanelButton.style.display = 'none';
                     }
                     if (isInitialLoad) {
@@ -883,17 +854,6 @@
         banCancelBtn.addEventListener('click', () => { hideModal(banUserModalOverlay); showModal(editUserModalOverlay); });
         banUserModalOverlay.addEventListener('click', (e) => { if (e.target === banUserModalOverlay) { hideModal(banUserModalOverlay); showModal(editUserModalOverlay); }});
         banUserForm.addEventListener('submit', handleBanFormSubmit);
-        
-        // --- START: بهبود یافته: استفاده از ResizeObserver برای واکنش به تغییر اندازه پنل ---
-        const resizeObserver = new ResizeObserver(() => {
-            if (userGemsCount) {
-                adjustGemFontSize(userGemsCount);
-            }
-        });
-        if (gemsPanel) {
-            resizeObserver.observe(gemsPanel);
-        }
-        // --- END: بهبود یافته ---
     </script>
 </body>
 </html>
