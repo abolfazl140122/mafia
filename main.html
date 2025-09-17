@@ -261,6 +261,21 @@
         .stat-label { font-weight: 700; color: #c5a687; display: flex; align-items: center; gap: 12px; }
         .stat-label span:first-child { font-size: 1.4rem; line-height: 1; }
         .stat-value { font-weight: 400; color: #e0dacc; direction: ltr; text-align: right; font-size: 1.1rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+        .stat-value.stat-value-admin {
+            font-weight: 900;
+            color: #ffc947;
+            text-shadow: 0 0 8px rgba(255, 201, 71, 0.6), 0 1px 2px rgba(0,0,0,0.8);
+            animation: admin-glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes admin-glow {
+            from {
+                text-shadow: 0 0 6px rgba(255, 201, 71, 0.5), 0 1px 2px rgba(0,0,0,0.8);
+            }
+            to {
+                text-shadow: 0 0 12px rgba(255, 201, 71, 0.8), 0 1px 3px rgba(0,0,0,0.9);
+            }
+        }
         
         /* --- استایل‌های پنل مدیریت --- */
         #admin-panel-content .modal-button { margin-top: 10px; }
@@ -716,6 +731,10 @@
             </div>
             <div class="profile-body">
                 <div class="profile-stat-item">
+                    <span class="stat-label"><span>👑</span><span>سطح:</span></span>
+                    <span id="profile-stat-level" class="stat-value"></span>
+                </div>
+                <div class="profile-stat-item">
                     <span class="stat-label"><span>📜</span><span>تاریخ ثبت نام:</span></span>
                     <span id="profile-stat-date" class="stat-value"></span>
                 </div>
@@ -991,6 +1010,7 @@
         const rankedGameBtn = document.getElementById('ranked-game-btn');
         const profileModalAvatar = document.getElementById('profile-modal-avatar');
         const profileModalName = document.getElementById('profile-modal-name');
+        const profileStatLevel = document.getElementById('profile-stat-level');
         const profileStatDate = document.getElementById('profile-stat-date');
         const profileStatAge = document.getElementById('profile-stat-age');
         const profileStatAvatars = document.getElementById('profile-stat-avatars');
@@ -1146,6 +1166,15 @@
             if (!currentUserData) return;
             profileModalAvatar.src = currentUserData.avatarUrl || DEFAULT_AVATAR;
             profileModalName.textContent = currentUserData.displayName || "کاربر ناشناس";
+
+            if (currentUserData.isAdmin === true) {
+                profileStatLevel.textContent = "ادمین";
+                profileStatLevel.classList.add('stat-value-admin');
+            } else {
+                profileStatLevel.textContent = "کاربر";
+                profileStatLevel.classList.remove('stat-value-admin');
+            }
+
             profileStatAge.textContent = currentUserData.old || "نامشخص";
             profileStatAvatars.textContent = (currentUserData.ownedAvatars?.length || 0) + " عدد";
             profileStatDiamonds.textContent = currentUserData.game || 0;
