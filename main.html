@@ -165,41 +165,24 @@
         #progress-text { margin-top: 15px; font-size: 1rem; font-weight: 700; color: #e0dacc; }
 
         /* --- استایل‌های اصلی صفحه --- */
-        /* START: کانتینر اصلی برای بالا صفحه با چیدمان جدید */
-        .top-container {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-        }
-
-        .top-left-panel {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .top-right-panel {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 12px;
-        }
-        /* END: کانتینر اصلی برای بالا صفحه */
-
+        .top-right-container { width: 100%; display: flex; justify-content: flex-end; align-items: flex-start; }
+        .profile-and-menu-wrapper { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
+        
+        /* --- START: کانتینر جدید برای پنل‌های بالا --- */
         .top-panel-container {
             display: flex;
-            flex-direction: row-reverse; /* برای حفظ ترتیب آواتار و نام */
             gap: 10px;
             align-items: center;
         }
+        /* --- END: کانتینر جدید برای پنل‌های بالا --- */
 
         .profile-section { display: flex; align-items: center; background-color: rgba(0, 0, 0, 0.5); padding: 10px 15px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 3px 8px rgba(0,0,0,0.3); }
-        .avatar-container { display: flex; flex-direction: row-reverse; align-items: center; gap: 12px; }
+        .avatar-container { display: flex; align-items: center; gap: 12px; }
         #user-avatar { width: 50px; height: 50px; border-radius: 50%; border: 2px solid #c5a687; object-fit: cover; cursor: pointer; transition: all 0.2s ease-in-out; }
         #user-avatar:hover { transform: scale(1.1); border-color: #ffc947; box-shadow: 0 0 10px rgba(255, 201, 71, 0.5); }
         #user-display-name { font-size: 1rem; font-weight: 700; text-shadow: 1px 1px 3px #000; }
         
+        /* --- START: استایل‌های جدید برای پنل الماس --- */
         .gems-section {
             display: flex;
             align-items: center;
@@ -210,7 +193,7 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
             box-shadow: 0 3px 8px rgba(0,0,0,0.3);
             transition: all 0.3s ease;
-            flex-shrink: 0;
+            flex-shrink: 0; /* جلوگیری از فشرده شدن پنل */
         }
         .gems-section:hover {
             border-color: #ffc947;
@@ -222,59 +205,13 @@
             filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
         }
         #user-gems-count {
-            font-size: 1.2rem;
+            font-size: 1.2rem; /* اندازه فونت پایه */
             font-weight: 900;
             color: #ffc947;
             text-shadow: 0 1px 4px rgba(0,0,0,0.6);
-            white-space: nowrap;
+            white-space: nowrap; /* جلوگیری از شکستن عدد به خط بعدی */
         }
-
-        /* START: استایل‌های جدید برای زنگوله اعلان */
-        #name-swap-notification {
-            position: relative;
-            background: linear-gradient(145deg, rgba(80, 50, 48, 0.8), rgba(56, 33, 32, 0.9));
-            border: 1px solid #c5a687;
-            border-radius: 50%;
-            width: 48px;
-            height: 48px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: none; /* مخفی به صورت پیشفرض */
-        }
-        #name-swap-notification:hover {
-            border-color: #ffc947;
-            transform: scale(1.1);
-            box-shadow: 0 0 15px rgba(255, 201, 71, 0.4);
-        }
-        #name-swap-notification.visible {
-            display: flex;
-            animation: pulse-glow 2s infinite;
-        }
-        #name-swap-notification svg {
-            width: 24px;
-            height: 24px;
-            fill: #f0e6d2;
-            filter: drop-shadow(0 1px 2px rgba(0,0,0,0.7));
-        }
-        #name-swap-badge {
-            position: absolute;
-            top: 2px;
-            right: 2px;
-            width: 12px;
-            height: 12px;
-            background-color: #e53e3e;
-            border-radius: 50%;
-            border: 2px solid #0c0a09;
-        }
-        @keyframes pulse-glow {
-            0% { box-shadow: 0 0 5px rgba(255, 201, 71, 0.2); }
-            50% { box-shadow: 0 0 20px rgba(255, 201, 71, 0.6); }
-            100% { box-shadow: 0 0 5px rgba(255, 201, 71, 0.2); }
-        }
-        /* END: استایل‌های جدید برای زنگوله اعلان */
+        /* --- END: استایل‌های جدید برای پنل الماس --- */
 
         .menu-buttons { display: flex; flex-direction: column; gap: 10px; align-items: flex-end; }
         .menu-button { background: linear-gradient(145deg, rgba(80, 50, 48, 0.8), rgba(56, 33, 32, 0.9)); color: #e0dacc; border: 1px solid #c5a687; padding: 8px 15px; border-radius: 8px; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; text-align: center; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); box-shadow: 0 2px 5px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05); }
@@ -337,27 +274,17 @@
             text-shadow: 0 0 8px rgba(255, 201, 71, 0.6), 0 1px 2px rgba(0,0,0,0.8);
             animation: admin-glow 2s ease-in-out infinite alternate;
         }
-        @keyframes admin-glow { from { text-shadow: 0 0 6px rgba(255, 201, 71, 0.5), 0 1px 2px rgba(0,0,0,0.8); } to { text-shadow: 0 0 12px rgba(255, 201, 71, 0.8), 0 1px 3px rgba(0,0,0,0.9); } }
+
+        @keyframes admin-glow {
+            from {
+                text-shadow: 0 0 6px rgba(255, 201, 71, 0.5), 0 1px 2px rgba(0,0,0,0.8);
+            }
+            to {
+                text-shadow: 0 0 12px rgba(255, 201, 71, 0.8), 0 1px 3px rgba(0,0,0,0.9);
+            }
+        }
         
-        /* START: استایل‌های پنل تغییر نام با حالت‌های مختلف */
-        #change-name-status-container { display: none; /* مخفی به صورت پیشفرض */ flex-direction: column; align-items: center; gap: 20px; padding: 20px 0; }
-        .status-icon { font-size: 3rem; }
-        .status-icon.pending { color: #ffc947; animation: spin 2s linear infinite; }
-        .status-icon.rejected { color: #ef4444; }
-        #change-name-status-text { font-size: 1.1rem; font-weight: 700; line-height: 1.6; }
-        /* END: استایل‌های پنل تغییر نام */
-
-        /* START: استایل‌های مودال درخواست تعویض نام */
-        #name-swap-request-content { padding: 30px; }
-        #swap-requester-info { display: flex; flex-direction: column; align-items: center; gap: 15px; margin-bottom: 25px; }
-        #swap-requester-avatar { width: 100px; height: 100px; border-radius: 50%; border: 4px solid #a47d54; object-fit: cover; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
-        .accept-button { background: linear-gradient(145deg, #27ae60, #229954); border-color: #58d68d; }
-        .accept-button:hover { background: linear-gradient(145deg, #2ecc71, #27ae60); }
-        .reject-button { background: linear-gradient(145deg, #c0392b, #a93226); border-color: #e67e22; }
-        .reject-button:hover { background: linear-gradient(145deg, #e74c3c, #c0392b); }
-        /* END: استایل‌های مودال درخواست تعویض نام */
-
-
+        /* --- سایر پنل‌ها (کد بدون تغییر باقی می‌ماند) --- */
         #admin-panel-content .modal-button { margin-top: 10px; }
         .search-bar-container { width: 100%; margin-bottom: 20px; }
         #user-search-input, #ranking-search-input { width: 100%; padding: 12px 15px; background-color: rgba(0,0,0,0.3); border: 1px solid #5c4a3a; border-radius: 8px; color: #f0e6d2; font-family: 'Vazirmatn', sans-serif; font-size: 1rem; transition: all 0.3s ease; }
@@ -510,19 +437,16 @@
         </div>
     </div>
     <div class="main-content">
-        <!-- START: کانتینر اصلی بالا صفحه با چیدمان جدید -->
-        <div class="top-container">
-            <!-- START: پنل سمت چپ - پروفایل، الماس و اعلان -->
-            <div class="top-left-panel">
-                <div id="name-swap-notification">
-                    <div id="name-swap-badge"></div>
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.5,13.2a9.1,9.1,0,0,1-5.7-5.7,1,1,0,0,0-1.8,0,9.1,9.1,0,0,1-5.7,5.7,1,1,0,0,0,0,1.8,9.1,9.1,0,0,1,5.7,5.7,1,1,0,0,0,1.8,0,9.1,9.1,0,0,1,5.7-5.7A1,1,0,0,0,20.5,13.2ZM12.1,3.8A1,1,0,0,0,11,4.9a6.8,6.8,0,0,1-4.2,4.2,1,1,0,0,0,0,1.8,6.8,6.8,0,0,1,4.2,4.2A1,1,0,0,0,12.1,16a1,1,0,0,0,1.1-1.1,6.8,6.8,0,0,1,4.2-4.2,1,1,0,0,0,0-1.8A6.8,6.8,0,0,1,13.2,4.9,1,1,0,0,0,12.1,3.8Z"/></svg>
-                </div>
+        <div class="top-right-container">
+            <div class="profile-and-menu-wrapper">
+                <!-- START: کانتینر جدید برای قرار دادن پنل پروفایل و الماس در کنار هم -->
                 <div class="top-panel-container">
+                    <!-- START: پنل نمایش الماس -->
                     <div class="gems-section">
                         <span class="gems-icon">💎</span>
                         <span id="user-gems-count">0</span>
                     </div>
+                    <!-- END: پنل نمایش الماس -->
                     <div class="profile-section">
                         <div class="avatar-container">
                             <img id="user-avatar" src="" alt="آواتار کاربر">
@@ -530,20 +454,14 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            <!-- END: پنل سمت چپ -->
-            <!-- START: پنل سمت راست - دکمه‌های منو -->
-            <div class="top-right-panel">
-                 <div class="menu-buttons">
+                <!-- END: کانتینر جدید -->
+                <div class="menu-buttons">
                     <button class="menu-button">سازندگان</button>
                     <button id="ranking-button" class="menu-button">رده بندی</button>
                     <button id="admin-panel-button" class="menu-button" style="display: none;">پنل مدیریت</button>
                 </div>
             </div>
-            <!-- END: پنل سمت راست -->
         </div>
-        <!-- END: کانتینر اصلی بالا صفحه -->
-
         <div class="start-game-container">
             <button id="start-game-button">شروع بازی</button>
         </div>
@@ -563,54 +481,16 @@
     <div id="ban-user-modal-overlay" class="modal-overlay"> <div id="ban-user-modal-content" class="modal-content"> <h2 class="modal-title">مسدود کردن کاربر</h2> <form id="ban-user-form"> <div class="form-group"> <label for="ban-reason" class="form-label">دلیل مسدودیت:</label> <input type="text" id="ban-reason" class="form-input" required placeholder="مثال: استفاده از الفاظ نامناسب"> </div> <div class="form-group form-group-horizontal"> <label class="form-label">مدت زمان:</label> <input type="number" id="ban-duration" class="form-input" required value="1"> <select id="ban-unit" class="form-select"> <option value="hours">ساعت</option> <option value="days">روز</option> <option value="weeks">هفته</option> </select> </div> <div class="confirm-buttons-container"> <button type="button" id="ban-cancel-btn" class="modal-button cancel-button" style="width: 50%;">انصراف</button> <button type="submit" class="modal-button ban-button" style="width: 50%;">اعمال مسدودیت</button> </div> </form> </div> </div>
     <div id="ranking-modal-overlay" class="modal-overlay"> <div id="ranking-modal-content" class="modal-content"> <div class="ranking-header"> <h2 class="modal-title">رده بندی بازیکنان</h2> <span id="ranking-modal-close-btn" class="modal-close-btn">&times;</span> </div> <div class="search-bar-container admin-only-ranking-feature"> <input type="text" id="ranking-search-input" placeholder="جستجوی بازیکن در رده‌بندی..."> </div> <div id="ranking-list-container"></div> <div class="banned-users-section admin-only-ranking-feature"> <h3 class="banned-users-title">کاربران حذف شده از رده‌بندی</h3> <div id="banned-ranking-list-container"></div> </div> </div> </div>
     <div id="edit-rank-modal-overlay" class="modal-overlay"> <div id="edit-rank-modal-content" class="modal-content"> <div id="edit-rank-header"> <img id="edit-rank-avatar-preview" src="" alt="آواتار کاربر"> <h3 id="edit-rank-name-preview"></h3> </div> <h2 class="modal-title">ویرایش امتیاز</h2> <form id="edit-rank-form"> <input type="hidden" id="edit-rank-uid"> <div class="form-group"> <label for="edit-rank-diamonds" class="form-label">تعداد جدید الماس (امتیاز):</label> <input type="number" id="edit-rank-diamonds" class="form-input" required min="0"> </div> <button type="submit" id="save-rank-changes-btn" class="modal-button">ذخیره تغییرات</button> <button type="button" id="edit-rank-cancel-btn" class="modal-button cancel-button">انصراف</button> </form> </div> </div>
-    <div id="change-name-overlay" class="modal-overlay"> <div id="change-name-content" class="modal-content"> <h2 class="modal-title">تغییر نام نمایشی</h2> 
-    <!-- START: کانتینر برای فرم تغییر نام -->
-    <div id="change-name-form-container">
-        <form id="change-name-form" style="width: 100%;" novalidate>
-            <div class="form-group">
-                <label for="new-display-name-input" class="form-label" style="margin-bottom: 8px;">نام جدید:</label>
-                <input type="text" id="new-display-name-input" class="form-input" required minlength="3" maxlength="15" placeholder="نام جدید را وارد کنید...">
-            </div>
-            <div id="name-check-result" class="name-check-result-container"></div>
-            <div class="confirm-buttons-container" style="margin-top: 20px;">
-                <button type="button" id="cancel-new-name-btn" class="modal-button cancel-button" style="width: 50%;">انصراف</button>
-                <button type="submit" id="save-new-name-btn" class="modal-button" style="width: 50%;">ذخیره تغییرات</button>
-            </div>
-        </form>
-    </div>
-    <!-- END: کانتینر برای فرم تغییر نام -->
-    <!-- START: کانتینر برای نمایش وضعیت درخواست تعویض نام -->
-    <div id="change-name-status-container">
-        <div id="change-name-status-icon" class="status-icon"></div>
-        <p id="change-name-status-text"></p>
-        <button id="close-name-status-btn" class="modal-button" style="width: 50%;">بستن</button>
-    </div>
-    <!-- END: کانتینر برای نمایش وضعیت -->
-    </div> </div>
+    <div id="change-name-overlay" class="modal-overlay"> <div id="change-name-content" class="modal-content"> <h2 class="modal-title">تغییر نام نمایشی</h2> <form id="change-name-form" style="width: 100%;" novalidate> <div class="form-group"> <label for="new-display-name-input" class="form-label" style="margin-bottom: 8px;">نام جدید:</label> <input type="text" id="new-display-name-input" class="form-input" required minlength="3" maxlength="15" placeholder="نام جدید را وارد کنید..."> </div> <div id="name-check-result" class="name-check-result-container"></div> <div class="confirm-buttons-container" style="margin-top: 20px;"> <button type="button" id="cancel-new-name-btn" class="modal-button cancel-button" style="width: 50%;">انصراف</button> <button type="submit" id="save-new-name-btn" class="modal-button" style="width: 50%;">ذخیره تغییرات</button> </div> </form> </div> </div>
     <div id="settings-overlay" class="modal-overlay"> <div id="settings-content" class="modal-content"> <h2 class="modal-title">تنظیمات</h2> <div class="form-group"> <div class="range-slider-container"> <div class="range-slider-label"> <span>انیمیشن پس‌زمینه</span> <span id="animation-intensity-value">50%</span> </div> <input type="range" min="0" max="100" value="50" class="range-slider" id="animation-intensity-slider"> </div> </div> <div class="form-group"> <div class="toggle-switch-container"> <span class="toggle-label">جلوه بصری</span> <label class="toggle-switch"> <input type="checkbox" id="visual-effect-toggle"> <span class="slider"></span> </label> </div> </div> <div class="confirm-buttons-container" style="margin-top: 20px;"> <button type="button" id="cancel-settings-btn" class="modal-button cancel-button" style="width: 50%;">انصراف</button> <button type="button" id="save-settings-btn" class="modal-button" style="width: 50%;">ذخیره</button> </div> </div> </div>
     <div id="tutorial-overlay"> <div id="tutorial-highlight-box"></div> <div id="tutorial-panel"> <h3 id="tutorial-title"></h3> <p id="tutorial-text" class="typing-text"></p> <div id="tutorial-button-container"> <button id="tutorial-next-btn"></button> </div> </div> </div>
     <div id="dialogue-guide-overlay" class="modal-overlay"> <div id="dialogue-guide-wrapper"> <div id="dialogue-guide-character-container"> <img id="dialogue-guide-character-img" src="" alt="راهنما"> </div> <div id="dialogue-guide-box"> <p id="dialogue-guide-text" class="typing-text"></p> <button id="dialogue-guide-button">ادامه</button> </div> </div> </div>
-    <!-- START: مودال جدید برای نمایش درخواست تعویض نام -->
-    <div id="name-swap-request-overlay" class="modal-overlay">
-        <div id="name-swap-request-content" class="modal-content">
-            <h2 class="modal-title">درخواست تعویض نام</h2>
-            <p id="swap-request-message" class="modal-message"></p>
-            <div id="swap-requester-info">
-                <img id="swap-requester-avatar" src="" alt="آواتار درخواست‌دهنده">
-            </div>
-            <div class="confirm-buttons-container">
-                <button id="reject-swap-btn" class="modal-button reject-button" style="width: 50%;">رد کردن</button>
-                <button id="accept-swap-btn" class="modal-button accept-button" style="width: 50%;">پذیرش</button>
-            </div>
-        </div>
-    </div>
-    <!-- END: مودال جدید -->
 
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, getDoc, onSnapshot, collection, getDocs, updateDoc, query, where, serverTimestamp, writeBatch, deleteDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, onSnapshot, collection, getDocs, updateDoc, query, orderBy, limit, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
@@ -629,7 +509,9 @@
         // --- DOM Elements ---
         const userDisplayName = document.getElementById('user-display-name');
         const userAvatar = document.getElementById('user-avatar');
+        // START: المان جدید برای نمایش الماس
         const userGemsCount = document.getElementById('user-gems-count');
+        // END: المان جدید برای نمایش الماس
         const startGameButton = document.getElementById('start-game-button');
         const menuButtons = document.querySelectorAll('.menu-button');
         const loadingOverlay = document.getElementById('loading-overlay');
@@ -702,16 +584,11 @@
         const bannedRankingListContainer = document.getElementById('banned-ranking-list-container');
         const changeNameBtn = document.getElementById('change-name-btn');
         const changeNameOverlay = document.getElementById('change-name-overlay');
-        const changeNameFormContainer = document.getElementById('change-name-form-container');
         const changeNameForm = document.getElementById('change-name-form');
         const newDisplayNameInput = document.getElementById('new-display-name-input');
         const nameCheckResultContainer = document.getElementById('name-check-result');
         const saveNewNameBtn = document.getElementById('save-new-name-btn');
         const cancelNewNameBtn = document.getElementById('cancel-new-name-btn');
-        const changeNameStatusContainer = document.getElementById('change-name-status-container');
-        const changeNameStatusIcon = document.getElementById('change-name-status-icon');
-        const changeNameStatusText = document.getElementById('change-name-status-text');
-        const closeNameStatusBtn = document.getElementById('close-name-status-btn');
         const backgroundContainer = document.getElementById('background-animation-container');
         const settingsBtn = document.getElementById('settings-btn');
         const settingsOverlay = document.getElementById('settings-overlay');
@@ -741,14 +618,6 @@
         const banDurationInput = document.getElementById('ban-duration');
         const banUnitSelect = document.getElementById('ban-unit');
         const banCancelBtn = document.getElementById('ban-cancel-btn');
-        // START: المان‌های جدید برای تعویض نام
-        const nameSwapNotification = document.getElementById('name-swap-notification');
-        const nameSwapRequestOverlay = document.getElementById('name-swap-request-overlay');
-        const swapRequestMessage = document.getElementById('swap-request-message');
-        const swapRequesterAvatar = document.getElementById('swap-requester-avatar');
-        const acceptSwapBtn = document.getElementById('accept-swap-btn');
-        const rejectSwapBtn = document.getElementById('reject-swap-btn');
-        // END: المان‌های جدید
 
         // متغیرها
         const MUSIC_URL = "https://raw.githubusercontent.com/abolfazl140122/mafia/main/dark-music-249503.mp3";
@@ -766,24 +635,26 @@
         let dialogueListenerUnsubscribe = null;
         let currentActiveDialogueId = null; 
         let currentlyEditingUser = null; 
-        // START: متغیرهای جدید برای شنونده‌های تعویض نام
-        let incomingSwapListenerUnsubscribe = null;
-        let outgoingSwapListenerUnsubscribe = null;
-        let currentSwapRequest = null;
-        // END: متغیرهای جدید
 
+        // --- START: تابع جدید برای تنظیم اندازه فونت الماس ---
         function adjustGemFontSize(element) {
             const container = element.parentElement;
+            // فضای اشغال شده توسط آیکون و فاصله‌ها
             const reservedSpace = container.querySelector('.gems-icon').offsetWidth + 20; 
             const maxTextWidth = container.clientWidth - reservedSpace;
+            
+            // بازنشانی فونت به حالت اولیه برای محاسبه مجدد
             element.style.fontSize = '1.2rem';
             let currentFontSize = 1.2;
             const minFontSize = 0.6; 
+
+            // کوچک کردن فونت تا زمانی که متن در کانتینر جا شود
             while (element.scrollWidth > maxTextWidth && currentFontSize > minFontSize) {
                 currentFontSize -= 0.05;
                 element.style.fontSize = `${currentFontSize}rem`;
             }
         }
+        // --- END: تابع جدید برای تنظیم اندازه فونت الماس ---
 
         // --- توابع عمومی ---
         function showModal(modalElement) { modalElement.classList.add('visible'); }
@@ -818,10 +689,10 @@
         function initializeDialogueListener() { if (dialogueListenerUnsubscribe) dialogueListenerUnsubscribe(); const dialogueDocRef = doc(db, 'settings', 'activeDialogue'); dialogueListenerUnsubscribe = onSnapshot(dialogueDocRef, (docSnap) => { if (!auth.currentUser || !currentUserData) return; if (docSnap.exists()) { const serverDialogue = docSnap.data(); const userLastSeenId = currentUserData.lastSeenDialogueId || null; if (serverDialogue.isActive && serverDialogue.id !== userLastSeenId) { showActiveDialogue(serverDialogue); } else { hideModal(dialogueGuideOverlay); } } else { hideModal(dialogueGuideOverlay); } }, (error) => { console.error("خطا در شنونده دیالوگ:", error); }); }
         function showActiveDialogue(dialogueData) { hideAllAdminModals(); hideModal(avatarMenuOverlay); hideModal(profileModalOverlay); hideModal(gameModeModalOverlay); currentActiveDialogueId = dialogueData.id; dialogueGuideButton.classList.remove('visible'); dialogueGuideCharacterImg.src = dialogueData.imageUrl || ''; dialogueGuideButton.textContent = dialogueData.buttonText || 'ادامه'; typeWriterEffect(dialogueGuideText, dialogueData.text, () => { dialogueGuideButton.classList.add('visible'); }); showModal(dialogueGuideOverlay); }
         const TUTORIAL_COMPLETED_KEY = 'mafia-tutorial-completed'; let currentTutorialStep = -1;
-        const tutorialSteps = [ { element: '.top-left-panel', title: 'به شهر مافیا خوش آمدی!', text: 'اینجا بخش پروفایل و دارایی توست. می‌تونی آواتار، نام و تعداد الماس‌هات رو ببینی.', position: 'bottom-left' }, { element: '.top-right-panel', title: 'منوی اصلی', text: 'از این دکمه‌ها برای دیدن رده‌بندی بازیکنان، سازندگان بازی و (اگر مدیر باشی) پنل مدیریت استفاده کن.', position: 'bottom-right' }, { element: '#start-game-button', title: 'شروع ماجراجویی', text: 'و اما دکمه اصلی! با زدن این دکمه، وارد لابی می‌شی و می‌تونی بازی رو شروع کنی. آماده‌ای؟', position: 'top-center' } ];
+        const tutorialSteps = [ { element: '.top-panel-container', title: 'به شهر مافیا خوش آمدی!', text: 'اینجا بخش پروفایل و دارایی توست. می‌تونی آواتار، نام و تعداد الماس‌هات رو ببینی.', position: 'bottom-right' }, { element: '.menu-buttons', title: 'منوی اصلی', text: 'از این دکمه‌ها برای دیدن رده‌بندی بازیکنان، سازندگان بازی و (اگر مدیر باشی) پنل مدیریت استفاده کن.', position: 'bottom-right' }, { element: '#start-game-button', title: 'شروع ماجراجویی', text: 'و اما دکمه اصلی! با زدن این دکمه، وارد لابی می‌شی و می‌تونی بازی رو شروع کنی. آماده‌ای؟', position: 'top-center' } ];
         function showTutorialStep(stepIndex) { if (stepIndex >= tutorialSteps.length) { endTutorial(); return; }
             const step = tutorialSteps[stepIndex]; const targetElement = document.querySelector(step.element); if (!targetElement) { showTutorialStep(stepIndex + 1); return; }
-            tutorialPanel.classList.remove('visible'); tutorialNextBtn.classList.remove('visible'); setTimeout(() => { const targetRect = targetElement.getBoundingClientRect(); const padding = 10; tutorialHighlightBox.style.width = (targetRect.width + padding) + 'px'; tutorialHighlightBox.style.height = (targetRect.height + padding) + 'px'; tutorialHighlightBox.style.top = (targetRect.top - padding / 2) + 'px'; tutorialHighlightBox.style.left = (targetRect.left - padding / 2) + 'px'; tutorialTitle.textContent = step.title; typeWriterEffect(tutorialText, step.text, () => { tutorialNextBtn.textContent = (stepIndex === tutorialSteps.length - 1) ? 'پایان آموزش' : 'بعدی'; tutorialNextBtn.classList.add('visible'); }); const panel = tutorialPanel; panel.style.visibility = 'hidden'; panel.style.display = 'block'; const panelRect = panel.getBoundingClientRect(); panel.style.visibility = ''; panel.style.display = ''; const margin = 20, edgePadding = 10, vw = window.innerWidth, vh = window.innerHeight; let top, left; switch (step.position) { case 'top-center': top = targetRect.top - panelRect.height - margin; left = targetRect.left + targetRect.width / 2 - panelRect.width / 2; break; case 'bottom-right': top = targetRect.bottom + margin; left = targetRect.right - panelRect.width; break; case 'bottom-left': top = targetRect.bottom + margin; left = targetRect.left; break; default: top = targetRect.bottom + margin; left = targetRect.left + targetRect.width / 2 - panelRect.width / 2; break; }
+            tutorialPanel.classList.remove('visible'); tutorialNextBtn.classList.remove('visible'); setTimeout(() => { const targetRect = targetElement.getBoundingClientRect(); const padding = 10; tutorialHighlightBox.style.width = (targetRect.width + padding) + 'px'; tutorialHighlightBox.style.height = (targetRect.height + padding) + 'px'; tutorialHighlightBox.style.top = (targetRect.top - padding / 2) + 'px'; tutorialHighlightBox.style.left = (targetRect.left - padding / 2) + 'px'; tutorialTitle.textContent = step.title; typeWriterEffect(tutorialText, step.text, () => { tutorialNextBtn.textContent = (stepIndex === tutorialSteps.length - 1) ? 'پایان آموزش' : 'بعدی'; tutorialNextBtn.classList.add('visible'); }); const panel = tutorialPanel; panel.style.visibility = 'hidden'; panel.style.display = 'block'; const panelRect = panel.getBoundingClientRect(); panel.style.visibility = ''; panel.style.display = ''; const margin = 20, edgePadding = 10, vw = window.innerWidth, vh = window.innerHeight; let top, left; switch (step.position) { case 'top-center': top = targetRect.top - panelRect.height - margin; left = targetRect.left + targetRect.width / 2 - panelRect.width / 2; break; case 'bottom-right': top = targetRect.bottom + margin; left = targetRect.right - panelRect.width; break; default: top = targetRect.bottom + margin; left = targetRect.left + targetRect.width / 2 - panelRect.width / 2; break; }
             if (top + panelRect.height > vh - edgePadding) { let newTop = targetRect.top - panelRect.height - margin; top = (newTop >= edgePadding) ? newTop : (vh - panelRect.height - edgePadding); }
             if (top < edgePadding) { let newTop = targetRect.bottom + margin; top = (newTop + panelRect.height <= vh - edgePadding) ? newTop : edgePadding; }
             if (left < edgePadding) left = edgePadding; if (left + panelRect.width > vw - edgePadding) left = vw - panelRect.width - edgePadding; panel.style.top = `${top}px`; panel.style.left = `${left}px`; panel.classList.add('visible'); }, 400); currentTutorialStep = stepIndex; }
@@ -850,184 +721,10 @@
         async function handleRestoreToRanking(userData) { if (!(await verifyAdminStatus())) return; const message = `آیا می‌خواهید کاربر "<b>${userData.name}</b>" را به رده‌بندی بازگردانید؟`; showCustomConfirm(message, async () => { try { await updateDoc(doc(db, 'users', userData.uid), { isBannedFromRanking: false }); showCustomAlert("کاربر با موفقیت به رده‌بندی بازگردانده شد."); } catch (error) { console.error("خطا در بازگردانی کاربر:", error); showCustomAlert("عملیات با خطا مواجه شد."); } }); }
         function showNameCheckError(message) { nameCheckResultContainer.classList.add('error'); nameCheckResultContainer.innerHTML = `<p class="error-message">${message}</p>`; }
         function clearNameCheckResult() { nameCheckResultContainer.classList.remove('error'); nameCheckResultContainer.innerHTML = ''; }
-        
-        // START: تابع به‌روزشده برای مدیریت تغییر نام و ارسال درخواست تعویض
-        async function handleNameChange(e) {
-            e.preventDefault();
-            if (!auth.currentUser || !currentUserData) return;
-            const newName = newDisplayNameInput.value.trim();
-            clearNameCheckResult();
-            if (newName.length < 3 || newName.length > 15) { showNameCheckError("نام باید بین ۳ تا ۱۵ کاراکتر باشد."); return; }
+        async function handleNameChange(e) { e.preventDefault(); if (!auth.currentUser || !currentUserData) return; const newName = newDisplayNameInput.value.trim(); clearNameCheckResult(); if (newName.length < 3 || newName.length > 15) { showNameCheckError("نام باید بین ۳ تا ۱۵ کاراکتر باشد."); return; }
             if (newName === currentUserData.displayName) { showNameCheckError("این نام در حال حاضر نام شماست."); return; }
-            const validNameRegex = /^[a-zA-Z0-9_.\u0600-\u06FF\s]+$/;
-            if (!validNameRegex.test(newName)) { showNameCheckError("نام شامل کاراکترهای غیرمجاز است."); return; }
-            
-            saveNewNameBtn.disabled = true;
-            saveNewNameBtn.textContent = 'در حال بررسی...';
-            try {
-                const usersRef = collection(db, "users");
-                const q = query(usersRef, where("displayName", "==", newName));
-                const querySnapshot = await getDocs(q);
-
-                if (querySnapshot.empty) {
-                    saveNewNameBtn.textContent = 'در حال ذخیره...';
-                    const userDocRef = doc(db, 'users', auth.currentUser.uid);
-                    await updateDoc(userDocRef, { displayName: newName });
-                    hideModal(changeNameOverlay);
-                    showCustomAlert("نام شما با موفقیت تغییر کرد.");
-                } else {
-                    const targetUserDoc = querySnapshot.docs[0];
-                    const targetUserData = targetUserDoc.data();
-                    
-                    const message = `این نام قبلا توسط کاربر <b>${targetUserData.displayName}</b> گرفته شده است. آیا می‌خواهید یک درخواست تعویض نام برای او ارسال کنید؟`;
-                    showCustomConfirm(message, async () => {
-                        // ایجاد درخواست تعویض نام در Firestore
-                        const requestData = {
-                            requesterUid: auth.currentUser.uid,
-                            requesterDisplayName: currentUserData.displayName,
-                            requesterAvatarUrl: currentUserData.avatarUrl || DEFAULT_AVATAR,
-                            targetUid: targetUserDoc.id,
-                            targetDisplayName: targetUserData.displayName,
-                            status: 'pending',
-                            createdAt: serverTimestamp()
-                        };
-                        const requestDocRef = doc(db, 'nameSwapRequests', auth.currentUser.uid); // از UID درخواست‌دهنده به عنوان ID استفاده می‌کنیم
-                        await setDoc(requestDocRef, requestData);
-                        updateChangeNameModalUI('pending');
-                    });
-                }
-            } catch (error) {
-                console.error("خطا در تغییر نام:", error);
-                showNameCheckError("خطا در ارتباط با سرور. لطفا دوباره تلاش کنید.");
-            } finally {
-                saveNewNameBtn.disabled = false;
-                saveNewNameBtn.textContent = 'ذخیره تغییرات';
-            }
-        }
-        // END: تابع به‌روزشده
-
-        // START: توابع جدید برای مدیریت UI پنل تغییر نام
-        function updateChangeNameModalUI(status, targetName = '') {
-            if (status === 'form') {
-                changeNameFormContainer.style.display = 'block';
-                changeNameStatusContainer.style.display = 'none';
-            } else {
-                changeNameFormContainer.style.display = 'none';
-                changeNameStatusContainer.style.display = 'flex';
-                switch (status) {
-                    case 'pending':
-                        changeNameStatusIcon.className = 'status-icon pending';
-                        changeNameStatusIcon.textContent = '⏳';
-                        changeNameStatusText.textContent = `درخواست شما برای تعویض نام با "${targetName}" ارسال شد. در انتظار پاسخ...`;
-                        break;
-                    case 'rejected':
-                        changeNameStatusIcon.className = 'status-icon rejected';
-                        changeNameStatusIcon.textContent = '❌';
-                        changeNameStatusText.textContent = `متاسفانه، درخواست شما برای تعویض نام با "${targetName}" رد شد.`;
-                        break;
-                    case 'accepted':
-                        // این حالت معمولا با یک alert سراسری نمایش داده می‌شود و مودال بسته می‌شود
-                        break;
-                }
-            }
-        }
-        // END: توابع جدید
-
-        // START: توابع جدید برای مدیریت درخواست‌های تعویض نام
-        function initializeIncomingSwapListener(uid) {
-            if (incomingSwapListenerUnsubscribe) incomingSwapListenerUnsubscribe();
-            const q = query(collection(db, 'nameSwapRequests'), where('targetUid', '==', uid), where('status', '==', 'pending'));
-            incomingSwapListenerUnsubscribe = onSnapshot(q, (snapshot) => {
-                if (!snapshot.empty) {
-                    const request = snapshot.docs[0].data();
-                    request.id = snapshot.docs[0].id;
-                    currentSwapRequest = request;
-                    nameSwapNotification.classList.add('visible');
-                } else {
-                    nameSwapNotification.classList.remove('visible');
-                    currentSwapRequest = null;
-                }
-            });
-        }
-
-        function initializeOutgoingSwapListener(uid) {
-            if (outgoingSwapListenerUnsubscribe) outgoingSwapListenerUnsubscribe();
-            const requestDocRef = doc(db, 'nameSwapRequests', uid); // چون ID سند را برابر UID درخواست دهنده گذاشتیم
-            outgoingSwapListenerUnsubscribe = onSnapshot(requestDocRef, (docSnap) => {
-                if (docSnap.exists()) {
-                    const request = docSnap.data();
-                    if (changeNameOverlay.classList.contains('visible')) {
-                        updateChangeNameModalUI(request.status, request.targetDisplayName);
-                    }
-                    if (request.status === 'accepted') {
-                        hideModal(changeNameOverlay);
-                        showCustomAlert(`تبریک! نام شما با موفقیت به "${request.targetDisplayName}" تغییر یافت.`);
-                        deleteDoc(requestDocRef); // حذف درخواست پس از موفقیت
-                    } else if (request.status === 'rejected') {
-                         // UI قبلا در حالت باز بودن مودال آپدیت شده است
-                    }
-                } else {
-                    if (changeNameOverlay.classList.contains('visible')) {
-                        updateChangeNameModalUI('form');
-                    }
-                }
-            });
-        }
-
-        async function handleAcceptSwap() {
-            if (!currentSwapRequest) return;
-            const { requesterUid, requesterDisplayName, targetUid, targetDisplayName, id } = currentSwapRequest;
-            
-            acceptSwapBtn.disabled = true;
-            acceptSwapBtn.textContent = 'در حال تعویض...';
-
-            try {
-                const batch = writeBatch(db);
-                const requesterDocRef = doc(db, 'users', requesterUid);
-                const targetDocRef = doc(db, 'users', targetUid);
-                const requestDocRef = doc(db, 'nameSwapRequests', id);
-
-                // تعویض نام‌ها
-                batch.update(requesterDocRef, { displayName: targetDisplayName });
-                batch.update(targetDocRef, { displayName: requesterDisplayName });
-                
-                // آپدیت وضعیت درخواست
-                batch.update(requestDocRef, { status: 'accepted', resolvedAt: serverTimestamp() });
-
-                await batch.commit();
-
-                hideModal(nameSwapRequestOverlay);
-                showCustomAlert('تعویض نام با موفقیت انجام شد!');
-            } catch (error) {
-                console.error("خطا در پذیرش تعویض نام: ", error);
-                showCustomAlert('خطا در انجام عملیات. لطفا دوباره تلاش کنید.');
-            } finally {
-                acceptSwapBtn.disabled = false;
-                acceptSwapBtn.textContent = 'پذیرش';
-            }
-        }
-
-        async function handleRejectSwap() {
-            if (!currentSwapRequest) return;
-            const { id } = currentSwapRequest;
-
-            rejectSwapBtn.disabled = true;
-            rejectSwapBtn.textContent = 'در حال رد کردن...';
-            try {
-                const requestDocRef = doc(db, 'nameSwapRequests', id);
-                await updateDoc(requestDocRef, { status: 'rejected', resolvedAt: serverTimestamp() });
-                hideModal(nameSwapRequestOverlay);
-                showCustomAlert('درخواست با موفقیت رد شد.');
-            } catch (error) {
-                console.error("خطا در رد کردن درخواست: ", error);
-                showCustomAlert('خطا در انجام عملیات. لطفا دوباره تلاش کنید.');
-            } finally {
-                rejectSwapBtn.disabled = false;
-                rejectSwapBtn.textContent = 'رد کردن';
-            }
-        }
-        // END: توابع جدید
-
+            const validNameRegex = /^[a-zA-Z0-9_.\u0600-\u06FF\s]+$/; if (!validNameRegex.test(newName)) { showNameCheckError("نام شامل کاراکترهای غیرمجاز است."); return; }
+            saveNewNameBtn.disabled = true; saveNewNameBtn.textContent = 'در حال بررسی...'; try { const usersRef = collection(db, "users"); const q = query(usersRef, where("displayName", "==", newName)); const querySnapshot = await getDocs(q); if (querySnapshot.empty) { saveNewNameBtn.textContent = 'در حال ذخیره...'; const userDocRef = doc(db, 'users', auth.currentUser.uid); await updateDoc(userDocRef, { displayName: newName }); hideModal(changeNameOverlay); showCustomAlert("نام شما با موفقیت تغییر کرد."); } else { const existingUserData = querySnapshot.docs[0].data(); nameCheckResultContainer.classList.add('error'); nameCheckResultContainer.innerHTML = `<div class="user-exists-info"><p class="error-message" style="margin-bottom: 10px;">این نام قبلاً ثبت شده و متعلق به کاربر زیر است:</p><img src="${existingUserData.avatarUrl || DEFAULT_AVATAR}" alt="avatar"><span class="name">${existingUserData.displayName}</span></div>`; } } catch (error) { console.error("خطا در تغییر نام:", error); showNameCheckError("خطا در ارتباط با سرور. لطفا دوباره تلاش کنید."); } finally { saveNewNameBtn.disabled = false; saveNewNameBtn.textContent = 'ذخیره تغییرات'; } }
         function updateBanStatusUI() { if (!currentlyEditingUser) return; const isBanned = currentlyEditingUser.isBanned === true && currentlyEditingUser.banExpiresAt && currentlyEditingUser.banExpiresAt.toDate() > new Date(); if (isBanned) { const expiryDate = currentlyEditingUser.banExpiresAt.toDate(); const formattedDate = new Intl.DateTimeFormat('fa-IR', { dateStyle: 'long', timeStyle: 'short' }).format(expiryDate); banStatusText.textContent = `این کاربر تا ${formattedDate} مسدود است.`; banStatusText.style.display = 'block'; manageBanBtn.textContent = 'رفع مسدودیت'; manageBanBtn.classList.remove('ban-button'); manageBanBtn.classList.add('unban-button'); } else { banStatusText.style.display = 'none'; manageBanBtn.textContent = 'مسدود کردن کاربر'; manageBanBtn.classList.remove('unban-button'); manageBanBtn.classList.add('ban-button'); } }
         async function handleUnbanUser() { if (!await verifyAdminStatus() || !currentlyEditingUser) return; const message = `آیا از رفع مسدودیت کاربر "<b>${currentlyEditingUser.displayName}</b>" مطمئن هستید؟`; showCustomConfirm(message, async () => { const userDocRef = doc(db, 'users', currentlyEditingUser.uid); try { await updateDoc(userDocRef, { isBanned: false }); currentlyEditingUser.isBanned = false; updateBanStatusUI(); showCustomAlert('کاربر با موفقیت از مسدودیت خارج شد.'); } catch (error) { showCustomAlert('خطا در رفع مسدودیت. لطفاً دوباره تلاش کنید.'); console.error("Unban Error:", error); } }); }
         async function handleBanFormSubmit(e) { e.preventDefault(); if (!await verifyAdminStatus() || !currentlyEditingUser) return; const reason = banReasonInput.value.trim(); const duration = parseInt(banDurationInput.value, 10); const unit = banUnitSelect.value; if (!reason || !duration || duration <= 0) { showCustomAlert('لطفاً دلیل و مدت زمان معتبر وارد کنید.'); return; }
@@ -1044,16 +741,18 @@
                         userDisplayName.textContent = currentUserData.displayName || "کاربر ناشناس";
                         userAvatar.src = currentUserData.avatarUrl || DEFAULT_AVATAR;
                         
+                        // --- START: به‌روزرسانی تعداد الماس و تنظیم فونت ---
                         const gems = currentUserData.game || 0;
                         userGemsCount.textContent = gems.toLocaleString('fa-IR');
-                        adjustGemFontSize(userGemsCount);
+                        adjustGemFontSize(userGemsCount); // فراخوانی تابع برای تنظیم اندازه فونت
+                        // --- END: به‌روزرسانی تعداد الماس و تنظیم فونت ---
 
                         adminPanelButton.style.display = currentUserData.isAdmin === true ? 'block' : 'none';
                     } else {
                         currentUserData = { email: user.email, displayName: user.displayName };
                         userDisplayName.textContent = user.displayName || "کاربر ناشناس";
                         userAvatar.src = DEFAULT_AVATAR;
-                        userGemsCount.textContent = "0";
+                        userGemsCount.textContent = "0"; // مقدار پیش‌فرض برای کاربر جدید
                         adminPanelButton.style.display = 'none';
                     }
                     if (isInitialLoad) {
@@ -1063,8 +762,6 @@
                         isInitialLoad = false;
                         
                         initializeDialogueListener(); 
-                        initializeIncomingSwapListener(user.uid); // راه‌اندازی شنونده برای درخواست‌های ورودی
-                        initializeOutgoingSwapListener(user.uid); // راه‌اندازی شنونده برای درخواست خروجی
                     }
                 }, (error) => {
                     console.error("خطا در گوش دادن به اطلاعات کاربر:", error);
@@ -1076,7 +773,7 @@
             } else { window.location.href = './login.html'; }
         });
 
-        // Event Listeners
+        // Event Listeners (بدون تغییر)
         userAvatar.addEventListener('click', () => checkMaintenanceAndProceed(() => showModal(avatarMenuOverlay)));
         avatarMenuOverlay.addEventListener('click', (e) => { if (e.target === avatarMenuOverlay) hideModal(avatarMenuOverlay); });
         avatarMenuShopBtn.addEventListener('click', () => checkMaintenanceAndProceed(() => { window.location.href = './Avatar shop.html'; }));
@@ -1112,7 +809,7 @@
         editRankModalOverlay.addEventListener('click', (e) => { if (e.target === editRankModalOverlay) hideModal(editRankModalOverlay); });
         editRankForm.addEventListener('submit', handleSaveRankChanges);
         editRankCancelBtn.addEventListener('click', () => hideModal(editRankModalOverlay));
-        changeNameBtn.addEventListener('click', () => { hideModal(avatarMenuOverlay); if (currentUserData) { newDisplayNameInput.value = currentUserData.displayName || ''; } clearNameCheckResult(); updateChangeNameModalUI('form'); showModal(changeNameOverlay); });
+        changeNameBtn.addEventListener('click', () => { hideModal(avatarMenuOverlay); if (currentUserData) { newDisplayNameInput.value = currentUserData.displayName || ''; } clearNameCheckResult(); showModal(changeNameOverlay); });
         changeNameOverlay.addEventListener('click', (e) => { if (e.target === changeNameOverlay) hideModal(changeNameOverlay); });
         cancelNewNameBtn.addEventListener('click', () => { hideModal(changeNameOverlay); });
         changeNameForm.addEventListener('submit', handleNameChange);
@@ -1157,28 +854,83 @@
         banCancelBtn.addEventListener('click', () => { hideModal(banUserModalOverlay); showModal(editUserModalOverlay); });
         banUserModalOverlay.addEventListener('click', (e) => { if (e.target === banUserModalOverlay) { hideModal(banUserModalOverlay); showModal(editUserModalOverlay); }});
         banUserForm.addEventListener('submit', handleBanFormSubmit);
+    </script>
+</body>
+</html>lay) hideModal(userListModalOverlay); });
+        userListCloseBtn.addEventListener('click', () => { hideModal(userListModalOverlay); showModal(adminPanelOverlay); });
+        userSearchInput.addEventListener('input', filterUserList);
+        userListContainer.addEventListener('click', (e) => { const editButton = e.target.closest('.edit-user-icon'); if (editButton) { const userItem = editButton.closest('.user-list-item'); if (userItem && userItem.dataset.uid) { openEditModalForUser(userItem.dataset.uid); } } });
+        editUserModalOverlay.addEventListener('click', (e) => { if (e.target === editUserModalOverlay) hideModal(editUserModalOverlay); });
+        editUserForm.addEventListener('submit', handleSaveChanges);
+        editUserCancelBtn.addEventListener('click', () => { hideModal(editUserModalOverlay); showModal(userListModalOverlay); });
+        manageGameModesBtn.addEventListener('click', openGameModesPanel);
+        gameModesPanelOverlay.addEventListener('click', (e) => { if (e.target === gameModesPanelOverlay) hideModal(gameModesPanelOverlay); });
+        gameModesSaveBtn.addEventListener('click', handleSaveGameModes);
+        gameModesCancelBtn.addEventListener('click', () => { hideModal(gameModesPanelOverlay); showModal(adminPanelOverlay); });
+        const closeRankingModal = () => { hideModal(rankingModalOverlay); stopRankingListener(); };
+        rankingButton.addEventListener('click', () => checkMaintenanceAndProceed(() => { rankingListContainer.innerHTML = '<p style="padding: 20px; text-align: center;">در حال بارگذاری رده‌بندی...</p>'; bannedRankingListContainer.innerHTML = ''; rankingSearchInput.value = ''; showModal(rankingModalOverlay); startRankingListener(); }));
+        rankingModalOverlay.addEventListener('click', (e) => { if(e.target === rankingModalOverlay) closeRankingModal(); });
+        rankingModalCloseBtn.addEventListener('click', closeRankingModal);
+        rankingSearchInput.addEventListener('input', filterRankingList);
+        rankingListContainer.addEventListener('click', (e) => { const editBtn = e.target.closest('.edit-rank-btn'); const banBtn = e.target.closest('.ban-rank-btn'); if (editBtn) { const userData = { ...editBtn.closest('.ranking-admin-controls').dataset }; openEditRankModal(userData); } if (banBtn) { const userData = { ...banBtn.closest('.ranking-admin-controls').dataset }; handleBanFromRanking(userData); } });
+        bannedRankingListContainer.addEventListener('click', (e) => { const restoreBtn = e.target.closest('.restore-rank-btn'); if (restoreBtn) { const userData = { ...restoreBtn.dataset }; handleRestoreToRanking(userData); } });
+        editRankModalOverlay.addEventListener('click', (e) => { if (e.target === editRankModalOverlay) hideModal(editRankModalOverlay); });
+        editRankForm.addEventListener('submit', handleSaveRankChanges);
+        editRankCancelBtn.addEventListener('click', () => hideModal(editRankModalOverlay));
+        changeNameBtn.addEventListener('click', () => { hideModal(avatarMenuOverlay); if (currentUserData) { newDisplayNameInput.value = currentUserData.displayName || ''; } clearNameCheckResult(); showModal(changeNameOverlay); });
+        changeNameOverlay.addEventListener('click', (e) => { if (e.target === changeNameOverlay) hideModal(changeNameOverlay); });
+        cancelNewNameBtn.addEventListener('click', () => { hideModal(changeNameOverlay); });
+        changeNameForm.addEventListener('submit', handleNameChange);
+        settingsBtn.addEventListener('click', () => { hideModal(avatarMenuOverlay); showModal(settingsOverlay); });
+        settingsOverlay.addEventListener('click', (e) => { if (e.target === settingsOverlay) hideModal(settingsOverlay); });
+        cancelSettingsBtn.addEventListener('click', () => { hideModal(settingsOverlay); loadAndApplySettings(); });
+        saveSettingsBtn.addEventListener('click', () => {
+            const newIntensity = animationIntensitySlider.value;
+            localStorage.setItem(ANIMATION_INTENSITY_KEY, newIntensity);
+            applyAnimationSettings(newIntensity);
+            const effectEnabled = visualEffectToggle.checked;
+            localStorage.setItem(VISUAL_EFFECT_KEY, effectEnabled);
+            if(effectEnabled) startParticleEffect(); else stopParticleEffect();
+            hideModal(settingsOverlay);
+            showCustomAlert("تنظیمات با موفقیت ذخیره شد.");
+        });
+        animationIntensitySlider.addEventListener('input', (e) => {
+            const value = e.target.value;
+            animationIntensityValue.textContent = `${value}%`;
+            applyAnimationSettings(value); 
+        });
+        tutorialNextBtn.addEventListener('click', () => { showTutorialStep(currentTutorialStep + 1); });
+        dialogueGuideButton.addEventListener('click', async () => {
+            hideModal(dialogueGuideOverlay);
+            if (auth.currentUser && currentActiveDialogueId) {
+                try {
+                    const userDocRef = doc(db, 'users', auth.currentUser.uid);
+                    await updateDoc(userDocRef, { lastSeenDialogueId: currentActiveDialogueId });
+                    if (currentUserData) currentUserData.lastSeenDialogueId = currentActiveDialogueId;
+                } catch (error) { console.error("خطا در آپدیت شناسه دیالوگ کاربر:", error); }
+            }
+            if (!localStorage.getItem(TUTORIAL_COMPLETED_KEY)) { setTimeout(startTutorial, 500); }
+        });
+        dialogueGuideCharacterContainer.addEventListener('click', () => {
+            const img = dialogueGuideCharacterImg;
+            if (!img.classList.contains('jiggle-animation')) {
+                img.classList.add('jiggle-animation');
+                img.addEventListener('animationend', () => { img.classList.remove('jiggle-animation'); }, { once: true });
+            }
+        });
         
-        // START: Event listenerهای جدید برای تعویض نام
-        nameSwapNotification.addEventListener('click', () => {
-            if (currentSwapRequest) {
-                swapRequesterAvatar.src = currentSwapRequest.requesterAvatarUrl;
-                swapRequestMessage.innerHTML = `کاربر <b>${currentSwapRequest.requesterDisplayName}</b> می‌خواهد نامش را با نام شما ("<b>${currentSwapRequest.targetDisplayName}</b>") تعویض کند. آیا می‌پذیرید؟`;
-                showModal(nameSwapRequestOverlay);
+        manageBanBtn.addEventListener('click', () => {
+            const isBanned = currentlyEditingUser.isBanned === true && currentlyEditingUser.banExpiresAt && currentlyEditingUser.banExpiresAt.toDate() > new Date();
+            if (isBanned) {
+                handleUnbanUser();
+            } else {
+                hideModal(editUserModalOverlay);
+                showModal(banUserModalOverlay);
             }
         });
-        acceptSwapBtn.addEventListener('click', handleAcceptSwap);
-        rejectSwapBtn.addEventListener('click', handleRejectSwap);
-        closeNameStatusBtn.addEventListener('click', async () => {
-            // پس از دیدن نتیجه (رد شدن)، درخواست را از دیتابیس حذف می‌کنیم
-            try {
-                const requestDocRef = doc(db, 'nameSwapRequests', auth.currentUser.uid);
-                await deleteDoc(requestDocRef);
-            } catch (error) {
-                console.error("خطا در حذف درخواست: ", error);
-            }
-            hideModal(changeNameOverlay);
-        });
-        // END: Event listenerهای جدید
+        banCancelBtn.addEventListener('click', () => { hideModal(banUserModalOverlay); showModal(editUserModalOverlay); });
+        banUserModalOverlay.addEventListener('click', (e) => { if (e.target === banUserModalOverlay) { hideModal(banUserModalOverlay); showModal(editUserModalOverlay); }});
+        banUserForm.addEventListener('submit', handleBanFormSubmit);
 
     </script>
 </body>
