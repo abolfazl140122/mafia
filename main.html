@@ -176,35 +176,6 @@
         }
         /* --- END: کانتینر جدید برای پنل‌های بالا --- */
 
-        /* --- START: استایل آیکون اعلان --- */
-        .notification-icon {
-            position: relative;
-            cursor: pointer;
-            font-size: 1.8rem;
-            color: #ffc947;
-            padding: 5px;
-            animation: bell-ring 2s ease-in-out infinite;
-        }
-        .notification-dot {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            width: 10px;
-            height: 10px;
-            background-color: #ef4444;
-            border-radius: 50%;
-            border: 2px solid #0c0a09;
-        }
-        @keyframes bell-ring {
-            0%, 100% { transform: rotate(0); }
-            10% { transform: rotate(25deg); }
-            20% { transform: rotate(-20deg); }
-            30% { transform: rotate(15deg); }
-            40% { transform: rotate(-10deg); }
-            50% { transform: rotate(5deg); }
-        }
-        /* --- END: استایل آیکون اعلان --- */
-
         .profile-section { display: flex; align-items: center; background-color: rgba(0, 0, 0, 0.5); padding: 10px 15px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 3px 8px rgba(0,0,0,0.3); }
         .avatar-container { display: flex; align-items: center; gap: 12px; }
         #user-avatar { width: 50px; height: 50px; border-radius: 50%; border: 2px solid #c5a687; object-fit: cover; cursor: pointer; transition: all 0.2s ease-in-out; }
@@ -397,69 +368,13 @@
         .banned-users-title { font-size: 1.1rem; font-weight: 700; color: #c5a687; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #5c4a3a; }
         #banned-ranking-list-container { max-height: 25vh; opacity: 0.8; }
         #banned-ranking-list-container .user-list-item { background-color: rgba(80, 40, 40, 0.2); }
-        /* --- START: استایل‌های جدید برای پنل تغییر نام و درخواست تعویض --- */
-        #change-name-overlay {
-            justify-content: flex-start; /* انتقال به سمت چپ */
-            align-items: flex-start;
-            padding-top: 10vh; /* فاصله از بالا */
-            padding-left: 5vw; /* فاصله از چپ */
-        }
-        #change-name-content {
-            max-width: 420px; /* افزایش کمی عرض */
-        }
-        .name-check-result-container { width: 100%; min-height: 90px; margin-top: 5px; padding: 15px; background-color: rgba(0,0,0,0.2); border: 1px solid transparent; border-radius: 8px; text-align: center; transition: all 0.3s ease; display: flex; justify-content: center; align-items: center; flex-direction: column; }
+        .name-check-result-container { width: 100%; min-height: 90px; margin-top: 5px; padding: 15px; background-color: rgba(0,0,0,0.2); border: 1px solid transparent; border-radius: 8px; text-align: center; transition: all 0.3s ease; display: flex; justify-content: center; align-items: center; }
         .name-check-result-container.error { border-color: #ef444480; background-color: rgba(239, 68, 68, 0.1); }
         .name-check-result-container .error-message { color: #fca5a5; font-size: 0.9rem; font-weight: 700; }
         .name-check-result-container .user-exists-info { display: flex; flex-direction: column; align-items: center; gap: 12px; }
         .user-exists-info img { width: 50px; height: 50px; border-radius: 50%; border: 2px solid #a47d54; object-fit: cover; }
         .user-exists-info .name { font-size: 1.1rem; font-weight: 700; color: #ffc947; }
-        #request-swap-btn {
-            background: linear-gradient(145deg, #3b82f6, #2563eb);
-            border-color: #60a5fa;
-            padding: 8px 16px;
-            font-size: 0.9rem;
-            margin-top: 15px;
-            display: none; /* در ابتدا مخفی */
-        }
-        #request-swap-btn:hover { background: linear-gradient(145deg, #60a5fa, #3b82f6); }
-        #name-swap-requests-container {
-            width: 100%;
-            margin-top: 25px;
-            padding-top: 20px;
-            border-top: 1px solid #5c4a3a;
-        }
-        .swap-requests-title {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: #c5a687;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        .swap-request-item {
-            background-color: rgba(255, 255, 255, 0.05);
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            border-left: 4px solid;
-        }
-        .swap-request-item.incoming { border-color: #3b82f6; }
-        .swap-request-item.outgoing { border-color: #eab308; }
-        .swap-request-item.rejected { border-color: #ef4444; }
-        .swap-request-item.accepted { border-color: #22c55e; }
-        .swap-request-info { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-        .swap-request-info p { margin: 0; font-size: 0.95rem; }
-        .swap-request-info .status { font-weight: 700; }
-        .status.pending { color: #eab308; }
-        .status.accepted { color: #22c55e; }
-        .status.rejected { color: #fca5a5; }
-        .swap-request-actions { display: flex; gap: 10px; margin-top: 12px; }
-        .action-btn { flex-grow: 1; }
-        .accept-btn { background-color: #22c55e; border-color: #4ade80; }
-        .accept-btn:hover { background-color: #4ade80; }
-        .reject-btn { background-color: #ef4444; border-color: #f87171; }
-        .reject-btn:hover { background-color: #f87171; }
-        /* --- END: استایل‌های جدید --- */
-
+        
         #settings-content .form-group { margin-bottom: 20px; }
         .range-slider-container { display: flex; flex-direction: column; gap: 10px; align-items: center; }
         .range-slider-label { display: flex; justify-content: space-between; width: 100%; font-size: 1rem; font-weight: 700; color: #c5a687; }
@@ -526,12 +441,6 @@
             <div class="profile-and-menu-wrapper">
                 <!-- START: کانتینر جدید برای قرار دادن پنل پروفایل و الماس در کنار هم -->
                 <div class="top-panel-container">
-                    <!-- START: آیکون اعلان جدید -->
-                    <div id="notification-bell" class="notification-icon" style="display: none;">
-                        <span>🔔</span>
-                        <div class="notification-dot"></div>
-                    </div>
-                    <!-- END: آیکون اعلان جدید -->
                     <!-- START: پنل نمایش الماس -->
                     <div class="gems-section">
                         <span class="gems-icon">💎</span>
@@ -572,30 +481,7 @@
     <div id="ban-user-modal-overlay" class="modal-overlay"> <div id="ban-user-modal-content" class="modal-content"> <h2 class="modal-title">مسدود کردن کاربر</h2> <form id="ban-user-form"> <div class="form-group"> <label for="ban-reason" class="form-label">دلیل مسدودیت:</label> <input type="text" id="ban-reason" class="form-input" required placeholder="مثال: استفاده از الفاظ نامناسب"> </div> <div class="form-group form-group-horizontal"> <label class="form-label">مدت زمان:</label> <input type="number" id="ban-duration" class="form-input" required value="1"> <select id="ban-unit" class="form-select"> <option value="hours">ساعت</option> <option value="days">روز</option> <option value="weeks">هفته</option> </select> </div> <div class="confirm-buttons-container"> <button type="button" id="ban-cancel-btn" class="modal-button cancel-button" style="width: 50%;">انصراف</button> <button type="submit" class="modal-button ban-button" style="width: 50%;">اعمال مسدودیت</button> </div> </form> </div> </div>
     <div id="ranking-modal-overlay" class="modal-overlay"> <div id="ranking-modal-content" class="modal-content"> <div class="ranking-header"> <h2 class="modal-title">رده بندی بازیکنان</h2> <span id="ranking-modal-close-btn" class="modal-close-btn">&times;</span> </div> <div class="search-bar-container admin-only-ranking-feature"> <input type="text" id="ranking-search-input" placeholder="جستجوی بازیکن در رده‌بندی..."> </div> <div id="ranking-list-container"></div> <div class="banned-users-section admin-only-ranking-feature"> <h3 class="banned-users-title">کاربران حذف شده از رده‌بندی</h3> <div id="banned-ranking-list-container"></div> </div> </div> </div>
     <div id="edit-rank-modal-overlay" class="modal-overlay"> <div id="edit-rank-modal-content" class="modal-content"> <div id="edit-rank-header"> <img id="edit-rank-avatar-preview" src="" alt="آواتار کاربر"> <h3 id="edit-rank-name-preview"></h3> </div> <h2 class="modal-title">ویرایش امتیاز</h2> <form id="edit-rank-form"> <input type="hidden" id="edit-rank-uid"> <div class="form-group"> <label for="edit-rank-diamonds" class="form-label">تعداد جدید الماس (امتیاز):</label> <input type="number" id="edit-rank-diamonds" class="form-input" required min="0"> </div> <button type="submit" id="save-rank-changes-btn" class="modal-button">ذخیره تغییرات</button> <button type="button" id="edit-rank-cancel-btn" class="modal-button cancel-button">انصراف</button> </form> </div> </div>
-    <div id="change-name-overlay" class="modal-overlay">
-        <div id="change-name-content" class="modal-content">
-            <h2 class="modal-title">تغییر و تعویض نام</h2>
-            <form id="change-name-form" style="width: 100%;" novalidate>
-                <div class="form-group">
-                    <label for="new-display-name-input" class="form-label" style="margin-bottom: 8px;">نام جدید:</label>
-                    <input type="text" id="new-display-name-input" class="form-input" required minlength="3" maxlength="15" placeholder="نام جدید را وارد کنید...">
-                </div>
-                <div id="name-check-result" class="name-check-result-container"></div>
-                <div class="confirm-buttons-container" style="margin-top: 20px;">
-                    <button type="button" id="cancel-new-name-btn" class="modal-button cancel-button" style="width: 50%;">بستن</button>
-                    <button type="submit" id="save-new-name-btn" class="modal-button" style="width: 50%;">بررسی و ذخیره</button>
-                </div>
-            </form>
-            <!-- START: بخش جدید برای نمایش درخواست‌های تعویض -->
-            <div id="name-swap-requests-container">
-                <h3 class="swap-requests-title">درخواست‌های تعویض نام</h3>
-                <div id="name-swap-requests-list">
-                    <!-- آیتم‌های درخواست در اینجا با جاوااسکریپت اضافه می‌شوند -->
-                </div>
-            </div>
-            <!-- END: بخش جدید -->
-        </div>
-    </div>
+    <div id="change-name-overlay" class="modal-overlay"> <div id="change-name-content" class="modal-content"> <h2 class="modal-title">تغییر نام نمایشی</h2> <form id="change-name-form" style="width: 100%;" novalidate> <div class="form-group"> <label for="new-display-name-input" class="form-label" style="margin-bottom: 8px;">نام جدید:</label> <input type="text" id="new-display-name-input" class="form-input" required minlength="3" maxlength="15" placeholder="نام جدید را وارد کنید..."> </div> <div id="name-check-result" class="name-check-result-container"></div> <div class="confirm-buttons-container" style="margin-top: 20px;"> <button type="button" id="cancel-new-name-btn" class="modal-button cancel-button" style="width: 50%;">انصراف</button> <button type="submit" id="save-new-name-btn" class="modal-button" style="width: 50%;">ذخیره تغییرات</button> </div> </form> </div> </div>
     <div id="settings-overlay" class="modal-overlay"> <div id="settings-content" class="modal-content"> <h2 class="modal-title">تنظیمات</h2> <div class="form-group"> <div class="range-slider-container"> <div class="range-slider-label"> <span>انیمیشن پس‌زمینه</span> <span id="animation-intensity-value">50%</span> </div> <input type="range" min="0" max="100" value="50" class="range-slider" id="animation-intensity-slider"> </div> </div> <div class="form-group"> <div class="toggle-switch-container"> <span class="toggle-label">جلوه بصری</span> <label class="toggle-switch"> <input type="checkbox" id="visual-effect-toggle"> <span class="slider"></span> </label> </div> </div> <div class="confirm-buttons-container" style="margin-top: 20px;"> <button type="button" id="cancel-settings-btn" class="modal-button cancel-button" style="width: 50%;">انصراف</button> <button type="button" id="save-settings-btn" class="modal-button" style="width: 50%;">ذخیره</button> </div> </div> </div>
     <div id="tutorial-overlay"> <div id="tutorial-highlight-box"></div> <div id="tutorial-panel"> <h3 id="tutorial-title"></h3> <p id="tutorial-text" class="typing-text"></p> <div id="tutorial-button-container"> <button id="tutorial-next-btn"></button> </div> </div> </div>
     <div id="dialogue-guide-overlay" class="modal-overlay"> <div id="dialogue-guide-wrapper"> <div id="dialogue-guide-character-container"> <img id="dialogue-guide-character-img" src="" alt="راهنما"> </div> <div id="dialogue-guide-box"> <p id="dialogue-guide-text" class="typing-text"></p> <button id="dialogue-guide-button">ادامه</button> </div> </div> </div>
@@ -604,7 +490,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, getDoc, onSnapshot, collection, getDocs, updateDoc, query, orderBy, limit, where, serverTimestamp, addDoc, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, onSnapshot, collection, getDocs, updateDoc, query, orderBy, limit, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
@@ -749,13 +635,6 @@
         let dialogueListenerUnsubscribe = null;
         let currentActiveDialogueId = null; 
         let currentlyEditingUser = null; 
-        let nameSwapListenerUnsubscribe = null; // Unsubscriber برای شنونده تعویض نام
-        let existingUserForSwap = null; // برای نگهداری اطلاعات کاربری که نامش درخواست می‌شود
-
-        // --- DOM Elements for Name Swap ---
-        const nameSwapRequestsContainer = document.getElementById('name-swap-requests-container');
-        const nameSwapRequestsList = document.getElementById('name-swap-requests-list');
-        const notificationBell = document.getElementById('notification-bell');
 
         // --- START: تابع جدید برای تنظیم اندازه فونت الماس ---
         function adjustGemFontSize(element) {
@@ -842,299 +721,14 @@
         async function handleRestoreToRanking(userData) { if (!(await verifyAdminStatus())) return; const message = `آیا می‌خواهید کاربر "<b>${userData.name}</b>" را به رده‌بندی بازگردانید؟`; showCustomConfirm(message, async () => { try { await updateDoc(doc(db, 'users', userData.uid), { isBannedFromRanking: false }); showCustomAlert("کاربر با موفقیت به رده‌بندی بازگردانده شد."); } catch (error) { console.error("خطا در بازگردانی کاربر:", error); showCustomAlert("عملیات با خطا مواجه شد."); } }); }
         function showNameCheckError(message) { nameCheckResultContainer.classList.add('error'); nameCheckResultContainer.innerHTML = `<p class="error-message">${message}</p>`; }
         function clearNameCheckResult() { nameCheckResultContainer.classList.remove('error'); nameCheckResultContainer.innerHTML = ''; }
-        async function handleNameChange(e) {
-            e.preventDefault();
-            if (!auth.currentUser || !currentUserData) return;
-            const newName = newDisplayNameInput.value.trim();
-            clearNameCheckResult();
-            existingUserForSwap = null; // Reset user swap info
-
-            if (newName.length < 3 || newName.length > 15) {
-                showNameCheckError("نام باید بین ۳ تا ۱۵ کاراکتر باشد.");
-                return;
-            }
-            if (newName === currentUserData.displayName) {
-                showNameCheckError("این نام در حال حاضر نام شماست.");
-                return;
-            }
-            const validNameRegex = /^[a-zA-Z0-9_.\u0600-\u06FF\s]+$/;
-            if (!validNameRegex.test(newName)) {
-                showNameCheckError("نام شامل کاراکترهای غیرمجاز است.");
-                return;
-            }
-
-            saveNewNameBtn.disabled = true;
-            saveNewNameBtn.textContent = 'در حال بررسی...';
-
-            try {
-                const usersRef = collection(db, "users");
-                const q = query(usersRef, where("displayName", "==", newName));
-                const querySnapshot = await getDocs(q);
-
-                if (querySnapshot.empty) {
-                    saveNewNameBtn.textContent = 'در حال ذخیره...';
-                    const userDocRef = doc(db, 'users', auth.currentUser.uid);
-                    await updateDoc(userDocRef, { displayName: newName });
-                    hideModal(changeNameOverlay);
-                    showCustomAlert("نام شما با موفقیت تغییر کرد.");
-                } else {
-                    const existingUserDoc = querySnapshot.docs[0];
-                    const existingUserData = existingUserDoc.data();
-                    existingUserForSwap = { id: existingUserDoc.id, ...existingUserData }; // Save target user info
-
-                    nameCheckResultContainer.classList.add('error');
-                    nameCheckResultContainer.innerHTML = `
-                        <div class="user-exists-info">
-                            <p class="error-message" style="margin-bottom: 10px;">این نام متعلق به کاربر زیر است:</p>
-                            <img src="${existingUserData.avatarUrl || DEFAULT_AVATAR}" alt="avatar">
-                            <span class="name">${existingUserData.displayName}</span>
-                            <button id="request-swap-btn" class="modal-button">درخواست تعویض نام</button>
-                        </div>`;
-
-                    const requestSwapBtn = document.getElementById('request-swap-btn');
-                    requestSwapBtn.style.display = 'block';
-                    requestSwapBtn.addEventListener('click', handleRequestSwap);
-                }
-            } catch (error) {
-                console.error("خطا در تغییر نام:", error);
-                showNameCheckError("خطا در ارتباط با سرور. لطفا دوباره تلاش کنید.");
-            } finally {
-                saveNewNameBtn.disabled = false;
-                saveNewNameBtn.textContent = 'بررسی و ذخیره';
-            }
-        }
-
-        async function handleRequestSwap() {
-            if (!auth.currentUser || !currentUserData || !existingUserForSwap) {
-                showCustomAlert("اطلاعات لازم برای ارسال درخواست موجود نیست.");
-                return;
-            }
-
-            const requesterId = auth.currentUser.uid;
-            const targetId = existingUserForSwap.id;
-
-            if (requesterId === targetId) {
-                showCustomAlert("شما نمی‌توانید به خودتان درخواست تعویض نام بدهید.");
-                return;
-            }
-
-            const requestSwapBtn = document.getElementById('request-swap-btn');
-            requestSwapBtn.disabled = true;
-            requestSwapBtn.textContent = 'در حال ارسال...';
-
-            try {
-                // Check for existing pending/accepted requests between these users
-                const requestsRef = collection(db, "nameSwapRequests");
-                const q = query(requestsRef,
-                    where('requesterId', '==', requesterId),
-                    where('targetId', '==', targetId),
-                    where('status', 'in', ['pending', 'accepted'])
-                );
-                const existingRequests = await getDocs(q);
-
-                if (!existingRequests.empty) {
-                    showCustomAlert("شما قبلاً یک درخواست فعال برای این کاربر ارسال کرده‌اید.");
-                    requestSwapBtn.textContent = 'درخواست ارسال شد';
-                    return;
-                }
-
-                await addDoc(requestsRef, {
-                    requesterId: requesterId,
-                    requesterName: currentUserData.displayName,
-                    requesterAvatar: currentUserData.avatarUrl || DEFAULT_AVATAR,
-                    targetId: targetId,
-                    targetName: existingUserForSwap.displayName,
-                    status: 'pending',
-                    createdAt: serverTimestamp(),
-                    updatedAt: serverTimestamp()
-                });
-
-                showCustomAlert("درخواست شما با موفقیت ارسال شد. منتظر پاسخ کاربر بمانید.");
-                requestSwapBtn.textContent = 'درخواست ارسال شد';
-
-            } catch (error) {
-                console.error("خطا در ارسال درخواست تعویض نام:", error);
-                showCustomAlert("خطا در ارسال درخواست. لطفاً دوباره تلاش کنید.");
-                requestSwapBtn.disabled = false;
-                requestSwapBtn.textContent = 'درخواست تعویض نام';
-            }
-        }
-
+        async function handleNameChange(e) { e.preventDefault(); if (!auth.currentUser || !currentUserData) return; const newName = newDisplayNameInput.value.trim(); clearNameCheckResult(); if (newName.length < 3 || newName.length > 15) { showNameCheckError("نام باید بین ۳ تا ۱۵ کاراکتر باشد."); return; }
+            if (newName === currentUserData.displayName) { showNameCheckError("این نام در حال حاضر نام شماست."); return; }
+            const validNameRegex = /^[a-zA-Z0-9_.\u0600-\u06FF\s]+$/; if (!validNameRegex.test(newName)) { showNameCheckError("نام شامل کاراکترهای غیرمجاز است."); return; }
+            saveNewNameBtn.disabled = true; saveNewNameBtn.textContent = 'در حال بررسی...'; try { const usersRef = collection(db, "users"); const q = query(usersRef, where("displayName", "==", newName)); const querySnapshot = await getDocs(q); if (querySnapshot.empty) { saveNewNameBtn.textContent = 'در حال ذخیره...'; const userDocRef = doc(db, 'users', auth.currentUser.uid); await updateDoc(userDocRef, { displayName: newName }); hideModal(changeNameOverlay); showCustomAlert("نام شما با موفقیت تغییر کرد."); } else { const existingUserData = querySnapshot.docs[0].data(); nameCheckResultContainer.classList.add('error'); nameCheckResultContainer.innerHTML = `<div class="user-exists-info"><p class="error-message" style="margin-bottom: 10px;">این نام قبلاً ثبت شده و متعلق به کاربر زیر است:</p><img src="${existingUserData.avatarUrl || DEFAULT_AVATAR}" alt="avatar"><span class="name">${existingUserData.displayName}</span></div>`; } } catch (error) { console.error("خطا در تغییر نام:", error); showNameCheckError("خطا در ارتباط با سرور. لطفا دوباره تلاش کنید."); } finally { saveNewNameBtn.disabled = false; saveNewNameBtn.textContent = 'ذخیره تغییرات'; } }
         function updateBanStatusUI() { if (!currentlyEditingUser) return; const isBanned = currentlyEditingUser.isBanned === true && currentlyEditingUser.banExpiresAt && currentlyEditingUser.banExpiresAt.toDate() > new Date(); if (isBanned) { const expiryDate = currentlyEditingUser.banExpiresAt.toDate(); const formattedDate = new Intl.DateTimeFormat('fa-IR', { dateStyle: 'long', timeStyle: 'short' }).format(expiryDate); banStatusText.textContent = `این کاربر تا ${formattedDate} مسدود است.`; banStatusText.style.display = 'block'; manageBanBtn.textContent = 'رفع مسدودیت'; manageBanBtn.classList.remove('ban-button'); manageBanBtn.classList.add('unban-button'); } else { banStatusText.style.display = 'none'; manageBanBtn.textContent = 'مسدود کردن کاربر'; manageBanBtn.classList.remove('unban-button'); manageBanBtn.classList.add('ban-button'); } }
         async function handleUnbanUser() { if (!await verifyAdminStatus() || !currentlyEditingUser) return; const message = `آیا از رفع مسدودیت کاربر "<b>${currentlyEditingUser.displayName}</b>" مطمئن هستید؟`; showCustomConfirm(message, async () => { const userDocRef = doc(db, 'users', currentlyEditingUser.uid); try { await updateDoc(userDocRef, { isBanned: false }); currentlyEditingUser.isBanned = false; updateBanStatusUI(); showCustomAlert('کاربر با موفقیت از مسدودیت خارج شد.'); } catch (error) { showCustomAlert('خطا در رفع مسدودیت. لطفاً دوباره تلاش کنید.'); console.error("Unban Error:", error); } }); }
         async function handleBanFormSubmit(e) { e.preventDefault(); if (!await verifyAdminStatus() || !currentlyEditingUser) return; const reason = banReasonInput.value.trim(); const duration = parseInt(banDurationInput.value, 10); const unit = banUnitSelect.value; if (!reason || !duration || duration <= 0) { showCustomAlert('لطفاً دلیل و مدت زمان معتبر وارد کنید.'); return; }
             const now = new Date(); let expiryDate = new Date(now); if (unit === 'hours') expiryDate.setHours(now.getHours() + duration); else if (unit === 'days') expiryDate.setDate(now.getDate() + duration); else if (unit === 'weeks') expiryDate.setDate(now.getDate() + (duration * 7)); const banData = { isBanned: true, banReason: reason, banExpiresAt: expiryDate }; const userDocRef = doc(db, 'users', currentlyEditingUser.uid); try { await updateDoc(userDocRef, banData); currentlyEditingUser.isBanned = true; currentlyEditingUser.banExpiresAt = { toDate: () => expiryDate }; hideModal(banUserModalOverlay); updateBanStatusUI(); showCustomAlert('کاربر با موفقیت مسدود شد.'); } catch (error) { showCustomAlert('خطا در اعمال مسدودیت. لطفاً دوباره تلاش کنید.'); console.error("Ban Error:", error); } }
-
-        function initializeNameSwapListener() {
-            if (nameSwapListenerUnsubscribe) nameSwapListenerUnsubscribe();
-            if (!auth.currentUser) return;
-
-            const userId = auth.currentUser.uid;
-            const requestsRef = collection(db, "nameSwapRequests");
-
-            const q = query(requestsRef,
-                where('status', '==', 'pending'),
-                where('targetId', '==', userId)
-            );
-
-            nameSwapListenerUnsubscribe = onSnapshot(q, (snapshot) => {
-                const hasPendingRequests = !snapshot.empty;
-                notificationBell.style.display = hasPendingRequests ? 'block' : 'none';
-                renderSwapRequests(); // Re-render the list when pending requests change
-            }, (error) => {
-                console.error("Error listening to name swap requests:", error);
-            });
-        }
-
-        async function renderSwapRequests() {
-            if (!auth.currentUser) return;
-            const userId = auth.currentUser.uid;
-            nameSwapRequestsList.innerHTML = '<p>در حال بارگذاری درخواست‌ها...</p>';
-
-            try {
-                const requestsRef = collection(db, "nameSwapRequests");
-                const outgoingQuery = query(requestsRef, where('requesterId', '==', userId));
-                const incomingQuery = query(requestsRef, where('targetId', '==', userId));
-
-                const [outgoingSnapshot, incomingSnapshot] = await Promise.all([
-                    getDocs(outgoingQuery),
-                    getDocs(incomingQuery)
-                ]);
-
-                let allRequests = [];
-                outgoingSnapshot.forEach(doc => allRequests.push({ id: doc.id, type: 'outgoing', ...doc.data() }));
-                incomingSnapshot.forEach(doc => allRequests.push({ id: doc.id, type: 'incoming', ...doc.data() }));
-
-                // Sort by creation date
-                allRequests.sort((a, b) => (b.createdAt?.toDate() || 0) - (a.createdAt?.toDate() || 0));
-
-                // Filter out old, non-pending requests
-                const twoDaysAgo = new Date();
-                twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
-                allRequests = allRequests.filter(req => {
-                    if (req.status !== 'pending') {
-                        const updatedAt = req.updatedAt?.toDate();
-                        return updatedAt ? updatedAt > twoDaysAgo : true;
-                    }
-                    return true;
-                });
-
-
-                nameSwapRequestsList.innerHTML = '';
-                if (allRequests.length === 0) {
-                    nameSwapRequestsList.innerHTML = '<p style="text-align: center; color: #999;">هیچ درخواستی برای نمایش وجود ندارد.</p>';
-                    return;
-                }
-
-                allRequests.forEach(req => {
-                    const item = document.createElement('div');
-                    item.classList.add('swap-request-item', req.type, req.status);
-
-                    let statusText = 'نامشخص';
-                    switch(req.status) {
-                        case 'pending': statusText = 'در انتظار'; break;
-                        case 'accepted': statusText = 'پذیرفته شد'; break;
-                        case 'rejected': statusText = 'رد شد'; break;
-                    }
-
-                    let infoHtml = '';
-                    if (req.type === 'incoming') {
-                        infoHtml = `
-                            <div class="swap-request-info">
-                                <p>درخواست از: <b>${req.requesterName}</b></p>
-                                <span class="status ${req.status}">${statusText}</span>
-                            </div>
-                            ${req.status === 'pending' ? `
-                            <div class="swap-request-actions">
-                                <button class="modal-button action-btn reject-btn" data-id="${req.id}">رد کردن</button>
-                                <button class="modal-button action-btn accept-btn" data-id="${req.id}">پذیرفتن</button>
-                            </div>` : ''}
-                        `;
-                    } else { // outgoing
-                        infoHtml = `
-                            <div class="swap-request-info">
-                                <p>درخواست به: <b>${req.targetName}</b></p>
-                                <span class="status ${req.status}">${statusText}</span>
-                            </div>
-                        `;
-                    }
-                    item.innerHTML = infoHtml;
-                    nameSwapRequestsList.appendChild(item);
-                });
-
-            } catch (error) {
-                console.error("Error rendering swap requests:", error);
-                nameSwapRequestsList.innerHTML = '<p>خطا در بارگذاری درخواست‌ها.</p>';
-            }
-        }
-
-        async function handleSwapAction(requestId, action) {
-            const actionBtn = document.querySelector(`.action-btn[data-id="${requestId}"]`);
-            if(actionBtn) actionBtn.closest('.swap-request-actions').innerHTML = `<p>در حال پردازش...</p>`;
-
-            const requestDocRef = doc(db, 'nameSwapRequests', requestId);
-
-            try {
-                const requestSnap = await getDoc(requestDocRef);
-                if (!requestSnap.exists() || requestSnap.data().status !== 'pending') {
-                    showCustomAlert("این درخواست دیگر معتبر نیست یا قبلاً به آن پاسخ داده شده است.");
-                    renderSwapRequests();
-                    return;
-                }
-
-                if (action === 'reject') {
-                    await updateDoc(requestDocRef, {
-                        status: 'rejected',
-                        updatedAt: serverTimestamp()
-                    });
-                    showCustomAlert("درخواست با موفقیت رد شد.");
-                } else if (action === 'accept') {
-                    const reqData = requestSnap.data();
-                    const requesterRef = doc(db, 'users', reqData.requesterId);
-                    const targetRef = doc(db, 'users', reqData.targetId);
-
-                    // Use a transaction to ensure atomicity
-                    await runTransaction(db, async (transaction) => {
-                        const requesterSnap = await transaction.get(requesterRef);
-                        const targetSnap = await transaction.get(targetRef);
-
-                        if (!requesterSnap.exists() || !targetSnap.exists()) {
-                            throw "UserNotFound";
-                        }
-
-                        const requesterName = requesterSnap.data().displayName;
-                        const targetName = targetSnap.data().displayName;
-
-                        // Check if names have changed since request was made
-                        if(requesterName !== reqData.requesterName || targetName !== reqData.targetName) {
-                            transaction.update(requestDocRef, { status: 'rejected', updatedAt: serverTimestamp() });
-                            throw "NamesChanged";
-                        }
-
-                        // Swap the names
-                        transaction.update(requesterRef, { displayName: targetName });
-                        transaction.update(targetRef, { displayName: requesterName });
-
-                        // Mark request as accepted
-                        transaction.update(requestDocRef, { status: 'accepted', updatedAt: serverTimestamp() });
-                    });
-
-                    showCustomAlert("عملیات تعویض نام با موفقیت انجام شد!");
-                }
-                renderSwapRequests();
-
-            } catch (error) {
-                if (error === "NamesChanged") {
-                     showCustomAlert("تعویض نام انجام نشد. یکی از کاربران نام خود را تغییر داده است. درخواست رد شد.");
-                } else if (error === "UserNotFound") {
-                    showCustomAlert("یکی از کاربران یافت نشد. امکان تعویض وجود ندارد.");
-                } else {
-                    console.error("Error handling swap action:", error);
-                    showCustomAlert("خطایی در پردازش درخواست رخ داد.");
-                }
-                renderSwapRequests();
-            }
-        }
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
@@ -1167,8 +761,7 @@
                         loadAndApplySettings();
                         isInitialLoad = false;
                         
-                        initializeDialogueListener();
-                        initializeNameSwapListener(); // فعال کردن شنونده تعویض نام
+                        initializeDialogueListener(); 
                     }
                 }, (error) => {
                     console.error("خطا در گوش دادن به اطلاعات کاربر:", error);
@@ -1216,25 +809,7 @@
         editRankModalOverlay.addEventListener('click', (e) => { if (e.target === editRankModalOverlay) hideModal(editRankModalOverlay); });
         editRankForm.addEventListener('submit', handleSaveRankChanges);
         editRankCancelBtn.addEventListener('click', () => hideModal(editRankModalOverlay));
-        changeNameBtn.addEventListener('click', () => {
-            hideModal(avatarMenuOverlay);
-            if (currentUserData) {
-                newDisplayNameInput.value = currentUserData.displayName || '';
-            }
-            clearNameCheckResult();
-            renderSwapRequests(); // Load requests when panel is opened
-            showModal(changeNameOverlay);
-        });
-
-        notificationBell.addEventListener('click', () => {
-            if (currentUserData) {
-                newDisplayNameInput.value = currentUserData.displayName || '';
-            }
-            clearNameCheckResult();
-            renderSwapRequests();
-            showModal(changeNameOverlay);
-        });
-
+        changeNameBtn.addEventListener('click', () => { hideModal(avatarMenuOverlay); if (currentUserData) { newDisplayNameInput.value = currentUserData.displayName || ''; } clearNameCheckResult(); showModal(changeNameOverlay); });
         changeNameOverlay.addEventListener('click', (e) => { if (e.target === changeNameOverlay) hideModal(changeNameOverlay); });
         cancelNewNameBtn.addEventListener('click', () => { hideModal(changeNameOverlay); });
         changeNameForm.addEventListener('submit', handleNameChange);
@@ -1279,18 +854,84 @@
         banCancelBtn.addEventListener('click', () => { hideModal(banUserModalOverlay); showModal(editUserModalOverlay); });
         banUserModalOverlay.addEventListener('click', (e) => { if (e.target === banUserModalOverlay) { hideModal(banUserModalOverlay); showModal(editUserModalOverlay); }});
         banUserForm.addEventListener('submit', handleBanFormSubmit);
-
-        nameSwapRequestsList.addEventListener('click', (e) => {
-            const target = e.target;
-            const requestId = target.dataset.id;
-            if (!requestId) return;
-
-            if (target.classList.contains('accept-btn')) {
-                handleSwapAction(requestId, 'accept');
-            } else if (target.classList.contains('reject-btn')) {
-                handleSwapAction(requestId, 'reject');
+    </script>
+</body>
+</html>lay) hideModal(userListModalOverlay); });
+        userListCloseBtn.addEventListener('click', () => { hideModal(userListModalOverlay); showModal(adminPanelOverlay); });
+        userSearchInput.addEventListener('input', filterUserList);
+        userListContainer.addEventListener('click', (e) => { const editButton = e.target.closest('.edit-user-icon'); if (editButton) { const userItem = editButton.closest('.user-list-item'); if (userItem && userItem.dataset.uid) { openEditModalForUser(userItem.dataset.uid); } } });
+        editUserModalOverlay.addEventListener('click', (e) => { if (e.target === editUserModalOverlay) hideModal(editUserModalOverlay); });
+        editUserForm.addEventListener('submit', handleSaveChanges);
+        editUserCancelBtn.addEventListener('click', () => { hideModal(editUserModalOverlay); showModal(userListModalOverlay); });
+        manageGameModesBtn.addEventListener('click', openGameModesPanel);
+        gameModesPanelOverlay.addEventListener('click', (e) => { if (e.target === gameModesPanelOverlay) hideModal(gameModesPanelOverlay); });
+        gameModesSaveBtn.addEventListener('click', handleSaveGameModes);
+        gameModesCancelBtn.addEventListener('click', () => { hideModal(gameModesPanelOverlay); showModal(adminPanelOverlay); });
+        const closeRankingModal = () => { hideModal(rankingModalOverlay); stopRankingListener(); };
+        rankingButton.addEventListener('click', () => checkMaintenanceAndProceed(() => { rankingListContainer.innerHTML = '<p style="padding: 20px; text-align: center;">در حال بارگذاری رده‌بندی...</p>'; bannedRankingListContainer.innerHTML = ''; rankingSearchInput.value = ''; showModal(rankingModalOverlay); startRankingListener(); }));
+        rankingModalOverlay.addEventListener('click', (e) => { if(e.target === rankingModalOverlay) closeRankingModal(); });
+        rankingModalCloseBtn.addEventListener('click', closeRankingModal);
+        rankingSearchInput.addEventListener('input', filterRankingList);
+        rankingListContainer.addEventListener('click', (e) => { const editBtn = e.target.closest('.edit-rank-btn'); const banBtn = e.target.closest('.ban-rank-btn'); if (editBtn) { const userData = { ...editBtn.closest('.ranking-admin-controls').dataset }; openEditRankModal(userData); } if (banBtn) { const userData = { ...banBtn.closest('.ranking-admin-controls').dataset }; handleBanFromRanking(userData); } });
+        bannedRankingListContainer.addEventListener('click', (e) => { const restoreBtn = e.target.closest('.restore-rank-btn'); if (restoreBtn) { const userData = { ...restoreBtn.dataset }; handleRestoreToRanking(userData); } });
+        editRankModalOverlay.addEventListener('click', (e) => { if (e.target === editRankModalOverlay) hideModal(editRankModalOverlay); });
+        editRankForm.addEventListener('submit', handleSaveRankChanges);
+        editRankCancelBtn.addEventListener('click', () => hideModal(editRankModalOverlay));
+        changeNameBtn.addEventListener('click', () => { hideModal(avatarMenuOverlay); if (currentUserData) { newDisplayNameInput.value = currentUserData.displayName || ''; } clearNameCheckResult(); showModal(changeNameOverlay); });
+        changeNameOverlay.addEventListener('click', (e) => { if (e.target === changeNameOverlay) hideModal(changeNameOverlay); });
+        cancelNewNameBtn.addEventListener('click', () => { hideModal(changeNameOverlay); });
+        changeNameForm.addEventListener('submit', handleNameChange);
+        settingsBtn.addEventListener('click', () => { hideModal(avatarMenuOverlay); showModal(settingsOverlay); });
+        settingsOverlay.addEventListener('click', (e) => { if (e.target === settingsOverlay) hideModal(settingsOverlay); });
+        cancelSettingsBtn.addEventListener('click', () => { hideModal(settingsOverlay); loadAndApplySettings(); });
+        saveSettingsBtn.addEventListener('click', () => {
+            const newIntensity = animationIntensitySlider.value;
+            localStorage.setItem(ANIMATION_INTENSITY_KEY, newIntensity);
+            applyAnimationSettings(newIntensity);
+            const effectEnabled = visualEffectToggle.checked;
+            localStorage.setItem(VISUAL_EFFECT_KEY, effectEnabled);
+            if(effectEnabled) startParticleEffect(); else stopParticleEffect();
+            hideModal(settingsOverlay);
+            showCustomAlert("تنظیمات با موفقیت ذخیره شد.");
+        });
+        animationIntensitySlider.addEventListener('input', (e) => {
+            const value = e.target.value;
+            animationIntensityValue.textContent = `${value}%`;
+            applyAnimationSettings(value); 
+        });
+        tutorialNextBtn.addEventListener('click', () => { showTutorialStep(currentTutorialStep + 1); });
+        dialogueGuideButton.addEventListener('click', async () => {
+            hideModal(dialogueGuideOverlay);
+            if (auth.currentUser && currentActiveDialogueId) {
+                try {
+                    const userDocRef = doc(db, 'users', auth.currentUser.uid);
+                    await updateDoc(userDocRef, { lastSeenDialogueId: currentActiveDialogueId });
+                    if (currentUserData) currentUserData.lastSeenDialogueId = currentActiveDialogueId;
+                } catch (error) { console.error("خطا در آپدیت شناسه دیالوگ کاربر:", error); }
+            }
+            if (!localStorage.getItem(TUTORIAL_COMPLETED_KEY)) { setTimeout(startTutorial, 500); }
+        });
+        dialogueGuideCharacterContainer.addEventListener('click', () => {
+            const img = dialogueGuideCharacterImg;
+            if (!img.classList.contains('jiggle-animation')) {
+                img.classList.add('jiggle-animation');
+                img.addEventListener('animationend', () => { img.classList.remove('jiggle-animation'); }, { once: true });
             }
         });
+        
+        manageBanBtn.addEventListener('click', () => {
+            const isBanned = currentlyEditingUser.isBanned === true && currentlyEditingUser.banExpiresAt && currentlyEditingUser.banExpiresAt.toDate() > new Date();
+            if (isBanned) {
+                handleUnbanUser();
+            } else {
+                hideModal(editUserModalOverlay);
+                showModal(banUserModalOverlay);
+            }
+        });
+        banCancelBtn.addEventListener('click', () => { hideModal(banUserModalOverlay); showModal(editUserModalOverlay); });
+        banUserModalOverlay.addEventListener('click', (e) => { if (e.target === banUserModalOverlay) { hideModal(banUserModalOverlay); showModal(editUserModalOverlay); }});
+        banUserForm.addEventListener('submit', handleBanFormSubmit);
+
     </script>
 </body>
 </html>
