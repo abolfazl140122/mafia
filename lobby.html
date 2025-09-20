@@ -176,23 +176,23 @@
             border: 1px solid var(--primary-gold);
             pointer-events: none;
         }
-        
-        /* === تغییر ۱: استایل جدید برای نمایش نام بازیکن زیر آواتار === */
+
+        /* === تغییر ۱: استایل‌دهی نام بازیکن برای نمایش زیر آواتار === */
         .player-name {
             position: absolute;
-            bottom: 5px; /* قرارگیری در پایین جایگاه */
+            bottom: 8px; /* موقعیت در پایین جایگاه */
             left: 0;
-            width: 100%;
+            right: 0;
             text-align: center;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             font-weight: 700;
             color: var(--text-light);
-            padding: 0 5px;
-            white-space: nowrap;      /* جلوگیری از شکستن خط */
-            overflow: hidden;         /* مخفی کردن متن اضافه */
-            text-overflow: ellipsis;  /* نمایش ... برای نام‌های طولانی */
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
-            pointer-events: none; /* برای اینکه کلیک روی نام، کلیک روی جایگاه محسوب شود */
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.9);
+            padding: 0 5px; /* جلوگیری از چسبیدن متن به لبه‌ها */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis; /* نمایش ... برای نام‌های طولانی */
+            pointer-events: none; /* برای اینکه روی کلیک جایگاه اختلال ایجاد نکند */
         }
         
         .host-crown { 
@@ -228,17 +228,16 @@
         @keyframes pulse-new-message { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
         #toggle-chat-btn svg { width: 24px; height: 24px; fill: currentColor; }
 
-        /* === تغییر ۲: استایل جدید پنل چت برای جلوگیری از همپوشانی === */
+        /* === تغییر ۲: استایل پنل چت برای قرارگیری در مرکز بدون همپوشانی === */
         #chat-panel { 
             position: fixed; 
             top: 50%; 
             left: 50%; 
-            /* عرض پنل برابر با عرض صفحه منهای فضای دو ستون بازیکنان (هر کدام 100px + 10px حاشیه) */
-            width: calc(100% - 220px);
-            max-width: 600px; /* حداکثر عرض برای نمایشگرهای بزرگ */
-            min-width: 280px; /* حداقل عرض برای نمایشگرهای کوچک */
-            height: 80%;
-            max-height: 550px;
+            width: calc(100% - 220px); /* عرض پنل برابر با عرض صفحه منهای جایگاه بازیکنان و کمی فاصله */
+            min-width: 280px; /* حداقل عرض برای جلوگیری از به هم ریختگی در صفحات خیلی باریک */
+            max-width: 700px; /* حداکثر عرض برای خوانایی بهتر در صفحات بزرگ */
+            height: 80%; 
+            max-height: 650px; 
             background-color: rgba(26, 20, 14, 0.95); 
             backdrop-filter: blur(10px); 
             border: 1px solid var(--border-color); 
@@ -408,7 +407,7 @@
         let targetUserForAction = null;
         let currentLobbyData = null;
 
-        // === تغییر ۳: به‌روزرسانی تابع رندر برای افزودن نام بازیکن ===
+        // === تغییر ۳: تابع رندر برای نمایش نام بازیکنان و فعال کردن کلیک ===
         function renderLobby(data) {
             lobbyNameEl.textContent = data.lobbyName;
             const allPlayers = data.players || [];
@@ -432,7 +431,7 @@
                     
                     const hostCrown = player.uid === data.creatorId ? `<div class="host-crown">👑</div>` : '';
                     
-                    // افزودن div.player-name به HTML
+                    // افزودن نام بازیکن به HTML جایگاه
                     slot.innerHTML = `
                         ${hostCrown}
                         <img src="${player.avatarUrl || 'https://up.20script.ir/file/1d50-defult.png'}" alt="avatar" class="player-avatar" onerror="this.src='https://up.20script.ir/file/1d50-defult.png';">
@@ -485,6 +484,7 @@
             document.getElementById('player-action-title').textContent = player.displayName;
             const buttonsContainer = document.getElementById('player-action-buttons');
             buttonsContainer.innerHTML = '';
+
             const profileBtn = document.createElement('button');
             profileBtn.className = 'modal-button primary';
             profileBtn.textContent = 'مشاهده پروفایل';
@@ -493,6 +493,7 @@
                 showPlayerProfile(player.uid);
             };
             buttonsContainer.appendChild(profileBtn);
+
             if (player.uid !== currentUser.uid) {
                 if (isHost || isCurrentUserAdmin) {
                     const kickBtn = document.createElement('button');
@@ -515,6 +516,7 @@
                     buttonsContainer.appendChild(banBtn);
                 }
             }
+
             modal.onclick = (e) => { if (e.target === modal) modal.classList.remove('visible'); };
             modal.classList.add('visible');
         }
