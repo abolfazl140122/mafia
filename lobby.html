@@ -37,7 +37,6 @@
             display: flex; 
             flex-direction: column; 
             position: relative; 
-            /* === تغییر ۱: اصلاح آدرس پس‌زمینه با نسخه کدگذاری شده (URL-Encoded) === */
             background-image: url('https://up.20script.ir/file/fe08-InShot-%DB%B2%DB%B0%DB%B2%DB%B5%DB%B0%DB%B9%DB%B1%DB%B1-%DB%B1%DB%B2%DB%B2%DB%B5%DB%B2%DB%B0%DB%B7%DB%B6%DB%B0.jpg');
             background-size: cover;
             background-position: center center;
@@ -147,7 +146,7 @@
             opacity: 0.5;
             cursor: default;
         }
-        .player-slot.empty .player-avatar, .player-slot.empty .player-number { display: none; }
+        .player-slot.empty .player-avatar, .player-slot.empty .player-number, .player-slot.empty .player-name { display: none; }
 
         .player-avatar {
             position: absolute;
@@ -177,7 +176,23 @@
             border: 1px solid var(--primary-gold);
             pointer-events: none;
         }
-        .player-name { display: none; }
+        
+        /* === تغییر ۱: استایل نمایش نام بازیکن در زیر آواتار === */
+        .player-name {
+            position: absolute;
+            bottom: 5px; /* موقعیت در پایین جایگاه */
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 0.8rem; /* فونت کمی کوچکتر برای جا شدن */
+            font-weight: 700;
+            color: var(--text-light);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+            padding: 0 5px; /* فاصله از لبه‌ها */
+            line-height: 1.2; /* فاصله خطوط برای نام‌های دو خطی */
+            overflow-wrap: break-word; /* جلوگیری از بیرون زدن نام‌های طولانی */
+            pointer-events: none; /* برای اینکه کلیک روی نام، به جایگاه منتقل شود */
+        }
         
         .host-crown { 
             position: absolute; 
@@ -370,7 +385,7 @@
         let targetUserForAction = null;
         let currentLobbyData = null;
 
-        // === تغییر ۲ بخش اول: تغییر در تابع رندر برای فعال کردن کلیک روی همه جایگاه‌ها ===
+        // === تغییر ۲: افزودن نام بازیکن به HTML جایگاه در تابع رندر ===
         function renderLobby(data) {
             lobbyNameEl.textContent = data.lobbyName;
             const allPlayers = data.players || [];
@@ -389,16 +404,17 @@
                 
                 if (player) {
                     slot.dataset.uid = player.uid;
-                    // حالا روی همه جایگاه‌های پر، چه خودی چه دیگران، می‌توان کلیک کرد
                     slot.onclick = () => showPlayerActionModal(player);
                     if (player.isReady) slot.classList.add('ready');
                     
                     const hostCrown = player.uid === data.creatorId ? `<div class="host-crown">👑</div>` : '';
                     
+                    // افزودن div برای نام بازیکن به innerHTML
                     slot.innerHTML = `
                         ${hostCrown}
                         <img src="${player.avatarUrl || 'https://up.20script.ir/file/1d50-defult.png'}" alt="avatar" class="player-avatar" onerror="this.src='https://up.20script.ir/file/1d50-defult.png';">
                         <div class="player-number">${i + 1}</div>
+                        <div class="player-name">${player.displayName}</div>
                     `;
                 } else {
                     slot.classList.add('empty');
@@ -440,7 +456,6 @@
         function updateAdminUI(allPlayers = []) { const adminJoinBtn = document.getElementById('admin-join-btn'); const self = allPlayers.find(p => p.uid === currentUser.uid); const isSpectating = self && self.isSpectator; if (isCurrentUserAdmin && isSpectating) { adminJoinBtn.style.display = 'block'; } else { adminJoinBtn.style.display = 'none'; } clearChatBtn.style.display = (isHost || isCurrentUserAdmin) ? 'block' : 'none'; }
         function handleAdminJoinGame() { showConfirmModal('پیوستن به بازی', 'آیا می‌خواهید به عنوان بازیکن به لابی ملحق شوید؟', async () => { const lobbyDocRef = doc(db, "Lobbys_list", lobbyId); try { await runTransaction(db, async (transaction) => { const lobbyDoc = await transaction.get(lobbyDocRef); if (!lobbyDoc.exists()) throw new Error("لابی دیگر وجود ندارد."); let players = lobbyDoc.data().players || []; const visiblePlayerCount = players.filter(p => !p.isSpectator).length; if (visiblePlayerCount >= MAX_PLAYERS) throw new Error("لابی پر است و نمی‌توانید ملحق شوید."); const playerIndex = players.findIndex(p => p.uid === currentUser.uid); if (playerIndex > -1) { players[playerIndex].isSpectator = false; transaction.update(lobbyDocRef, { players: players }); } else throw new Error("اطلاعات شما در لابی یافت نشد."); }); } catch (error) { showNotificationModal("خطا", error.message); } }); }
         
-        // === تغییر ۲ بخش دوم: تغییر در تابع مودال برای مدیریت کلیک روی خود ===
         async function showPlayerActionModal(player) {
             targetUserForAction = player;
             const modal = document.getElementById('player-action-modal');
@@ -448,7 +463,6 @@
             const buttonsContainer = document.getElementById('player-action-buttons');
             buttonsContainer.innerHTML = '';
 
-            // دکمه مشاهده پروفایل همیشه نمایش داده می‌شود
             const profileBtn = document.createElement('button');
             profileBtn.className = 'modal-button primary';
             profileBtn.textContent = 'مشاهده پروفایل';
@@ -458,7 +472,6 @@
             };
             buttonsContainer.appendChild(profileBtn);
 
-            // دکمه‌های ادمین/هاست فقط زمانی نمایش داده می‌شوند که روی کاربر دیگری کلیک شده باشد
             if (player.uid !== currentUser.uid) {
                 if (isHost || isCurrentUserAdmin) {
                     const kickBtn = document.createElement('button');
