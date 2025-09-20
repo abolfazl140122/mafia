@@ -37,8 +37,8 @@
             display: flex; 
             flex-direction: column; 
             position: relative; 
-            /* استفاده از بک‌گراند اصلی بازی */
-            background-image: url('https://cdn.imgurl.ir/uploads/t044055_IMG_20250913_222727_529.jpg');
+            /* === تغییر ۱: استفاده از بک‌گراند جدید درخواست شده === */
+            background-image: url('https://up.20script.ir/file/fe08-InShot-۲۰۲۵۰۹۱۱-۱۲۲۵۲۰۷۶۰.jpg');
             background-size: cover;
             background-position: center center;
         }
@@ -115,7 +115,7 @@
             width: 100px;
         }
         
-        /* کانتینر تابلوی وسط */
+        /* کانتینر مرکزی (که قبلا تابلو در آن بود) */
         #central-board-container {
             flex-grow: 1;
             display: flex;
@@ -123,12 +123,6 @@
             align-items: center;
             height: 100%;
             padding: 0 5px;
-        }
-        #central-board-container img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            filter: drop-shadow(0 5px 20px rgba(0,0,0,0.6));
         }
 
         /* === استایل جدید برای جایگاه بازیکن === */
@@ -219,9 +213,37 @@
         @keyframes pulse-new-message { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
         #toggle-chat-btn svg { width: 24px; height: 24px; fill: currentColor; }
 
-        /* === بقیه استایل‌ها (چت، مودال‌ها و...) بدون تغییر باقی می‌مانند === */
-        #chat-panel { position: fixed; bottom: 20px; left: 20px; width: 90%; max-width: 350px; height: 50%; max-height: 400px; background-color: rgba(26, 20, 14, 0.9); backdrop-filter: blur(8px); border: 1px solid var(--border-color); border-radius: 16px; display: flex; flex-direction: column; z-index: 999; box-shadow: 0 8px 30px rgba(0,0,0,0.6); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease; transform: translateY(110%); opacity: 0; }
-        #chat-panel.visible { transform: translateY(0); opacity: 1; }
+        /* === تغییر ۳: استایل جدید پنل چت برای نمایش در مرکز === */
+        #chat-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 90%;
+            max-width: 550px; /* کمی بزرگتر برای نمایش بهتر در مرکز */
+            height: 70%;
+            max-height: 500px;
+            background-color: rgba(26, 20, 14, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            z-index: 999;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+            
+            /* انیمیشن ظاهر و پنهان شدن */
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.9);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+            pointer-events: none; /* غیرفعال کردن کلیک در حالت مخفی */
+        }
+        #chat-panel.visible {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+            pointer-events: auto; /* فعال کردن کلیک در حالت نمایش */
+        }
+
+        /* بقیه استایل‌های چت بدون تغییر */
         .chat-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
         .chat-header h3 { font-size: 1.1rem; color: var(--primary-gold); font-weight: 700; }
         .chat-header-buttons { display: flex; align-items: center; gap: 10px; }
@@ -248,6 +270,8 @@
         #chat-input:focus { outline: none; border-color: var(--primary-gold); }
         #chat-send-btn { background-color: var(--primary-gold); border: none; border-radius: 8px; color: var(--darker-red); font-weight: 900; padding: 0 15px; cursor: pointer; transition: background-color 0.2s ease; }
         #chat-send-btn:hover { background-color: #ffd46d; }
+
+        /* === بقیه استایل‌ها (مودال‌ها و...) بدون تغییر باقی می‌مانند === */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.85); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s 0.3s; }
         .modal-overlay.visible { opacity: 1; visibility: visible; transition: opacity 0.3s ease; }
         .modal-content { background: linear-gradient(145deg, #3c3022, var(--bg-dark)); border: 2px solid var(--border-color); border-radius: 16px; padding: 25px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
@@ -308,9 +332,8 @@
             <!-- ستون بازیکنان سمت راست (چون dir=rtl است) -->
             <div id="right-players" class="players-column"></div>
 
-            <!-- تابلوی مرکزی -->
+            <!-- === تغییر ۲: تابلوی مرکزی حذف شد و این کانتینر خالی است === -->
             <div id="central-board-container">
-                <img src="https://cdn.imgurl.ir/uploads/b104094_IMG_20250913_222722_598.jpg" alt="تابلوی تصویب‌ها">
             </div>
 
             <!-- ستون بازیکنان سمت چپ -->
@@ -325,7 +348,7 @@
         </footer>
     </div>
     
-    <!-- تمام مودال‌ها و پنل چت بدون تغییر باقی می‌مانند -->
+    <!-- پنل چت و تمام مودال‌ها در اینجا قرار دارند -->
     <div id="chat-panel"> <div class="chat-header"> <h3>چت لابی</h3> <div class="chat-header-buttons"> <button id="clear-chat-btn" title="پاک کردن کل چت">🗑️</button> <button id="close-chat-btn" title="بستن چت">&times;</button> </div> </div> <div id="chat-messages"></div> <form id="chat-form"> <input type="text" id="chat-input" placeholder="پیام خود را بنویسید..." autocomplete="off"> <button type="submit" id="chat-send-btn">ارسال</button> </form> </div>
     <div id="confirm-modal" class="modal-overlay"> <div class="modal-content"> <h2 id="confirm-modal-title" class="modal-title"></h2> <p id="confirm-modal-message" class="modal-message"></p> <div class="modal-buttons" style="flex-direction: row;"> <button id="confirm-modal-yes-btn" class="modal-button primary" style="width: 50%;">بله</button> <button id="confirm-modal-no-btn" class="modal-button secondary" style="width: 50%;">خیر</button> </div> </div> </div>
     <div id="notification-modal" class="modal-overlay"> <div class="modal-content"> <h2 id="notification-modal-title" class="modal-title">توجه</h2> <p id="notification-modal-message" class="modal-message"></p> <div class="modal-buttons"> <button id="notification-modal-ok-btn" class="modal-button primary">متوجه شدم</button> </div> </div> </div>
@@ -339,7 +362,8 @@
     <audio id="sound-new-message" src="https://assets.mixkit.co/sfx/preview/mixkit-message-pop-alert-2354.mp3" preload="auto"></audio>
     
     <script type="module">
-        // تمام کدهای جاوا اسکریپت بدون تغییر باقی می‌مانند، به جز تابع renderLobby
+        // تمام کدهای جاوا اسکریپت بدون هیچ تغییری کار می‌کنند
+        // زیرا فقط ظاهر (CSS) و ساختار (HTML) تغییر کرده است و منطق برنامه ثابت مانده
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getFirestore, doc, onSnapshot, runTransaction, getDoc, collection, addDoc, writeBatch, deleteDoc, getDocs, serverTimestamp, orderBy, query, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -383,7 +407,6 @@
         let targetUserForAction = null;
         let currentLobbyData = null;
 
-        // *** تابع renderLobby اصلاح شده است ***
         function renderLobby(data) {
             lobbyNameEl.textContent = data.lobbyName;
             const allPlayers = data.players || [];
@@ -396,7 +419,7 @@
             const playersPerColumn = MAX_PLAYERS / 2;
 
             for (let i = 0; i < MAX_PLAYERS; i++) {
-                const player = visiblePlayers.find(p => visiblePlayers.indexOf(p) === i); // پیدا کردن بازیکن بر اساس ایندکس در لیست قابل مشاهده
+                const player = visiblePlayers.find(p => visiblePlayers.indexOf(p) === i);
                 const slot = document.createElement('div');
                 slot.className = 'player-slot';
                 
@@ -408,7 +431,6 @@
                     
                     const hostCrown = player.uid === data.creatorId ? `<div class="host-crown">👑</div>` : '';
                     
-                    // ساختار HTML جدید برای جایگاه بازیکن
                     slot.innerHTML = `
                         ${hostCrown}
                         <img src="${player.avatarUrl || 'https://up.20script.ir/file/1d50-defult.png'}" alt="avatar" class="player-avatar" onerror="this.src='https://up.20script.ir/file/1d50-defult.png';">
@@ -418,9 +440,7 @@
                     slot.classList.add('empty');
                 }
 
-                // تقسیم جایگاه‌ها بین دو ستون
                 if (i < playersPerColumn) {
-                    // در حالت rtl، این ستون سمت راست است
                     rightPlayersEl.appendChild(slot);
                 } else {
                     leftPlayersEl.appendChild(slot);
@@ -447,8 +467,6 @@
             }
             updateAdminUI(allPlayers);
         }
-
-        // *** بقیه توابع جاوا اسکریپت بدون تغییر باقی می‌مانند ***
         
         async function main() { lobbyId = new URLSearchParams(window.location.search).get('id'); if (!lobbyId) { showNotificationModal("خطا", "شناسه لابی نامعتبر است.", () => window.location.href = './Lobby page.html'); return; } onAuthStateChanged(auth, async (user) => { if (user) { currentUser = user; const userDocRef = doc(db, 'users', user.uid); const userDocSnap = await getDoc(userDocRef); if (userDocSnap.exists()) { currentUserData = userDocSnap.data(); isCurrentUserAdmin = currentUserData.isAdmin === true; } else { currentUserData = { displayName: user.displayName, avatarUrl: user.photoURL }; } listenToSelfChanges(); await joinLobby(); listenToLobbyChanges(); listenToChatMessages(); setupEventListeners(); } else { window.location.href = './login.html'; } }); }
         async function joinLobby() { const lobbyDocRef = doc(db, "Lobbys_list", lobbyId); try { await runTransaction(db, async (transaction) => { const lobbyDoc = await transaction.get(lobbyDocRef); if (!lobbyDoc.exists()) throw new Error("لابی یافت نشد!"); let players = lobbyDoc.data().players || []; const playerExists = players.some(p => p.uid === currentUser.uid); if (!playerExists) { if (players.length >= MAX_PLAYERS) throw new Error("لابی پر است!"); const newPlayer = { uid: currentUser.uid, displayName: currentUserData.displayName || "بازیکن", avatarUrl: currentUserData.avatarUrl || "https://up.20script.ir/file/1d50-defult.png", isReady: false, isSpectator: isCurrentUserAdmin }; players.push(newPlayer); transaction.update(lobbyDocRef, { players: players, playerCount: players.length }); } }); } catch (error) { showNotificationModal("خطا در ورود", `خطا: ${error.message}`, () => window.location.href = './Lobby page.html'); } }
