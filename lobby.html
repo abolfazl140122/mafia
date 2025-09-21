@@ -216,9 +216,7 @@
         <header class="lobby-header">
             <div class="header-buttons-wrapper">
                 <button id="leave-lobby-btn" class="leave-button">خروج</button>
-                <!-- START: Bot additions - دکمه افزودن ربات -->
                 <button id="add-bot-btn" class="add-bot-button">افزودن ربات</button>
-                <!-- END: Bot additions -->
                 <button id="admin-join-btn" class="admin-join-button">پیوستن</button>
             </div>
             <h1 id="lobby-name">نام لابی...</h1>
@@ -259,6 +257,7 @@
 
         // --- Config & Elements ---
         const MAX_PLAYERS = 12;
+        // const MIN_PLAYERS_TO_START = 2; // دیگر استفاده نمی‌شود
         const firebaseConfig = { apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg", authDomain: "mafia-9fcbf.firebaseapp.com", projectId: "mafia-9fcbf", storageBucket: "mafia-9fcbf.appspot.com", messagingSenderId: "471627157488", appId: "1:471627157488:web:92f008548a5596619a5735", };
         
         const app = initializeApp(firebaseConfig);
@@ -347,12 +346,13 @@
             if (self && !self.isSpectator) {
                 actionBtn.style.display = 'block';
                 if (isHost) {
-                    // *** CHANGE START: Modified start game condition ***
-                    const canStart = visiblePlayers.length === MAX_PLAYERS && visiblePlayers.every(p => p.uid === currentUser.uid || p.isReady);
+                    // *** START CHANGE: شرط جدید برای شروع بازی ***
+                    const isLobbyFull = visiblePlayers.length === MAX_PLAYERS;
+                    const allOthersReady = visiblePlayers.every(p => p.uid === currentUser.uid || p.isReady);
                     actionBtn.textContent = 'شروع بازی';
                     actionBtn.className = 'action-button start-btn';
-                    actionBtn.disabled = !canStart;
-                    // *** CHANGE END ***
+                    actionBtn.disabled = !(isLobbyFull && allOthersReady);
+                    // *** END CHANGE ***
                 } else {
                     actionBtn.textContent = isReady ? 'لغو آمادگی' : 'آماده';
                     actionBtn.className = `action-button ${isReady ? 'unready-btn' : 'ready-btn'}`;
@@ -367,56 +367,55 @@
         async function main() { lobbyId = new URLSearchParams(window.location.search).get('id'); if (!lobbyId) { showNotificationModal("خطا", "شناسه لابی نامعتبر است.", () => window.location.href = './Lobby page.html'); return; } onAuthStateChanged(auth, async (user) => { if (user) { currentUser = user; const userDocRef = doc(db, 'users', user.uid); const userDocSnap = await getDoc(userDocRef); if (userDocSnap.exists()) { currentUserData = userDocSnap.data(); isCurrentUserAdmin = currentUserData.isAdmin === true; } else { currentUserData = { displayName: user.displayName, avatarUrl: user.photoURL }; } listenToSelfChanges(); await joinLobby(); listenToLobbyChanges(); listenToChatMessages(); setupEventListeners(); } else { window.location.href = './login.html'; } }); }
         async function joinLobby() { const lobbyDocRef = doc(db, "Lobbys_list", lobbyId); try { await runTransaction(db, async (transaction) => { const lobbyDoc = await transaction.get(lobbyDocRef); if (!lobbyDoc.exists()) throw new Error("لابی یافت نشد!"); let players = lobbyDoc.data().players || []; const playerExists = players.some(p => p.uid === currentUser.uid); if (!playerExists) { if (players.length >= MAX_PLAYERS) throw new Error("لابی پر است!"); const newPlayer = { uid: currentUser.uid, displayName: currentUserData.displayName || "بازیکن", avatarUrl: currentUserData.avatarUrl || "https://up.20script.ir/file/1d50-defult.png", isReady: false, isSpectator: isCurrentUserAdmin }; players.push(newPlayer); transaction.update(lobbyDocRef, { players: players, playerCount: players.length }); } }); } catch (error) { showNotificationModal("خطا در ورود", `خطا: ${error.message}`, () => window.location.href = './Lobby page.html'); } }
         
-        function listenToLobbyChanges() { 
-            const lobbyDocRef = doc(db, "Lobbys_list", lobbyId); 
-            unsubscribeLobby = onSnapshot(lobbyDocRef, (docSnap) => { 
-                if (!isCurrentUserInLobby) return; 
-                if (!docSnap.exists()) { 
-                    if (unsubscribeLobby) unsubscribeLobby(); 
-                    showNotificationModal("لابی حذف شد", "این لابی توسط سازنده حذف شده است.", () => window.location.href = './Lobby page.html'); 
-                    return; 
-                } 
-                currentLobbyData = docSnap.data(); 
+        function listenToLobbyChanges() {
+            const lobbyDocRef = doc(db, "Lobbys_list", lobbyId);
+            unsubscribeLobby = onSnapshot(lobbyDocRef, (docSnap) => {
+                if (!isCurrentUserInLobby) return;
 
-                // *** CHANGE START: Redirect to game if gameId is set ***
-                if (currentLobbyData.gameId) {
+                // *** START CHANGE: منطق انتقال به صفحه بازی ***
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if (data.gameStarted && data.gameId) {
+                        if (unsubscribeLobby) unsubscribeLobby();
+                        if (unsubscribeChat) unsubscribeChat();
+                        if (unsubscribeSelf) unsubscribeSelf();
+                        window.removeEventListener('beforeunload', handleLeaveLobbyOnExit);
+                        window.location.href = `./gamescreen.html?id=${data.gameId}`;
+                        return; // از ادامه اجرای تابع جلوگیری می‌کند
+                    }
+                }
+                // *** END CHANGE ***
+
+                if (!docSnap.exists()) {
                     if (unsubscribeLobby) unsubscribeLobby();
-                    if (unsubscribeChat) unsubscribeChat();
-                    if (unsubscribeSelf) unsubscribeSelf();
-                    window.removeEventListener('beforeunload', handleLeaveLobbyOnExit);
-                    loadingOverlay.style.display = 'flex';
-                    loadingOverlay.style.opacity = '1';
-                    document.getElementById('loading-text').textContent = 'در حال ورود به بازی...';
-                    window.location.href = `./gamescreen.html?id=${currentLobbyData.gameId}`;
+                    showNotificationModal("لابی حذف شد", "این لابی توسط سازنده حذف شده است.", () => window.location.href = './Lobby page.html');
                     return;
                 }
-                // *** CHANGE END ***
-
-                const players = currentLobbyData.players || []; 
-                const wasInLobby = isCurrentUserInLobby; 
-                isCurrentUserInLobby = players.some(p => p.uid === currentUser.uid); 
-                if (wasInLobby && !isCurrentUserInLobby) { 
-                    cleanUpAndLeave("شما توسط سازنده لابی اخراج شدید.", './Lobby page.html'); 
-                    return; 
-                } 
-                const visiblePlayerCount = players.filter(p => !p.isSpectator).length; 
-                if(visiblePlayerCount > lastPlayerCount) playSound('sound-player-join'); 
-                else if(visiblePlayerCount < lastPlayerCount) playSound('sound-player-leave'); 
-                lastPlayerCount = visiblePlayerCount; 
-                renderLobby(currentLobbyData); 
-                if (loadingOverlay.style.display !== 'none') { 
-                    loadingOverlay.style.opacity = '0'; 
-                    setTimeout(() => { 
-                        loadingOverlay.style.display = 'none'; 
-                        lobbyContainer.style.display = 'flex'; 
-                    }, 500); 
-                } 
-            }, (error) => { 
-                console.error("Firestore listen error:", error); 
-                showNotificationModal("خطای ارتباط", "ارتباط با لابی قطع شد.", () => window.location.reload()); 
-            }); 
+                currentLobbyData = docSnap.data();
+                const players = currentLobbyData.players || [];
+                const wasInLobby = isCurrentUserInLobby;
+                isCurrentUserInLobby = players.some(p => p.uid === currentUser.uid);
+                if (wasInLobby && !isCurrentUserInLobby) {
+                    cleanUpAndLeave("شما توسط سازنده لابی اخراج شدید.", './Lobby page.html');
+                    return;
+                }
+                const visiblePlayerCount = players.filter(p => !p.isSpectator).length;
+                if (visiblePlayerCount > lastPlayerCount) playSound('sound-player-join');
+                else if (visiblePlayerCount < lastPlayerCount) playSound('sound-player-leave');
+                lastPlayerCount = visiblePlayerCount;
+                renderLobby(currentLobbyData);
+                if (loadingOverlay.style.display !== 'none') {
+                    loadingOverlay.style.opacity = '0';
+                    setTimeout(() => {
+                        loadingOverlay.style.display = 'none';
+                        lobbyContainer.style.display = 'flex';
+                    }, 500);
+                }
+            }, (error) => {
+                console.error("Firestore listen error:", error);
+                showNotificationModal("خطای ارتباط", "ارتباط با لابی قطع شد.", () => window.location.reload());
+            });
         }
-
         function listenToSelfChanges() { if (unsubscribeSelf) unsubscribeSelf(); const selfDocRef = doc(db, 'users', currentUser.uid); unsubscribeSelf = onSnapshot(selfDocRef, (docSnap) => { if (docSnap.exists()) { const latestSelfData = docSnap.data(); if (latestSelfData.isBanned && latestSelfData.banExpiresAt && latestSelfData.banExpiresAt.toDate() > new Date()) { cleanUpAndLeave("حساب کاربری شما مسدود شد!", './index.html'); return; } const newAdminStatus = latestSelfData.isAdmin === true; if (newAdminStatus !== isCurrentUserAdmin) { isCurrentUserAdmin = newAdminStatus; if (currentLobbyData) updateAdminUI(currentLobbyData.players || []); } } }); }
         function playSound(soundId) { try { document.getElementById(soundId).play(); } catch(e) { console.warn("Sound play failed", e); } }
         function updateAdminUI(allPlayers = []) { const adminJoinBtn = document.getElementById('admin-join-btn'); const self = allPlayers.find(p => p.uid === currentUser.uid); const isSpectating = self && self.isSpectator; if (isCurrentUserAdmin && isSpectating) { adminJoinBtn.style.display = 'block'; } else { adminJoinBtn.style.display = 'none'; } clearChatBtn.style.display = (isHost || isCurrentUserAdmin) ? 'block' : 'none'; }
@@ -502,24 +501,13 @@
                 await runTransaction(db, async (transaction) => {
                     const lobbyDoc = await transaction.get(lobbyDocRef);
                     if (!lobbyDoc.exists()) throw new Error("لابی یافت نشد!");
-                    
                     let players = lobbyDoc.data().players || [];
                     const visiblePlayerCount = players.filter(p => !p.isSpectator).length;
-
                     if (visiblePlayerCount >= MAX_PLAYERS) {
                         throw new Error("لابی پر است و نمی‌توان ربات اضافه کرد.");
                     }
-
                     const botCount = players.filter(p => p.isBot).length;
-                    const newBot = {
-                        uid: `bot_${Date.now()}`,
-                        displayName: `ربات ${botCount + 1}`,
-                        avatarUrl: 'https://cdn-icons-png.flaticon.com/512/1693/1693746.png',
-                        isReady: true,
-                        isSpectator: false,
-                        isBot: true 
-                    };
-                    
+                    const newBot = { uid: `bot_${Date.now()}`, displayName: `ربات ${botCount + 1}`, avatarUrl: 'https://cdn-icons-png.flaticon.com/512/1693/1693746.png', isReady: true, isSpectator: false, isBot: true };
                     players.push(newBot);
                     transaction.update(lobbyDocRef, { players: players, playerCount: players.length });
                 });
@@ -544,84 +532,80 @@
         async function kickPlayer(uidToKick) { const lobbyDocRef = doc(db, "Lobbys_list", lobbyId); await runTransaction(db, async (transaction) => { const lobbyDoc = await transaction.get(lobbyDocRef); if (!lobbyDoc.exists()) return; let players = lobbyDoc.data().players.filter(p => p.uid !== uidToKick); transaction.update(lobbyDocRef, { players: players, playerCount: players.length }); }); }
         async function toggleReadyStatus() { playSound('sound-ready'); const lobbyDocRef = doc(db, "Lobbys_list", lobbyId); await runTransaction(db, async (transaction) => { const lobbyDoc = await transaction.get(lobbyDocRef); if (!lobbyDoc.exists()) throw new Error("لابی یافت نشد!"); let players = lobbyDoc.data().players || []; const playerIndex = players.findIndex(p => p.uid === currentUser.uid); if (playerIndex > -1) { players[playerIndex].isReady = !players[playerIndex].isReady; transaction.update(lobbyDocRef, { players: players }); } }); }
         
-        // *** CHANGE START: New Start Game Logic ***
+        // *** START CHANGE: تابع جدید و کامل برای شروع بازی ***
         /**
-         * Assigns roles to players and creates a new game document in Firestore.
+         * A helper function to assign roles to players for a 12-player game.
+         * Shuffles players to ensure random role assignment.
          */
+        function assignRoles(lobbyPlayers) {
+            const roles = [
+                { roleName: 'پدرخوانده', team: 'mafia', ability: { actionText: 'شلیک', canTarget: true, requiresTarget: true } },
+                { roleName: 'مافیا ساده', team: 'mafia', ability: { actionText: 'شلیک', canTarget: true, requiresTarget: true } },
+                { roleName: 'مافیا ساده', team: 'mafia', ability: { actionText: 'شلیک', canTarget: true, requiresTarget: true } },
+                { roleName: 'دکتر', team: 'citizen', ability: { actionText: 'نجات دادن', canTarget: true, requiresTarget: true } },
+                { roleName: 'کارآگاه', team: 'citizen', ability: { actionText: 'استعلام', canTarget: true, requiresTarget: true } },
+                { roleName: 'شهروند ساده', team: 'citizen', ability: null },
+                { roleName: 'شهروند ساده', team: 'citizen', ability: null },
+                { roleName: 'شهروند ساده', team: 'citizen', ability: null },
+                { roleName: 'شهروند ساده', team: 'citizen', ability: null },
+                { roleName: 'شهروند ساده', team: 'citizen', ability: null },
+                { roleName: 'شهروند ساده', team: 'citizen', ability: null },
+                { roleName: 'شهروند ساده', team: 'citizen', ability: null },
+            ];
+            // Shuffle players using Fisher-Yates algorithm for randomness
+            const shuffledPlayers = [...lobbyPlayers].sort(() => Math.random() - 0.5);
+            
+            return shuffledPlayers.map((player, index) => ({
+                uid: player.uid,
+                displayName: player.displayName,
+                avatarUrl: player.avatarUrl,
+                isAlive: true,
+                ...roles[index] // Assign role and ability from the predefined list
+            }));
+        }
+
         async function startGame() {
             actionBtn.disabled = true;
             actionBtn.textContent = 'در حال ساخت بازی...';
 
             try {
-                const playersToStart = currentLobbyData.players.filter(p => !p.isSpectator);
-                
-                // 1. Assign roles to players
-                const gamePlayers = assignRoles(playersToStart);
-
-                // 2. Create the game document in the 'games' collection
-                const gamesCollectionRef = collection(db, 'games');
-                const newGameDoc = await addDoc(gamesCollectionRef, {
-                    lobbyId: lobbyId,
-                    createdAt: serverTimestamp(),
-                    day: 1,
-                    phase: 'night', // Games typically start in the night phase
-                    timerEndsAt: null,
-                    announcements: ['بازی شروع شد! شب اول است.'],
-                    players: gamePlayers
-                });
-
-                // 3. Update the lobby document with the new game ID to trigger redirection for all clients
                 const lobbyDocRef = doc(db, "Lobbys_list", lobbyId);
-                await updateDoc(lobbyDocRef, {
-                    gameId: newGameDoc.id,
-                    status: 'in-game'
-                });
+                const lobbyDocSnap = await getDoc(lobbyDocRef);
 
+                if (!lobbyDocSnap.exists()) {
+                    throw new Error("لابی دیگر وجود ندارد!");
+                }
+                const lobbyData = lobbyDocSnap.data();
+                const gamePlayers = assignRoles(lobbyData.players.filter(p => !p.isSpectator));
+                
+                const gameData = {
+                    creatorId: lobbyData.creatorId,
+                    players: gamePlayers,
+                    day: 1,
+                    phase: 'day_discussion', // فاز اول بازی
+                    timerEndsAt: new Date(Date.now() + 60000), // تایمر برای 60 ثانیه
+                    announcements: ['بازی شروع شد! همه در روز اول فرصت صحبت دارند.'],
+                    createdAt: serverTimestamp()
+                };
+
+                // Create the new game document in the 'games' collection
+                const gameCollectionRef = collection(db, 'games');
+                const newGameDocRef = await addDoc(gameCollectionRef, gameData);
+
+                // Update the lobby to signal all players to redirect
+                await updateDoc(lobbyDocRef, {
+                    gameStarted: true,
+                    gameId: newGameDocRef.id
+                });
+                // The onSnapshot listener will handle the redirection for all clients
             } catch (error) {
                 console.error("Error starting game:", error);
-                showNotificationModal("خطا", "مشکلی در شروع بازی پیش آمد. لطفا دوباره تلاش کنید.");
+                showNotificationModal("خطا", `مشکلی در شروع بازی پیش آمد: ${error.message}`);
                 actionBtn.disabled = false;
                 actionBtn.textContent = 'شروع بازی';
             }
         }
-
-        /**
-         * Helper function to shuffle players and assign them roles.
-         * @param {Array} players - The array of player objects from the lobby.
-         * @returns {Array} A new array of player objects with roles assigned.
-         */
-        function assignRoles(players) {
-            const shuffledPlayers = [...players].sort(() => Math.random() - 0.5);
-            const numPlayers = shuffledPlayers.length;
-
-            // Example role distribution for a 12-player game.
-            // This should be made more dynamic or configurable in a real application.
-            let rolePool = [];
-            if (numPlayers === 12) {
-                rolePool = [
-                    { roleName: 'رئیس مافیا', team: 'mafia' }, { roleName: 'مافیا', team: 'mafia' }, { roleName: 'مافیا', team: 'mafia' },
-                    { roleName: 'پزشک', team: 'citizen' }, { roleName: 'کارآگاه', team: 'citizen' }, { roleName: 'تک تیرانداز', team: 'citizen' },
-                    { roleName: 'شهروند ساده', team: 'citizen' }, { roleName: 'شهروند ساده', team: 'citizen' }, { roleName: 'شهروند ساده', team: 'citizen' },
-                    { roleName: 'شهروند ساده', team: 'citizen' }, { roleName: 'شهروند ساده', team: 'citizen' }, { roleName: 'شهروند ساده', team: 'citizen' }
-                ];
-            } else { // Fallback for other player counts
-                const numMafia = Math.floor(numPlayers / 3);
-                for(let i=0; i < numMafia; i++) rolePool.push({ roleName: 'مافیا', team: 'mafia' });
-                while(rolePool.length < numPlayers) rolePool.push({ roleName: 'شهروند ساده', team: 'citizen' });
-            }
-
-            const shuffledRoles = rolePool.sort(() => Math.random() - 0.5);
-
-            return shuffledPlayers.map((player, index) => ({
-                ...player,
-                roleName: shuffledRoles[index].roleName,
-                team: shuffledRoles[index].team,
-                isAlive: true,
-                votedFor: null,
-                abilityTarget: null,
-            }));
-        }
-        // *** CHANGE END ***
+        // *** END CHANGE ***
 
         function showLeaveConfirm() { showConfirmModal("خروج از لابی", "آیا مطمئن هستید؟" + (isHost ? " (چون شما سازنده هستید، لابی حذف خواهد شد)" : ""), () => { window.removeEventListener('beforeunload', handleLeaveLobbyOnExit); handleLeaveLobbyOnExit().then(() => window.location.href = './Lobby page.html'); }); }
         function showKickConfirm(playerName, playerUid) { showConfirmModal(`اخراج ${playerName}`, `آیا از اخراج این بازیکن مطمئن هستید؟`, () => kickPlayer(playerUid)); }
