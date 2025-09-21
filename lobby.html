@@ -414,7 +414,17 @@
             buttonsContainer.appendChild(profileBtn);
 
             if (player.uid !== currentUser.uid) {
+                // START: Added for Ownership Transfer & Host/Admin actions
                 if (isHost || isCurrentUserAdmin) {
+                    const transferBtn = document.createElement('button');
+                    transferBtn.className = 'modal-button secondary';
+                    transferBtn.textContent = 'انتقال مالکیت';
+                    transferBtn.onclick = () => {
+                        modal.classList.remove('visible');
+                        showTransferOwnershipConfirm(player);
+                    };
+                    buttonsContainer.appendChild(transferBtn);
+
                     const kickBtn = document.createElement('button');
                     kickBtn.className = 'modal-button secondary';
                     kickBtn.textContent = 'اخراج از لابی';
@@ -424,6 +434,8 @@
                     };
                     buttonsContainer.appendChild(kickBtn);
                 }
+                // END: Added for Ownership Transfer & Host/Admin actions
+                
                 if (isCurrentUserAdmin) {
                     const banBtn = document.createElement('button');
                     banBtn.className = 'modal-button danger';
@@ -444,6 +456,37 @@
         function showBanModal() { const modal = document.getElementById('lobby-ban-user-modal-overlay'); document.getElementById('ban-user-form').reset(); modal.onclick = e => { if (e.target === modal) modal.classList.remove('visible'); }; document.getElementById('ban-cancel-btn').onclick = () => modal.classList.remove('visible'); modal.classList.add('visible'); }
         async function handleBanFormSubmit(e) { e.preventDefault(); const reason = document.getElementById('ban-reason').value.trim(); const duration = parseInt(document.getElementById('ban-duration').value, 10); const unit = document.getElementById('ban-unit').value; if (!reason || !duration || duration <= 0) { showNotificationModal('خطا', 'لطفاً دلیل و مدت زمان معتبر وارد کنید.'); return; } const now = new Date(); let expiryDate = new Date(now); if (unit === 'hours') expiryDate.setHours(now.getHours() + duration); else if (unit === 'days') expiryDate.setDate(now.getDate() + duration); else if (unit === 'weeks') expiryDate.setDate(now.getDate() + (duration * 7)); const banData = { isBanned: true, banReason: reason, banExpiresAt: expiryDate }; const userToBanRef = doc(db, 'users', targetUserForAction.uid); try { await updateDoc(userToBanRef, banData); document.getElementById('lobby-ban-user-modal-overlay').classList.remove('visible'); showNotificationModal('موفقیت', `کاربر ${targetUserForAction.displayName} با موفقیت مسدود شد.`); } catch (error) { showNotificationModal('خطا', 'اعمال مسدودیت با مشکل مواجه شد.'); console.error("Ban Error:", error); } }
         
+        // START: New functions for Ownership Transfer
+        /**
+         * Shows a confirmation modal for transferring lobby ownership.
+         * @param {object} player - The player object to transfer ownership to.
+         */
+        function showTransferOwnershipConfirm(player) {
+            showConfirmModal(
+                `انتقال مالکیت به ${player.displayName}`,
+                'آیا مطمئن هستید که می‌خواهید مالکیت لابی را به این کاربر منتقل کنید؟ این عمل غیرقابل بازگشت است.',
+                () => transferOwnership(player.uid)
+            );
+        }
+
+        /**
+         * Updates the Firestore document to change the lobby creator.
+         * @param {string} newOwnerUid - The UID of the new lobby owner.
+         */
+        async function transferOwnership(newOwnerUid) {
+            const lobbyDocRef = doc(db, "Lobbys_list", lobbyId);
+            try {
+                await updateDoc(lobbyDocRef, {
+                    creatorId: newOwnerUid
+                });
+                // The onSnapshot listener will handle the UI update automatically.
+            } catch (error) {
+                console.error("Error transferring ownership:", error);
+                showNotificationModal('خطا', 'انتقال مالکیت با مشکل مواجه شد.');
+            }
+        }
+        // END: New functions for Ownership Transfer
+
         /**
          * Cleans up listeners and navigates away, showing a final notification.
          * Used for kicking, banning, or lobby deletion.
