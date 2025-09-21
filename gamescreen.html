@@ -55,7 +55,7 @@
         /* === نوار اعلانات === */
         .announcement-bar { flex-shrink: 0; width: 100%; padding: 10px; background-color: rgba(140, 72, 67, 0.5); border-radius: 8px; text-align: center; font-size: 1rem; font-weight: 700; display: none; transition: all 0.3s ease; }
 
-        /* START CHANGE: استایل‌های جدید برای چیدمان بازیکنان مشابه لابی */
+        /* استایل‌های چیدمان بازیکنان مشابه لابی */
         .players-area { flex-grow: 1; width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 5px; overflow: hidden; }
         .players-column { display: flex; flex-direction: column; justify-content: space-around; align-items: center; height: 100%; flex-shrink: 0; width: 100px; }
         #central-board-container { flex-grow: 1; display: flex; justify-content: center; align-items: center; height: 100%; padding: 0 5px; }
@@ -74,7 +74,6 @@
         .player-slot.dead .dead-overlay { opacity: 1; }
         .dead-icon { font-size: 2.5rem; text-shadow: 0 0 10px black; }
         .revealed-role { font-weight: 700; color: var(--primary-gold); font-size: 0.8rem; text-shadow: 1px 1px 3px black; }
-        /* END CHANGE */
 
         /* === فوتر بازی (دکمه‌های اقدام) === */
         .game-footer { flex-shrink: 0; display: flex; gap: 10px; align-items: center; padding: 10px; background-color: rgba(0,0,0,0.3); border-top: 1px solid var(--border-color); }
@@ -82,29 +81,40 @@
         #game-action-btn:disabled { background: linear-gradient(145deg, #7f8c8d, #626567); border-color: #95a5a6; cursor: not-allowed; opacity: 0.6; }
         #game-action-btn:not(:disabled):hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
 
-        /* === استایل‌های چت و مودال‌ها (بدون تغییر) === */
+        /* START: بخش اصلاح شده CSS چت */
+        /* این بخش به طور کامل از فایل لابی کپی شده تا یکپارچگی کامل ایجاد شود */
         #toggle-chat-btn { flex-shrink: 0; width: 50px; height: 50px; border-radius: 50%; background-color: #4a5568; color: white; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: all 0.3s ease; position: relative; }
         #toggle-chat-btn:hover { background-color: #2d3748; transform: scale(1.1); }
-        #toggle-chat-btn.new-message::after { content: ''; position: absolute; bottom: 0; right: 0; width: 14px; height: 14px; background-color: #e53e3e; border-radius: 50%; border: 2px solid var(--bg-dark); }
+        #toggle-chat-btn.new-message::after { content: ''; position: absolute; bottom: 0; right: 0; width: 14px; height: 14px; background-color: #e53e3e; border-radius: 50%; border: 2px solid var(--bg-dark); animation: pulse-new-message 1.5s infinite; }
+        @keyframes pulse-new-message { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
         #toggle-chat-btn svg { width: 24px; height: 24px; fill: currentColor; }
+
         #chat-panel { position: fixed; top: 50%; left: 50%; width: 90%; max-width: 550px; height: 70%; max-height: 500px; background-color: rgba(26, 20, 14, 0.95); backdrop-filter: blur(10px); border: 1px solid var(--border-color); border-radius: 16px; display: flex; flex-direction: column; z-index: 999; box-shadow: 0 8px 30px rgba(0,0,0,0.6); opacity: 0; transform: translate(-50%, -50%) scale(0.9); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease; pointer-events: none; }
         #chat-panel.visible { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; }
         .chat-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
         .chat-header h3 { font-size: 1.1rem; color: var(--primary-gold); font-weight: 700; }
         #close-chat-btn { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1.5rem; line-height: 1; padding: 5px; }
+        #close-chat-btn:hover { color: white; }
         #chat-messages { flex-grow: 1; overflow-y: auto; padding: 10px 15px; display: flex; flex-direction: column; gap: 12px; }
+        #chat-messages::-webkit-scrollbar { width: 6px; }
+        #chat-messages::-webkit-scrollbar-track { background: transparent; }
+        #chat-messages::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 3px; }
         .chat-message { display: flex; align-items: flex-start; gap: 10px; }
         .chat-message.self { align-self: flex-end; flex-direction: row-reverse; }
-        .chat-message-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
-        .chat-message-content { display: flex; flex-direction: column; }
+        .chat-message-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 2px solid var(--border-color); }
+        .chat-message-content { display: flex; flex-direction: column; max-width: calc(100% - 42px); }
         .chat-message-sender { font-size: 0.8rem; font-weight: 700; color: var(--primary-gold); margin-bottom: 3px; }
         .chat-message.self .chat-message-sender { color: var(--green-ready); text-align: right; }
-        .chat-message-bubble { background-color: #332a20; padding: 8px 12px; border-radius: 12px; font-size: 0.9rem; word-wrap: break-word; }
+        .chat-message-bubble { background-color: #332a20; padding: 8px 12px; border-radius: 12px; font-size: 0.9rem; line-height: 1.5; word-wrap: break-word; position: relative; }
         .chat-message.self .chat-message-bubble { background-color: #2a3a30; }
         #chat-form { display: flex; padding: 10px 15px; border-top: 1px solid var(--border-color); gap: 10px; flex-shrink: 0; }
         #chat-input { flex-grow: 1; background-color: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-light); font-family: 'Vazirmatn', sans-serif; font-size: 0.9rem; }
         #chat-input:focus { outline: none; border-color: var(--primary-gold); }
-        #chat-send-btn { background-color: var(--primary-gold); border: none; border-radius: 8px; color: var(--darker-red); font-weight: 900; padding: 0 15px; cursor: pointer; }
+        #chat-send-btn { background-color: var(--primary-gold); border: none; border-radius: 8px; color: var(--darker-red); font-weight: 900; padding: 0 15px; cursor: pointer; transition: background-color 0.2s ease; }
+        #chat-send-btn:hover { background-color: #ffd46d; }
+        /* END: بخش اصلاح شده CSS چت */
+
+        /* استایل‌های مودال‌ها */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.85); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s 0.3s; }
         .modal-overlay.visible { opacity: 1; visibility: visible; transition: opacity 0.3s ease; }
         .modal-content { background: linear-gradient(145deg, #3c3022, var(--bg-dark)); border: 2px solid var(--border-color); border-radius: 16px; padding: 25px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
@@ -133,15 +143,11 @@
 
         <div id="announcement-bar" class="announcement-bar"></div>
 
-        <!-- START CHANGE: ساختار جدید برای نمایش بازیکنان -->
         <main class="players-area">
             <div id="right-players" class="players-column"></div>
-            <div id="central-board-container">
-                <!-- این بخش می‌تواند برای نمایش اطلاعات اضافی بازی استفاده شود -->
-            </div>
+            <div id="central-board-container"></div>
             <div id="left-players" class="players-column"></div>
         </main>
-        <!-- END CHANGE -->
         
         <footer class="game-footer">
             <button id="toggle-chat-btn" title="باز کردن چت">
@@ -152,8 +158,26 @@
     </div>
     
     <!-- پنل چت و مودال‌ها (کپی شده از لابی) -->
-    <div id="chat-panel"> <div class="chat-header"> <h3>چت بازی</h3> <button id="close-chat-btn" title="بستن چت">&times;</button> </div> <div id="chat-messages"></div> <form id="chat-form"> <input type="text" id="chat-input" placeholder="پیام خود را بنویسید..." autocomplete="off"> <button type="submit" id="chat-send-btn">ارسال</button> </form> </div>
-    <div id="notification-modal" class="modal-overlay"> <div class="modal-content"> <h2 id="notification-modal-title" class="modal-title">توجه</h2> <p id="notification-modal-message" class="modal-message"></p> <div class="modal-buttons"> <button id="notification-modal-ok-btn" class="modal-button primary">متوجه شدم</button> </div> </div> </div>
+    <div id="chat-panel"> 
+        <div class="chat-header"> 
+            <h3>چت بازی</h3> 
+            <button id="close-chat-btn" title="بستن چت">&times;</button> 
+        </div> 
+        <div id="chat-messages"></div> 
+        <form id="chat-form"> 
+            <input type="text" id="chat-input" placeholder="پیام خود را بنویسید..." autocomplete="off"> 
+            <button type="submit" id="chat-send-btn">ارسال</button> 
+        </form> 
+    </div>
+    <div id="notification-modal" class="modal-overlay"> 
+        <div class="modal-content"> 
+            <h2 id="notification-modal-title" class="modal-title">توجه</h2> 
+            <p id="notification-modal-message" class="modal-message"></p> 
+            <div class="modal-buttons"> 
+                <button id="notification-modal-ok-btn" class="modal-button primary">متوجه شدم</button> 
+            </div> 
+        </div> 
+    </div>
     
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -167,14 +191,12 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         
-        const MAX_PLAYERS = 12; // برای حفظ ساختار مشابه لابی
+        const MAX_PLAYERS = 12;
 
         const loadingOverlay = document.getElementById('loading-overlay');
         const gameContainer = document.querySelector('.game-container');
-        // START CHANGE: المنت‌های جدید برای چیدمان ستونی
         const leftPlayersEl = document.getElementById('left-players');
         const rightPlayersEl = document.getElementById('right-players');
-        // END CHANGE
         const gamePhaseInfoEl = document.getElementById('game-phase-info');
         const gameTimerEl = document.getElementById('game-timer');
         const announcementBarEl = document.getElementById('announcement-bar');
@@ -191,13 +213,11 @@
         let currentUserData = {};
         let gameId = null;
         let unsubscribeGame = null;
-        let unsubscribeChat = null; // START CHANGE: برای listener چت
+        let unsubscribeChat = null;
         let currentGameState = {};
         let localSelectedPlayerUid = null;
         let timerInterval = null;
-        let isChatPanelVisible = false; // START CHANGE: برای وضعیت پنل چت
-
-        // --- Main Functions ---
+        let isChatPanelVisible = false;
 
         async function main() {
             gameId = new URLSearchParams(window.location.search).get('id');
@@ -211,7 +231,7 @@
                     currentUser = user;
                     currentUserData = { displayName: user.displayName, avatarUrl: user.photoURL }; 
                     listenToGameStateChanges();
-                    listenToChatMessages(); // START CHANGE: فعال کردن شنونده چت
+                    listenToChatMessages();
                     setupEventListeners();
                 } else {
                     window.location.href = './login.html';
@@ -224,7 +244,7 @@
             unsubscribeGame = onSnapshot(gameDocRef, (docSnap) => {
                 if (!docSnap.exists()) {
                     if (unsubscribeGame) unsubscribeGame();
-                    if (unsubscribeChat) unsubscribeChat(); // START CHANGE: توقف شنونده چت
+                    if (unsubscribeChat) unsubscribeChat();
                     showNotificationModal("بازی پایان یافت", "این بازی دیگر فعال نیست.", () => window.location.href = './Lobby page.html');
                     return;
                 }
@@ -251,7 +271,7 @@
 
             renderHeader(data.phase, data.day, data.timerEndsAt);
             renderAnnouncements(data.announcements);
-            renderPlayerSlots(data.players, self, data.phase); // START CHANGE: فراخوانی تابع جدید
+            renderPlayerSlots(data.players, self, data.phase);
             updateActionButton(self, data.phase);
         }
         
@@ -287,7 +307,6 @@
             }
         }
         
-        // START CHANGE: تابع جدید برای رندر کردن بازیکنان در ستون‌ها
         function renderPlayerSlots(players, self, phase) {
             leftPlayersEl.innerHTML = '';
             rightPlayersEl.innerHTML = '';
@@ -296,9 +315,8 @@
             const playersPerColumn = MAX_PLAYERS / 2;
 
             for (let i = 0; i < MAX_PLAYERS; i++) {
-                // بازیکن را بر اساس ایندکس پیدا می‌کنیم تا ترتیب حفظ شود
                 const player = players[i];
-                if (!player) continue; // اگر در دیتابیس کمتر از 12 بازیکن بود، از خطا جلوگیری می‌کند
+                if (!player) continue;
                 
                 const slot = document.createElement('div');
                 slot.className = 'player-slot';
@@ -320,9 +338,7 @@
                     `;
                 } else {
                     if (isSelectablePhase) {
-                        let canBeSelected = player.uid !== self.uid; // نمی‌توان به خود رای داد
-                        // TODO: قوانین بیشتر (مثلا دکتر نمی‌تواند یک نفر را دو شب متوالی نجات دهد)
-                        
+                        let canBeSelected = player.uid !== self.uid;
                         if (canBeSelected) {
                             slot.classList.add('selectable');
                             slot.onclick = () => handlePlayerCardClick(player.uid);
@@ -343,7 +359,6 @@
                 }
             }
         }
-        // END CHANGE
 
         function updateActionButton(self, phase) {
             if (!self.isAlive) {
@@ -375,13 +390,12 @@
 
         function handlePlayerCardClick(uid) {
             localSelectedPlayerUid = (localSelectedPlayerUid === uid) ? null : uid;
-            renderGame(currentGameState); // بازрисовانی برای نمایش انتخاب
+            renderGame(currentGameState);
         }
         
         async function handleMainAction() {
             gameActionBtn.disabled = true;
             const actionType = currentGameState.phase === 'day_voting' ? 'vote' : 'ability';
-            console.log(`Action: ${actionType}, Target: ${localSelectedPlayerUid}`);
             showNotificationModal("اقدام ثبت شد", "حرکت شما ثبت شد، منتظر بقیه بازیکنان بمانید.");
             try {
                 const gameDocRef = doc(db, "games", gameId);
@@ -404,7 +418,6 @@
             }
         }
         
-        // START CHANGE: توابع مربوط به چت که اضافه شده‌اند
         function listenToChatMessages() {
             const chatCollectionRef = collection(db, `games/${gameId}/chat`);
             const q = query(chatCollectionRef, orderBy('timestamp', 'asc'));
@@ -420,11 +433,14 @@
             });
         }
 
+        // START: تابع اصلاح شده برای رندر پیام
+        // این تابع اکنون با فایل لابی کاملاً یکسان است
         function renderMessage(data) {
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('chat-message');
             const isSelf = data.senderUid === currentUser.uid;
             if (isSelf) messageDiv.classList.add('self');
+            
             messageDiv.innerHTML = `
                 <img src="${data.senderAvatarUrl || 'https://up.20script.ir/file/1d50-defult.png'}" class="chat-message-avatar" onerror="this.src='https://up.20script.ir/file/1d50-defult.png';">
                 <div class="chat-message-content">
@@ -434,6 +450,7 @@
             chatMessagesEl.appendChild(messageDiv);
             chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
         }
+        // END: تابع اصلاح شده
         
         function toggleChatPanel() { 
             isChatPanelVisible = !isChatPanelVisible; 
@@ -470,13 +487,12 @@
                 });
              } catch (error) {
                 console.error("Send message error:", error);
-                chatInput.value = tempMessage; // بازگرداندن پیام در صورت خطا
+                chatInput.value = tempMessage;
              } finally {
                 chatInput.disabled = false;
                 chatInput.focus();
              }
         }
-        // END CHANGE
 
         function showNotificationModal(title, message, onOk) { 
             const modal = document.getElementById('notification-modal'); 
