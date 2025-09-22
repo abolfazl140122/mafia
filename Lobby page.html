@@ -14,7 +14,6 @@
             --darker-red: #5a2c2a;
             --admin-red: #c0392b;
             --admin-red-hover: #e74c3c;
-            /* [جدید] استایل دکمه تماشا */
             --admin-spectate-blue: #2980b9;
             --admin-spectate-blue-hover: #3498db;
             --admin-edit-bg: #504436; 
@@ -60,7 +59,6 @@
             z-index: -1;
         }
         
-        /* --- لودینگ حرفه‌ای و جدید --- */
         #loading-overlay {
             position: fixed;
             top: 0;
@@ -119,7 +117,6 @@
             text-shadow: 1px 1px 3px #000;
         }
         
-        /* --- پنل دانلود موسیقی --- */
         #music-download-overlay {
             position: fixed;
             top: 0;
@@ -176,7 +173,6 @@
             color: var(--text-light);
         }
 
-        /* --- محتوای اصلی --- */
         .main-container {
             width: 100%;
             height: 100%;
@@ -217,7 +213,6 @@
             line-height: 1; transform: scaleX(-1);
         }
 
-        /* --- لیست لابی‌ها --- */
         #lobby-list {
             flex-grow: 1; overflow-y: auto; display: flex;
             flex-direction: column; gap: 15px; padding-right: 5px;
@@ -383,7 +378,6 @@
             background: linear-gradient(145deg, var(--admin-red-hover), var(--admin-red));
             transform: translateY(-2px);
         }
-        /* [جدید] استایل دکمه تماشای لابی */
         .btn-spectate {
             background: linear-gradient(145deg, var(--admin-spectate-blue), #20638f);
             color: white; border: 1px solid #7dc2f1;
@@ -394,7 +388,6 @@
         }
 
 
-        /* --- دکمه شناور --- */
         #create-lobby-fab {
             position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
             width: 60px; height: 60px;
@@ -410,7 +403,6 @@
         }
         #create-lobby-fab:active { transform: translateX(-50%) scale(0.95); }
 
-        /* --- پنل‌های مودال (Modal) --- */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(0, 0, 0, 0.85); 
@@ -472,7 +464,6 @@
         }
         .modal-button.secondary:hover { background: linear-gradient(145deg, #615342, #403529); }
         
-        /* استایل‌های رمز لابی */
         .password-toggle-group {
             display: flex;
             align-items: center;
@@ -837,7 +828,6 @@
 
             let actionButtonsHTML = '';
             
-            // [جدید] دکمه تماشای لابی برای ادمین
             if (currentUserIsAdmin) {
                 actionButtonsHTML += `<button class="lobby-btn btn-spectate" data-action="spectate">تماشای لابی</button>`;
             }
@@ -926,14 +916,12 @@
                 promptForPasswordChange(lobbyData);
             });
 
-            // [جدید] رویداد کلیک برای دکمه تماشای لابی
             card.querySelector('[data-action="spectate"]')?.addEventListener('click', () => {
                 showCustomAlert(
                     'تایید تماشا',
                     `آیا می‌خواهید به صورت مخفیانه به عنوان تماشاگر وارد لابی "${lobbyData.lobbyName}" شوید؟`,
                     [
                         { text: 'بله، تماشا می‌کنم', class: 'primary', action: () => {
-                            // هدایت به لابی با پارامتر تماشاگر
                             window.location.href = `./lobby.html?id=${lobbyData.id}&spectate=true`;
                         }},
                         { text: 'خیر', class: 'secondary' }
@@ -965,13 +953,11 @@
 
                 const userDocRef = doc(db, 'users', user.uid);
                 
-                // این بخش به صورت لحظه‌ای وضعیت ادمین را چک می‌کند
                 onSnapshot(userDocRef, (docSnap) => {
                     if (docSnap.exists()) {
                         const userData = docSnap.data();
                         const newAdminStatus = userData && userData.isAdmin === true;
                         
-                        // اگر وضعیت ادمین تغییر کرده باشد، کل لیست را دوباره رندر می‌کند
                         if (newAdminStatus !== currentUserIsAdmin) {
                             currentUserIsAdmin = newAdminStatus;
                             rerenderAllLobbyCards(); 
@@ -986,6 +972,16 @@
                     snapshot.docChanges().forEach((change) => {
                         const lobbyData = { id: change.doc.id, ...change.doc.data() };
                         
+                        // --- START: تغییر اصلی برای حذف لابی‌های شروع شده از لیست ---
+                        // اگر بازی برای این لابی شروع شده باشد، آن را از لیست حافظه موقت حذف می‌کنیم و ادامه نمی‌دهیم
+                        if (lobbyData.gameStarted) {
+                            if (allLobbiesData.has(lobbyData.id)) {
+                                allLobbiesData.delete(lobbyData.id);
+                            }
+                            return; // از پردازش بیشتر این لابی صرف نظر می‌کنیم
+                        }
+                        // --- END: پایان تغییر ---
+
                         if (change.type === "added" || change.type === "modified") {
                            allLobbiesData.set(lobbyData.id, lobbyData);
                         }
