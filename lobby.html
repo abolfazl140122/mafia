@@ -202,6 +202,51 @@
         #lobby-ban-user-modal-content .form-group-horizontal .form-input { width: 80px; flex-shrink: 0; text-align: center; }
         #lobby-ban-user-modal-content .form-group-horizontal .form-select { flex-grow: 1; }
         #lobby-ban-user-modal-content .confirm-buttons-container { display: flex; gap: 15px; margin-top: 25px; }
+
+        /* START: استایل مودال انتخاب آواتار */
+        #avatar-selection-modal-content {
+            max-width: 95%;
+            width: 500px;
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+        #avatar-selection-grid {
+            flex-grow: 1;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            gap: 15px;
+            padding: 15px;
+            margin: 0 -15px -15px; /* برای چسبیدن به لبه‌ها */
+        }
+        #avatar-selection-grid::-webkit-scrollbar { width: 8px; }
+        #avatar-selection-grid::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 4px; }
+        #avatar-selection-grid::-webkit-scrollbar-thumb { background: var(--text-secondary); border-radius: 4px; }
+        #avatar-selection-grid::-webkit-scrollbar-thumb:hover { background: var(--primary-gold); }
+        
+        .avatar-select-item {
+            aspect-ratio: 1 / 1;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+        .avatar-select-item:hover {
+            transform: scale(1.05);
+        }
+        .avatar-select-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 3px solid var(--border-color);
+            transition: all 0.2s ease-in-out;
+        }
+        .avatar-select-item.selected img {
+            border-color: var(--primary-gold);
+            box-shadow: 0 0 15px rgba(255, 201, 71, 0.7);
+        }
+        /* END: استایل مودال انتخاب آواتار */
     </style>
 </head>
 <body>
@@ -245,6 +290,18 @@
     <div id="view-profile-modal-overlay" class="modal-overlay"> <div id="view-profile-modal-content" class="modal-content"> <div class="profile-header"> <span id="profile-modal-close-btn" class="modal-close-btn">&times;</span> <img id="profile-modal-avatar" src="" alt="آواتار پروفایل"> <div class="profile-name-banner"> <h2 id="profile-modal-name"></h2> </div> </div> <div class="profile-body"> <div class="profile-stat-item"> <span class="stat-label"><span>👑</span><span>سطح:</span></span> <span id="profile-stat-level" class="stat-value"></span> </div> <div class="profile-stat-item"> <span class="stat-label"><span>📜</span><span>تاریخ ثبت نام:</span></span> <span id="profile-stat-date" class="stat-value"></span> </div> <div class="profile-stat-item"> <span class="stat-label"><span>🎂</span><span>سن:</span></span> <span id="profile-stat-age" class="stat-value"></span> </div> <div class="profile-stat-item" id="profile-stat-diamonds-container"> <span class="stat-label"><span>💎</span><span>تعداد الماس:</span></span> <span id="profile-stat-diamonds" class="stat-value"></span> </div> <div class="profile-stat-item" id="profile-stat-email-container"> <span class="stat-label"><span>📧</span><span>ایمیل:</span></span> <span id="profile-stat-email" class="stat-value"></span> </div> </div> </div> </div>
     <div id="lobby-ban-user-modal-overlay" class="modal-overlay"> <div id="lobby-ban-user-modal-content" class="modal-content"> <h2 class="modal-title">مسدود کردن کاربر</h2> <form id="ban-user-form"> <div class="form-group"> <label for="ban-reason" class="form-label">دلیل مسدودیت:</label> <input type="text" id="ban-reason" class="form-input" required placeholder="مثال: استفاده از الفاظ نامناسب"> </div> <div class="form-group form-group-horizontal"> <label class="form-label">مدت زمان:</label> <input type="number" id="ban-duration" class="form-input" required value="1"> <select id="ban-unit" class="form-select"> <option value="hours">ساعت</option> <option value="days">روز</option> <option value="weeks">هفته</option> </select> </div> <div class="confirm-buttons-container"> <button type="button" id="ban-cancel-btn" class="modal-button secondary" style="width: 50%;">انصراف</button> <button type="submit" class="modal-button danger" style="width: 50%;">اعمال مسدودیت</button> </div> </form> </div> </div>
     
+    <!-- START: مودال جدید برای انتخاب آواتار -->
+    <div id="avatar-selection-modal-overlay" class="modal-overlay">
+        <div id="avatar-selection-modal-content" class="modal-content">
+            <h2 class="modal-title">انتخاب آواتار</h2>
+            <span id="avatar-select-close-btn" class="modal-close-btn">&times;</span>
+            <div id="avatar-selection-grid">
+                <!-- آواتارهای خریداری شده اینجا قرار می‌گیرند -->
+            </div>
+        </div>
+    </div>
+    <!-- END: مودال جدید برای انتخاب آواتار -->
+
     <audio id="sound-player-join" src="https://assets.mixkit.co/sfx/preview/mixkit-unlock-game-notification-253.mp3" preload="auto"></audio>
     <audio id="sound-player-leave" src="https://assets.mixkit.co/sfx/preview/mixkit-player-losing-or-failing-2042.mp3" preload="auto"></audio>
     <audio id="sound-ready" src="https://assets.mixkit.co/sfx/preview/mixkit-quick-positive-video-game-notification-interface-265.mp3" preload="auto"></audio>
@@ -257,7 +314,6 @@
 
         // --- Config & Elements ---
         const MAX_PLAYERS = 12;
-        // const MIN_PLAYERS_TO_START = 2; // دیگر استفاده نمی‌شود
         const firebaseConfig = { apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg", authDomain: "mafia-9fcbf.firebaseapp.com", projectId: "mafia-9fcbf", storageBucket: "mafia-9fcbf.appspot.com", messagingSenderId: "471627157488", appId: "1:471627157488:web:92f008548a5596619a5735", };
         
         const app = initializeApp(firebaseConfig);
@@ -293,6 +349,7 @@
         let isCurrentUserInLobby = true;
         let targetUserForAction = null;
         let currentLobbyData = null;
+        let allShopAvatars = []; // NEW: برای ذخیره آواتارهای فروشگاه
 
         /**
          * Renders the entire lobby state based on Firestore data.
@@ -346,13 +403,11 @@
             if (self && !self.isSpectator) {
                 actionBtn.style.display = 'block';
                 if (isHost) {
-                    // *** START CHANGE: شرط جدید برای شروع بازی ***
                     const isLobbyFull = visiblePlayers.length === MAX_PLAYERS;
                     const allOthersReady = visiblePlayers.every(p => p.uid === currentUser.uid || p.isReady);
                     actionBtn.textContent = 'شروع بازی';
                     actionBtn.className = 'action-button start-btn';
                     actionBtn.disabled = !(isLobbyFull && allOthersReady);
-                    // *** END CHANGE ***
                 } else {
                     actionBtn.textContent = isReady ? 'لغو آمادگی' : 'آماده';
                     actionBtn.className = `action-button ${isReady ? 'unready-btn' : 'ready-btn'}`;
@@ -364,7 +419,22 @@
             updateAdminUI(allPlayers);
         }
         
-        async function main() { lobbyId = new URLSearchParams(window.location.search).get('id'); if (!lobbyId) { showNotificationModal("خطا", "شناسه لابی نامعتبر است.", () => window.location.href = './Lobby page.html'); return; } onAuthStateChanged(auth, async (user) => { if (user) { currentUser = user; const userDocRef = doc(db, 'users', user.uid); const userDocSnap = await getDoc(userDocRef); if (userDocSnap.exists()) { currentUserData = userDocSnap.data(); isCurrentUserAdmin = currentUserData.isAdmin === true; } else { currentUserData = { displayName: user.displayName, avatarUrl: user.photoURL }; } listenToSelfChanges(); await joinLobby(); listenToLobbyChanges(); listenToChatMessages(); setupEventListeners(); } else { window.location.href = './login.html'; } }); }
+        async function main() { lobbyId = new URLSearchParams(window.location.search).get('id'); if (!lobbyId) { showNotificationModal("خطا", "شناسه لابی نامعتبر است.", () => window.location.href = './Lobby page.html'); return; } onAuthStateChanged(auth, async (user) => { if (user) { currentUser = user; const userDocRef = doc(db, 'users', user.uid); const userDocSnap = await getDoc(userDocRef); if (userDocSnap.exists()) { currentUserData = userDocSnap.data(); isCurrentUserAdmin = currentUserData.isAdmin === true; } else { currentUserData = { displayName: user.displayName, avatarUrl: user.photoURL }; } await loadAllAvatars(); listenToSelfChanges(); await joinLobby(); listenToLobbyChanges(); listenToChatMessages(); setupEventListeners(); } else { window.location.href = './login.html'; } }); }
+        
+        // NEW: تابع برای بارگذاری تمام آواتارها از فروشگاه یک بار در ابتدا
+        async function loadAllAvatars() {
+            try {
+                const avatarsCollectionRef = collection(db, 'avatars');
+                const avatarsSnapshot = await getDocs(avatarsCollectionRef);
+                allShopAvatars = [];
+                avatarsSnapshot.forEach(doc => {
+                    allShopAvatars.push({ id: doc.id, ...doc.data() });
+                });
+            } catch (error) {
+                console.error("خطا در بارگذاری آواتارهای فروشگاه:", error);
+            }
+        }
+
         async function joinLobby() { const lobbyDocRef = doc(db, "Lobbys_list", lobbyId); try { await runTransaction(db, async (transaction) => { const lobbyDoc = await transaction.get(lobbyDocRef); if (!lobbyDoc.exists()) throw new Error("لابی یافت نشد!"); let players = lobbyDoc.data().players || []; const playerExists = players.some(p => p.uid === currentUser.uid); if (!playerExists) { if (players.length >= MAX_PLAYERS) throw new Error("لابی پر است!"); const newPlayer = { uid: currentUser.uid, displayName: currentUserData.displayName || "بازیکن", avatarUrl: currentUserData.avatarUrl || "https://up.20script.ir/file/1d50-defult.png", isReady: false, isSpectator: isCurrentUserAdmin }; players.push(newPlayer); transaction.update(lobbyDocRef, { players: players, playerCount: players.length }); } }); } catch (error) { showNotificationModal("خطا در ورود", `خطا: ${error.message}`, () => window.location.href = './Lobby page.html'); } }
         
         function listenToLobbyChanges() {
@@ -372,7 +442,6 @@
             unsubscribeLobby = onSnapshot(lobbyDocRef, (docSnap) => {
                 if (!isCurrentUserInLobby) return;
 
-                // *** START CHANGE: منطق انتقال به صفحه بازی ***
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     if (data.gameStarted && data.gameId) {
@@ -381,10 +450,9 @@
                         if (unsubscribeSelf) unsubscribeSelf();
                         window.removeEventListener('beforeunload', handleLeaveLobbyOnExit);
                         window.location.href = `./gamescreen.html?id=${data.gameId}`;
-                        return; // از ادامه اجرای تابع جلوگیری می‌کند
+                        return;
                     }
                 }
-                // *** END CHANGE ***
 
                 if (!docSnap.exists()) {
                     if (unsubscribeLobby) unsubscribeLobby();
@@ -416,12 +484,18 @@
                 showNotificationModal("خطای ارتباط", "ارتباط با لابی قطع شد.", () => window.location.reload());
             });
         }
-        function listenToSelfChanges() { if (unsubscribeSelf) unsubscribeSelf(); const selfDocRef = doc(db, 'users', currentUser.uid); unsubscribeSelf = onSnapshot(selfDocRef, (docSnap) => { if (docSnap.exists()) { const latestSelfData = docSnap.data(); if (latestSelfData.isBanned && latestSelfData.banExpiresAt && latestSelfData.banExpiresAt.toDate() > new Date()) { cleanUpAndLeave("حساب کاربری شما مسدود شد!", './index.html'); return; } const newAdminStatus = latestSelfData.isAdmin === true; if (newAdminStatus !== isCurrentUserAdmin) { isCurrentUserAdmin = newAdminStatus; if (currentLobbyData) updateAdminUI(currentLobbyData.players || []); } } }); }
+        function listenToSelfChanges() { if (unsubscribeSelf) unsubscribeSelf(); const selfDocRef = doc(db, 'users', currentUser.uid); unsubscribeSelf = onSnapshot(selfDocRef, (docSnap) => { if (docSnap.exists()) { const latestSelfData = docSnap.data(); if (latestSelfData.isBanned && latestSelfData.banExpiresAt && latestSelfData.banExpiresAt.toDate() > new Date()) { cleanUpAndLeave("حساب کاربری شما مسدود شد!", './index.html'); return; } const newAdminStatus = latestSelfData.isAdmin === true; if (newAdminStatus !== isCurrentUserAdmin) { isCurrentUserAdmin = newAdminStatus; if (currentLobbyData) updateAdminUI(currentLobbyData.players || []); } currentUserData = latestSelfData; } }); }
         function playSound(soundId) { try { document.getElementById(soundId).play(); } catch(e) { console.warn("Sound play failed", e); } }
         function updateAdminUI(allPlayers = []) { const adminJoinBtn = document.getElementById('admin-join-btn'); const self = allPlayers.find(p => p.uid === currentUser.uid); const isSpectating = self && self.isSpectator; if (isCurrentUserAdmin && isSpectating) { adminJoinBtn.style.display = 'block'; } else { adminJoinBtn.style.display = 'none'; } clearChatBtn.style.display = (isHost || isCurrentUserAdmin) ? 'block' : 'none'; }
         function handleAdminJoinGame() { showConfirmModal('پیوستن به بازی', 'آیا می‌خواهید به عنوان بازیکن به لابی ملحق شوید؟', async () => { const lobbyDocRef = doc(db, "Lobbys_list", lobbyId); try { await runTransaction(db, async (transaction) => { const lobbyDoc = await transaction.get(lobbyDocRef); if (!lobbyDoc.exists()) throw new Error("لابی دیگر وجود ندارد."); let players = lobbyDoc.data().players || []; const visiblePlayerCount = players.filter(p => !p.isSpectator).length; if (visiblePlayerCount >= MAX_PLAYERS) throw new Error("لابی پر است و نمی‌توانید ملحق شوید."); const playerIndex = players.findIndex(p => p.uid === currentUser.uid); if (playerIndex > -1) { players[playerIndex].isSpectator = false; transaction.update(lobbyDocRef, { players: players }); } else throw new Error("اطلاعات شما در لابی یافت نشد."); }); } catch (error) { showNotificationModal("خطا", error.message); } }); }
         
         async function showPlayerActionModal(player) {
+            // UPDATED: اگر روی خودمان کلیک شد، پنل آواتار را باز کن
+            if (player.uid === currentUser.uid && !player.isBot) {
+                openAvatarSelectionModal();
+                return;
+            }
+
             targetUserForAction = player;
             const modal = document.getElementById('player-action-modal');
             document.getElementById('player-action-title').textContent = player.displayName;
@@ -433,20 +507,14 @@
                     const kickBotBtn = document.createElement('button');
                     kickBotBtn.className = 'modal-button danger';
                     kickBotBtn.textContent = 'اخراج ربات';
-                    kickBotBtn.onclick = () => {
-                        modal.classList.remove('visible');
-                        showKickConfirm(player.displayName, player.uid);
-                    };
+                    kickBotBtn.onclick = () => { modal.classList.remove('visible'); showKickConfirm(player.displayName, player.uid); };
                     buttonsContainer.appendChild(kickBotBtn);
                 }
             } else {
                 const profileBtn = document.createElement('button');
                 profileBtn.className = 'modal-button primary';
                 profileBtn.textContent = 'مشاهده پروفایل';
-                profileBtn.onclick = () => {
-                    modal.classList.remove('visible');
-                    showPlayerProfile(player.uid);
-                };
+                profileBtn.onclick = () => { modal.classList.remove('visible'); showPlayerProfile(player.uid); };
                 buttonsContainer.appendChild(profileBtn);
 
                 if (player.uid !== currentUser.uid) {
@@ -454,38 +522,110 @@
                         const transferBtn = document.createElement('button');
                         transferBtn.className = 'modal-button secondary';
                         transferBtn.textContent = 'انتقال مالکیت';
-                        transferBtn.onclick = () => {
-                            modal.classList.remove('visible');
-                            showTransferOwnershipConfirm(player);
-                        };
+                        transferBtn.onclick = () => { modal.classList.remove('visible'); showTransferOwnershipConfirm(player); };
                         buttonsContainer.appendChild(transferBtn);
 
                         const kickBtn = document.createElement('button');
                         kickBtn.className = 'modal-button secondary';
                         kickBtn.textContent = 'اخراج از لابی';
-                        kickBtn.onclick = () => {
-                            modal.classList.remove('visible');
-                            showKickConfirm(player.displayName, player.uid);
-                        };
+                        kickBtn.onclick = () => { modal.classList.remove('visible'); showKickConfirm(player.displayName, player.uid); };
                         buttonsContainer.appendChild(kickBtn);
                     }
-                    
                     if (isCurrentUserAdmin) {
                         const banBtn = document.createElement('button');
                         banBtn.className = 'modal-button danger';
                         banBtn.textContent = 'مسدود کردن کاربر';
-                        banBtn.onclick = () => {
-                            modal.classList.remove('visible');
-                            showBanModal();
-                        };
+                        banBtn.onclick = () => { modal.classList.remove('visible'); showBanModal(); };
                         buttonsContainer.appendChild(banBtn);
                     }
                 }
             }
-
             modal.onclick = (e) => { if (e.target === modal) modal.classList.remove('visible'); };
             modal.classList.add('visible');
         }
+
+        // START: توابع جدید برای مودال انتخاب آواتار
+        function openAvatarSelectionModal() {
+            const modal = document.getElementById('avatar-selection-modal-overlay');
+            const grid = document.getElementById('avatar-selection-grid');
+            grid.innerHTML = ''; // پاک کردن محتوای قبلی
+
+            const ownedAvatarIds = new Set(currentUserData.ownedAvatars || []);
+            // اضافه کردن آواتار دیفالت به لیست قابل انتخاب‌ها
+            const defaultAvatar = { id: 'default', name: 'پیش‌فرض', imageUrl: 'https://up.20script.ir/file/1d50-defult.png' };
+            const ownedAvatars = allShopAvatars.filter(avatar => ownedAvatarIds.has(avatar.id));
+            const allSelectableAvatars = [defaultAvatar, ...ownedAvatars];
+
+            if (allSelectableAvatars.length === 0) {
+                grid.innerHTML = '<p style="text-align:center;color:var(--text-secondary);">شما آواتار دیگری خریداری نکرده‌اید.</p>';
+            } else {
+                allSelectableAvatars.forEach(avatar => {
+                    const item = document.createElement('div');
+                    item.className = 'avatar-select-item';
+                    
+                    const isSelected = (currentUserData.avatarUrl || defaultAvatar.imageUrl) === avatar.imageUrl;
+                    if (isSelected) {
+                        item.classList.add('selected');
+                    }
+                    
+                    item.innerHTML = `<img src="${avatar.imageUrl}" alt="${avatar.name || ''}" title="${avatar.name || ''}">`;
+                    item.onclick = () => selectNewAvatar(avatar);
+                    grid.appendChild(item);
+                });
+            }
+
+            modal.classList.add('visible');
+        }
+
+        async function selectNewAvatar(avatar) {
+            const defaultAvatarUrl = 'https://up.20script.ir/file/1d50-defult.png';
+            const currentAvatarUrl = currentUserData.avatarUrl || defaultAvatarUrl;
+            
+            if (currentAvatarUrl === avatar.imageUrl) {
+                // اگر روی آواتار فعلی کلیک شد، کاری نکن
+                return;
+            }
+
+            loadingOverlay.style.opacity = '1';
+            loadingOverlay.style.display = 'flex';
+            document.getElementById('loading-text').textContent = 'در حال تغییر آواتار...';
+            
+            try {
+                const batch = writeBatch(db);
+                const userDocRef = doc(db, 'users', currentUser.uid);
+                const lobbyDocRef = doc(db, "Lobbys_list", lobbyId);
+
+                // برای آپدیت در لابی، ابتدا باید داکیومنت را بخوانیم
+                const lobbyDocSnap = await getDoc(lobbyDocRef);
+                if (!lobbyDocSnap.exists()) throw new Error("لابی یافت نشد!");
+                
+                let players = lobbyDocSnap.data().players;
+                const playerIndex = players.findIndex(p => p.uid === currentUser.uid);
+
+                if (playerIndex > -1) {
+                    players[playerIndex].avatarUrl = avatar.imageUrl;
+                    batch.update(lobbyDocRef, { players: players }); // 1. آپدیت در لابی
+                }
+
+                batch.update(userDocRef, { avatarUrl: avatar.imageUrl }); // 2. آپدیت در پروفایل اصلی کاربر
+
+                await batch.commit();
+
+                // آپدیت داده‌های محلی
+                currentUserData.avatarUrl = avatar.imageUrl;
+
+                // بستن مودال
+                document.getElementById('avatar-selection-modal-overlay').classList.remove('visible');
+
+            } catch (error) {
+                console.error("خطا در تغییر آواتار:", error);
+                showNotificationModal("خطا", "مشکلی در تغییر آواتار پیش آمد.");
+            } finally {
+                loadingOverlay.style.opacity = '0';
+                setTimeout(() => { loadingOverlay.style.display = 'none'; }, 500);
+            }
+        }
+        // END: توابع جدید برای مودال انتخاب آواتار
 
         async function showPlayerProfile(uid) { const userDocRef = doc(db, 'users', uid); const docSnap = await getDoc(userDocRef); if (!docSnap.exists()) { showNotificationModal("خطا", "اطلاعات این کاربر یافت نشد."); return; } const userData = docSnap.data(); document.getElementById('profile-modal-avatar').src = userData.avatarUrl || 'https://up.20script.ir/file/1d50-defult.png'; document.getElementById('profile-modal-name').textContent = userData.displayName || "کاربر ناشناس"; const profileStatLevel = document.getElementById('profile-stat-level'); if (userData.isAdmin === true) { profileStatLevel.textContent = "ادمین"; profileStatLevel.classList.add('stat-value-admin'); } else { profileStatLevel.textContent = "کاربر"; profileStatLevel.classList.remove('stat-value-admin'); } document.getElementById('profile-stat-age').textContent = userData.old || "نامشخص"; if (userData.createdAt && typeof userData.createdAt.toDate === 'function') { const date = userData.createdAt.toDate(); document.getElementById('profile-stat-date').textContent = new Intl.DateTimeFormat('fa-IR', { year: 'numeric', month: 'long', day: 'numeric' }).format(date); } else { document.getElementById('profile-stat-date').textContent = "نامشخص"; } const diamondsContainer = document.getElementById('profile-stat-diamonds-container'); const emailContainer = document.getElementById('profile-stat-email-container'); if (isCurrentUserAdmin) { diamondsContainer.style.display = 'flex'; emailContainer.style.display = 'flex'; document.getElementById('profile-stat-diamonds').textContent = userData.game || 0; document.getElementById('profile-stat-email').textContent = userData.email || "ثبت نشده"; } else { diamondsContainer.style.display = 'none'; emailContainer.style.display = 'none'; } const modal = document.getElementById('view-profile-modal-overlay'); document.getElementById('profile-modal-close-btn').onclick = () => modal.classList.remove('visible'); modal.onclick = (e) => { if (e.target === modal) modal.classList.remove('visible'); }; modal.classList.add('visible'); }
         function showBanModal() { const modal = document.getElementById('lobby-ban-user-modal-overlay'); document.getElementById('ban-user-form').reset(); modal.onclick = e => { if (e.target === modal) modal.classList.remove('visible'); }; document.getElementById('ban-cancel-btn').onclick = () => modal.classList.remove('visible'); modal.classList.add('visible'); }
@@ -503,17 +643,13 @@
                     if (!lobbyDoc.exists()) throw new Error("لابی یافت نشد!");
                     let players = lobbyDoc.data().players || [];
                     const visiblePlayerCount = players.filter(p => !p.isSpectator).length;
-                    if (visiblePlayerCount >= MAX_PLAYERS) {
-                        throw new Error("لابی پر است و نمی‌توان ربات اضافه کرد.");
-                    }
+                    if (visiblePlayerCount >= MAX_PLAYERS) { throw new Error("لابی پر است و نمی‌توان ربات اضافه کرد."); }
                     const botCount = players.filter(p => p.isBot).length;
                     const newBot = { uid: `bot_${Date.now()}`, displayName: `ربات ${botCount + 1}`, avatarUrl: 'https://cdn-icons-png.flaticon.com/512/1693/1693746.png', isReady: true, isSpectator: false, isBot: true };
                     players.push(newBot);
                     transaction.update(lobbyDocRef, { players: players, playerCount: players.length });
                 });
-            } catch (error) {
-                showNotificationModal("خطا", `خطا در افزودن ربات: ${error.message}`);
-            }
+            } catch (error) { showNotificationModal("خطا", `خطا در افزودن ربات: ${error.message}`); }
         }
 
         function setupEventListeners() { 
@@ -527,85 +663,36 @@
             document.getElementById('ban-user-form').addEventListener('submit', handleBanFormSubmit); 
             document.getElementById('admin-join-btn').addEventListener('click', handleAdminJoinGame);
             document.getElementById('add-bot-btn').addEventListener('click', handleAddBot);
+            
+            // NEW: Event listeners for avatar selection modal
+            const avatarModal = document.getElementById('avatar-selection-modal-overlay');
+            document.getElementById('avatar-select-close-btn').onclick = () => avatarModal.classList.remove('visible');
+            avatarModal.onclick = (e) => { if (e.target === avatarModal) avatarModal.classList.remove('visible'); };
         }
 
         async function kickPlayer(uidToKick) { const lobbyDocRef = doc(db, "Lobbys_list", lobbyId); await runTransaction(db, async (transaction) => { const lobbyDoc = await transaction.get(lobbyDocRef); if (!lobbyDoc.exists()) return; let players = lobbyDoc.data().players.filter(p => p.uid !== uidToKick); transaction.update(lobbyDocRef, { players: players, playerCount: players.length }); }); }
         async function toggleReadyStatus() { playSound('sound-ready'); const lobbyDocRef = doc(db, "Lobbys_list", lobbyId); await runTransaction(db, async (transaction) => { const lobbyDoc = await transaction.get(lobbyDocRef); if (!lobbyDoc.exists()) throw new Error("لابی یافت نشد!"); let players = lobbyDoc.data().players || []; const playerIndex = players.findIndex(p => p.uid === currentUser.uid); if (playerIndex > -1) { players[playerIndex].isReady = !players[playerIndex].isReady; transaction.update(lobbyDocRef, { players: players }); } }); }
         
-        // *** START CHANGE: تابع جدید و کامل برای شروع بازی ***
-        /**
-         * A helper function to assign roles to players for a 12-player game.
-         * Shuffles players to ensure random role assignment.
-         */
         function assignRoles(lobbyPlayers) {
-            const roles = [
-                { roleName: 'پدرخوانده', team: 'mafia', ability: { actionText: 'شلیک', canTarget: true, requiresTarget: true } },
-                { roleName: 'مافیا ساده', team: 'mafia', ability: { actionText: 'شلیک', canTarget: true, requiresTarget: true } },
-                { roleName: 'مافیا ساده', team: 'mafia', ability: { actionText: 'شلیک', canTarget: true, requiresTarget: true } },
-                { roleName: 'دکتر', team: 'citizen', ability: { actionText: 'نجات دادن', canTarget: true, requiresTarget: true } },
-                { roleName: 'کارآگاه', team: 'citizen', ability: { actionText: 'استعلام', canTarget: true, requiresTarget: true } },
-                { roleName: 'شهروند ساده', team: 'citizen', ability: null },
-                { roleName: 'شهروند ساده', team: 'citizen', ability: null },
-                { roleName: 'شهروند ساده', team: 'citizen', ability: null },
-                { roleName: 'شهروند ساده', team: 'citizen', ability: null },
-                { roleName: 'شهروند ساده', team: 'citizen', ability: null },
-                { roleName: 'شهروند ساده', team: 'citizen', ability: null },
-                { roleName: 'شهروند ساده', team: 'citizen', ability: null },
-            ];
-            // Shuffle players using Fisher-Yates algorithm for randomness
+            const roles = [ { roleName: 'پدرخوانده', team: 'mafia', ability: { actionText: 'شلیک', canTarget: true, requiresTarget: true } }, { roleName: 'مافیا ساده', team: 'mafia', ability: { actionText: 'شلیک', canTarget: true, requiresTarget: true } }, { roleName: 'مافیا ساده', team: 'mafia', ability: { actionText: 'شلیک', canTarget: true, requiresTarget: true } }, { roleName: 'دکتر', team: 'citizen', ability: { actionText: 'نجات دادن', canTarget: true, requiresTarget: true } }, { roleName: 'کارآگاه', team: 'citizen', ability: { actionText: 'استعلام', canTarget: true, requiresTarget: true } }, { roleName: 'شهروند ساده', team: 'citizen', ability: null }, { roleName: 'شهروند ساده', team: 'citizen', ability: null }, { roleName: 'شهروند ساده', team: 'citizen', ability: null }, { roleName: 'شهروند ساده', team: 'citizen', ability: null }, { roleName: 'شهروند ساده', team: 'citizen', ability: null }, { roleName: 'شهروند ساده', team: 'citizen', ability: null }, { roleName: 'شهروند ساده', team: 'citizen', ability: null }, ];
             const shuffledPlayers = [...lobbyPlayers].sort(() => Math.random() - 0.5);
-            
-            return shuffledPlayers.map((player, index) => ({
-                uid: player.uid,
-                displayName: player.displayName,
-                avatarUrl: player.avatarUrl,
-                isAlive: true,
-                ...roles[index] // Assign role and ability from the predefined list
-            }));
+            return shuffledPlayers.map((player, index) => ({ uid: player.uid, displayName: player.displayName, avatarUrl: player.avatarUrl, isAlive: true, ...roles[index] }));
         }
 
         async function startGame() {
-            actionBtn.disabled = true;
-            actionBtn.textContent = 'در حال ساخت بازی...';
-
+            actionBtn.disabled = true; actionBtn.textContent = 'در حال ساخت بازی...';
             try {
                 const lobbyDocRef = doc(db, "Lobbys_list", lobbyId);
                 const lobbyDocSnap = await getDoc(lobbyDocRef);
-
-                if (!lobbyDocSnap.exists()) {
-                    throw new Error("لابی دیگر وجود ندارد!");
-                }
+                if (!lobbyDocSnap.exists()) { throw new Error("لابی دیگر وجود ندارد!"); }
                 const lobbyData = lobbyDocSnap.data();
                 const gamePlayers = assignRoles(lobbyData.players.filter(p => !p.isSpectator));
-                
-                const gameData = {
-                    creatorId: lobbyData.creatorId,
-                    players: gamePlayers,
-                    day: 1,
-                    phase: 'day_discussion', // فاز اول بازی
-                    timerEndsAt: new Date(Date.now() + 60000), // تایمر برای 60 ثانیه
-                    announcements: ['بازی شروع شد! همه در روز اول فرصت صحبت دارند.'],
-                    createdAt: serverTimestamp()
-                };
-
-                // Create the new game document in the 'games' collection
+                const gameData = { creatorId: lobbyData.creatorId, players: gamePlayers, day: 1, phase: 'day_discussion', timerEndsAt: new Date(Date.now() + 60000), announcements: ['بازی شروع شد! همه در روز اول فرصت صحبت دارند.'], createdAt: serverTimestamp() };
                 const gameCollectionRef = collection(db, 'games');
                 const newGameDocRef = await addDoc(gameCollectionRef, gameData);
-
-                // Update the lobby to signal all players to redirect
-                await updateDoc(lobbyDocRef, {
-                    gameStarted: true,
-                    gameId: newGameDocRef.id
-                });
-                // The onSnapshot listener will handle the redirection for all clients
-            } catch (error) {
-                console.error("Error starting game:", error);
-                showNotificationModal("خطا", `مشکلی در شروع بازی پیش آمد: ${error.message}`);
-                actionBtn.disabled = false;
-                actionBtn.textContent = 'شروع بازی';
-            }
+                await updateDoc(lobbyDocRef, { gameStarted: true, gameId: newGameDocRef.id });
+            } catch (error) { console.error("Error starting game:", error); showNotificationModal("خطا", `مشکلی در شروع بازی پیش آمد: ${error.message}`); actionBtn.disabled = false; actionBtn.textContent = 'شروع بازی'; }
         }
-        // *** END CHANGE ***
 
         function showLeaveConfirm() { showConfirmModal("خروج از لابی", "آیا مطمئن هستید؟" + (isHost ? " (چون شما سازنده هستید، لابی حذف خواهد شد)" : ""), () => { window.removeEventListener('beforeunload', handleLeaveLobbyOnExit); handleLeaveLobbyOnExit().then(() => window.location.href = './Lobby page.html'); }); }
         function showKickConfirm(playerName, playerUid) { showConfirmModal(`اخراج ${playerName}`, `آیا از اخراج این بازیکن مطمئن هستید؟`, () => kickPlayer(playerUid)); }
