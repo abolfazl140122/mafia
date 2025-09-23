@@ -168,11 +168,13 @@
         .top-right-container { width: 100%; display: flex; justify-content: flex-end; align-items: flex-start; }
         .profile-and-menu-wrapper { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
         
+        /* --- START: کانتینر جدید برای پنل‌های بالا --- */
         .top-panel-container {
             display: flex;
             gap: 10px;
             align-items: center;
         }
+        /* --- END: کانتینر جدید برای پنل‌های بالا --- */
 
         .profile-section { display: flex; align-items: center; background-color: rgba(0, 0, 0, 0.5); padding: 10px 15px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 3px 8px rgba(0,0,0,0.3); }
         .avatar-container { display: flex; align-items: center; gap: 12px; }
@@ -180,6 +182,7 @@
         #user-avatar:hover { transform: scale(1.1); border-color: #ffc947; box-shadow: 0 0 10px rgba(255, 201, 71, 0.5); }
         #user-display-name { font-size: 1rem; font-weight: 700; text-shadow: 1px 1px 3px #000; }
         
+        /* --- START: استایل‌های جدید برای پنل الماس --- */
         .gems-section {
             display: flex;
             align-items: center;
@@ -190,7 +193,7 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
             box-shadow: 0 3px 8px rgba(0,0,0,0.3);
             transition: all 0.3s ease;
-            flex-shrink: 0;
+            flex-shrink: 0; /* جلوگیری از فشرده شدن پنل */
         }
         .gems-section:hover {
             border-color: #ffc947;
@@ -202,12 +205,13 @@
             filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
         }
         #user-gems-count {
-            font-size: 1.2rem;
+            font-size: 1.2rem; /* اندازه فونت پایه */
             font-weight: 900;
             color: #ffc947;
             text-shadow: 0 1px 4px rgba(0,0,0,0.6);
-            white-space: nowrap;
+            white-space: nowrap; /* جلوگیری از شکستن عدد به خط بعدی */
         }
+        /* --- END: استایل‌های جدید برای پنل الماس --- */
 
         .menu-buttons { display: flex; flex-direction: column; gap: 10px; align-items: flex-end; }
         .menu-button { background: linear-gradient(145deg, rgba(80, 50, 48, 0.8), rgba(56, 33, 32, 0.9)); color: #e0dacc; border: 1px solid #c5a687; padding: 8px 15px; border-radius: 8px; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; text-align: center; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); box-shadow: 0 2px 5px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05); }
@@ -283,14 +287,14 @@
         /* --- سایر پنل‌ها (کد بدون تغییر باقی می‌ماند) --- */
         #admin-panel-content .modal-button { margin-top: 10px; }
         .search-bar-container { width: 100%; margin-bottom: 20px; }
-        #user-search-input, #ranking-search-input, #running-lobbies-search-input { width: 100%; padding: 12px 15px; background-color: rgba(0,0,0,0.3); border: 1px solid #5c4a3a; border-radius: 8px; color: #f0e6d2; font-family: 'Vazirmatn', sans-serif; font-size: 1rem; transition: all 0.3s ease; }
-        #user-search-input:focus, #ranking-search-input:focus, #running-lobbies-search-input:focus { outline: none; border-color: #ffc947; box-shadow: 0 0 10px rgba(255, 201, 71, 0.3); }
-        #user-search-input::placeholder, #ranking-search-input::placeholder, #running-lobbies-search-input::placeholder { color: #c5a687; opacity: 0.7; }
-        #user-list-container, #banned-ranking-list-container, #running-lobbies-list-container { width: 100%; max-height: 55vh; overflow-y: auto; border: 1px solid #5c4a3a; border-radius: 8px; background-color: rgba(0,0,0,0.2); padding: 5px; }
-        #user-list-container::-webkit-scrollbar, #ranking-list-container::-webkit-scrollbar, #banned-ranking-list-container::-webkit-scrollbar, #running-lobbies-list-container::-webkit-scrollbar { width: 8px; }
-        #user-list-container::-webkit-scrollbar-track, #ranking-list-container::-webkit-scrollbar-track, #banned-ranking-list-container::-webkit-scrollbar-track, #running-lobbies-list-container::-webkit-scrollbar-track { background: #1e170f; border-radius: 10px; }
-        #user-list-container::-webkit-scrollbar-thumb, #ranking-list-container::-webkit-scrollbar-thumb, #banned-ranking-list-container::-webkit-scrollbar-thumb, #running-lobbies-list-container::-webkit-scrollbar-thumb { background: #8c4843; border-radius: 10px; }
-        #user-list-container::-webkit-scrollbar-thumb:hover, #ranking-list-container::-webkit-scrollbar-thumb:hover, #banned-ranking-list-container::-webkit-scrollbar-thumb:hover, #running-lobbies-list-container::-webkit-scrollbar-thumb:hover { background: #a1534d; }
+        #user-search-input, #ranking-search-input { width: 100%; padding: 12px 15px; background-color: rgba(0,0,0,0.3); border: 1px solid #5c4a3a; border-radius: 8px; color: #f0e6d2; font-family: 'Vazirmatn', sans-serif; font-size: 1rem; transition: all 0.3s ease; }
+        #user-search-input:focus, #ranking-search-input:focus { outline: none; border-color: #ffc947; box-shadow: 0 0 10px rgba(255, 201, 71, 0.3); }
+        #user-search-input::placeholder, #ranking-search-input::placeholder { color: #c5a687; opacity: 0.7; }
+        #user-list-container, #banned-ranking-list-container { width: 100%; max-height: 55vh; overflow-y: auto; border: 1px solid #5c4a3a; border-radius: 8px; background-color: rgba(0,0,0,0.2); padding: 5px; }
+        #user-list-container::-webkit-scrollbar, #ranking-list-container::-webkit-scrollbar, #banned-ranking-list-container::-webkit-scrollbar { width: 8px; }
+        #user-list-container::-webkit-scrollbar-track, #ranking-list-container::-webkit-scrollbar-track, #banned-ranking-list-container::-webkit-scrollbar-track { background: #1e170f; border-radius: 10px; }
+        #user-list-container::-webkit-scrollbar-thumb, #ranking-list-container::-webkit-scrollbar-thumb, #banned-ranking-list-container::-webkit-scrollbar-thumb { background: #8c4843; border-radius: 10px; }
+        #user-list-container::-webkit-scrollbar-thumb:hover, #ranking-list-container::-webkit-scrollbar-thumb:hover, #banned-ranking-list-container::-webkit-scrollbar-thumb:hover { background: #a1534d; }
         .user-list-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background-color: rgba(255, 255, 255, 0.05); border-bottom: 1px solid #5c4a3a; color: #e0dacc; transition: background-color 0.2s ease; }
         .user-list-item:hover { background-color: rgba(255, 201, 71, 0.1); }
         .user-list-item:last-child { border-bottom: none; }
@@ -412,112 +416,6 @@
         #dialogue-guide-button.visible { opacity: 1; visibility: visible; transition: opacity 0.4s ease 0.2s; }
         @keyframes character-jiggle { 0%, 100% { transform: translateY(0) rotate(0); } 25% { transform: translateY(-8px) rotate(-3deg); } 50% { transform: translateY(0) rotate(0); } 75% { transform: translateY(-5px) rotate(3deg); } }
         .jiggle-animation { animation: character-jiggle 0.6s ease-in-out; }
-
-        /* --- START: استایل‌های جدید برای پنل مدیریت لابی‌های در حال اجرا --- */
-        #manage-running-lobbies-content {
-            max-width: 600px;
-            padding: 0;
-        }
-        .running-lobby-card {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            padding: 15px;
-            margin: 10px;
-            border-radius: 12px;
-            background-color: rgba(255, 255, 255, 0.04);
-            border: 1px solid #5c4a3a;
-        }
-        .running-lobby-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 12px;
-            border-bottom: 1px solid #5c4a3a;
-        }
-        .running-lobby-title {
-            font-size: 1.2rem;
-            font-weight: 900;
-            color: #ffc947;
-        }
-        .running-lobby-info {
-            font-size: 0.9rem;
-            color: #c5a687;
-        }
-        .players-list-title {
-            font-size: 1rem;
-            font-weight: 700;
-            color: #e0dacc;
-            margin-bottom: 10px;
-        }
-        .running-lobby-players-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 10px;
-        }
-        .player-list-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background-color: rgba(0,0,0,0.2);
-            padding: 8px;
-            border-radius: 6px;
-        }
-        .player-list-item img {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-        .player-details {
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-        }
-        .player-details .name {
-            font-weight: 700;
-            font-size: 0.9rem;
-        }
-        .player-details .role {
-            font-size: 0.8rem;
-            color: #c5a687;
-        }
-        .player-status {
-            font-weight: 700;
-            font-size: 0.8rem;
-            padding: 3px 8px;
-            border-radius: 10px;
-        }
-        .player-status.alive {
-            color: #2ecc71;
-            background-color: rgba(46, 204, 113, 0.15);
-        }
-        .player-status.dead {
-            color: #e74c3c;
-            background-color: rgba(231, 76, 60, 0.15);
-        }
-        .running-lobby-actions {
-            margin-top: 10px;
-            display: flex;
-            justify-content: flex-end;
-        }
-        .btn-spectate-game {
-            padding: 8px 15px;
-            font-size: 0.9rem;
-            font-weight: 700;
-            border-radius: 8px; 
-            cursor: pointer; 
-            border: 1px solid #7dc2f1;
-            background: linear-gradient(145deg, #2980b9, #20638f);
-            color: white;
-            transition: all 0.2s ease;
-        }
-        .btn-spectate-game:hover {
-            transform: translateY(-2px);
-            background: linear-gradient(145deg, #3498db, #2980b9);
-        }
-        /* --- END: استایل‌های جدید --- */
-
         @media (max-width: 600px) { #dialogue-guide-wrapper { max-width: 100%; } #dialogue-guide-character-container { width: 120px; left: -15px; bottom: -15px; } #dialogue-guide-box { padding: 20px 20px 20px 90px; min-height: 120px; } #dialogue-guide-text { font-size: 0.9rem; } }
     </style>
 </head>
@@ -541,11 +439,14 @@
     <div class="main-content">
         <div class="top-right-container">
             <div class="profile-and-menu-wrapper">
+                <!-- START: کانتینر جدید برای قرار دادن پنل پروفایل و الماس در کنار هم -->
                 <div class="top-panel-container">
+                    <!-- START: پنل نمایش الماس -->
                     <div class="gems-section">
                         <span class="gems-icon">💎</span>
                         <span id="user-gems-count">0</span>
                     </div>
+                    <!-- END: پنل نمایش الماس -->
                     <div class="profile-section">
                         <div class="avatar-container">
                             <img id="user-avatar" src="" alt="آواتار کاربر">
@@ -553,6 +454,7 @@
                         </div>
                     </div>
                 </div>
+                <!-- END: کانتینر جدید -->
                 <div class="menu-buttons">
                     <button class="menu-button">سازندگان</button>
                     <button id="ranking-button" class="menu-button">رده بندی</button>
@@ -572,7 +474,7 @@
     <div id="avatar-menu-overlay" class="modal-overlay"> <div id="avatar-menu-content" class="modal-content"> <button id="avatar-menu-profile-btn" class="modal-button">پروفایل</button> <button id="avatar-menu-shop-btn" class="modal-button">فروشگاه</button> <button id="change-name-btn" class="modal-button">تغییر نام</button> <button id="settings-btn" class="modal-button">تنظیمات</button> </div> </div>
     <div id="game-mode-modal-overlay" class="modal-overlay"> <div id="game-mode-modal-content" class="modal-content"> <h2 class="modal-title">انتخاب نوع بازی</h2> <p class="modal-message">لطفا یکی از حالت‌های زیر را برای شروع انتخاب کنید.</p> <div class="game-mode-buttons"> <button id="friendly-game-btn" class="modal-button game-mode-button">بازی دوستانه</button> <button id="ranked-game-btn" class="modal-button game-mode-button">بازی امتیازی</button> </div> </div> </div>
     <div id="profile-modal-overlay" class="modal-overlay"> <div id="profile-modal-content" class="modal-content"> <div class="profile-header"> <span id="profile-modal-close-btn" class="modal-close-btn">&times;</span> <img id="profile-modal-avatar" src="" alt="آواتار پروفایل"> <div class="profile-name-banner"> <h2 id="profile-modal-name"></h2> </div> </div> <div class="profile-body"> <div class="profile-stat-item"> <span class="stat-label"><span>👑</span><span>سطح:</span></span> <span id="profile-stat-level" class="stat-value"></span> </div> <div class="profile-stat-item"> <span class="stat-label"><span>📜</span><span>تاریخ ثبت نام:</span></span> <span id="profile-stat-date" class="stat-value"></span> </div> <div class="profile-stat-item"> <span class="stat-label"><span>🎂</span><span>سن:</span></span> <span id="profile-stat-age" class="stat-value"></span> </div> <div class="profile-stat-item"> <span class="stat-label"><span>🎭</span><span>تعداد آواتارها:</span></span> <span id="profile-stat-avatars" class="stat-value"></span> </div> <div class="profile-stat-item"> <span class="stat-label"><span>💎</span><span>تعداد الماس:</span></span> <span id="profile-stat-diamonds" class="stat-value"></span> </div> <div class="profile-stat-item"> <span class="stat-label"><span>📧</span><span>ایمیل:</span></span> <span id="profile-stat-email" class="stat-value"></span> </div> </div> </div> </div>
-    <div id="admin-panel-overlay" class="modal-overlay"> <div id="admin-panel-content" class="modal-content"> <h2 class="modal-title">پنل مدیریت</h2> <button id="manage-users-btn" class="modal-button">مدیریت کاربران</button> <button id="manage-game-modes-btn" class="modal-button">مدیریت ورودی بازی</button> <button id="manage-lobbies-btn" class="modal-button">مدیریت بازی‌های فعال</button> </div> </div>
+    <div id="admin-panel-overlay" class="modal-overlay"> <div id="admin-panel-content" class="modal-content"> <h2 class="modal-title">پنل مدیریت</h2> <button id="manage-users-btn" class="modal-button">مدیریت کاربران</button> <button id="manage-game-modes-btn" class="modal-button">مدیریت ورودی بازی</button> <button id="manage-lobbies-btn" class="modal-button" disabled>مدیریت لابی‌ها (غیرفعال)</button> </div> </div>
     <div id="user-list-modal-overlay" class="modal-overlay"> <div id="user-list-modal-content" class="modal-content" style="max-width: 480px;"> <h2 class="modal-title">مدیریت کاربران</h2> <div class="search-bar-container"> <input type="text" id="user-search-input" placeholder="جستجوی کاربر بر اساس نام یا ایمیل..."> </div> <div id="user-list-container"></div> <button id="user-list-close-btn" class="modal-button" style="margin-top: 20px;">بازگشت</button> </div> </div>
     <div id="edit-user-modal-overlay" class="modal-overlay"> <div id="edit-user-modal-content" class="modal-content"> <div id="edit-user-header"> <img id="edit-user-avatar-preview" src="" alt="آواتار کاربر"> <h3 id="edit-user-name-preview"></h3> </div> <h2 id="edit-user-title" class="modal-title">ویرایش اطلاعات</h2> <form id="edit-user-form"> <input type="hidden" id="edit-user-uid"> <div class="form-group"> <label for="edit-display-name" class="form-label">نام نمایشی:</label> <input type="text" id="edit-display-name" class="form-input" required> </div> <div class="form-group"> <label for="edit-user-age" class="form-label">سن:</label> <input type="number" id="edit-user-age" class="form-input" required> </div> <div class="form-group"> <label for="edit-user-diamonds" class="form-label">تعداد الماس (game):</label> <input type="number" id="edit-user-diamonds" class="form-input" required> </div> <button type="submit" id="save-user-changes-btn" class="modal-button">ذخیره تغییرات</button> <button type="button" id="edit-user-cancel-btn" class="modal-button cancel-button">انصراف</button> </form> <div id="ban-status-section"> <p id="ban-status-text" style="display:none;"></p> <button id="manage-ban-btn" class="modal-button ban-button">مدیریت مسدودیت</button> </div> </div> </div>
     <div id="game-modes-panel-overlay" class="modal-overlay"> <div id="game-modes-panel-content" class="modal-content"> <h2 class="modal-title">مدیریت ورودی بازی</h2> <div class="settings-container"> <div class="toggle-switch-container"> <span class="toggle-label">بازی دوستانه</span> <label class="toggle-switch"> <input type="checkbox" id="friendly-mode-toggle"> <span class="slider"></span> </label> </div> <div class="toggle-switch-container"> <span class="toggle-label">بازی امتیازی</span> <label class="toggle-switch"> <input type="checkbox" id="ranked-mode-toggle"> <span class="slider"></span> </label> </div> </div> <div class="buttons-group"> <button id="game-modes-cancel-btn" class="modal-button cancel-button" style="width: 50%;">انصراف</button> <button id="game-modes-save-btn" class="modal-button" style="width: 50%;">ذخیره</button> </div> </div> </div>
@@ -583,23 +485,6 @@
     <div id="settings-overlay" class="modal-overlay"> <div id="settings-content" class="modal-content"> <h2 class="modal-title">تنظیمات</h2> <div class="form-group"> <div class="range-slider-container"> <div class="range-slider-label"> <span>انیمیشن پس‌زمینه</span> <span id="animation-intensity-value">50%</span> </div> <input type="range" min="0" max="100" value="50" class="range-slider" id="animation-intensity-slider"> </div> </div> <div class="form-group"> <div class="toggle-switch-container"> <span class="toggle-label">جلوه بصری</span> <label class="toggle-switch"> <input type="checkbox" id="visual-effect-toggle"> <span class="slider"></span> </label> </div> </div> <div class="confirm-buttons-container" style="margin-top: 20px;"> <button type="button" id="cancel-settings-btn" class="modal-button cancel-button" style="width: 50%;">انصراف</button> <button type="button" id="save-settings-btn" class="modal-button" style="width: 50%;">ذخیره</button> </div> </div> </div>
     <div id="tutorial-overlay"> <div id="tutorial-highlight-box"></div> <div id="tutorial-panel"> <h3 id="tutorial-title"></h3> <p id="tutorial-text" class="typing-text"></p> <div id="tutorial-button-container"> <button id="tutorial-next-btn"></button> </div> </div> </div>
     <div id="dialogue-guide-overlay" class="modal-overlay"> <div id="dialogue-guide-wrapper"> <div id="dialogue-guide-character-container"> <img id="dialogue-guide-character-img" src="" alt="راهنما"> </div> <div id="dialogue-guide-box"> <p id="dialogue-guide-text" class="typing-text"></p> <button id="dialogue-guide-button">ادامه</button> </div> </div> </div>
-    
-    <!-- --- START: مودال جدید برای مدیریت لابی‌های در حال اجرا --- -->
-    <div id="manage-running-lobbies-overlay" class="modal-overlay">
-        <div id="manage-running-lobbies-content" class="modal-content">
-            <div class="ranking-header">
-                <h2 class="modal-title">مدیریت بازی‌های فعال</h2>
-                <span id="running-lobbies-close-btn" class="modal-close-btn">&times;</span>
-            </div>
-            <div class="search-bar-container" style="padding: 20px 20px 0;">
-                <input type="text" id="running-lobbies-search-input" placeholder="جستجوی بازی بر اساس نام سازنده...">
-            </div>
-            <div id="running-lobbies-list-container">
-                <!-- کارت‌های بازی‌های فعال اینجا قرار می‌گیرند -->
-            </div>
-        </div>
-    </div>
-    <!-- --- END: مودال جدید --- -->
 
 
     <script type="module">
@@ -624,7 +509,9 @@
         // --- DOM Elements ---
         const userDisplayName = document.getElementById('user-display-name');
         const userAvatar = document.getElementById('user-avatar');
+        // START: المان جدید برای نمایش الماس
         const userGemsCount = document.getElementById('user-gems-count');
+        // END: المان جدید برای نمایش الماس
         const startGameButton = document.getElementById('start-game-button');
         const menuButtons = document.querySelectorAll('.menu-button');
         const loadingOverlay = document.getElementById('loading-overlay');
@@ -731,14 +618,7 @@
         const banDurationInput = document.getElementById('ban-duration');
         const banUnitSelect = document.getElementById('ban-unit');
         const banCancelBtn = document.getElementById('ban-cancel-btn');
-        // --- START: المان‌های جدید برای پنل مدیریت بازی‌های فعال ---
-        const manageLobbiesBtn = document.getElementById('manage-lobbies-btn');
-        const manageRunningLobbiesOverlay = document.getElementById('manage-running-lobbies-overlay');
-        const runningLobbiesListContainer = document.getElementById('running-lobbies-list-container');
-        const runningLobbiesSearchInput = document.getElementById('running-lobbies-search-input');
-        const runningLobbiesCloseBtn = document.getElementById('running-lobbies-close-btn');
-        // --- END: المان‌های جدید ---
-        
+
         // متغیرها
         const MUSIC_URL = "https://raw.githubusercontent.com/abolfazl140122/mafia/main/dark-music-249503.mp3";
         const MUSIC_CACHE_NAME = 'mafia-music-cache-v1';
@@ -756,23 +636,30 @@
         let currentActiveDialogueId = null; 
         let currentlyEditingUser = null; 
 
+        // --- START: تابع جدید برای تنظیم اندازه فونت الماس ---
         function adjustGemFontSize(element) {
             const container = element.parentElement;
+            // فضای اشغال شده توسط آیکون و فاصله‌ها
             const reservedSpace = container.querySelector('.gems-icon').offsetWidth + 20; 
             const maxTextWidth = container.clientWidth - reservedSpace;
+            
+            // بازنشانی فونت به حالت اولیه برای محاسبه مجدد
             element.style.fontSize = '1.2rem';
             let currentFontSize = 1.2;
             const minFontSize = 0.6; 
+
+            // کوچک کردن فونت تا زمانی که متن در کانتینر جا شود
             while (element.scrollWidth > maxTextWidth && currentFontSize > minFontSize) {
                 currentFontSize -= 0.05;
                 element.style.fontSize = `${currentFontSize}rem`;
             }
         }
+        // --- END: تابع جدید برای تنظیم اندازه فونت الماس ---
 
         // --- توابع عمومی ---
         function showModal(modalElement) { modalElement.classList.add('visible'); }
         function hideModal(modalElement) { modalElement.classList.remove('visible'); }
-        function hideAllAdminModals() { hideModal(adminPanelOverlay); hideModal(userListModalOverlay); hideModal(editUserModalOverlay); hideModal(gameModesPanelOverlay); hideModal(banUserModalOverlay); hideModal(manageRunningLobbiesOverlay); }
+        function hideAllAdminModals() { hideModal(adminPanelOverlay); hideModal(userListModalOverlay); hideModal(editUserModalOverlay); hideModal(gameModesPanelOverlay); hideModal(banUserModalOverlay); }
         function showCustomAlert(message, onConfirm) { customAlertMessage.textContent = message; showModal(customAlertOverlay); customAlertConfirmBtn.onclick = () => { hideModal(customAlertOverlay); if (onConfirm) onConfirm(); }; }
         function showCustomConfirm(message, onConfirm) { customConfirmMessage.innerHTML = message; showModal(customConfirmOverlay); const confirmHandler = () => { hideModal(customConfirmOverlay); if (onConfirm) onConfirm(); cleanup(); }; const cancelHandler = () => { hideModal(customConfirmOverlay); cleanup(); }; const cleanup = () => { customConfirmOkBtn.removeEventListener('click', confirmHandler); customConfirmCancelBtn.removeEventListener('click', cancelHandler); }
             customConfirmOkBtn.addEventListener('click', confirmHandler); customConfirmCancelBtn.addEventListener('click', cancelHandler); }
@@ -843,89 +730,6 @@
         async function handleBanFormSubmit(e) { e.preventDefault(); if (!await verifyAdminStatus() || !currentlyEditingUser) return; const reason = banReasonInput.value.trim(); const duration = parseInt(banDurationInput.value, 10); const unit = banUnitSelect.value; if (!reason || !duration || duration <= 0) { showCustomAlert('لطفاً دلیل و مدت زمان معتبر وارد کنید.'); return; }
             const now = new Date(); let expiryDate = new Date(now); if (unit === 'hours') expiryDate.setHours(now.getHours() + duration); else if (unit === 'days') expiryDate.setDate(now.getDate() + duration); else if (unit === 'weeks') expiryDate.setDate(now.getDate() + (duration * 7)); const banData = { isBanned: true, banReason: reason, banExpiresAt: expiryDate }; const userDocRef = doc(db, 'users', currentlyEditingUser.uid); try { await updateDoc(userDocRef, banData); currentlyEditingUser.isBanned = true; currentlyEditingUser.banExpiresAt = { toDate: () => expiryDate }; hideModal(banUserModalOverlay); updateBanStatusUI(); showCustomAlert('کاربر با موفقیت مسدود شد.'); } catch (error) { showCustomAlert('خطا در اعمال مسدودیت. لطفاً دوباره تلاش کنید.'); console.error("Ban Error:", error); } }
 
-        // --- START: توابع جدید برای مدیریت بازی‌های فعال ---
-        function renderRunningLobbyCard(gameData) {
-            const playersHTML = gameData.players.map(player => `
-                <div class="player-list-item">
-                    <img src="${player.avatarUrl || DEFAULT_AVATAR}" alt="avatar">
-                    <div class="player-details">
-                        <span class="name">${player.displayName}</span>
-                        <span class="role">نقش: ${player.roleName}</span>
-                    </div>
-                    <span class="player-status ${player.isAlive ? 'alive' : 'dead'}">
-                        ${player.isAlive ? 'زنده' : 'مرده'}
-                    </span>
-                </div>
-            `).join('');
-
-            const creator = gameData.players.find(p => p.uid === gameData.creatorId);
-            const creatorName = creator ? creator.displayName : 'نامشخص';
-
-            return `
-                <div class="running-lobby-card" data-creator-name="${creatorName.toLowerCase()}">
-                    <div class="running-lobby-header">
-                        <div>
-                            <h3 class="running-lobby-title">بازی فعال</h3>
-                            <p class="running-lobby-info">سازنده: ${creatorName}</p>
-                        </div>
-                        <div class="running-lobby-actions">
-                            <button class="btn-spectate-game" data-game-id="${gameData.id}">مشاهده بازی</button>
-                        </div>
-                    </div>
-                    <div class="running-lobby-body">
-                        <h4 class="players-list-title">بازیکنان (${gameData.players.length}/12):</h4>
-                        <div class="running-lobby-players-list">
-                            ${playersHTML}
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        async function loadAndShowRunningLobbies() {
-            if (!(await verifyAdminStatus())) return;
-
-            runningLobbiesListContainer.innerHTML = '<p style="padding: 20px; text-align: center;">در حال بارگذاری بازی‌های فعال...</p>';
-            runningLobbiesSearchInput.value = '';
-            hideModal(adminPanelOverlay);
-            showModal(manageRunningLobbiesOverlay);
-
-            try {
-                const gamesCollection = collection(db, "games");
-                const q = query(gamesCollection, orderBy("createdAt", "desc"));
-                const querySnapshot = await getDocs(q);
-
-                runningLobbiesListContainer.innerHTML = '';
-                if (querySnapshot.empty) {
-                    runningLobbiesListContainer.innerHTML = '<p style="padding: 20px; text-align: center;">در حال حاضر هیچ بازی فعالی وجود ندارد.</p>';
-                    return;
-                }
-                
-                querySnapshot.forEach(doc => {
-                    const gameData = { id: doc.id, ...doc.data() };
-                    const cardHTML = renderRunningLobbyCard(gameData);
-                    runningLobbiesListContainer.innerHTML += cardHTML;
-                });
-            } catch (error) {
-                console.error("خطا در دریافت لیست بازی‌های فعال: ", error);
-                runningLobbiesListContainer.innerHTML = '<p style="padding: 20px; text-align: center;">خطا در بارگذاری اطلاعات. لطفا دوباره تلاش کنید.</p>';
-            }
-        }
-
-        function filterRunningLobbies() {
-            const searchTerm = runningLobbiesSearchInput.value.toLowerCase();
-            const allCards = runningLobbiesListContainer.querySelectorAll('.running-lobby-card');
-            allCards.forEach(card => {
-                const creatorName = card.dataset.creatorName || '';
-                if (creatorName.includes(searchTerm)) {
-                    card.style.display = 'flex';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        }
-        // --- END: توابع جدید ---
-
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 const userDocRef = doc(db, 'users', user.uid);
@@ -937,16 +741,18 @@
                         userDisplayName.textContent = currentUserData.displayName || "کاربر ناشناس";
                         userAvatar.src = currentUserData.avatarUrl || DEFAULT_AVATAR;
                         
+                        // --- START: به‌روزرسانی تعداد الماس و تنظیم فونت ---
                         const gems = currentUserData.game || 0;
                         userGemsCount.textContent = gems.toLocaleString('fa-IR');
-                        adjustGemFontSize(userGemsCount);
+                        adjustGemFontSize(userGemsCount); // فراخوانی تابع برای تنظیم اندازه فونت
+                        // --- END: به‌روزرسانی تعداد الماس و تنظیم فونت ---
 
                         adminPanelButton.style.display = currentUserData.isAdmin === true ? 'block' : 'none';
                     } else {
                         currentUserData = { email: user.email, displayName: user.displayName };
                         userDisplayName.textContent = user.displayName || "کاربر ناشناس";
                         userAvatar.src = DEFAULT_AVATAR;
-                        userGemsCount.textContent = "0";
+                        userGemsCount.textContent = "0"; // مقدار پیش‌فرض برای کاربر جدید
                         adminPanelButton.style.display = 'none';
                     }
                     if (isInitialLoad) {
@@ -967,7 +773,7 @@
             } else { window.location.href = './login.html'; }
         });
 
-        // Event Listeners
+        // Event Listeners (بدون تغییر)
         userAvatar.addEventListener('click', () => checkMaintenanceAndProceed(() => showModal(avatarMenuOverlay)));
         avatarMenuOverlay.addEventListener('click', (e) => { if (e.target === avatarMenuOverlay) hideModal(avatarMenuOverlay); });
         avatarMenuShopBtn.addEventListener('click', () => checkMaintenanceAndProceed(() => { window.location.href = './Avatar shop.html'; }));
@@ -1048,21 +854,6 @@
         banCancelBtn.addEventListener('click', () => { hideModal(banUserModalOverlay); showModal(editUserModalOverlay); });
         banUserModalOverlay.addEventListener('click', (e) => { if (e.target === banUserModalOverlay) { hideModal(banUserModalOverlay); showModal(editUserModalOverlay); }});
         banUserForm.addEventListener('submit', handleBanFormSubmit);
-        // --- START: Event Listeners برای پنل جدید ---
-        manageLobbiesBtn.addEventListener('click', loadAndShowRunningLobbies);
-        runningLobbiesCloseBtn.addEventListener('click', () => hideModal(manageRunningLobbiesOverlay));
-        manageRunningLobbiesOverlay.addEventListener('click', e => { if (e.target === manageRunningLobbiesOverlay) hideModal(manageRunningLobbiesOverlay); });
-        runningLobbiesSearchInput.addEventListener('input', filterRunningLobbies);
-        runningLobbiesListContainer.addEventListener('click', e => {
-            const spectateBtn = e.target.closest('.btn-spectate-game');
-            if (spectateBtn) {
-                const gameId = spectateBtn.dataset.gameId;
-                if (gameId) {
-                    window.location.href = `./gamescreen.html?id=${gameId}`;
-                }
-            }
-        });
-        // --- END: Event Listeners برای پنل جدید ---
     </script>
 </body>
 </html>
