@@ -199,7 +199,49 @@
 
         // --- Main Functions ---
 
+        // START: کد جدید برای پخش صدای خوش‌آمدگویی بر اساس زمان روز
+        async function playGreetingBasedOnTimeOfDay() {
+            const apiKey = "b31bd8909b9b4b87b45e4869a8be7358";
+            const apiUrl = `https://api.ipgeolocation.io/astronomy?apiKey=${apiKey}&location=Tehran`;
+
+            // لینک‌های مستقیم (Raw) به فایل‌های صوتی در GitHub
+            const daySoundUrl = 'https://raw.githubusercontent.com/abolfazl140122/mafia/58cc5df365b21b6f32f609f5c12175acce8f717c/voicravi/%D8%B3%D9%84%D8%A7%D9%85%20%D8%A8%D8%B1%20%D8%AF%D9%88%D8%B3%D8%AA%D8%A7%D9%86%20%D8%B9%D8%B2%DB%8C%D8%B2%20%D8%B1%D9%88%D8%B2%20%D9%87%D9%85%DA%AF%DB%8C%20%D8%A8%D8%AE%DB%8C%D8%B1!.wav';
+            const nightSoundUrl = 'https://raw.githubusercontent.com/abolfazl140122/mafia/58cc5df365b21b6f32f609f5c12175acce8f717c/voicravi/%D8%B3%D9%84%D8%A7%D9%85%20%D8%A8%D8%B1%20%D8%AF%D9%88%D8%B3%D8%AA%D8%A7%D9%86%20%D8%B9%D8%B2%DB%8C%D8%B2%20%D8%B4%D8%A8%20%D9%87%D9%85%DA%AF%DB%8C%20%D8%A8%D8%AE%DB%8C%D8%B1!.wav';
+
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error(`API request failed with status ${response.status}`);
+                }
+                const data = await response.json();
+
+                const { current_time, sunrise, sunset } = data;
+                
+                // مقایسه زمان فعلی با زمان طلوع و غروب خورشید برای تشخیص روز یا شب بودن
+                const isDay = current_time > sunrise && current_time < sunset;
+
+                const soundUrl = isDay ? daySoundUrl : nightSoundUrl;
+                const audio = new Audio(soundUrl);
+
+                // تلاش برای پخش صدا. ممکن است توسط مرورگر به دلیل عدم تعامل کاربر مسدود شود.
+                try {
+                    await audio.play();
+                    console.log(isDay ? "Playing day greeting." : "Playing night greeting.");
+                } catch (playError) {
+                    console.warn("پخش خودکار صدا توسط مرورگر مسدود شد. برای پخش صدا به تعامل کاربر نیاز است.", playError);
+                }
+
+            } catch (error) {
+                console.error("خطا در دریافت اطلاعات زمان یا پخش صدا:", error);
+                // در صورت بروز خطا، ادامه بارگذاری بازی بدون مشکل انجام می‌شود.
+            }
+        }
+        // END: کد جدید برای پخش صدای خوش‌آمدگویی
+
         async function main() {
+            // فراخوانی تابع پخش صدای خوش‌آمدگویی در ابتدای بارگذاری بازی
+            playGreetingBasedOnTimeOfDay();
+
             gameId = new URLSearchParams(window.location.search).get('id');
             if (!gameId) {
                 showNotificationModal("خطا", "شناسه بازی نامعتبر است.", () => window.location.href = './Lobby page.html');
