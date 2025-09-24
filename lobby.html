@@ -1,3 +1,5 @@
+--- START OF FILE صفه داخل لابی.txt ---
+
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -204,7 +206,7 @@
         #lobby-ban-user-modal-content .form-group-horizontal .form-select { flex-grow: 1; }
         #lobby-ban-user-modal-content .confirm-buttons-container { display: flex; gap: 15px; margin-top: 25px; }
 
-        /* === NEW: استایل‌های پنل انتخاب آواتار === */
+        /* === NEW & IMPROVED: استایل‌های پنل انتخاب آواتار === */
         #avatar-selection-modal-content {
             background: linear-gradient(160deg, #2c2118, #1a140e 80%);
             border: 2px solid var(--border-color);
@@ -233,6 +235,7 @@
             grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
             gap: 15px;
             justify-content: center;
+            background-image: repeating-linear-gradient(45deg, transparent, transparent 15px, rgba(255,255,255,0.01) 15px, rgba(255,255,255,0.01) 30px);
         }
         #avatar-selection-grid::-webkit-scrollbar { width: 8px; }
         #avatar-selection-grid::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 4px; }
@@ -248,6 +251,7 @@
             overflow: hidden;
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            opacity: 0; /* Initial state for animation */
         }
         .avatar-select-card:hover {
             transform: translateY(-5px) scale(1.05);
@@ -279,18 +283,53 @@
             font-size: 1rem;
             text-shadow: none;
         }
-        #avatar-grid-loader {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
+
+        /* NEW: Animation for avatar cards appearing */
+        @keyframes avatar-card-appear {
+            from {
+                opacity: 0;
+                transform: scale(0.8) translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
         }
+
+        /* NEW: Beautiful Skeleton Loader for Avatars */
+        .avatar-skeleton-card {
+            aspect-ratio: 1 / 1;
+            border-radius: 12px;
+            background-color: rgba(255, 255, 255, 0.05);
+            animation: pulse-skeleton 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse-skeleton {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: .5;
+            }
+        }
+
+        /* NEW: Improved styling for no-avatars message */
         #no-avatars-message {
             font-size: 1.1rem;
             color: var(--text-secondary);
             text-align: center;
             padding: 40px 20px;
             grid-column: 1 / -1; /* Spans the full width of the grid */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            height: 100%;
+        }
+        #no-avatars-message::before {
+            content: '🖼️';
+            font-size: 3rem;
+            filter: grayscale(80%);
         }
 
     </style>
@@ -336,7 +375,7 @@
     <div id="view-profile-modal-overlay" class="modal-overlay"> <div id="view-profile-modal-content" class="modal-content"> <div class="profile-header"> <span id="profile-modal-close-btn" class="modal-close-btn">&times;</span> <img id="profile-modal-avatar" src="" alt="آواتار پروفایل"> <div class="profile-name-banner"> <h2 id="profile-modal-name"></h2> </div> </div> <div class="profile-body"> <div class="profile-stat-item"> <span class="stat-label"><span>👑</span><span>سطح:</span></span> <span id="profile-stat-level" class="stat-value"></span> </div> <div class="profile-stat-item"> <span class="stat-label"><span>📜</span><span>تاریخ ثبت نام:</span></span> <span id="profile-stat-date" class="stat-value"></span> </div> <div class="profile-stat-item"> <span class="stat-label"><span>🎂</span><span>سن:</span></span> <span id="profile-stat-age" class="stat-value"></span> </div> <div class="profile-stat-item" id="profile-stat-diamonds-container"> <span class="stat-label"><span>💎</span><span>تعداد الماس:</span></span> <span id="profile-stat-diamonds" class="stat-value"></span> </div> <div class="profile-stat-item" id="profile-stat-email-container"> <span class="stat-label"><span>📧</span><span>ایمیل:</span></span> <span id="profile-stat-email" class="stat-value"></span> </div> </div> </div> </div>
     <div id="lobby-ban-user-modal-overlay" class="modal-overlay"> <div id="lobby-ban-user-modal-content" class="modal-content"> <h2 class="modal-title">مسدود کردن کاربر</h2> <form id="ban-user-form"> <div class="form-group"> <label for="ban-reason" class="form-label">دلیل مسدودیت:</label> <input type="text" id="ban-reason" class="form-input" required placeholder="مثال: استفاده از الفاظ نامناسب"> </div> <div class="form-group form-group-horizontal"> <label class="form-label">مدت زمان:</label> <input type="number" id="ban-duration" class="form-input" required value="1"> <select id="ban-unit" class="form-select"> <option value="hours">ساعت</option> <option value="days">روز</option> <option value="weeks">هفته</option> </select> </div> <div class="confirm-buttons-container"> <button type="button" id="ban-cancel-btn" class="modal-button secondary" style="width: 50%;">انصراف</button> <button type="submit" class="modal-button danger" style="width: 50%;">اعمال مسدودیت</button> </div> </form> </div> </div>
     
-    <!-- NEW: پنل انتخاب آواتار -->
+    <!-- NEW & IMPROVED: پنل انتخاب آواتار -->
     <div id="avatar-selection-modal-overlay" class="modal-overlay">
         <div id="avatar-selection-modal-content" class="modal-content">
             <header class="avatar-modal-header">
@@ -396,7 +435,7 @@
         let isCurrentUserInLobby = true;
         let targetUserForAction = null;
         let currentLobbyData = null;
-        let allShopAvatars = []; // NEW: Cache for shop avatars
+        let allShopAvatars = []; // Cache for shop avatars
 
         /**
          * Renders the entire lobby state based on Firestore data.
@@ -549,10 +588,10 @@
                 };
                 buttonsContainer.appendChild(profileBtn);
 
-                // NEW: Add "Change Avatar" button for self
+                // Add "Change Avatar" button for self with the same theme
                 if (player.uid === currentUser.uid) {
                     const changeAvatarBtn = document.createElement('button');
-                    changeAvatarBtn.className = 'modal-button secondary';
+                    changeAvatarBtn.className = 'modal-button primary'; // CHANGED: from 'secondary' to 'primary'
                     changeAvatarBtn.textContent = 'تغییر آواتار';
                     changeAvatarBtn.onclick = () => {
                         modal.classList.remove('visible');
@@ -599,11 +638,20 @@
             modal.classList.add('visible');
         }
         
-        // --- NEW: Avatar Selection Logic ---
+        // --- NEW & IMPROVED: Avatar Selection Logic ---
         async function showAvatarSelectionModal() {
             const modal = document.getElementById('avatar-selection-modal-overlay');
             const grid = document.getElementById('avatar-selection-grid');
-            grid.innerHTML = `<div id="avatar-grid-loader" class="loader"></div>`;
+            
+            // Show new beautiful skeleton loader
+            grid.innerHTML = ''; // Clear previous content
+            for (let i = 0; i < 8; i++) {
+                const skeleton = document.createElement('div');
+                skeleton.className = 'avatar-skeleton-card';
+                skeleton.style.animationDelay = `${i * 0.05}s`;
+                grid.appendChild(skeleton);
+            }
+            
             modal.classList.add('visible');
 
             try {
@@ -616,25 +664,33 @@
                 const ownedAvatarIds = currentUserData.ownedAvatars || [];
                 const ownedAvatars = allShopAvatars.filter(avatar => ownedAvatarIds.includes(avatar.id));
 
-                grid.innerHTML = ''; // Clear loader
+                // A short delay to let the user appreciate the loader
+                setTimeout(() => {
+                    grid.innerHTML = ''; // Clear loader
+                    if (ownedAvatars.length === 0) {
+                        grid.innerHTML = `<div id="no-avatars-message">شما هنوز آواتار خریداری شده‌ای ندارید. برای خرید به فروشگاه مراجعه کنید.</div>`;
+                    } else {
+                        ownedAvatars.forEach((avatar, index) => {
+                            const card = document.createElement('div');
+                            card.className = 'avatar-select-card';
+                            if (avatar.imageUrl === currentUserData.avatarUrl) {
+                                card.classList.add('equipped');
+                            }
+                            card.innerHTML = `<img src="${avatar.imageUrl}" alt="${avatar.name}" class="avatar-select-img">`;
+                            card.onclick = () => handleAvatarSelect(avatar);
 
-                if (ownedAvatars.length === 0) {
-                    grid.innerHTML = `<p id="no-avatars-message">شما هنوز آواتار خریداری شده‌ای ندارید. برای خرید به فروشگاه مراجعه کنید.</p>`;
-                } else {
-                    ownedAvatars.forEach(avatar => {
-                        const card = document.createElement('div');
-                        card.className = 'avatar-select-card';
-                        if (avatar.imageUrl === currentUserData.avatarUrl) {
-                            card.classList.add('equipped');
-                        }
-                        card.innerHTML = `<img src="${avatar.imageUrl}" alt="${avatar.name}" class="avatar-select-img">`;
-                        card.onclick = () => handleAvatarSelect(avatar);
-                        grid.appendChild(card);
-                    });
-                }
+                            // Apply staggered entrance animation
+                            card.style.animation = 'avatar-card-appear 0.5s cubic-bezier(0.25, 0.8, 0.25, 1) forwards';
+                            card.style.animationDelay = `${index * 0.05}s`;
+                            
+                            grid.appendChild(card);
+                        });
+                    }
+                }, 700); // delay in milliseconds
+
             } catch (error) {
                 console.error("Error loading avatars:", error);
-                grid.innerHTML = `<p id="no-avatars-message" style="color: #e74c3c;">خطا در بارگذاری آواتارها.</p>`;
+                grid.innerHTML = `<div id="no-avatars-message" style="color: #e74c3c;">خطا در بارگذاری آواتارها.</div>`;
             }
         }
 
