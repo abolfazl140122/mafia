@@ -116,7 +116,7 @@
         .ready-indicator { display: none; }
 
         /* === فوتر و دکمه‌ها === */
-        .lobby-footer { flex-shrink: 0; display: flex; gap: 10px; align-items: center; justify-content: space-between; padding: 10px; background-color: rgba(0,0,0,0.3); border-top: 1px solid var(--border-color); }
+        .lobby-footer { flex-shrink: 0; display: flex; gap: 10px; align-items: center; padding: 10px; background-color: rgba(0,0,0,0.3); border-top: 1px solid var(--border-color); }
         .action-button { flex-grow: 1; padding: 14px; font-size: 1.2rem; font-weight: 900; border-radius: 12px; border: none; cursor: pointer; transition: all 0.3s ease; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.5); position: relative; overflow: hidden; }
         .action-button::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(to bottom, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 20%); transform: rotate(25deg); }
         .action-button.ready-btn { background: linear-gradient(145deg, var(--green-join), var(--green-join-darker)); border: 2px solid #58d68d; }
@@ -126,47 +126,11 @@
         .action-button:not(:disabled):hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
         .action-button.start-btn:not(:disabled) { animation: pulse-start 2s infinite; }
         @keyframes pulse-start { 0% { box-shadow: 0 0 0 0 rgba(255, 201, 71, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(255, 201, 71, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 201, 71, 0); } }
-
-        /* NEW: Wrapper for icon buttons */
-        .footer-icon-buttons { display: flex; gap: 10px; flex-shrink: 0; }
-
-        .icon-button {
-            flex-shrink: 0; width: 50px; height: 50px; border-radius: 50%;
-            background-color: #4a5568; color: white; border: none;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            transition: all 0.3s ease;
-        }
-        .icon-button:hover:not(:disabled) { background-color: #2d3748; transform: scale(1.1); }
-        .icon-button:disabled { background-color: #626567; cursor: not-allowed; opacity: 0.6; transform: none; }
-        
-        #toggle-chat-btn svg { width: 24px; height: 24px; fill: currentColor; }
+        #toggle-chat-btn { flex-shrink: 0; width: 50px; height: 50px; border-radius: 50%; background-color: #4a5568; color: white; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: all 0.3s ease; }
+        #toggle-chat-btn:hover { background-color: #2d3748; transform: scale(1.1); }
         #toggle-chat-btn.new-message::after { content: ''; position: absolute; bottom: 0; right: 0; width: 14px; height: 14px; background-color: #e53e3e; border-radius: 50%; border: 2px solid var(--bg-dark); animation: pulse-new-message 1.5s infinite; }
         @keyframes pulse-new-message { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
-        
-        .reaction-btn { font-size: 1.5rem; }
-
-        /* NEW: Floating emoji animation */
-        .floating-emoji {
-            position: absolute;
-            z-index: 1500;
-            font-size: 2.5rem;
-            pointer-events: none;
-            text-shadow: 0 3px 6px rgba(0,0,0,0.5);
-            animation: float-up-and-fade 2s ease-out forwards;
-            /* Centering transform will be applied via JS positioning */
-        }
-        @keyframes float-up-and-fade {
-            0% {
-                transform: translateY(0) scale(0.5);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-60px) scale(1.2);
-                opacity: 0;
-            }
-        }
-
+        #toggle-chat-btn svg { width: 24px; height: 24px; fill: currentColor; }
 
         /* === پنل چت === */
         #chat-panel { position: fixed; top: 50%; left: 50%; width: 90%; max-width: 550px; height: 70%; max-height: 500px; background-color: rgba(26, 20, 14, 0.95); backdrop-filter: blur(10px); border: 1px solid var(--border-color); border-radius: 16px; display: flex; flex-direction: column; z-index: 999; box-shadow: 0 8px 30px rgba(0,0,0,0.6); opacity: 0; transform: translate(-50%, -50%) scale(0.9); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease; pointer-events: none; }
@@ -394,14 +358,9 @@
         </main>
         
         <footer class="lobby-footer">
-            <div class="footer-icon-buttons">
-                <button id="toggle-chat-btn" class="icon-button" title="باز کردن چت">
-                    <svg viewBox="0 0 24 24"><path d="M20,2H4A2,2,0,0,0,2,4V22l4-4H20a2,2,0,0,0,2-2V4A2,2,0,0,0,20,2Z"/></svg>
-                </button>
-                <!-- NEW: Reaction Buttons -->
-                <button id="like-btn" class="icon-button reaction-btn" title="لایک">👍</button>
-                <button id="dislike-btn" class="icon-button reaction-btn" title="دیس‌لایک">👎</button>
-            </div>
+            <button id="toggle-chat-btn" title="باز کردن چت">
+                <svg viewBox="0 0 24 24"><path d="M20,2H4A2,2,0,0,0,2,4V22l4-4H20a2,2,0,0,0,2-2V4A2,2,0,0,0,20,2Z"/></svg>
+            </button>
             <button id="action-btn" class="action-button ready-btn">آماده</button>
         </footer>
     </div>
@@ -459,9 +418,6 @@
         const chatForm = document.getElementById('chat-form');
         const chatInput = document.getElementById('chat-input');
         const clearChatBtn = document.getElementById('clear-chat-btn');
-        // NEW: Reaction buttons elements
-        const likeBtn = document.getElementById('like-btn');
-        const dislikeBtn = document.getElementById('dislike-btn');
         
         let currentUser = null;
         let currentUserData = {};
@@ -478,7 +434,6 @@
         let targetUserForAction = null;
         let currentLobbyData = null;
         let allShopAvatars = []; // Cache for shop avatars
-        let isReactionOnCooldown = false; // NEW: Cooldown flag for reactions
 
         /**
          * Renders the entire lobby state based on Firestore data.
@@ -529,10 +484,8 @@
             const self = allPlayers.find(p => p.uid === currentUser.uid);
             isReady = self ? self.isReady : false;
 
-            const iconButtonsWrapper = document.querySelector('.footer-icon-buttons');
             if (self && !self.isSpectator) {
                 actionBtn.style.display = 'block';
-                iconButtonsWrapper.style.display = 'flex'; // NEW: Show icon buttons
                 if (isHost) {
                     const isLobbyFull = visiblePlayers.length === MAX_PLAYERS;
                     const allOthersReady = visiblePlayers.every(p => p.uid === currentUser.uid || p.isReady);
@@ -546,7 +499,6 @@
                 }
             } else {
                 actionBtn.style.display = 'none';
-                iconButtonsWrapper.style.display = 'none'; // NEW: Hide icon buttons
             }
             updateAdminUI(allPlayers);
         }
@@ -811,53 +763,6 @@
             }
         }
 
-        // --- NEW: Reaction Handling Functions ---
-        function handleReaction(emoji) {
-            if (isReactionOnCooldown) return;
-
-            const selfSlot = document.querySelector(`.player-slot[data-uid="${currentUser.uid}"]`);
-            if (!selfSlot) {
-                console.warn("Could not find self player slot for reaction.");
-                return;
-            }
-
-            // 1. Start Cooldown
-            isReactionOnCooldown = true;
-            likeBtn.disabled = true;
-            dislikeBtn.disabled = true;
-
-            // 2. Show Effect
-            showFloatingEmoji(selfSlot, emoji);
-
-            // 3. End Cooldown after 3 seconds
-            setTimeout(() => {
-                isReactionOnCooldown = false;
-                likeBtn.disabled = false;
-                dislikeBtn.disabled = false;
-            }, 3000);
-        }
-
-        function showFloatingEmoji(targetElement, emoji) {
-            const emojiEl = document.createElement('span');
-            emojiEl.className = 'floating-emoji';
-            emojiEl.textContent = emoji;
-            document.body.appendChild(emojiEl);
-
-            const rect = targetElement.getBoundingClientRect();
-            // Position at the center of the target element initially
-            const top = rect.top + (rect.height / 2);
-            const left = rect.left + (rect.width / 2);
-
-            emojiEl.style.top = `${top}px`;
-            emojiEl.style.left = `${left}px`;
-            
-            // The CSS animation will handle movement and fading.
-            // Remove the element from the DOM after the animation completes (2s).
-            setTimeout(() => {
-                emojiEl.remove();
-            }, 2000);
-        }
-
         function setupEventListeners() { 
             actionBtn.addEventListener('click', () => isHost ? startGame() : toggleReadyStatus()); 
             leaveLobbyBtn.addEventListener('click', showLeaveConfirm); 
@@ -869,12 +774,7 @@
             document.getElementById('ban-user-form').addEventListener('submit', handleBanFormSubmit); 
             document.getElementById('admin-join-btn').addEventListener('click', handleAdminJoinGame);
             document.getElementById('add-bot-btn').addEventListener('click', handleAddBot);
-            
-            // NEW: Add event listeners for reaction buttons
-            likeBtn.addEventListener('click', () => handleReaction('👍'));
-            dislikeBtn.addEventListener('click', () => handleReaction('👎'));
-
-            // Event listeners for Avatar Selection Modal
+            // NEW: Event listeners for Avatar Selection Modal
             const avatarModal = document.getElementById('avatar-selection-modal-overlay');
             document.getElementById('avatar-modal-close-btn').onclick = () => avatarModal.classList.remove('visible');
             avatarModal.onclick = (e) => { if (e.target === avatarModal) avatarModal.classList.remove('visible'); };
