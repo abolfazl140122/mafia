@@ -55,7 +55,6 @@
         /* === نوار اعلانات === */
         .announcement-bar { flex-shrink: 0; width: 100%; padding: 10px; background-color: rgba(140, 72, 67, 0.5); border-radius: 8px; text-align: center; font-size: 1rem; font-weight: 700; display: none; transition: all 0.3s ease; }
 
-        /* START CHANGE: استایل‌های جدید برای چیدمان بازیکنان مشابه لابی */
         .players-area { flex-grow: 1; width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 5px; overflow: hidden; }
         .players-column { display: flex; flex-direction: column; justify-content: space-around; align-items: center; height: 100%; flex-shrink: 0; width: 100px; }
         #central-board-container { flex-grow: 1; display: flex; justify-content: center; align-items: center; height: 100%; padding: 0 5px; }
@@ -74,7 +73,6 @@
         .player-slot.dead .dead-overlay { opacity: 1; }
         .dead-icon { font-size: 2.5rem; text-shadow: 0 0 10px black; }
         .revealed-role { font-weight: 700; color: var(--primary-gold); font-size: 0.8rem; text-shadow: 1px 1px 3px black; }
-        /* END CHANGE */
 
         /* === فوتر بازی (دکمه‌های اقدام) === */
         .game-footer { flex-shrink: 0; display: flex; gap: 10px; align-items: center; padding: 10px; background-color: rgba(0,0,0,0.3); border-top: 1px solid var(--border-color); }
@@ -82,7 +80,6 @@
         #game-action-btn:disabled { background: linear-gradient(145deg, #7f8c8d, #626567); border-color: #95a5a6; cursor: not-allowed; opacity: 0.6; }
         #game-action-btn:not(:disabled):hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
 
-        /* === استایل‌های چت و مودال‌ها (بدون تغییر) === */
         #toggle-chat-btn { flex-shrink: 0; width: 50px; height: 50px; border-radius: 50%; background-color: #4a5568; color: white; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: all 0.3s ease; position: relative; }
         #toggle-chat-btn:hover { background-color: #2d3748; transform: scale(1.1); }
         #toggle-chat-btn.new-message::after { content: ''; position: absolute; bottom: 0; right: 0; width: 14px; height: 14px; background-color: #e53e3e; border-radius: 50%; border: 2px solid var(--bg-dark); }
@@ -133,15 +130,15 @@
 
         <div id="announcement-bar" class="announcement-bar"></div>
 
-        <!-- START CHANGE: ساختار جدید برای نمایش بازیکنان -->
         <main class="players-area">
             <div id="right-players" class="players-column"></div>
             <div id="central-board-container">
-                <!-- این بخش می‌تواند برای نمایش اطلاعات اضافی بازی استفاده شود -->
+                <!-- START: بخش جدید برای دکمه‌های قابلیت‌های خاص -->
+                <div id="special-abilities-container"></div>
+                <!-- END: بخش جدید -->
             </div>
             <div id="left-players" class="players-column"></div>
         </main>
-        <!-- END CHANGE -->
         
         <footer class="game-footer">
             <button id="toggle-chat-btn" title="باز کردن چت">
@@ -151,7 +148,6 @@
         </footer>
     </div>
     
-    <!-- پنل چت و مودال‌ها (کپی شده از لابی) -->
     <div id="chat-panel"> <div class="chat-header"> <h3>چت بازی</h3> <button id="close-chat-btn" title="بستن چت">&times;</button> </div> <div id="chat-messages"></div> <form id="chat-form"> <input type="text" id="chat-input" placeholder="پیام خود را بنویسید..." autocomplete="off"> <button type="submit" id="chat-send-btn">ارسال</button> </form> </div>
     <div id="notification-modal" class="modal-overlay"> <div class="modal-content"> <h2 id="notification-modal-title" class="modal-title">توجه</h2> <p id="notification-modal-message" class="modal-message"></p> <div class="modal-buttons"> <button id="notification-modal-ok-btn" class="modal-button primary">متوجه شدم</button> </div> </div> </div>
     
@@ -167,19 +163,16 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         
-        const MAX_PLAYERS = 12; // برای حفظ ساختار مشابه لابی
+        const MAX_PLAYERS = 8; // تعداد بازیکنان شما 8 نفر است
 
         const loadingOverlay = document.getElementById('loading-overlay');
         const gameContainer = document.querySelector('.game-container');
-        // START CHANGE: المنت‌های جدید برای چیدمان ستونی
         const leftPlayersEl = document.getElementById('left-players');
         const rightPlayersEl = document.getElementById('right-players');
-        // END CHANGE
         const gamePhaseInfoEl = document.getElementById('game-phase-info');
         const gameTimerEl = document.getElementById('game-timer');
         const announcementBarEl = document.getElementById('announcement-bar');
         const gameActionBtn = document.getElementById('game-action-btn');
-        // Chat elements
         const toggleChatBtn = document.getElementById('toggle-chat-btn');
         const chatPanel = document.getElementById('chat-panel');
         const closeChatBtn = document.getElementById('close-chat-btn');
@@ -191,57 +184,13 @@
         let currentUserData = {};
         let gameId = null;
         let unsubscribeGame = null;
-        let unsubscribeChat = null; // START CHANGE: برای listener چت
+        let unsubscribeChat = null;
         let currentGameState = {};
         let localSelectedPlayerUid = null;
         let timerInterval = null;
-        let isChatPanelVisible = false; // START CHANGE: برای وضعیت پنل چت
-
-        // --- Main Functions ---
-
-        // START: کد جدید برای پخش صدای خوش‌آمدگویی بر اساس زمان روز
-        async function playGreetingBasedOnTimeOfDay() {
-            const apiKey = "b31bd8909b9b4b87b45e4869a8be7358";
-            const apiUrl = `https://api.ipgeolocation.io/astronomy?apiKey=${apiKey}&location=Tehran`;
-
-            // لینک‌های مستقیم (Raw) به فایل‌های صوتی در GitHub
-            const daySoundUrl = 'https://raw.githubusercontent.com/abolfazl140122/mafia/58cc5df365b21b6f32f609f5c12175acce8f717c/voicravi/%D8%B3%D9%84%D8%A7%D9%85%20%D8%A8%D8%B1%20%D8%AF%D9%88%D8%B3%D8%AA%D8%A7%D9%86%20%D8%B9%D8%B2%DB%8C%D8%B2%20%D8%B1%D9%88%D8%B2%20%D9%87%D9%85%DA%AF%DB%8C%20%D8%A8%D8%AE%DB%8C%D8%B1!.wav';
-            const nightSoundUrl = 'https://raw.githubusercontent.com/abolfazl140122/mafia/58cc5df365b21b6f32f609f5c12175acce8f717c/voicravi/%D8%B3%D9%84%D8%A7%D9%85%20%D8%A8%D8%B1%20%D8%AF%D9%88%D8%B3%D8%AA%D8%A7%D9%86%20%D8%B9%D8%B2%DB%8C%D8%B2%20%D8%B4%D8%A8%20%D9%87%D9%85%DA%AF%DB%8C%20%D8%A8%D8%AE%DB%8C%D8%B1!.wav';
-
-            try {
-                const response = await fetch(apiUrl);
-                if (!response.ok) {
-                    throw new Error(`API request failed with status ${response.status}`);
-                }
-                const data = await response.json();
-
-                const { current_time, sunrise, sunset } = data;
-                
-                // مقایسه زمان فعلی با زمان طلوع و غروب خورشید برای تشخیص روز یا شب بودن
-                const isDay = current_time > sunrise && current_time < sunset;
-
-                const soundUrl = isDay ? daySoundUrl : nightSoundUrl;
-                const audio = new Audio(soundUrl);
-
-                // تلاش برای پخش صدا. ممکن است توسط مرورگر به دلیل عدم تعامل کاربر مسدود شود.
-                try {
-                    await audio.play();
-                    console.log(isDay ? "Playing day greeting." : "Playing night greeting.");
-                } catch (playError) {
-                    console.warn("پخش خودکار صدا توسط مرورگر مسدود شد. برای پخش صدا به تعامل کاربر نیاز است.", playError);
-                }
-
-            } catch (error) {
-                console.error("خطا در دریافت اطلاعات زمان یا پخش صدا:", error);
-                // در صورت بروز خطا، ادامه بارگذاری بازی بدون مشکل انجام می‌شود.
-            }
-        }
-        // END: کد جدید برای پخش صدای خوش‌آمدگویی
+        let isChatPanelVisible = false;
 
         async function main() {
-            // فراخوانی تابع پخش صدای خوش‌آمدگویی در ابتدای بارگذاری بازی
-            playGreetingBasedOnTimeOfDay();
-
             gameId = new URLSearchParams(window.location.search).get('id');
             if (!gameId) {
                 showNotificationModal("خطا", "شناسه بازی نامعتبر است.", () => window.location.href = './Lobby page.html');
@@ -251,9 +200,12 @@
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
                     currentUser = user;
-                    currentUserData = { displayName: user.displayName, avatarUrl: user.photoURL }; 
+                    const userDoc = await getDoc(doc(db, "users", user.uid));
+                    if(userDoc.exists()) currentUserData = userDoc.data();
+                    else currentUserData = { displayName: user.displayName, avatarUrl: user.photoURL };
+                    
                     listenToGameStateChanges();
-                    listenToChatMessages(); // START CHANGE: فعال کردن شنونده چت
+                    listenToChatMessages();
                     setupEventListeners();
                 } else {
                     window.location.href = './login.html';
@@ -266,14 +218,29 @@
             unsubscribeGame = onSnapshot(gameDocRef, (docSnap) => {
                 if (!docSnap.exists()) {
                     if (unsubscribeGame) unsubscribeGame();
-                    if (unsubscribeChat) unsubscribeChat(); // START CHANGE: توقف شنونده چت
+                    if (unsubscribeChat) unsubscribeChat();
                     showNotificationModal("بازی پایان یافت", "این بازی دیگر فعال نیست.", () => window.location.href = './Lobby page.html');
                     return;
                 }
                 
+                const oldPhase = currentGameState.phase;
                 currentGameState = docSnap.data();
+                const newPhase = currentGameState.phase;
+
                 renderGame(currentGameState);
-                
+
+                // START: منطق پردازش خودکار توسط سازنده (Host)
+                const isHost = currentUser.uid === currentGameState.creatorId;
+                if (isHost && newPhase !== oldPhase) {
+                    // اگر فاز بازی تغییر کرده، یعنی یک مرحله تمام شده و باید مرحله بعدی پردازش شود
+                    if (newPhase === 'NIGHT_RESULTS' && !currentGameState.isProcessing) {
+                        processNightActions();
+                    }
+                    // میتوانید منطق مشابهی برای پردازش رای گیری روز اضافه کنید
+                    // if (newPhase === 'VOTE_RESULTS' && !currentGameState.isProcessing) { processDayVote(); }
+                }
+                // END: منطق پردازش خودکار
+
                 if (loadingOverlay.style.display !== 'none') {
                     loadingOverlay.style.opacity = '0';
                     setTimeout(() => {
@@ -289,19 +256,22 @@
 
         function renderGame(data) {
             const self = data.players.find(p => p.uid === currentUser.uid);
-            if (!self) return;
+            if (!self) { // اگر بازیکن در لیست نبود (مثلا اخراج شده)
+                showNotificationModal("توجه", "شما دیگر در این بازی حضور ندارید.", () => window.location.href = './Lobby page.html');
+                return;
+            }
 
             renderHeader(data.phase, data.day, data.timerEndsAt);
             renderAnnouncements(data.announcements);
-            renderPlayerSlots(data.players, self, data.phase); // START CHANGE: فراخوانی تابع جدید
+            renderPlayerSlots(data.players, self, data.phase);
             updateActionButton(self, data.phase);
         }
         
         function renderHeader(phase, day, timerEndsAt) {
-            const phaseTranslations = { 'day_discussion': 'بحث روز', 'day_voting': 'رأی‌گیری', 'defense': 'دفاعیه', 'night': 'شب' };
+            const phaseTranslations = { 'DAY_DISCUSSION': 'بحث روز', 'DAY_VOTING': 'رأی‌گیری', 'DEFENSE': 'دفاعیه', 'NIGHT': 'شب', 'GAME_OVER': 'پایان بازی' };
             gamePhaseInfoEl.textContent = `${phaseTranslations[phase] || phase} - روز ${day}`;
             if (timerInterval) clearInterval(timerInterval);
-            if (timerEndsAt) {
+            if (timerEndsAt && typeof timerEndsAt.toDate === 'function') {
                 const endTime = timerEndsAt.toDate();
                 timerInterval = setInterval(() => {
                     const now = new Date();
@@ -317,31 +287,29 @@
                     gameTimerEl.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
                     gameTimerEl.classList.toggle('critical', secondsLeft <= 10);
                 }, 1000);
+            } else {
+                 gameTimerEl.textContent = "--:--";
             }
         }
         
         function renderAnnouncements(announcements) {
              if (announcements && announcements.length > 0) {
-                announcementBarEl.textContent = announcements[announcements.length - 1];
+                announcementBarEl.innerHTML = announcements[announcements.length - 1]; // Use innerHTML to support bold tags etc.
                 announcementBarEl.style.display = 'block';
             } else {
                 announcementBarEl.style.display = 'none';
             }
         }
         
-        // START CHANGE: تابع جدید برای رندر کردن بازیکنان در ستون‌ها
         function renderPlayerSlots(players, self, phase) {
             leftPlayersEl.innerHTML = '';
             rightPlayersEl.innerHTML = '';
             
-            const isSelectablePhase = phase === 'day_voting' || (phase === 'night' && self.isAlive && self.ability?.canTarget);
-            const playersPerColumn = MAX_PLAYERS / 2;
+            const isNight = phase === 'NIGHT';
+            const canTarget = isNight && self.isAlive && self.ability?.canTarget;
+            const playersPerColumn = Math.ceil(players.length / 2);
 
-            for (let i = 0; i < MAX_PLAYERS; i++) {
-                // بازیکن را بر اساس ایندکس پیدا می‌کنیم تا ترتیب حفظ شود
-                const player = players[i];
-                if (!player) continue; // اگر در دیتابیس کمتر از 12 بازیکن بود، از خطا جلوگیری می‌کند
-                
+            players.forEach((player, i) => {
                 const slot = document.createElement('div');
                 slot.className = 'player-slot';
                 slot.dataset.uid = player.uid;
@@ -354,22 +322,24 @@
                 
                 if (!player.isAlive) {
                     slot.classList.add('dead');
+                    const roleToShow = (self.team === 'robot' || !self.isAlive) ? player.roleName : (player.team === 'robot' ? 'ربات' : 'شهروند');
                     slotContent += `
                         <div class="dead-overlay">
                             <div class="dead-icon">👻</div>
-                            <div class="revealed-role">${player.roleName || 'نقش نامشخص'}</div>
+                            <div class="revealed-role">${roleToShow}</div>
                         </div>
                     `;
-                } else {
-                    if (isSelectablePhase) {
-                        let canBeSelected = player.uid !== self.uid; // نمی‌توان به خود رای داد
-                        // TODO: قوانین بیشتر (مثلا دکتر نمی‌تواند یک نفر را دو شب متوالی نجات دهد)
-                        
-                        if (canBeSelected) {
-                            slot.classList.add('selectable');
-                            slot.onclick = () => handlePlayerCardClick(player.uid);
-                        }
+                } else if (canTarget) {
+                    // START: منطق پیشرفته برای انتخاب هدف
+                    let isSelectable = true;
+                    if (self.uid === player.uid) isSelectable = false; // عدم انتخاب خود
+                    if (self.team === 'robot' && player.team === 'robot') isSelectable = false; // ربات‌ها نمی‌توانند هم‌تیمی را بزنند
+                    
+                    if (isSelectable) {
+                         slot.classList.add('selectable');
+                         slot.onclick = () => handlePlayerCardClick(player.uid);
                     }
+                    // END: منطق پیشرفته
                 }
                 
                 if (player.uid === localSelectedPlayerUid) {
@@ -383,9 +353,8 @@
                 } else {
                     leftPlayersEl.appendChild(slot);
                 }
-            }
+            });
         }
-        // END CHANGE
 
         function updateActionButton(self, phase) {
             if (!self.isAlive) {
@@ -393,14 +362,29 @@
                 gameActionBtn.disabled = true;
                 return;
             }
+
+            // پاک کردن دکمه‌های قابلیت‌های ویژه
+            document.getElementById('special-abilities-container').innerHTML = '';
+
             switch(phase) {
-                case 'day_voting':
+                case 'DAY_VOTING':
                     gameActionBtn.textContent = 'ثبت رأی';
                     gameActionBtn.disabled = !localSelectedPlayerUid;
                     break;
-                case 'night':
+                case 'NIGHT':
                     gameActionBtn.textContent = self.ability?.actionText || 'انجام حرکت شب';
-                    gameActionBtn.disabled = !localSelectedPlayerUid && self.ability?.requiresTarget;
+                    gameActionBtn.disabled = self.ability?.requiresTarget && !localSelectedPlayerUid;
+                    break;
+                case 'DAY_DISCUSSION':
+                    // قابلیت‌های شهردار و تبدیل شونده در این فاز نمایش داده می‌شوند
+                    if (self.roleName === 'شهردار' && self.ability.usesLeft > 0) {
+                        // ... نمایش دکمه‌های شهردار
+                    }
+                    if (self.roleName === 'تبدیل شونده' && self.ability.usesLeft > 0) {
+                        // ... نمایش دکمه تبدیل شونده
+                    }
+                    gameActionBtn.textContent = 'لطفا منتظر بمانید';
+                    gameActionBtn.disabled = true;
                     break;
                 default:
                     gameActionBtn.textContent = 'لطفا منتظر بمانید';
@@ -408,35 +392,24 @@
             }
         }
         
-        function setupEventListeners() {
-            gameActionBtn.addEventListener('click', handleMainAction);
-            toggleChatBtn.addEventListener('click', toggleChatPanel);
-            closeChatBtn.addEventListener('click', toggleChatPanel);
-            chatForm.addEventListener('submit', handleSendMessage);
-        }
-
         function handlePlayerCardClick(uid) {
             localSelectedPlayerUid = (localSelectedPlayerUid === uid) ? null : uid;
-            renderGame(currentGameState); // بازрисовانی برای نمایش انتخاب
+            renderGame(currentGameState);
         }
         
         async function handleMainAction() {
+            const self = currentGameState.players.find(p => p.uid === currentUser.uid);
+            if (!self || !self.isAlive) return;
+
             gameActionBtn.disabled = true;
-            const actionType = currentGameState.phase === 'day_voting' ? 'vote' : 'ability';
-            console.log(`Action: ${actionType}, Target: ${localSelectedPlayerUid}`);
+            const actionType = currentGameState.phase === 'DAY_VOTING' ? 'votedFor' : 'abilityTarget';
+            
             showNotificationModal("اقدام ثبت شد", "حرکت شما ثبت شد، منتظر بقیه بازیکنان بمانید.");
             try {
                 const gameDocRef = doc(db, "games", gameId);
-                await runTransaction(db, async (transaction) => {
-                     const gameDoc = await transaction.get(gameDocRef);
-                     if (!gameDoc.exists()) throw "Game does not exist!";
-                     let players = gameDoc.data().players;
-                     const playerIndex = players.findIndex(p => p.uid === currentUser.uid);
-                     if(playerIndex > -1) {
-                         if(actionType === 'vote') players[playerIndex].votedFor = localSelectedPlayerUid;
-                         else players[playerIndex].abilityTarget = localSelectedPlayerUid;
-                         transaction.update(gameDocRef, { players });
-                     }
+                const playerPath = `players.${currentGameState.players.indexOf(self)}.${actionType}`;
+                await updateDoc(gameDocRef, {
+                    [playerPath]: localSelectedPlayerUid
                 });
                 localSelectedPlayerUid = null;
             } catch (error) {
@@ -446,92 +419,128 @@
             }
         }
         
-        // START CHANGE: توابع مربوط به چت که اضافه شده‌اند
-        function listenToChatMessages() {
-            const chatCollectionRef = collection(db, `games/${gameId}/chat`);
-            const q = query(chatCollectionRef, orderBy('timestamp', 'asc'));
-            unsubscribeChat = onSnapshot(q, (snapshot) => {
-                snapshot.docChanges().forEach(change => {
-                    if (change.type === 'added') {
-                        renderMessage(change.doc.data());
-                        if (!isChatPanelVisible && change.doc.data().senderUid !== currentUser.uid) {
-                            toggleChatBtn.classList.add('new-message');
-                        }
-                    }
-                });
-            });
-        }
+        // START: تابع اصلی پردازش شب
+        async function processNightActions() {
+            const gameDocRef = doc(db, "games", gameId);
+            
+            try {
+                await updateDoc(gameDocRef, { isProcessing: true });
 
-        function renderMessage(data) {
-            const messageDiv = document.createElement('div');
-            messageDiv.classList.add('chat-message');
-            const isSelf = data.senderUid === currentUser.uid;
-            if (isSelf) messageDiv.classList.add('self');
-            messageDiv.innerHTML = `
-                <img src="${data.senderAvatarUrl || 'https://up.20script.ir/file/1d50-defult.png'}" class="chat-message-avatar" onerror="this.src='https://up.20script.ir/file/1d50-defult.png';">
-                <div class="chat-message-content">
-                    <span class="chat-message-sender">${data.senderName}</span>
-                    <div class="chat-message-bubble">${data.text}</div>
-                </div>`;
-            chatMessagesEl.appendChild(messageDiv);
-            chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
-        }
-        
-        function toggleChatPanel() { 
-            isChatPanelVisible = !isChatPanelVisible; 
-            chatPanel.classList.toggle('visible', isChatPanelVisible); 
-            if(isChatPanelVisible) {
-                toggleChatBtn.classList.remove('new-message');
-                chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
-                chatInput.focus();
+                let players = [...currentGameState.players]; // کپی از آرایه بازیکنان برای دستکاری
+                let announcements = [];
+
+                // 1. شناسایی نقش‌ها و اهدافشان
+                const hoshSiah = players.find(p => p.roleName === 'هوش سیاه' && p.isAlive);
+                const doctor = players.find(p => p.roleName === 'دکتر' && p.isAlive);
+                const ambot = players.find(p => p.roleName === 'آموبات' && p.isAlive);
+                const guardian = players.find(p => p.roleName === 'محافظ' && p.isAlive);
+                
+                // 2. بررسی گروگان‌گیری و محافظت
+                let isDoctorHostaged = false;
+                if (ambot && doctor && ambot.abilityTarget === doctor.uid) {
+                    isDoctorHostaged = true;
+                    if (guardian && guardian.abilityTarget === doctor.uid) {
+                        isDoctorHostaged = false; // محافظ دکتر را نجات داد
+                        announcements.push("محافظ هوشیار بود و از دکتر در مقابل خطر دفاع کرد!");
+                    } else {
+                        announcements.push("آموبات دکتر را به گروگان گرفت و قابلیت او را مختل کرد.");
+                    }
+                }
+
+                // 3. بررسی نجات دکتر
+                const savedPlayerUid = (doctor && !isDoctorHostaged) ? doctor.abilityTarget : null;
+                if (savedPlayerUid) {
+                    announcements.push("دکتر شب گذشته مشغول فعالیت بود.");
+                }
+
+                // 4. اعمال شلیک
+                let shotPlayer = null;
+                if (hoshSiah && hoshSiah.abilityTarget) {
+                    if (hoshSiah.abilityTarget !== savedPlayerUid) {
+                        const targetIndex = players.findIndex(p => p.uid === hoshSiah.abilityTarget);
+                        if (targetIndex > -1) {
+                            players[targetIndex].isAlive = false;
+                            shotPlayer = players[targetIndex];
+                            announcements.push(`دیشب <b>${shotPlayer.displayName}</b> از بازی حذف شد.`);
+                        }
+                    } else {
+                        announcements.push("شلیک ربات‌ها به نتیجه نرسید.");
+                    }
+                } else {
+                     announcements.push("دیشب اتفاق خاصی رخ نداد.");
+                }
+
+                // 5. ریست کردن انتخاب‌های شب
+                players = players.map(p => ({ ...p, abilityTarget: null, votedFor: null }));
+
+                // 6. بررسی وضعیت برد
+                const winResult = checkWinCondition(players);
+                if (winResult.isGameOver) {
+                    await updateDoc(gameDocRef, {
+                        players: players,
+                        phase: 'GAME_OVER',
+                        announcements: [...currentGameState.announcements, ...announcements, winResult.message],
+                        isProcessing: false
+                    });
+                    return;
+                }
+
+                // 7. رفتن به روز بعد
+                await updateDoc(gameDocRef, {
+                    players: players,
+                    day: currentGameState.day + 1,
+                    phase: 'DAY_DISCUSSION',
+                    timerEndsAt: serverTimestamp(), // می‌توانید زمان مشخصی ست کنید
+                    announcements: [...currentGameState.announcements, ...announcements],
+                    isProcessing: false
+                });
+
+            } catch (error) {
+                console.error("Error processing night actions:", error);
+                // در صورت خطا، بازی را از حالت پردازش خارج کن
+                await updateDoc(gameDocRef, { isProcessing: false });
             }
         }
+        // END: تابع اصلی پردازش شب
 
-        async function handleSendMessage(e) {
-             e.preventDefault();
-             const messageText = chatInput.value.trim();
-             if (messageText === '') return;
-             
-             const selfInGame = currentGameState.players.find(p => p.uid === currentUser.uid);
-             if (!selfInGame || !selfInGame.isAlive) {
-                showNotificationModal("توجه", "افراد حذف شده نمی‌توانند پیام ارسال کنند.");
-                return;
-             }
+        // START: تابع بررسی وضعیت برد
+        function checkWinCondition(players) {
+            const alivePlayers = players.filter(p => p.isAlive);
+            const aliveRobots = alivePlayers.filter(p => p.team === 'robot');
+            const aliveCitizens = alivePlayers.filter(p => p.team === 'citizen');
+            const multiFace = players.find(p => p.roleName === 'چند چهره');
 
-             chatInput.disabled = true;
-             const tempMessage = chatInput.value;
-             chatInput.value = '';
-             try {
-                const chatCollectionRef = collection(db, `games/${gameId}/chat`);
-                await addDoc(chatCollectionRef, { 
-                    text: messageText, 
-                    senderName: currentUserData.displayName || "بازیکن", 
-                    senderUid: currentUser.uid, 
-                    senderAvatarUrl: currentUserData.avatarUrl || "https://up.20script.ir/file/1d50-defult.png",
-                    timestamp: serverTimestamp() 
-                });
-             } catch (error) {
-                console.error("Send message error:", error);
-                chatInput.value = tempMessage; // بازگرداندن پیام در صورت خطا
-             } finally {
-                chatInput.disabled = false;
-                chatInput.focus();
-             }
+            let result = { isGameOver: false, message: "" };
+
+            if (aliveRobots.length === 0) {
+                result.isGameOver = true;
+                let winners = "شهروندان";
+                if (multiFace && multiFace.isAlive) winners += " و چند چهره";
+                result.message = `<b>پایان بازی! ${winners} برنده شدند.</b>`;
+            } else if (aliveRobots.length >= aliveCitizens.length) {
+                result.isGameOver = true;
+                let winners = "ربات‌ها";
+                 if (multiFace && multiFace.isAlive) winners += " و چند چهره";
+                result.message = `<b>پایان بازی! ${winners} برنده شدند.</b>`;
+            }
+            
+            return result;
         }
-        // END CHANGE
+        // END: تابع بررسی وضعیت برد
 
-        function showNotificationModal(title, message, onOk) { 
-            const modal = document.getElementById('notification-modal'); 
-            document.getElementById('notification-modal-title').textContent = title; 
-            document.getElementById('notification-modal-message').textContent = message; 
-            const okBtn = document.getElementById('notification-modal-ok-btn'); 
-            const newOkBtn = okBtn.cloneNode(true); 
-            okBtn.parentNode.replaceChild(newOkBtn, okBtn); 
-            const closeModal = () => { modal.classList.remove('visible'); if (onOk) onOk(); }; 
-            newOkBtn.onclick = closeModal; 
-            modal.onclick = (e) => { if (e.target === modal) closeModal(); }; 
-            modal.classList.add('visible'); 
+        function setupEventListeners() {
+            gameActionBtn.addEventListener('click', handleMainAction);
+            toggleChatBtn.addEventListener('click', toggleChatPanel);
+            closeChatBtn.addEventListener('click', toggleChatPanel);
+            chatForm.addEventListener('submit', handleSendMessage);
         }
+
+        // --- توابع کمکی چت و مودال (بدون تغییر) ---
+        function listenToChatMessages() { const chatCollectionRef = collection(db, `games/${gameId}/chat`); const q = query(chatCollectionRef, orderBy('timestamp', 'asc')); unsubscribeChat = onSnapshot(q, (snapshot) => { snapshot.docChanges().forEach(change => { if (change.type === 'added') { renderMessage(change.doc.data()); if (!isChatPanelVisible && change.doc.data().senderUid !== currentUser.uid) { toggleChatBtn.classList.add('new-message'); } } }); }); }
+        function renderMessage(data) { const messageDiv = document.createElement('div'); messageDiv.classList.add('chat-message'); const isSelf = data.senderUid === currentUser.uid; if (isSelf) messageDiv.classList.add('self'); messageDiv.innerHTML = `<img src="${data.senderAvatarUrl || 'https://up.20script.ir/file/1d50-defult.png'}" class="chat-message-avatar" onerror="this.src='https://up.20script.ir/file/1d50-defult.png';"><div class="chat-message-content"><span class="chat-message-sender">${data.senderName}</span><div class="chat-message-bubble">${data.text}</div></div>`; chatMessagesEl.appendChild(messageDiv); chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight; }
+        function toggleChatPanel() { isChatPanelVisible = !isChatPanelVisible; chatPanel.classList.toggle('visible', isChatPanelVisible); if(isChatPanelVisible) { toggleChatBtn.classList.remove('new-message'); chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight; chatInput.focus(); } }
+        async function handleSendMessage(e) { e.preventDefault(); const messageText = chatInput.value.trim(); if (messageText === '') return; const selfInGame = currentGameState.players.find(p => p.uid === currentUser.uid); if (!selfInGame || !selfInGame.isAlive) { showNotificationModal("توجه", "افراد حذف شده نمی‌توانند پیام ارسال کنند."); return; } chatInput.disabled = true; const tempMessage = chatInput.value; chatInput.value = ''; try { const chatCollectionRef = collection(db, `games/${gameId}/chat`); await addDoc(chatCollectionRef, { text: messageText, senderName: currentUserData.displayName || "بازیکن", senderUid: currentUser.uid, senderAvatarUrl: currentUserData.avatarUrl || "https://up.20script.ir/file/1d50-defult.png", timestamp: serverTimestamp() }); } catch (error) { console.error("Send message error:", error); chatInput.value = tempMessage; } finally { chatInput.disabled = false; chatInput.focus(); } }
+        function showNotificationModal(title, message, onOk) { const modal = document.getElementById('notification-modal'); document.getElementById('notification-modal-title').textContent = title; document.getElementById('notification-modal-message').innerHTML = message; const okBtn = document.getElementById('notification-modal-ok-btn'); const newOkBtn = okBtn.cloneNode(true); okBtn.parentNode.replaceChild(newOkBtn, okBtn); const closeModal = () => { modal.classList.remove('visible'); if (onOk) onOk(); }; newOkBtn.onclick = closeModal; modal.onclick = (e) => { if (e.target === modal) closeModal(); }; modal.classList.add('visible'); }
 
         main();
     </script>
