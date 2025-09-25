@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        /* === متغیرهای رنگی پایه (کپی شده از لابی برای یکپارچگی) === */
+        /* === متغیرهای رنگی پایه === */
         :root {
             --primary-gold: #ffc947;
             --dark-red: #8c4843;
@@ -37,52 +37,119 @@
         }
 
         #background-blurry { position: fixed; top: -20px; left: -20px; width: calc(100% + 40px); height: calc(100% + 40px); background-image: url('https://up.20script.ir/file/d1c7-InShot-۲۰۲۵۰۹۱۱-۱۲۲۵۲۰۷۶۰.jpg'); background-size: cover; background-position: center center; filter: blur(8px) brightness(0.6); z-index: -1; }
+        
+        /* === لودینگ اولیه === */
         #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.9); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2000; transition: opacity 0.5s ease; }
         .loader { border: 6px solid #f3f3f330; border-top: 6px solid var(--primary-gold); border-radius: 50%; width: 60px; height: 60px; animation: spin 1.5s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         #loading-text { margin-top: 20px; font-size: 1.1rem; font-weight: 700; }
 
+        /* START CHANGE: پنل انتخاب نقش */
+        #role-selection-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(5px);
+            z-index: 1900;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.7s ease-in-out, visibility 0.7s;
+            visibility: hidden;
+        }
+        #role-selection-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        .role-selection-header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--primary-gold);
+            animation: fadeInDown 1s ease-out;
+        }
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        .role-selection-header h1 {
+            font-size: 1.8rem;
+            font-weight: 900;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
+        }
+        .role-selection-header p { font-size: 1rem; color: var(--text-secondary); }
+        #role-cards-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            perspective: 1200px;
+            max-width: 550px;
+            width: 100%;
+        }
+        @media (max-width: 600px) { #role-cards-container { grid-template-columns: repeat(3, 1fr); max-width: 400px; } }
+        @media (max-width: 400px) { #role-cards-container { grid-template-columns: repeat(2, 1fr); max-width: 250px; } }
+        .role-card {
+            width: 100%;
+            aspect-ratio: 0.7;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.5s;
+            cursor: pointer;
+            animation: popIn 0.5s ease-out forwards;
+            opacity: 0;
+        }
+        .role-card.flipped { transform: rotateY(180deg); }
+        .role-card.disabled { pointer-events: none; opacity: 0.4; }
+        .role-card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            border-radius: 10px;
+            background-size: cover;
+            background-position: center;
+            border: 2px solid var(--border-color);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+        .role-card-back { background-image: url('https://up.20script.ir/file/a448-ChatGPT-Image-Sep-25-2025-05-25-01-PM.png'); }
+        .role-card-front { transform: rotateY(180deg); background-color: var(--bg-dark); }
+        @keyframes popIn {
+          from { opacity: 0; transform: scale(0.5); }
+          to { opacity: 1; transform: scale(1); }
+        }
+        /* END CHANGE */
+
         /* === ساختار اصلی صفحه بازی === */
         .game-container { width: 100%; height: 100%; display: flex; flex-direction: column; padding: 10px 5px; gap: 10px; }
-
-        /* === هدر بازی (اطلاعات و تایمر) === */
         .game-header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding: 5px 15px; background-color: rgba(0, 0, 0, 0.4); border: 1px solid var(--border-color); border-radius: 12px; height: 60px; }
         #game-phase-info { font-size: 1.3rem; font-weight: 900; color: var(--primary-gold); text-shadow: 1px 1px 3px rgba(0,0,0,0.7); }
         #game-timer { font-size: 1.5rem; font-weight: 700; background-color: var(--darker-red); color: white; padding: 5px 15px; border-radius: 8px; border: 1px solid var(--primary-gold); min-width: 80px; text-align: center; }
         #game-timer.critical { animation: pulse-timer 1s infinite; }
         @keyframes pulse-timer { 0% { transform: scale(1); box-shadow: 0 0 5px #e74c3c; } 50% { transform: scale(1.05); box-shadow: 0 0 15px #e74c3c; } 100% { transform: scale(1); box-shadow: 0 0 5px #e74c3c; } }
-
-        /* === نوار اعلانات === */
         .announcement-bar { flex-shrink: 0; width: 100%; padding: 10px; background-color: rgba(140, 72, 67, 0.5); border-radius: 8px; text-align: center; font-size: 1rem; font-weight: 700; display: none; transition: all 0.3s ease; }
-
-        /* START CHANGE: استایل‌های جدید برای چیدمان بازیکنان مشابه لابی */
         .players-area { flex-grow: 1; width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 5px; overflow: hidden; }
         .players-column { display: flex; flex-direction: column; justify-content: space-around; align-items: center; height: 100%; flex-shrink: 0; width: 100px; }
         #central-board-container { flex-grow: 1; display: flex; justify-content: center; align-items: center; height: 100%; padding: 0 5px; }
-        
         .player-slot { position: relative; width: 90px; height: 110px; background-image: url('https://cdn.imgurl.ir/uploads/g585174_IMG_20250913_222658_030.jpg'); background-size: contain; background-position: center; background-repeat: no-repeat; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; border: 3px solid transparent; }
         .player-slot.selectable:hover { transform: scale(1.05); border-color: var(--primary-gold); box-shadow: 0 0 15px var(--primary-gold); }
         .player-slot.selected { transform: scale(1.08); border-color: var(--green-ready); box-shadow: 0 0 20px var(--green-ready); }
-        
         .player-avatar { position: absolute; top: 15px; width: 68px; height: 68px; border-radius: 50%; object-fit: cover; border: 3px solid #a47d54; }
         .player-number { position: absolute; top: 2px; left: 2px; width: 28px; height: 28px; background-color: rgba(0, 0, 0, 0.5); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.9rem; font-weight: 700; color: var(--primary-gold); border: 1px solid var(--primary-gold); }
         .player-name { position: absolute; bottom: 5px; left: 0; width: 100%; text-align: center; font-size: 0.8rem; font-weight: 700; color: var(--text-light); text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7); }
-        
         .player-slot.dead { filter: grayscale(1) brightness(0.5); cursor: default; pointer-events: none; }
         .player-slot.dead .player-avatar { border-color: var(--dead-color); }
         .dead-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px; opacity: 0; transition: opacity 0.3s ease; }
         .player-slot.dead .dead-overlay { opacity: 1; }
         .dead-icon { font-size: 2.5rem; text-shadow: 0 0 10px black; }
         .revealed-role { font-weight: 700; color: var(--primary-gold); font-size: 0.8rem; text-shadow: 1px 1px 3px black; }
-        /* END CHANGE */
-
-        /* === فوتر بازی (دکمه‌های اقدام) === */
         .game-footer { flex-shrink: 0; display: flex; gap: 10px; align-items: center; padding: 10px; background-color: rgba(0,0,0,0.3); border-top: 1px solid var(--border-color); }
         #game-action-btn { flex-grow: 1; padding: 14px; font-size: 1.2rem; font-weight: 900; border-radius: 12px; border: 2px solid var(--primary-gold); cursor: pointer; transition: all 0.3s ease; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.5); background: linear-gradient(145deg, var(--dark-red), var(--darker-red)); }
         #game-action-btn:disabled { background: linear-gradient(145deg, #7f8c8d, #626567); border-color: #95a5a6; cursor: not-allowed; opacity: 0.6; }
         #game-action-btn:not(:disabled):hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-
-        /* === استایل‌های چت و مودال‌ها (بدون تغییر) === */
         #toggle-chat-btn { flex-shrink: 0; width: 50px; height: 50px; border-radius: 50%; background-color: #4a5568; color: white; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: all 0.3s ease; position: relative; }
         #toggle-chat-btn:hover { background-color: #2d3748; transform: scale(1.1); }
         #toggle-chat-btn.new-message::after { content: ''; position: absolute; bottom: 0; right: 0; width: 14px; height: 14px; background-color: #e53e3e; border-radius: 50%; border: 2px solid var(--bg-dark); }
@@ -120,10 +187,23 @@
 <body>
 
     <div id="background-blurry"></div>
+
     <div id="loading-overlay">
         <div class="loader"></div>
         <p id="loading-text">در حال بارگذاری بازی...</p>
     </div>
+
+    <!-- START CHANGE: پنل انتخاب نقش -->
+    <div id="role-selection-overlay">
+        <div class="role-selection-header">
+            <h1>نقش شما مشخص شد</h1>
+            <p>روی یکی از کارت‌ها کلیک کنید تا از نقش خود مطلع شوید</p>
+        </div>
+        <div id="role-cards-container">
+            <!-- کارت‌ها به صورت داینامیک با جاوااسکریپت ساخته می‌شوند -->
+        </div>
+    </div>
+    <!-- END CHANGE -->
 
     <div class="game-container" style="display: none;">
         <header class="game-header">
@@ -133,15 +213,11 @@
 
         <div id="announcement-bar" class="announcement-bar"></div>
 
-        <!-- START CHANGE: ساختار جدید برای نمایش بازیکنان -->
         <main class="players-area">
             <div id="right-players" class="players-column"></div>
-            <div id="central-board-container">
-                <!-- این بخش می‌تواند برای نمایش اطلاعات اضافی بازی استفاده شود -->
-            </div>
+            <div id="central-board-container"></div>
             <div id="left-players" class="players-column"></div>
         </main>
-        <!-- END CHANGE -->
         
         <footer class="game-footer">
             <button id="toggle-chat-btn" title="باز کردن چت">
@@ -151,7 +227,6 @@
         </footer>
     </div>
     
-    <!-- پنل چت و مودال‌ها (کپی شده از لابی) -->
     <div id="chat-panel"> <div class="chat-header"> <h3>چت بازی</h3> <button id="close-chat-btn" title="بستن چت">&times;</button> </div> <div id="chat-messages"></div> <form id="chat-form"> <input type="text" id="chat-input" placeholder="پیام خود را بنویسید..." autocomplete="off"> <button type="submit" id="chat-send-btn">ارسال</button> </form> </div>
     <div id="notification-modal" class="modal-overlay"> <div class="modal-content"> <h2 id="notification-modal-title" class="modal-title">توجه</h2> <p id="notification-modal-message" class="modal-message"></p> <div class="modal-buttons"> <button id="notification-modal-ok-btn" class="modal-button primary">متوجه شدم</button> </div> </div> </div>
     
@@ -167,19 +242,32 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         
-        const MAX_PLAYERS = 12; // برای حفظ ساختار مشابه لابی
+        const MAX_PLAYERS = 12;
 
+        // START CHANGE: دیکشنری کارت‌های نقش
+        const roleCardImages = {
+            'هوش سیاه': 'https://up.20script.ir/file/8714-IMG-20250915-124407-956.jpg',
+            'آموبات': 'https://up.20script.ir/file/8714-IMG-20250915-124454-356.jpg',
+            'تبدیل شونده': 'https://up.20script.ir/file/8714-IMG-20250915-124547-109.jpg',
+            'شهروند': 'https://up.20script.ir/file/8714-IMG-20250915-125022-878.jpg',
+            'پزشک': 'https://up.20script.ir/file/8714-IMG-20250915-140001-151.jpg',
+            'شهردار': 'https://up.20script.ir/file/98bb-IMG-20250915-140136-690.jpg',
+            'بادیگارد': 'https://up.20script.ir/file/98bb-IMG-20250915-140411-337.jpg',
+            'چند چهره': 'https://up.20script.ir/file/1d7f-IMG-20250915-140657-127.jpg'
+        };
+        // END CHANGE
+
+        // --- Elements ---
         const loadingOverlay = document.getElementById('loading-overlay');
+        const roleSelectionOverlay = document.getElementById('role-selection-overlay');
+        const roleCardsContainer = document.getElementById('role-cards-container');
         const gameContainer = document.querySelector('.game-container');
-        // START CHANGE: المنت‌های جدید برای چیدمان ستونی
         const leftPlayersEl = document.getElementById('left-players');
         const rightPlayersEl = document.getElementById('right-players');
-        // END CHANGE
         const gamePhaseInfoEl = document.getElementById('game-phase-info');
         const gameTimerEl = document.getElementById('game-timer');
         const announcementBarEl = document.getElementById('announcement-bar');
         const gameActionBtn = document.getElementById('game-action-btn');
-        // Chat elements
         const toggleChatBtn = document.getElementById('toggle-chat-btn');
         const chatPanel = document.getElementById('chat-panel');
         const closeChatBtn = document.getElementById('close-chat-btn');
@@ -191,57 +279,35 @@
         let currentUserData = {};
         let gameId = null;
         let unsubscribeGame = null;
-        let unsubscribeChat = null; // START CHANGE: برای listener چت
+        let unsubscribeChat = null;
         let currentGameState = {};
         let localSelectedPlayerUid = null;
         let timerInterval = null;
-        let isChatPanelVisible = false; // START CHANGE: برای وضعیت پنل چت
+        let isChatPanelVisible = false;
 
         // --- Main Functions ---
 
-        // START: کد جدید برای پخش صدای خوش‌آمدگویی بر اساس زمان روز
         async function playGreetingBasedOnTimeOfDay() {
             const apiKey = "b31bd8909b9b4b87b45e4869a8be7358";
             const apiUrl = `https://api.ipgeolocation.io/astronomy?apiKey=${apiKey}&location=Tehran`;
-
-            // لینک‌های مستقیم (Raw) به فایل‌های صوتی در GitHub
             const daySoundUrl = 'https://raw.githubusercontent.com/abolfazl140122/mafia/58cc5df365b21b6f32f609f5c12175acce8f717c/voicravi/%D8%B3%D9%84%D8%A7%D9%85%20%D8%A8%D8%B1%20%D8%AF%D9%88%D8%B3%D8%AA%D8%A7%D9%86%20%D8%B9%D8%B2%DB%8C%D8%B2%20%D8%B1%D9%88%D8%B2%20%D9%87%D9%85%DA%AF%DB%8C%20%D8%A8%D8%AE%DB%8C%D8%B1!.wav';
             const nightSoundUrl = 'https://raw.githubusercontent.com/abolfazl140122/mafia/58cc5df365b21b6f32f609f5c12175acce8f717c/voicravi/%D8%B3%D9%84%D8%A7%D9%85%20%D8%A8%D8%B1%20%D8%AF%D9%88%D8%B3%D8%AA%D8%A7%D9%86%20%D8%B9%D8%B2%DB%8C%D8%B2%20%D8%B4%D8%A8%20%D9%87%D9%85%DA%AF%DB%8C%20%D8%A8%D8%AE%DB%8C%D8%B1!.wav';
 
             try {
                 const response = await fetch(apiUrl);
-                if (!response.ok) {
-                    throw new Error(`API request failed with status ${response.status}`);
-                }
+                if (!response.ok) throw new Error(`API request failed with status ${response.status}`);
                 const data = await response.json();
-
                 const { current_time, sunrise, sunset } = data;
-                
-                // مقایسه زمان فعلی با زمان طلوع و غروب خورشید برای تشخیص روز یا شب بودن
                 const isDay = current_time > sunrise && current_time < sunset;
-
                 const soundUrl = isDay ? daySoundUrl : nightSoundUrl;
                 const audio = new Audio(soundUrl);
-
-                // تلاش برای پخش صدا. ممکن است توسط مرورگر به دلیل عدم تعامل کاربر مسدود شود.
-                try {
-                    await audio.play();
-                    console.log(isDay ? "Playing day greeting." : "Playing night greeting.");
-                } catch (playError) {
-                    console.warn("پخش خودکار صدا توسط مرورگر مسدود شد. برای پخش صدا به تعامل کاربر نیاز است.", playError);
-                }
-
+                await audio.play();
             } catch (error) {
                 console.error("خطا در دریافت اطلاعات زمان یا پخش صدا:", error);
-                // در صورت بروز خطا، ادامه بارگذاری بازی بدون مشکل انجام می‌شود.
             }
         }
-        // END: کد جدید برای پخش صدای خوش‌آمدگویی
 
         async function main() {
-            // فراخوانی تابع پخش صدای خوش‌آمدگویی در ابتدای بارگذاری بازی
-            playGreetingBasedOnTimeOfDay();
-
             gameId = new URLSearchParams(window.location.search).get('id');
             if (!gameId) {
                 showNotificationModal("خطا", "شناسه بازی نامعتبر است.", () => window.location.href = './Lobby page.html');
@@ -253,7 +319,7 @@
                     currentUser = user;
                     currentUserData = { displayName: user.displayName, avatarUrl: user.photoURL }; 
                     listenToGameStateChanges();
-                    listenToChatMessages(); // START CHANGE: فعال کردن شنونده چت
+                    listenToChatMessages();
                     setupEventListeners();
                 } else {
                     window.location.href = './login.html';
@@ -266,26 +332,101 @@
             unsubscribeGame = onSnapshot(gameDocRef, (docSnap) => {
                 if (!docSnap.exists()) {
                     if (unsubscribeGame) unsubscribeGame();
-                    if (unsubscribeChat) unsubscribeChat(); // START CHANGE: توقف شنونده چت
+                    if (unsubscribeChat) unsubscribeChat();
                     showNotificationModal("بازی پایان یافت", "این بازی دیگر فعال نیست.", () => window.location.href = './Lobby page.html');
                     return;
                 }
                 
+                const oldState = currentGameState;
                 currentGameState = docSnap.data();
-                renderGame(currentGameState);
                 
-                if (loadingOverlay.style.display !== 'none') {
-                    loadingOverlay.style.opacity = '0';
-                    setTimeout(() => {
-                        loadingOverlay.style.display = 'none';
-                        gameContainer.style.display = 'flex';
-                    }, 500);
+                // START CHANGE: منطق جدید برای نمایش پنل نقش
+                const self = currentGameState.players.find(p => p.uid === currentUser.uid);
+                if (!self) return; // هنوز بازیکن به بازی اضافه نشده
+                
+                const roleRevealed = sessionStorage.getItem(`roleRevealed_${gameId}`);
+                
+                // اگر نقش بازیکن مشخص شده و هنوز پنل نقش را ندیده، آن را نمایش بده
+                if (self.roleName && !roleRevealed) {
+                    showRoleSelectionPanel(self.roleName);
+                } else {
+                    // در غیر این صورت، بازی را به صورت عادی رندر کن
+                    renderGame(currentGameState);
+                    
+                    if (loadingOverlay.style.display !== 'none') {
+                        loadingOverlay.style.opacity = '0';
+                        setTimeout(() => {
+                            loadingOverlay.style.display = 'none';
+                            gameContainer.style.display = 'flex';
+                        }, 500);
+                    }
                 }
+                // END CHANGE
             }, (error) => {
                 console.error("Firestore listen error:", error);
                 showNotificationModal("خطای ارتباط", "ارتباط با سرور بازی قطع شد.", () => window.location.reload());
             });
         }
+        
+        // START CHANGE: توابع جدید برای مدیریت پنل انتخاب نقش
+        function showRoleSelectionPanel(roleName) {
+            if (loadingOverlay.style.display !== 'none') {
+                loadingOverlay.style.opacity = '0';
+                setTimeout(() => loadingOverlay.style.display = 'none', 500);
+            }
+            
+            roleCardsContainer.innerHTML = ''; // پاک کردن کارت‌های قبلی
+            for (let i = 0; i < 12; i++) {
+                const card = document.createElement('div');
+                card.className = 'role-card';
+                card.style.animationDelay = `${i * 0.05}s`; // انیمیشن ورود با تاخیر
+                card.innerHTML = `
+                    <div class="role-card-face role-card-back"></div>
+                    <div class="role-card-face role-card-front"></div>
+                `;
+                card.addEventListener('click', () => handleCardClick(card, roleName));
+                roleCardsContainer.appendChild(card);
+            }
+            
+            roleSelectionOverlay.classList.add('visible');
+        }
+
+        function handleCardClick(clickedCard, roleName) {
+            // غیرفعال کردن همه کارت‌ها
+            const allCards = roleCardsContainer.querySelectorAll('.role-card');
+            allCards.forEach(card => card.classList.add('disabled'));
+
+            // پیدا کردن تصویر نقش از دیکشنری
+            const roleImageUrl = roleCardImages[roleName] || '';
+            const frontFace = clickedCard.querySelector('.role-card-front');
+            if (roleImageUrl) {
+                frontFace.style.backgroundImage = `url('${roleImageUrl}')`;
+            } else {
+                frontFace.innerHTML = `<p style="padding: 10px; text-align: center; color: var(--primary-gold);">${roleName}</p>`;
+            }
+
+            // چرخاندن کارت کلیک شده
+            clickedCard.classList.remove('disabled');
+            clickedCard.classList.add('flipped');
+
+            // ذخیره وضعیت مشاهده نقش
+            sessionStorage.setItem(`roleRevealed_${gameId}`, 'true');
+
+            // پس از 4 ثانیه، پنل را ببند و بازی را شروع کن
+            setTimeout(hideRoleSelectionPanelAndStartGame, 4000);
+        }
+
+        function hideRoleSelectionPanelAndStartGame() {
+            roleSelectionOverlay.classList.remove('visible');
+            
+            setTimeout(() => {
+                // بعد از محو شدن پنل، صدای راوی را پخش کن و بازی را نمایش بده
+                playGreetingBasedOnTimeOfDay(); 
+                gameContainer.style.display = 'flex';
+                renderGame(currentGameState); // رندر مجدد برای اطمینان
+            }, 700); // مطابق با زمان transition در CSS
+        }
+        // END CHANGE
 
         function renderGame(data) {
             const self = data.players.find(p => p.uid === currentUser.uid);
@@ -293,12 +434,12 @@
 
             renderHeader(data.phase, data.day, data.timerEndsAt);
             renderAnnouncements(data.announcements);
-            renderPlayerSlots(data.players, self, data.phase); // START CHANGE: فراخوانی تابع جدید
+            renderPlayerSlots(data.players, self, data.phase);
             updateActionButton(self, data.phase);
         }
         
         function renderHeader(phase, day, timerEndsAt) {
-            const phaseTranslations = { 'day_discussion': 'بحث روز', 'day_voting': 'رأی‌گیری', 'defense': 'دفاعیه', 'night': 'شب' };
+            const phaseTranslations = { 'day_discussion': 'بحث روز', 'day_voting': 'رأی‌گیری', 'defense': 'دفاعیه', 'night': 'شب', 'role_reveal': 'نمایش نقش‌ها' };
             gamePhaseInfoEl.textContent = `${phaseTranslations[phase] || phase} - روز ${day}`;
             if (timerInterval) clearInterval(timerInterval);
             if (timerEndsAt) {
@@ -329,7 +470,6 @@
             }
         }
         
-        // START CHANGE: تابع جدید برای رندر کردن بازیکنان در ستون‌ها
         function renderPlayerSlots(players, self, phase) {
             leftPlayersEl.innerHTML = '';
             rightPlayersEl.innerHTML = '';
@@ -338,9 +478,8 @@
             const playersPerColumn = MAX_PLAYERS / 2;
 
             for (let i = 0; i < MAX_PLAYERS; i++) {
-                // بازیکن را بر اساس ایندکس پیدا می‌کنیم تا ترتیب حفظ شود
                 const player = players[i];
-                if (!player) continue; // اگر در دیتابیس کمتر از 12 بازیکن بود، از خطا جلوگیری می‌کند
+                if (!player) continue;
                 
                 const slot = document.createElement('div');
                 slot.className = 'player-slot';
@@ -362,9 +501,7 @@
                     `;
                 } else {
                     if (isSelectablePhase) {
-                        let canBeSelected = player.uid !== self.uid; // نمی‌توان به خود رای داد
-                        // TODO: قوانین بیشتر (مثلا دکتر نمی‌تواند یک نفر را دو شب متوالی نجات دهد)
-                        
+                        let canBeSelected = player.uid !== self.uid;
                         if (canBeSelected) {
                             slot.classList.add('selectable');
                             slot.onclick = () => handlePlayerCardClick(player.uid);
@@ -385,7 +522,6 @@
                 }
             }
         }
-        // END CHANGE
 
         function updateActionButton(self, phase) {
             if (!self.isAlive) {
@@ -417,13 +553,12 @@
 
         function handlePlayerCardClick(uid) {
             localSelectedPlayerUid = (localSelectedPlayerUid === uid) ? null : uid;
-            renderGame(currentGameState); // بازрисовانی برای نمایش انتخاب
+            renderGame(currentGameState);
         }
         
         async function handleMainAction() {
             gameActionBtn.disabled = true;
             const actionType = currentGameState.phase === 'day_voting' ? 'vote' : 'ability';
-            console.log(`Action: ${actionType}, Target: ${localSelectedPlayerUid}`);
             showNotificationModal("اقدام ثبت شد", "حرکت شما ثبت شد، منتظر بقیه بازیکنان بمانید.");
             try {
                 const gameDocRef = doc(db, "games", gameId);
@@ -446,7 +581,6 @@
             }
         }
         
-        // START CHANGE: توابع مربوط به چت که اضافه شده‌اند
         function listenToChatMessages() {
             const chatCollectionRef = collection(db, `games/${gameId}/chat`);
             const q = query(chatCollectionRef, orderBy('timestamp', 'asc'));
@@ -512,13 +646,12 @@
                 });
              } catch (error) {
                 console.error("Send message error:", error);
-                chatInput.value = tempMessage; // بازگرداندن پیام در صورت خطا
+                chatInput.value = tempMessage;
              } finally {
                 chatInput.disabled = false;
                 chatInput.focus();
              }
         }
-        // END CHANGE
 
         function showNotificationModal(title, message, onOk) { 
             const modal = document.getElementById('notification-modal'); 
