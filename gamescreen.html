@@ -69,6 +69,7 @@
             margin-bottom: 25px;
             text-shadow: 0 0 10px var(--primary-gold);
             animation: fadeInDown 1s ease both;
+            text-align: center; /* FIX: Added to center the title text */
         }
         @keyframes fadeInDown {
             from { opacity: 0; transform: translateY(-20px); }
@@ -389,34 +390,43 @@
             roleSelectionOverlay.classList.add('visible');
         }
 
+        // FIX: This function now correctly handles role selection atomically
         async function handleRoleCardClick(event) {
             // غیرفعال کردن همه کارت‌ها برای جلوگیری از کلیک‌های متعدد
             document.querySelectorAll('.facedown-card').forEach(card => card.style.pointerEvents = 'none');
             
+            // نمایش یک پیغام انتظار موقت
             showNotificationModal("در حال تخصیص نقش...", "لطفا کمی صبر کنید.");
             
             const gameDocRef = doc(db, "games", gameId);
             try {
                 await runTransaction(db, async (transaction) => {
                     const gameDoc = await transaction.get(gameDocRef);
-                    if (!gameDoc.exists()) throw "Game does not exist!";
+                    if (!gameDoc.exists()) {
+                        throw "Game does not exist!";
+                    }
                     
                     const gameData = gameDoc.data();
-                    const availableRoles = gameData.availableRoles;
-                    const players = gameData.players;
+                    let availableRoles = gameData.availableRoles;
+                    let players = gameData.players;
                     
                     const playerIndex = players.findIndex(p => p.uid === currentUser.uid);
-                    if (playerIndex === -1 || players[playerIndex].roleId) {
-                        // این بازیکن یا وجود ندارد یا از قبل نقش دارد
-                        console.warn("Player already has a role or does not exist.");
-                        return;
+                    if (playerIndex === -1) {
+                         throw "Player not found in game.";
+                    }
+                    
+                    if (players[playerIndex].roleId) {
+                        // این بازیکن از قبل نقش دارد (ممکن است در تب دیگری کلیک کرده باشد)
+                        console.warn("Player already has a role.");
+                        return; // تراکنش را با موفقیت خاتمه می‌دهیم
                     }
                     
                     if (!availableRoles || availableRoles.length === 0) {
-                        throw "No available roles left!";
+                        // نکته مهم: این خطا یعنی در هنگام ساخت بازی، فیلد availableRoles به درستی پر نشده است
+                        throw "No available roles left in the database!";
                     }
 
-                    // انتخاب و حذف یک نقش تصادفی
+                    // انتخاب و حذف یک نقش تصادفی از لیست نقش‌های موجود
                     const randomIndex = Math.floor(Math.random() * availableRoles.length);
                     const selectedRoleId = availableRoles.splice(randomIndex, 1)[0];
                     
@@ -430,11 +440,12 @@
                         availableRoles: availableRoles 
                     });
                 });
-                // Note: The UI update will be handled by the onSnapshot listener
-                // when it detects the roleId has been set.
+                // پس از موفقیت تراکنش، نیازی به کار خاصی نیست
+                // چون onSnapshot به طور خودکار با داده‌های جدید فراخوانی شده و UI را آپدیت می‌کند.
             } catch (error) {
                 console.error("Role selection transaction failed: ", error);
-                showNotificationModal("خطا", "مشکلی در انتخاب نقش پیش آمد. لطفا دوباره تلاش کنید.");
+                showNotificationModal("خطا", "مشکلی در انتخاب نقش پیش آمد. لطفا صفحه را رفرش کرده و دوباره تلاش کنید.");
+                // در صورت خطا، کارت‌ها را دوباره فعال می‌کنیم
                 document.querySelectorAll('.facedown-card').forEach(card => card.style.pointerEvents = 'auto');
             }
         }
@@ -443,6 +454,10 @@
             const roleInfo = ROLE_DATA[roleId];
             if (!roleInfo) {
                 console.error(`Role data not found for ID: ${roleId}`);
+                // در این حالت هم بازی را نمایش می‌دهیم تا کاربر گیر نکند
+                roleSelectionOverlay.classList.remove('visible');
+                gameContainer.style.display = 'flex';
+                renderGame(currentGameState);
                 return;
             }
 
