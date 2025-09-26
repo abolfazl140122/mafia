@@ -20,6 +20,7 @@
             --green-ready: #2ecc71;
             --blue-night: #2980b9;
             --dead-color: #7f8c8d;
+            --speaker-glow: #00a8ff; /* START NEW: رنگ برای نوبت صحبت */
         }
 
         /* === ریست و استایل‌های کلی === */
@@ -177,16 +178,30 @@
         @keyframes pulse-timer { 0% { transform: scale(1); box-shadow: 0 0 5px #e74c3c; } 50% { transform: scale(1.05); box-shadow: 0 0 15px #e74c3c; } 100% { transform: scale(1); box-shadow: 0 0 5px #e74c3c; } }
 
         /* === نوار اعلانات === */
-        .announcement-bar { flex-shrink: 0; width: 100%; padding: 10px; background-color: rgba(140, 72, 67, 0.5); border-radius: 8px; text-align: center; font-size: 1rem; font-weight: 700; display: none; transition: all 0.3s ease; }
+        .announcement-bar { flex-shrink: 0; width: 100%; padding: 10px; background-color: rgba(0, 168, 255, 0.2); border-radius: 8px; text-align: center; font-size: 1.1rem; font-weight: 700; display: none; transition: all 0.3s ease; border: 1px solid var(--speaker-glow); color: var(--speaker-glow); }
 
         /* استایل‌های چیدمان بازیکنان */
         .players-area { flex-grow: 1; width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 5px; overflow: hidden; }
         .players-column { display: flex; flex-direction: column; justify-content: space-around; align-items: center; height: 100%; flex-shrink: 0; width: 100px; }
         #central-board-container { flex-grow: 1; display: flex; justify-content: center; align-items: center; height: 100%; padding: 0 5px; }
         
-        .player-slot { position: relative; width: 90px; height: 110px; background-image: url('https://cdn.imgurl.ir/uploads/g585174_IMG_20250913_222658_030.jpg'); background-size: contain; background-position: center; background-repeat: no-repeat; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; border: 3px solid transparent; }
+        .player-slot { position: relative; width: 90px; height: 110px; background-image: url('https://cdn.imgurl.ir/uploads/g585174_IMG_20250913_222658_030.jpg'); background-size: contain; background-position: center; background-repeat: no-repeat; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, filter 0.3s ease; border: 3px solid transparent; }
         .player-slot.selectable:hover { transform: scale(1.05); border-color: var(--primary-gold); box-shadow: 0 0 15px var(--primary-gold); }
         .player-slot.selected { transform: scale(1.08); border-color: var(--green-ready); box-shadow: 0 0 20px var(--green-ready); }
+        
+        /* START NEW: استایل برای بازیکن در حال صحبت */
+        .player-slot.speaking-turn {
+            transform: scale(1.15);
+            border-color: var(--speaker-glow);
+            box-shadow: 0 0 25px var(--speaker-glow);
+            animation: speaking-pulse 1.5s infinite;
+        }
+        @keyframes speaking-pulse {
+            0% { box-shadow: 0 0 25px var(--speaker-glow); }
+            50% { box-shadow: 0 0 40px var(--speaker-glow); }
+            100% { box-shadow: 0 0 25px var(--speaker-glow); }
+        }
+        /* END NEW */
         
         .player-avatar { position: absolute; top: 15px; width: 68px; height: 68px; border-radius: 50%; object-fit: cover; border: 3px solid #a47d54; }
         .player-number { position: absolute; top: 2px; left: 2px; width: 28px; height: 28px; background-color: rgba(0, 0, 0, 0.5); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.9rem; font-weight: 700; color: var(--primary-gold); border: 1px solid var(--primary-gold); }
@@ -286,7 +301,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, runTransaction, updateDoc, serverTimestamp, collection, addDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, runTransaction, updateDoc, serverTimestamp, collection, addDoc, query, orderBy, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         // --- Config & Elements ---
         const firebaseConfig = { apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg", authDomain: "mafia-9fcbf.firebaseapp.com", projectId: "mafia-9fcbf", storageBucket: "mafia-9fcbf.appspot.com", messagingSenderId: "471627157488", appId: "1:471627157488:web:92f008548a5596619a5735", };
@@ -297,7 +312,6 @@
         
         const MAX_PLAYERS = 12;
 
-        // START NEW: تعریف نقش‌ها، عکس کارت‌ها و تیم‌ها (جهت رفع باگ)
         const ROLES_DATA = {
             'هوش سیاه':     { img: 'https://up.20script.ir/file/8714-IMG-20250915-124407-956.jpg', team: 'mafia' },
             'آموبات':        { img: 'https://up.20script.ir/file/8714-IMG-20250915-124454-356.jpg', team: 'mafia' },
@@ -308,7 +322,6 @@
             'چند چهره':      { img: 'https://up.20script.ir/file/1d7f-IMG-20250915-140657-127.jpg', team: 'citizen' },
             'شهروند':        { img: 'https://up.20script.ir/file/8714-IMG-20250915-125022-878.jpg', team: 'citizen' }
         };
-        // END NEW
 
         const loadingOverlay = document.getElementById('loading-overlay');
         const roleRevealOverlay = document.getElementById('role-reveal-overlay');
@@ -326,6 +339,7 @@
         const chatMessagesEl = document.getElementById('chat-messages');
         const chatForm = document.getElementById('chat-form');
         const chatInput = document.getElementById('chat-input');
+        const chatSendBtn = document.getElementById('chat-send-btn');
         
         let currentUser = null;
         let currentUserData = {};
@@ -336,9 +350,7 @@
         let localSelectedPlayerUid = null;
         let timerInterval = null;
         let isChatPanelVisible = false;
-        let roleHasBeenRevealed = false; // فلگ برای جلوگیری از نمایش دوباره پنل نقش
-
-        // --- Main Functions ---
+        let roleHasBeenRevealed = false;
 
         async function main() {
             gameId = new URLSearchParams(window.location.search).get('id');
@@ -373,17 +385,14 @@
                 const previousState = currentGameState;
                 currentGameState = docSnap.data();
                 
-                // --- منطق اختصاص نقش توسط میزبان ---
                 if (currentUser.uid === currentGameState.creatorId && !currentGameState.rolesAssigned) {
-                    console.log("شما میزبان هستید. در حال اختصاص نقش‌ها...");
                     await assignRoles(currentGameState);
-                    return; // منتظر آپدیت بعدی می‌مانیم
+                    return;
                 }
 
                 const self = currentGameState.players.find(p => p.uid === currentUser.uid);
                 if (!self) return;
 
-                // --- منطق نمایش پنل انتخاب نقش ---
                 if (self.roleName && !roleHasBeenRevealed) {
                     roleHasBeenRevealed = true;
                     loadingOverlay.style.opacity = '0';
@@ -393,7 +402,6 @@
                     }, 500);
                 } 
                 
-                // فقط اگر نقش‌ها نمایش داده شده باشد، بازی اصلی رندر می‌شود
                 if (roleHasBeenRevealed) {
                     renderGame(currentGameState);
                 }
@@ -404,51 +412,28 @@
             });
         }
 
-        // --- تابع اختصاص نقش‌ها (فقط توسط میزبان اجرا می‌شود) ---
         async function assignRoles(gameState) {
             const gameDocRef = doc(db, "games", gameId);
             const players = [...gameState.players];
             const playerCount = players.length;
-
-            // تعریف لیست نقش‌ها بر اساس تعداد بازیکنان با رعایت حداکثر ۳ شهروند ساده
             let rolesToAssign = [];
-            if (playerCount >= 10) { // سناریو برای ۱۰ تا ۱۲ بازیکن
-                rolesToAssign = [
-                    'هوش سیاه', 'آموبات', 'تبدیل شونده', // 3 مافیا
-                    'پزشک', 'شهردار', 'بادیگارد', 'چند چهره', // 4 شهروند خاص
-                    'شهروند', 'شهروند', 'شهروند', // 3 شهروند ساده
-                    'پزشک', 'بادیگارد' // 2 نقش اضافه برای پر کردن تا 12 نفر
-                ].slice(0, playerCount);
-            } else { // سناریو برای تعداد کمتر بازیکن
+            if (playerCount >= 10) {
+                rolesToAssign = ['هوش سیاه', 'آموبات', 'تبدیل شونده', 'پزشک', 'شهردار', 'بادیگارد', 'چند چهره', 'شهروند', 'شهروند', 'شهروند', 'پزشک', 'بادیگارد'].slice(0, playerCount);
+            } else {
                  rolesToAssign = ['هوش سیاه', 'آموبات', 'پزشک', 'بادیگارد', 'شهروند', 'شهروند', 'شهروند', 'شهردار'].slice(0, playerCount);
             }
-
-            // بر زدن نقش‌ها
             for (let i = rolesToAssign.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [rolesToAssign[i], rolesToAssign[j]] = [rolesToAssign[j], rolesToAssign[i]];
             }
-
-            // اختصاص نقش و تیم به هر بازیکن
             const updatedPlayers = players.map((player, index) => {
                 const roleName = rolesToAssign[index];
                 const roleData = ROLES_DATA[roleName] || { team: 'unknown' };
-                return {
-                    ...player,
-                    roleName: roleName,
-                    team: roleData.team // BUG FIX: ثبت تیم صحیح در سرور
-                };
+                return { ...player, roleName: roleName, team: roleData.team };
             });
-
             try {
-                await updateDoc(gameDocRef, {
-                    players: updatedPlayers,
-                    rolesAssigned: true
-                });
-                console.log("نقش‌ها با موفقیت در سرور ثبت شد.");
-            } catch (error) {
-                console.error("خطا در ثبت نقش‌ها:", error);
-            }
+                await updateDoc(gameDocRef, { players: updatedPlayers, rolesAssigned: true });
+            } catch (error) { console.error("خطا در ثبت نقش‌ها:", error); }
         }
 
         let revealCountdownTimer = null;
@@ -460,43 +445,35 @@
             setTimeout(() => {
                 roleRevealOverlay.style.display = 'none';
                 gameContainer.style.display = 'flex';
-                playGreetingBasedOnTimeOfDay();
+                // فقط میزبان، فرآیند را آغاز می‌کند
+                if (currentUser.uid === currentGameState.creatorId) {
+                    playGreetingBasedOnTimeOfDay();
+                }
             }, 500);
         }
 
-        // --- تابع نمایش پنل نقش و مدیریت کلیک ---
         function showRoleRevealPanel(myRoleName, playerCount) {
             roleCardGrid.innerHTML = '';
             for (let i = 0; i < playerCount; i++) {
                 const cardContainer = document.createElement('div');
                 cardContainer.className = 'role-card-container';
-                cardContainer.innerHTML = `
-                    <div class="role-card" data-index="${i}">
-                        <div class="card-face card-back"></div>
-                        <div class="card-face card-front"></div>
-                    </div>`;
+                cardContainer.innerHTML = `<div class="role-card" data-index="${i}"><div class="card-face card-back"></div><div class="card-face card-front"></div></div>`;
                 roleCardGrid.appendChild(cardContainer);
             }
-
             roleRevealOverlay.classList.add('visible');
             const instructionsEl = document.getElementById('role-reveal-instructions');
             const cards = document.querySelectorAll('.role-card');
-
             cards.forEach(card => {
                 card.addEventListener('click', () => {
                     if (card.classList.contains('flipped') || roleRevealOverlay.classList.contains('card-focused')) return;
-
                     const frontFace = card.querySelector('.card-front');
                     frontFace.style.backgroundImage = `url('${ROLES_DATA[myRoleName].img}')`;
                     card.classList.add('flipped');
-
                     cards.forEach(c => { if (c !== card) c.parentElement.style.pointerEvents = 'none'; });
-
                     setTimeout(() => {
                         roleRevealOverlay.classList.add('card-focused');
                         card.parentElement.classList.add('has-revealed');
                         card.classList.add('revealed-and-waiting');
-                        
                         let count = 5;
                         instructionsEl.textContent = `برای ادامه روی کارت خود کلیک کنید (${count})`;
                         revealCountdownTimer = setInterval(() => {
@@ -508,46 +485,64 @@
                                 instructionsEl.textContent = `برای ادامه روی کارت خود کلیک کنید (${count})`;
                             }
                         }, 1000);
-
                         card.addEventListener('click', closeRevealPanelAndStartGame, { once: true });
                     }, 600);
                 }, { once: true });
             });
         }
 
-
         async function playGreetingBasedOnTimeOfDay() {
-            const apiKey = "b31bd8909b9b4b87b45e4869a8be7358";
-            const apiUrl = `https://api.ipgeolocation.io/astronomy?apiKey=${apiKey}&location=Tehran`;
             const daySoundUrl = 'https://raw.githubusercontent.com/abolfazl140122/mafia/58cc5df365b21b6f32f609f5c12175acce8f717c/voicravi/%D8%B3%D9%84%D8%A7%D9%85%20%D8%A8%D8%B1%20%D8%AF%D9%88%D8%B3%D8%AA%D8%A7%D9%86%20%D8%B9%D8%B2%DB%8C%D8%B2%20%D8%B1%D9%88%D8%B2%20%D9%87%D9%85%DA%AF%DB%8C%20%D8%A8%D8%AE%DB%8C%D8%B1!.wav';
             const nightSoundUrl = 'https://raw.githubusercontent.com/abolfazl140122/mafia/58cc5df365b21b6f32f609f5c12175acce8f717c/voicravi/%D8%B3%D9%84%D8%A7%D9%85%20%D8%A8%D8%B1%20%D8%AF%D9%88%D8%B3%D8%AA%D8%A7%D9%86%20%D8%B9%D8%B2%DB%8C%D8%B2%20%D8%B4%D8%A8%20%D9%87%D9%85%DA%AF%DB%8C%20%D8%A8%D8%AE%DB%8C%D8%B1!.wav';
+            // برای سادگی، فرض می‌کنیم همیشه روز است
+            const soundUrl = daySoundUrl; 
+            const audio = new Audio(soundUrl);
             try {
-                const response = await fetch(apiUrl);
-                if (!response.ok) throw new Error(`API request failed with status ${response.status}`);
-                const data = await response.json();
-                const { current_time, sunrise, sunset } = data;
-                const isDay = current_time > sunrise && current_time < sunset;
-                const soundUrl = isDay ? daySoundUrl : nightSoundUrl;
-                const audio = new Audio(soundUrl);
                 await audio.play();
+                audio.onended = () => {
+                    // فقط میزبان بازی فاز بعدی را شروع می‌کند
+                    if (currentUser.uid === currentGameState.creatorId) {
+                        console.log("صدای گوینده تمام شد. شروع نوبت‌های صحبت.");
+                        startSpeakingTurns();
+                    }
+                };
             } catch (error) {
-                console.error("خطا در دریافت اطلاعات زمان یا پخش صدا:", error);
+                console.error("خطا در پخش صدا:", error);
+                // اگر پخش صدا به مشکل خورد، باز هم میزبان بازی را ادامه می‌دهد
+                if (currentUser.uid === currentGameState.creatorId) {
+                    startSpeakingTurns();
+                }
             }
+        }
+        
+        async function startSpeakingTurns() {
+             const firstAlivePlayerIndex = currentGameState.players.findIndex(p => p.isAlive);
+             if (firstAlivePlayerIndex === -1) return; // No one is alive
+
+             const gameDocRef = doc(db, "games", gameId);
+             await updateDoc(gameDocRef, {
+                 phase: 'day_speaking_turns',
+                 currentSpeakerIndex: firstAlivePlayerIndex,
+                 timerEndsAt: Timestamp.fromMillis(Date.now() + 30000) // 30 ثانیه برای نفر اول
+             });
         }
 
         function renderGame(data) {
             const self = data.players.find(p => p.uid === currentUser.uid);
             if (!self) return;
 
-            renderHeader(data.phase, data.day, data.timerEndsAt);
-            renderAnnouncements(data.announcements);
-            renderPlayerSlots(data.players, self, data.phase);
+            renderHeader(data);
+            renderAnnouncements(data);
+            renderPlayerSlots(data);
             updateActionButton(self, data.phase);
+            updateChatPermissions(data);
         }
         
-        function renderHeader(phase, day, timerEndsAt) {
-            const phaseTranslations = { 'day_discussion': 'بحث روز', 'day_voting': 'رأی‌گیری', 'defense': 'دفاعیه', 'night': 'شب' };
+        function renderHeader(data) {
+            const { phase, day, timerEndsAt } = data;
+            const phaseTranslations = { 'day_discussion': 'بحث روز', 'day_voting': 'رأی‌گیری', 'defense': 'دفاعیه', 'night': 'شب', 'day_speaking_turns': 'نوبت صحبت' };
             gamePhaseInfoEl.textContent = `${phaseTranslations[phase] || phase} - روز ${day}`;
+            
             if (timerInterval) clearInterval(timerInterval);
             if (timerEndsAt) {
                 const endTime = timerEndsAt.toDate();
@@ -558,6 +553,10 @@
                         gameTimerEl.textContent = "00:00";
                         gameTimerEl.classList.remove('critical');
                         clearInterval(timerInterval);
+                        // فقط میزبان بازی مسئول جلو بردن نوبت است
+                        if (currentUser.uid === currentGameState.creatorId && currentGameState.phase === 'day_speaking_turns') {
+                             advanceSpeakingTurn();
+                        }
                         return;
                     }
                     const minutes = Math.floor(secondsLeft / 60);
@@ -568,16 +567,24 @@
             }
         }
         
-        function renderAnnouncements(announcements) {
-             if (announcements && announcements.length > 0) {
-                announcementBarEl.textContent = announcements[announcements.length - 1];
+        function renderAnnouncements(data) {
+             if (data.phase === 'day_speaking_turns') {
+                 const speaker = data.players[data.currentSpeakerIndex];
+                 if(speaker) {
+                    announcementBarEl.textContent = `نوبت صحبت: ${speaker.displayName} (بازیکن شماره ${data.currentSpeakerIndex + 1})`;
+                    announcementBarEl.style.display = 'block';
+                 }
+             } else if (data.announcements && data.announcements.length > 0) {
+                announcementBarEl.textContent = data.announcements[data.announcements.length - 1];
                 announcementBarEl.style.display = 'block';
             } else {
                 announcementBarEl.style.display = 'none';
             }
         }
         
-        function renderPlayerSlots(players, self, phase) {
+        function renderPlayerSlots(data) {
+            const { players, phase, currentSpeakerIndex } = data;
+            const self = players.find(p => p.uid === currentUser.uid);
             leftPlayersEl.innerHTML = '';
             rightPlayersEl.innerHTML = '';
             
@@ -592,40 +599,56 @@
                 slot.className = 'player-slot';
                 slot.dataset.uid = player.uid;
 
-                let slotContent = `
-                    <img src="${player.avatarUrl || 'https://up.20script.ir/file/1d50-defult.png'}" alt="avatar" class="player-avatar" onerror="this.src='https://up.20script.ir/file/1d50-defult.png';">
-                    <div class="player-number">${i + 1}</div>
-                    <div class="player-name">${player.displayName}</div>
-                `;
+                let slotContent = `<img src="${player.avatarUrl || 'https://up.20script.ir/file/1d50-defult.png'}" alt="avatar" class="player-avatar" onerror="this.src='https://up.20script.ir/file/1d50-defult.png';"><div class="player-number">${i + 1}</div><div class="player-name">${player.displayName}</div>`;
                 
                 if (!player.isAlive) {
                     slot.classList.add('dead');
-                    slotContent += `
-                        <div class="dead-overlay">
-                            <div class="dead-icon">👻</div>
-                            <div class="revealed-role">${player.roleName || 'نقش نامشخص'}</div>
-                        </div>
-                    `;
+                    slotContent += `<div class="dead-overlay"><div class="dead-icon">👻</div><div class="revealed-role">${player.roleName || 'نقش نامشخص'}</div></div>`;
                 } else {
-                    if (isSelectablePhase) {
-                        if (player.uid !== self.uid) {
-                            slot.classList.add('selectable');
-                            slot.onclick = () => handlePlayerCardClick(player.uid);
-                        }
+                    if (isSelectablePhase && player.uid !== self.uid) {
+                        slot.classList.add('selectable');
+                        slot.onclick = () => handlePlayerCardClick(player.uid);
                     }
                 }
                 
-                if (player.uid === localSelectedPlayerUid) {
-                    slot.classList.add('selected');
+                if (phase === 'day_speaking_turns' && i === currentSpeakerIndex) {
+                    slot.classList.add('speaking-turn');
                 }
+                
+                if (player.uid === localSelectedPlayerUid) slot.classList.add('selected');
                 
                 slot.innerHTML = slotContent;
                 
-                if (i < playersPerColumn) {
-                    rightPlayersEl.appendChild(slot);
-                } else {
-                    leftPlayersEl.appendChild(slot);
+                if (i < playersPerColumn) rightPlayersEl.appendChild(slot);
+                else leftPlayersEl.appendChild(slot);
+            }
+        }
+        
+        async function advanceSpeakingTurn() {
+            const { players, currentSpeakerIndex } = currentGameState;
+            let nextSpeakerIndex = -1;
+
+            // پیدا کردن بازیکن زنده بعدی
+            for (let i = currentSpeakerIndex + 1; i < players.length; i++) {
+                if (players[i].isAlive) {
+                    nextSpeakerIndex = i;
+                    break;
                 }
+            }
+
+            const gameDocRef = doc(db, "games", gameId);
+            if (nextSpeakerIndex !== -1) {
+                // نوبت نفر بعدی
+                await updateDoc(gameDocRef, {
+                    currentSpeakerIndex: nextSpeakerIndex,
+                    timerEndsAt: Timestamp.fromMillis(Date.now() + 30000) // 30 ثانیه برای نفر بعدی
+                });
+            } else {
+                // همه صحبت کرده‌اند، رفتن به فاز رای‌گیری
+                await updateDoc(gameDocRef, {
+                    phase: 'day_voting',
+                    timerEndsAt: Timestamp.fromMillis(Date.now() + 60000) // 60 ثانیه برای رای‌گیری
+                });
             }
         }
 
@@ -650,6 +673,20 @@
             }
         }
         
+        function updateChatPermissions(data) {
+            if (data.phase === 'day_speaking_turns') {
+                const isMyTurn = data.players[data.currentSpeakerIndex]?.uid === currentUser.uid;
+                chatInput.disabled = !isMyTurn;
+                chatSendBtn.disabled = !isMyTurn;
+                chatInput.placeholder = isMyTurn ? 'نوبت شماست، صحبت کنید...' : 'منتظر نوبت خود باشید...';
+            } else {
+                 const self = data.players.find(p => p.uid === currentUser.uid);
+                 chatInput.disabled = !self?.isAlive;
+                 chatSendBtn.disabled = !self?.isAlive;
+                 chatInput.placeholder = self?.isAlive ? "پیام خود را بنویسید..." : "شما حذف شده‌اید و نمی‌توانید پیام دهید";
+            }
+        }
+
         function setupEventListeners() {
             gameActionBtn.addEventListener('click', handleMainAction);
             toggleChatBtn.addEventListener('click', toggleChatPanel);
@@ -665,7 +702,6 @@
         async function handleMainAction() {
             gameActionBtn.disabled = true;
             const actionType = currentGameState.phase === 'day_voting' ? 'vote' : 'ability';
-            console.log(`Action: ${actionType}, Target: ${localSelectedPlayerUid}`);
             showNotificationModal("اقدام ثبت شد", "حرکت شما ثبت شد، منتظر بقیه بازیکنان بمانید.");
             try {
                 const gameDocRef = doc(db, "games", gameId);
@@ -694,8 +730,13 @@
             unsubscribeChat = onSnapshot(q, (snapshot) => {
                 snapshot.docChanges().forEach(change => {
                     if (change.type === 'added') {
-                        renderMessage(change.doc.data());
-                        if (!isChatPanelVisible && change.doc.data().senderUid !== currentUser.uid) {
+                        const messageData = change.doc.data();
+                        renderMessage(messageData);
+
+                        const isSpeakerMessage = currentGameState.phase === 'day_speaking_turns' && messageData.senderUid !== currentUser.uid;
+                        if (isSpeakerMessage && !isChatPanelVisible) {
+                            openChatPanelForced();
+                        } else if (!isChatPanelVisible && messageData.senderUid !== currentUser.uid) {
                             toggleChatBtn.classList.add('new-message');
                         }
                     }
@@ -724,8 +765,15 @@
             if(isChatPanelVisible) {
                 toggleChatBtn.classList.remove('new-message');
                 chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
-                chatInput.focus();
+                if(!chatInput.disabled) chatInput.focus();
             }
+        }
+        
+        function openChatPanelForced() {
+            if (isChatPanelVisible) return;
+            isChatPanelVisible = true;
+            chatPanel.classList.add('visible');
+            chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
         }
 
         async function handleSendMessage(e) {
@@ -733,12 +781,6 @@
              const messageText = chatInput.value.trim();
              if (messageText === '') return;
              
-             const selfInGame = currentGameState.players.find(p => p.uid === currentUser.uid);
-             if (!selfInGame || !selfInGame.isAlive) {
-                showNotificationModal("توجه", "افراد حذف شده نمی‌توانند پیام ارسال کنند.");
-                return;
-             }
-
              chatInput.disabled = true;
              const tempMessage = chatInput.value;
              chatInput.value = '';
@@ -756,7 +798,11 @@
                 chatInput.value = tempMessage;
              } finally {
                 chatInput.disabled = false;
-                chatInput.focus();
+                if (currentGameState.phase === 'day_speaking_turns') {
+                    const isMyTurn = currentGameState.players[currentGameState.currentSpeakerIndex]?.uid === currentUser.uid;
+                    chatInput.disabled = !isMyTurn;
+                }
+                if (!chatInput.disabled) chatInput.focus();
              }
         }
 
