@@ -217,10 +217,40 @@
         .menu-button { background: linear-gradient(145deg, rgba(80, 50, 48, 0.8), rgba(56, 33, 32, 0.9)); color: #e0dacc; border: 1px solid #c5a687; padding: 8px 15px; border-radius: 8px; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; text-align: center; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); box-shadow: 0 2px 5px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05); }
         .menu-button:hover { background: linear-gradient(145deg, rgba(100, 65, 63, 0.9), rgba(74, 44, 42, 1)); border-color: #ffc947; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1); }
         .menu-button:active { transform: translateY(0) scale(0.98); box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+        
+        /* --- START: استایل‌های بخش دکمه‌های اصلی --- */
         .start-game-container { width: 100%; display: flex; justify-content: center; padding-bottom: 20px; }
-        #start-game-button { padding: 15px 40px; font-size: 1.3rem; font-weight: 900; color: #ffffff; background: linear-gradient(145deg, #8c4843, #5a2c2a); border: 2px solid #ffc947; border-radius: 15px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5), inset 0 -2px 5px rgba(0,0,0,0.3); text-shadow: 0 2px 4px rgba(0,0,0,0.7); }
+        .main-action-buttons { display: flex; justify-content: center; align-items: center; gap: 20px; width: 100%; }
+        
+        #start-game-button { padding: 15px 40px; font-size: 1.3rem; font-weight: 900; color: #ffffff; background: linear-gradient(145deg, #8c4843, #5a2c2a); border: 2px solid #ffc947; border-radius: 15px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5), inset 0 -2px 5px rgba(0,0,0,0.3); text-shadow: 0 2px 4px rgba(0,0,0,0.7); flex-shrink: 0; }
         #start-game-button:hover { background: linear-gradient(145deg, #a1534d, #6b3431); box-shadow: 0 8px 20px rgba(255, 201, 71, 0.3), inset 0 -2px 5px rgba(0,0,0,0.3); }
         #start-game-button:active { transform: scale(0.96); }
+        
+        .secondary-action-button {
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #e0dacc;
+            background: linear-gradient(145deg, rgba(80, 50, 48, 0.8), rgba(56, 33, 32, 0.9));
+            border: 1px solid #c5a687;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+        }
+        .secondary-action-button:hover {
+            background: linear-gradient(145deg, rgba(100, 65, 63, 0.9), rgba(74, 44, 42, 1));
+            border-color: #ffc947;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+        .secondary-action-button:active {
+            transform: translateY(0) scale(0.98);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        /* --- END: استایل‌های بخش دکمه‌های اصلی --- */
+        
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); }
         .modal-overlay.visible { opacity: 1; visibility: visible; }
         
@@ -463,7 +493,13 @@
             </div>
         </div>
         <div class="start-game-container">
-            <button id="start-game-button">شروع بازی</button>
+            <!-- START: کانتینر جدید برای دکمه‌های اصلی -->
+            <div class="main-action-buttons">
+                <button id="shop-button" class="secondary-action-button">فروشگاه</button>
+                <button id="start-game-button">شروع بازی</button>
+                <button id="clan-button" class="secondary-action-button">کلن</button>
+            </div>
+            <!-- END: کانتینر جدید برای دکمه‌های اصلی -->
         </div>
     </div>
     <audio id="background-music" loop></audio>
@@ -509,10 +545,12 @@
         // --- DOM Elements ---
         const userDisplayName = document.getElementById('user-display-name');
         const userAvatar = document.getElementById('user-avatar');
-        // START: المان جدید برای نمایش الماس
         const userGemsCount = document.getElementById('user-gems-count');
-        // END: المان جدید برای نمایش الماس
         const startGameButton = document.getElementById('start-game-button');
+        // START: المان‌های دکمه‌های جدید
+        const shopButton = document.getElementById('shop-button');
+        const clanButton = document.getElementById('clan-button');
+        // END: المان‌های دکمه‌های جدید
         const menuButtons = document.querySelectorAll('.menu-button');
         const loadingOverlay = document.getElementById('loading-overlay');
         const loaderSpinner = loadingOverlay.querySelector('.loader');
@@ -741,18 +779,16 @@
                         userDisplayName.textContent = currentUserData.displayName || "کاربر ناشناس";
                         userAvatar.src = currentUserData.avatarUrl || DEFAULT_AVATAR;
                         
-                        // --- START: به‌روزرسانی تعداد الماس و تنظیم فونت ---
                         const gems = currentUserData.game || 0;
                         userGemsCount.textContent = gems.toLocaleString('fa-IR');
-                        adjustGemFontSize(userGemsCount); // فراخوانی تابع برای تنظیم اندازه فونت
-                        // --- END: به‌روزرسانی تعداد الماس و تنظیم فونت ---
+                        adjustGemFontSize(userGemsCount);
 
                         adminPanelButton.style.display = currentUserData.isAdmin === true ? 'block' : 'none';
                     } else {
                         currentUserData = { email: user.email, displayName: user.displayName };
                         userDisplayName.textContent = user.displayName || "کاربر ناشناس";
                         userAvatar.src = DEFAULT_AVATAR;
-                        userGemsCount.textContent = "0"; // مقدار پیش‌فرض برای کاربر جدید
+                        userGemsCount.textContent = "0";
                         adminPanelButton.style.display = 'none';
                     }
                     if (isInitialLoad) {
@@ -773,7 +809,7 @@
             } else { window.location.href = './login.html'; }
         });
 
-        // Event Listeners (بدون تغییر)
+        // Event Listeners
         userAvatar.addEventListener('click', () => checkMaintenanceAndProceed(() => showModal(avatarMenuOverlay)));
         avatarMenuOverlay.addEventListener('click', (e) => { if (e.target === avatarMenuOverlay) hideModal(avatarMenuOverlay); });
         avatarMenuShopBtn.addEventListener('click', () => checkMaintenanceAndProceed(() => { window.location.href = './Avatar shop.html'; }));
@@ -781,6 +817,16 @@
         profileModalCloseBtn.addEventListener('click', () => hideModal(profileModalOverlay));
         profileModalOverlay.addEventListener('click', (e) => { if (e.target === profileModalOverlay) hideModal(profileModalOverlay); });
         startGameButton.addEventListener('click', () => checkMaintenanceAndProceed(() => showModal(gameModeModalOverlay)));
+        
+        // START: رویدادهای کلیک برای دکمه‌های جدید
+        shopButton.addEventListener('click', () => checkMaintenanceAndProceed(() => {
+            window.location.href = './Avatar shop.html';
+        }));
+        clanButton.addEventListener('click', () => checkMaintenanceAndProceed(() => {
+            window.location.href = './clan_list.html';
+        }));
+        // END: رویدادهای کلیک برای دکمه‌های جدید
+        
         gameModeModalOverlay.addEventListener('click', (e) => { if(e.target === gameModeModalOverlay) hideModal(gameModeModalOverlay); });
         friendlyGameBtn.addEventListener('click', () => checkMaintenanceAndProceed(() => { window.location.href = './Lobby page.html'; }));
         rankedGameBtn.addEventListener('click', () => checkMaintenanceAndProceed(() => { window.location.href = './users search.html'; }));
