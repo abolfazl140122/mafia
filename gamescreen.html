@@ -42,7 +42,7 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         #loading-text { margin-top: 20px; font-size: 1.1rem; font-weight: 700; }
 
-        /* START NEW: استایل‌های پنل انتخاب نقش */
+        /* START CHANGE: استایل‌های جدید پنل انتخاب نقش و انیمیشن */
         #role-reveal-overlay {
             position: fixed;
             top: 0;
@@ -65,6 +65,10 @@
             visibility: visible;
             transition: opacity 0.5s ease;
         }
+        #role-reveal-overlay.closing {
+            opacity: 0;
+            transition: opacity 0.7s ease-in-out;
+        }
         #role-reveal-title {
             font-size: 1.8rem;
             font-weight: 900;
@@ -72,6 +76,14 @@
             margin-bottom: 30px;
             text-shadow: 0 0 10px var(--primary-gold);
             animation: fadeInDown 1s ease forwards;
+            transition: opacity 0.5s ease;
+        }
+        #role-reveal-status {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-top: 30px;
+            display: none;
+            color: var(--text-secondary);
         }
         @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
         #role-card-grid {
@@ -80,6 +92,7 @@
             gap: 15px;
             padding: 10px;
             max-width: 600px;
+            transition: opacity 0.5s ease, transform 0.5s ease;
         }
         .role-card-container {
             perspective: 1000px;
@@ -94,9 +107,7 @@
             transform-style: preserve-3d;
             transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
-        .role-card.flipped {
-            transform: rotateY(180deg);
-        }
+        .role-card.flipped { transform: rotateY(180deg); }
         .card-face {
             position: absolute;
             width: 100%;
@@ -108,17 +119,35 @@
             background-position: center;
             border: 2px solid var(--border-color);
         }
-        .card-back {
-            background-image: url('https://up.20script.ir/file/a448-ChatGPT-Image-Sep-25-2025-05-25-01-PM.png');
+        .card-back { background-image: url('https://up.20script.ir/file/a448-ChatGPT-Image-Sep-25-2025-05-25-01-PM.png'); }
+        .card-front { transform: rotateY(180deg); }
+        
+        /* انیمیشن زوم شدن کارت */
+        .zoomed-card {
+            position: fixed;
+            z-index: 2000;
+            width: 120px; /* اندازه اولیه کارت */
+            height: 180px; /* اندازه اولیه کارت */
+            border-radius: 12px;
+            background-size: cover;
+            background-position: center;
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .card-front {
-            transform: rotateY(180deg);
+        .zoomed-card.animate {
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) scale(1.8); /* بزرگنمایی */
+            border: 4px solid var(--primary-gold);
+            box-shadow: 0 0 40px 10px rgba(255, 201, 71, 0.7); /* افکت درخشش طلایی */
         }
+
         @media (max-width: 600px) {
             #role-card-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
             .role-card-container { width: 100px; height: 150px; }
+            .zoomed-card { width: 100px; height: 150px; }
+            .zoomed-card.animate { transform: translate(-50%, -50%) scale(1.6); }
         }
-        /* END NEW */
+        /* END CHANGE */
 
         /* === ساختار اصلی صفحه بازی === */
         .game-container { width: 100%; height: 100%; display: flex; flex-direction: column; padding: 10px 5px; gap: 10px; }
@@ -202,14 +231,15 @@
         <p id="loading-text">در حال بارگذاری بازی...</p>
     </div>
 
-    <!-- START NEW: پنل انتخاب نقش -->
+    <!-- START CHANGE: پنل انتخاب نقش با ساختار جدید -->
     <div id="role-reveal-overlay">
         <h2 id="role-reveal-title">نقش خود را انتخاب کنید</h2>
         <div id="role-card-grid">
             <!-- کارت‌ها توسط جاوااسکریپت ساخته می‌شوند -->
         </div>
+        <p id="role-reveal-status"></p>
     </div>
-    <!-- END NEW -->
+    <!-- END CHANGE -->
 
     <div class="game-container" style="display: none;">
         <header class="game-header">
@@ -250,22 +280,24 @@
         
         const MAX_PLAYERS = 12;
 
-        // START NEW: تعریف نقش‌ها و عکس کارت‌ها
+        // START CHANGE: تعریف نقش‌ها همراه با تیم و عکس کارت‌ها (باگ تیم شهروند حل شد)
         const ROLES_DATA = {
-            'هوش سیاه': { img: 'https://up.20script.ir/file/8714-IMG-20250915-124407-956.jpg' },
-            'آموبات': { img: 'https://up.20script.ir/file/8714-IMG-20250915-124454-356.jpg' },
-            'تبدیل شونده': { img: 'https://up.20script.ir/file/8714-IMG-20250915-124547-109.jpg' },
-            'پزشک': { img: 'https://up.20script.ir/file/8714-IMG-20250915-140001-151.jpg' },
-            'شهردار': { img: 'https://up.20script.ir/file/98bb-IMG-20250915-140136-690.jpg' },
-            'بادیگارد': { img: 'https://up.20script.ir/file/98bb-IMG-20250915-140411-337.jpg' },
-            'چند چهره': { img: 'https://up.20script.ir/file/1d7f-IMG-20250915-140657-127.jpg' },
-            'شهروند': { img: 'https://up.20script.ir/file/8714-IMG-20250915-125022-878.jpg' }
+            'هوش سیاه':   { img: 'https://up.20script.ir/file/8714-IMG-20250915-124407-956.jpg', team: 'mafia' },
+            'آموبات':     { img: 'https://up.20script.ir/file/8714-IMG-20250915-124454-356.jpg', team: 'mafia' },
+            'تبدیل شونده':{ img: 'https://up.20script.ir/file/8714-IMG-20250915-124547-109.jpg', team: 'mafia' },
+            'پزشک':      { img: 'https://up.20script.ir/file/8714-IMG-20250915-140001-151.jpg', team: 'citizen' },
+            'شهردار':     { img: 'https://up.20script.ir/file/98bb-IMG-20250915-140136-690.jpg', team: 'citizen' },
+            'بادیگارد':    { img: 'https://up.20script.ir/file/98bb-IMG-20250915-140411-337.jpg', team: 'citizen' },
+            'چند چهره':   { img: 'https://up.20script.ir/file/1d7f-IMG-20250915-140657-127.jpg', team: 'citizen' },
+            'شهروند':     { img: 'https://up.20script.ir/file/8714-IMG-20250915-125022-878.jpg', team: 'citizen' }
         };
-        // END NEW
+        // END CHANGE
 
         const loadingOverlay = document.getElementById('loading-overlay');
         const roleRevealOverlay = document.getElementById('role-reveal-overlay');
         const roleCardGrid = document.getElementById('role-card-grid');
+        const roleRevealTitle = document.getElementById('role-reveal-title');
+        const roleRevealStatus = document.getElementById('role-reveal-status');
         const gameContainer = document.querySelector('.game-container');
         const leftPlayersEl = document.getElementById('left-players');
         const rightPlayersEl = document.getElementById('right-players');
@@ -289,10 +321,9 @@
         let localSelectedPlayerUid = null;
         let timerInterval = null;
         let isChatPanelVisible = false;
-        let roleHasBeenRevealed = false; // NEW: فلگ برای جلوگیری از نمایش دوباره پنل نقش
+        let roleRevealPhaseActive = false; // فلگ برای کنترل مرحله نمایش نقش
 
         // --- Main Functions ---
-
         async function main() {
             gameId = new URLSearchParams(window.location.search).get('id');
             if (!gameId) {
@@ -326,33 +357,43 @@
                 const previousState = currentGameState;
                 currentGameState = docSnap.data();
                 
-                // --- START NEW: منطق اختصاص نقش توسط میزبان ---
+                // منطق اختصاص نقش توسط میزبان
                 if (currentUser.uid === currentGameState.creatorId && !currentGameState.rolesAssigned) {
                     console.log("شما میزبان هستید. در حال اختصاص نقش‌ها...");
                     await assignRoles(currentGameState);
-                    return; // منتظر آپدیت بعدی می‌مانیم
+                    return; 
                 }
-                // --- END NEW ---
 
                 const self = currentGameState.players.find(p => p.uid === currentUser.uid);
                 if (!self) return;
 
-                // --- START NEW: منطق نمایش پنل انتخاب نقش ---
-                if (self.roleName && !roleHasBeenRevealed) {
-                    roleHasBeenRevealed = true;
-                    // مخفی کردن لودینگ و نمایش پنل نقش
+                // START CHANGE: منطق جدید برای نمایش پنل نقش و انتظار برای همه
+                const allPlayersReady = currentGameState.players.every(p => p.hasSeenRole);
+
+                if (self.roleName && !allPlayersReady && !roleRevealPhaseActive) {
+                    roleRevealPhaseActive = true;
                     loadingOverlay.style.opacity = '0';
                     setTimeout(() => {
                         loadingOverlay.style.display = 'none';
                         showRoleRevealPanel(self.roleName, currentGameState.players.length);
                     }, 500);
-                } 
-                // --- END NEW ---
-                
-                // فقط اگر نقش‌ها نمایش داده شده باشد، بازی اصلی رندر می‌شود
-                if (roleHasBeenRevealed) {
+                } else if (roleRevealPhaseActive && allPlayersReady) {
+                    // وقتی همه آماده شدند، پنل را برای همه ببند و بازی را شروع کن
+                    roleRevealPhaseActive = false; // فقط یک بار اجرا شود
+                    roleRevealOverlay.classList.add('closing');
+                    setTimeout(() => {
+                        roleRevealOverlay.style.display = 'none';
+                        gameContainer.style.display = 'flex';
+                        renderGame(currentGameState);
+                        playGreetingBasedOnTimeOfDay();
+                    }, 700);
+                } else if (!roleRevealPhaseActive) {
+                    // اگر مرحله نقش تمام شده، بازی را رندر کن
+                    loadingOverlay.style.display = 'none';
+                    gameContainer.style.display = 'flex';
                     renderGame(currentGameState);
                 }
+                // END CHANGE
 
             }, (error) => {
                 console.error("Firestore listen error:", error);
@@ -360,54 +401,77 @@
             });
         }
 
-        // --- START NEW: تابع اختصاص نقش‌ها (فقط توسط میزبان اجرا می‌شود) ---
+        // START CHANGE: تابع جدید اختصاص نقش با محدودیت ۳ شهروند ساده
         async function assignRoles(gameState) {
             const gameDocRef = doc(db, "games", gameId);
             const players = [...gameState.players];
             const playerCount = players.length;
 
-            // تعریف لیست نقش‌ها بر اساس تعداد بازیکنان (اینجا برای 12 نفر)
-            // شما می‌توانید این بخش را برای سناریوهای مختلف تغییر دهید
+            const mafiaRoles = ['هوش سیاه', 'آموبات', 'تبدیل شونده'];
+            const specialCitizenRoles = ['پزشک', 'شهردار', 'بادیگارد', 'چند چهره'];
+            
             let rolesToAssign = [];
-            if (playerCount >= 8) { // مثال برای 12 بازیکن
-                rolesToAssign = [
-                    'هوش سیاه', 'آموبات', 'تبدیل شونده', // تیم مافیا
-                    'پزشک', 'شهردار', 'بادیگارد', 'چند چهره', // شهروندان خاص
-                    'شهروند', 'شهروند', 'شهروند', 'شهروند', 'شهروند' // شهروندان ساده
-                ].slice(0, playerCount); // اطمینان از اینکه تعداد نقش‌ها برابر بازیکنان است
-            } else {
-                 // سناریو برای تعداد کمتر بازیکن
-                 rolesToAssign = ['هوش سیاه', 'آموبات', 'پزشک', 'بادیگارد', 'شهروند', 'شهروند', 'شهروند', 'شهروند'].slice(0, playerCount);
+            
+            // 1. اضافه کردن مافیا بر اساس تعداد بازیکن (مثلا ۱ مافیا برای کمتر از ۶، ۲ برای ۶-۹، ۳ برای ۱۰+)
+            let mafiaCount = 1;
+            if (playerCount >= 6) mafiaCount = 2;
+            if (playerCount >= 10) mafiaCount = 3;
+            rolesToAssign.push(...mafiaRoles.slice(0, mafiaCount));
+
+            // 2. محاسبه تعداد شهروندان مورد نیاز
+            const citizenCount = playerCount - mafiaCount;
+            let citizensToAssign = [];
+            
+            // 3. اضافه کردن شهروندان خاص
+            citizensToAssign.push(...specialCitizenRoles);
+            
+            // 4. اضافه کردن شهروند ساده (با محدودیت حداکثر ۳)
+            const simpleCitizensNeeded = citizenCount - citizensToAssign.length;
+            const simpleCitizensToAdd = Math.min(3, Math.max(0, simpleCitizensNeeded));
+            for(let i = 0; i < simpleCitizensToAdd; i++) {
+                citizensToAssign.push('شهروند');
             }
 
-            // بر زدن نقش‌ها (الگوریتم Fisher-Yates)
+            // 5. پر کردن بقیه ظرفیت شهروندان با شهروند ساده (اگر لازم باشد)
+            while(citizensToAssign.length < citizenCount) {
+                citizensToAssign.push('شهروند');
+            }
+            
+            // 6. لیست نهایی شهروندان را به اندازه مورد نیاز برش بزن
+            citizensToAssign = citizensToAssign.slice(0, citizenCount);
+            
+            rolesToAssign.push(...citizensToAssign);
+            
+            // بر زدن نقش‌ها
             for (let i = rolesToAssign.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [rolesToAssign[i], rolesToAssign[j]] = [rolesToAssign[j], rolesToAssign[i]];
             }
 
-            // اختصاص نقش به هر بازیکن
+            // اختصاص نقش، تیم و فیلد hasSeenRole به هر بازیکن
             const updatedPlayers = players.map((player, index) => {
+                const roleName = rolesToAssign[index];
                 return {
                     ...player,
-                    roleName: rolesToAssign[index] // فیلد roleName اضافه و ذخیره می‌شود
+                    roleName: roleName,
+                    team: ROLES_DATA[roleName].team, // ذخیره تیم بر اساس ROLES_DATA
+                    hasSeenRole: false // برای هماهنگ‌سازی شروع بازی
                 };
             });
 
             try {
-                // آپدیت داکیومنت بازی با نقش‌های جدید و فلگ rolesAssigned
                 await updateDoc(gameDocRef, {
                     players: updatedPlayers,
-                    rolesAssigned: true // این فلگ باعث می‌شود این تابع فقط یک بار اجرا شود
+                    rolesAssigned: true
                 });
                 console.log("نقش‌ها با موفقیت در سرور ثبت شد.");
             } catch (error) {
                 console.error("خطا در ثبت نقش‌ها:", error);
             }
         }
-        // --- END NEW ---
+        // END CHANGE
 
-        // --- START NEW: تابع نمایش پنل نقش و مدیریت کلیک ---
+        // START CHANGE: تابع نمایش پنل نقش با انیمیشن جدید و منطق انتظار
         function showRoleRevealPanel(myRoleName, playerCount) {
             roleCardGrid.innerHTML = ''; // خالی کردن گرید
             for (let i = 0; i < playerCount; i++) {
@@ -425,33 +489,73 @@
 
             const cards = document.querySelectorAll('.role-card');
             cards.forEach(card => {
-                card.addEventListener('click', () => {
-                    if (card.classList.contains('flipped')) return; // جلوگیری از کلیک مجدد
+                card.addEventListener('click', (event) => {
+                    if (card.classList.contains('flipped')) return;
 
-                    // چرخاندن کارت کلیک شده و نمایش نقش
+                    const clickedCardElement = event.currentTarget.parentElement;
+                    const cardRect = clickedCardElement.getBoundingClientRect();
+
+                    // 1. چرخاندن کارت کلیک شده و نمایش نقش
                     const frontFace = card.querySelector('.card-front');
                     frontFace.style.backgroundImage = `url('${ROLES_DATA[myRoleName].img}')`;
                     card.classList.add('flipped');
 
-                    // غیرفعال کردن بقیه کارت‌ها
+                    // 2. غیرفعال کردن بقیه کارت‌ها
                     cards.forEach(c => c.style.pointerEvents = 'none');
 
-                    // بستن پنل بعد از چند ثانیه و شروع بازی
+                    // 3. انیمیشن زوم و درخشش
                     setTimeout(() => {
-                        roleRevealOverlay.style.opacity = '0';
+                        // ساخت یک کپی از کارت برای انیمیشن
+                        const zoomCard = document.createElement('div');
+                        zoomCard.className = 'zoomed-card';
+                        zoomCard.style.backgroundImage = `url('${ROLES_DATA[myRoleName].img}')`;
+                        zoomCard.style.top = `${cardRect.top}px`;
+                        zoomCard.style.left = `${cardRect.left}px`;
+                        document.body.appendChild(zoomCard);
+
+                        // محو کردن گرید کارت‌ها
+                        roleCardGrid.style.opacity = '0';
+                        roleRevealTitle.style.opacity = '0';
+
+                        // شروع انیمیشن حرکت به مرکز و بزرگ شدن
                         setTimeout(() => {
-                            roleRevealOverlay.style.display = 'none';
-                            gameContainer.style.display = 'flex';
-                            playGreetingBasedOnTimeOfDay(); // پخش صدای راوی بعد از دیدن نقش
-                        }, 500);
-                    }, 4000); // 4 ثانیه برای دیدن نقش
-                }, { once: true }); // event listener فقط یک بار اجرا می‌شود
+                            zoomCard.classList.add('animate');
+                        }, 50);
+
+                        // 4. نمایش پیام انتظار و ثبت در دیتابیس
+                        setTimeout(async () => {
+                            roleRevealStatus.textContent = "نقش شما مشخص شد. منتظر سایر بازیکنان بمانید...";
+                            roleRevealStatus.style.display = 'block';
+                            await confirmRoleSeen(); // آپدیت فایربیس
+                        }, 1000); // 1 ثانیه بعد از شروع انیمیشن
+
+                    }, 800); // 0.8 ثانیه بعد از چرخش کارت
+                }, { once: true });
             });
         }
-        // --- END NEW ---
+
+        async function confirmRoleSeen() {
+            try {
+                const gameDocRef = doc(db, "games", gameId);
+                await runTransaction(db, async (transaction) => {
+                    const gameDoc = await transaction.get(gameDocRef);
+                    if (!gameDoc.exists()) throw "Game does not exist!";
+                    
+                    let players = gameDoc.data().players;
+                    const playerIndex = players.findIndex(p => p.uid === currentUser.uid);
+                    
+                    if (playerIndex > -1 && !players[playerIndex].hasSeenRole) {
+                         players[playerIndex].hasSeenRole = true;
+                         transaction.update(gameDocRef, { players });
+                    }
+                });
+            } catch (error) {
+                console.error("Error confirming role seen:", error);
+            }
+        }
+        // END CHANGE
 
         async function playGreetingBasedOnTimeOfDay() {
-            // این تابع بدون تغییر باقی می‌ماند اما زمان فراخوانی آن تغییر کرده است
             const apiKey = "b31bd8909b9b4b87b45e4869a8be7358";
             const apiUrl = `https://api.ipgeolocation.io/astronomy?apiKey=${apiKey}&location=Tehran`;
             const daySoundUrl = 'https://raw.githubusercontent.com/abolfazl140122/mafia/58cc5df365b21b6f32f609f5c12175acce8f717c/voicravi/%D8%B3%D9%84%D8%A7%D9%85%20%D8%A8%D8%B1%20%D8%AF%D9%88%D8%B3%D8%AA%D8%A7%D9%86%20%D8%B9%D8%B2%DB%8C%D8%B2%20%D8%B1%D9%88%D8%B2%20%D9%87%D9%85%DA%AF%DB%8C%20%D8%A8%D8%AE%DB%8C%D8%B1!.wav';
@@ -538,7 +642,6 @@
                     slotContent += `
                         <div class="dead-overlay">
                             <div class="dead-icon">👻</div>
-                            <!-- CHANGE: نمایش نقش واقعی از دیتابیس -->
                             <div class="revealed-role">${player.roleName || 'نقش نامشخص'}</div>
                         </div>
                     `;
