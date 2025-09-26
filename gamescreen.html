@@ -20,7 +20,7 @@
             --green-ready: #2ecc71;
             --blue-night: #2980b9;
             --dead-color: #7f8c8d;
-            --speaker-glow: #00a8ff; /* START NEW: رنگ برای نوبت صحبت */
+            --speaker-glow: #ffffff;
         }
 
         /* === ریست و استایل‌های کلی === */
@@ -43,134 +43,30 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         #loading-text { margin-top: 20px; font-size: 1.1rem; font-weight: 700; }
 
-        /* START NEW: استایل‌های پنل انتخاب نقش */
-        #role-reveal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
-            backdrop-filter: blur(5px);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 1999;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.5s ease, visibility 0s 0.5s, background-color 0.5s ease;
-        }
-        #role-reveal-overlay.visible {
-            opacity: 1;
-            visibility: visible;
-            transition: opacity 0.5s ease;
-        }
-        #role-reveal-title {
-            font-size: 1.8rem;
-            font-weight: 900;
-            color: var(--primary-gold);
-            margin-bottom: 30px;
-            text-shadow: 0 0 10px var(--primary-gold);
-            animation: fadeInDown 1s ease forwards;
-            transition: opacity 0.5s ease;
-        }
+        /* START: استایل‌های پنل انتخاب نقش */
+        #role-reveal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.9); backdrop-filter: blur(5px); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1999; opacity: 0; visibility: hidden; transition: opacity 0.5s ease, visibility 0s 0.5s, background-color 0.5s ease; }
+        #role-reveal-overlay.visible { opacity: 1; visibility: visible; transition: opacity 0.5s ease; }
+        #role-reveal-title { font-size: 1.8rem; font-weight: 900; color: var(--primary-gold); margin-bottom: 30px; text-shadow: 0 0 10px var(--primary-gold); animation: fadeInDown 1s ease forwards; transition: opacity 0.5s ease; }
         @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-        #role-card-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            padding: 10px;
-            max-width: 600px;
-            transition: transform 0.5s ease;
-        }
-        .role-card-container {
-            perspective: 1000px;
-            width: 120px;
-            height: 180px;
-            cursor: pointer;
-            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.5s ease;
-        }
-        .role-card {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            transform-style: preserve-3d;
-            transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-        .role-card.flipped {
-            transform: rotateY(180deg);
-        }
-        .card-face {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
-            -webkit-backface-visibility: hidden;
-            border-radius: 12px;
-            background-size: cover;
-            background-position: center;
-            border: 2px solid var(--border-color);
-        }
-        .card-back {
-            background-image: url('https://up.20script.ir/file/a448-ChatGPT-Image-Sep-25-2025-05-25-01-PM.png');
-        }
-        .card-front {
-            transform: rotateY(180deg);
-        }
-        #role-reveal-instructions {
-            position: absolute;
-            bottom: 5vh;
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--primary-gold);
-            text-shadow: 0 0 8px black;
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-            transition: opacity 0.5s ease 0.5s, visibility 0s 1s;
-        }
-
-        /* --- استایل‌های انیمیشن فوکوس کارت --- */
-        #role-reveal-overlay.card-focused #role-reveal-title {
-            opacity: 0;
-        }
-        #role-reveal-overlay.card-focused .role-card-container:not(.has-revealed) {
-            opacity: 0;
-            transform: scale(0.8);
-            pointer-events: none;
-        }
-        #role-reveal-overlay.card-focused .role-card-container.has-revealed {
-            transform: scale(1.4);
-            z-index: 10;
-        }
-        .role-card.revealed-and-waiting {
-            cursor: pointer;
-            animation: pulse-glow 1.5s infinite;
-        }
-        @keyframes pulse-glow {
-            0% { box-shadow: 0 0 25px 8px rgba(255, 201, 71, 0.7); }
-            50% { box-shadow: 0 0 40px 15px rgba(255, 223, 133, 1); }
-            100% { box-shadow: 0 0 25px 8px rgba(255, 201, 71, 0.7); }
-        }
-        #role-reveal-overlay.card-focused #role-reveal-instructions {
-            opacity: 1;
-            visibility: visible;
-            transition: opacity 0.5s ease 0.5s;
-        }
-
-        @media (max-width: 600px) {
-            #role-card-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
-            .role-card-container { width: 100px; height: 150px; }
-            #role-reveal-overlay.card-focused .role-card-container.has-revealed { transform: scale(1.3); }
-        }
-        /* END NEW */
-
+        #role-card-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; padding: 10px; max-width: 600px; transition: transform 0.5s ease; }
+        .role-card-container { perspective: 1000px; width: 120px; height: 180px; cursor: pointer; transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.5s ease; }
+        .role-card { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+        .role-card.flipped { transform: rotateY(180deg); }
+        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 12px; background-size: cover; background-position: center; border: 2px solid var(--border-color); }
+        .card-back { background-image: url('https://up.20script.ir/file/a448-ChatGPT-Image-Sep-25-2025-05-25-01-PM.png'); }
+        .card-front { transform: rotateY(180deg); }
+        #role-reveal-instructions { position: absolute; bottom: 5vh; font-size: 1.2rem; font-weight: 700; color: var(--primary-gold); text-shadow: 0 0 8px black; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.5s ease 0.5s, visibility 0s 1s; }
+        #role-reveal-overlay.card-focused #role-reveal-title { opacity: 0; }
+        #role-reveal-overlay.card-focused .role-card-container:not(.has-revealed) { opacity: 0; transform: scale(0.8); pointer-events: none; }
+        #role-reveal-overlay.card-focused .role-card-container.has-revealed { transform: scale(1.4); z-index: 10; }
+        .role-card.revealed-and-waiting { cursor: pointer; animation: pulse-glow 1.5s infinite; }
+        @keyframes pulse-glow { 0% { box-shadow: 0 0 25px 8px rgba(255, 201, 71, 0.7); } 50% { box-shadow: 0 0 40px 15px rgba(255, 223, 133, 1); } 100% { box-shadow: 0 0 25px 8px rgba(255, 201, 71, 0.7); } }
+        #role-reveal-overlay.card-focused #role-reveal-instructions { opacity: 1; visibility: visible; transition: opacity 0.5s ease 0.5s; }
+        @media (max-width: 600px) { #role-card-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; } .role-card-container { width: 100px; height: 150px; } #role-reveal-overlay.card-focused .role-card-container.has-revealed { transform: scale(1.3); } }
+        /* END: استایل‌های پنل انتخاب نقش */
 
         /* === ساختار اصلی صفحه بازی === */
         .game-container { width: 100%; height: 100%; display: flex; flex-direction: column; padding: 10px 5px; gap: 10px; }
-
-        /* === هدر بازی (اطلاعات و تایمر) === */
         .game-header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding: 5px 15px; background-color: rgba(0, 0, 0, 0.4); border: 1px solid var(--border-color); border-radius: 12px; height: 60px; }
         #game-phase-info { font-size: 1.3rem; font-weight: 900; color: var(--primary-gold); text-shadow: 1px 1px 3px rgba(0,0,0,0.7); }
         #game-timer { font-size: 1.5rem; font-weight: 700; background-color: var(--darker-red); color: white; padding: 5px 15px; border-radius: 8px; border: 1px solid var(--primary-gold); min-width: 80px; text-align: center; }
@@ -178,28 +74,27 @@
         @keyframes pulse-timer { 0% { transform: scale(1); box-shadow: 0 0 5px #e74c3c; } 50% { transform: scale(1.05); box-shadow: 0 0 15px #e74c3c; } 100% { transform: scale(1); box-shadow: 0 0 5px #e74c3c; } }
 
         /* === نوار اعلانات === */
-        .announcement-bar { flex-shrink: 0; width: 100%; padding: 10px; background-color: rgba(0, 168, 255, 0.2); border-radius: 8px; text-align: center; font-size: 1.1rem; font-weight: 700; display: none; transition: all 0.3s ease; border: 1px solid var(--speaker-glow); color: var(--speaker-glow); }
+        .announcement-bar { flex-shrink: 0; width: 100%; padding: 12px; background-color: rgba(255, 201, 71, 0.15); border: 1px solid var(--primary-gold); border-radius: 8px; text-align: center; font-size: 1.1rem; font-weight: 700; color: var(--primary-gold); display: none; transition: all 0.5s ease; animation: fadeInAnnounce 0.5s ease forwards; }
+        @keyframes fadeInAnnounce { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* استایل‌های چیدمان بازیکنان */
         .players-area { flex-grow: 1; width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 5px; overflow: hidden; }
         .players-column { display: flex; flex-direction: column; justify-content: space-around; align-items: center; height: 100%; flex-shrink: 0; width: 100px; }
         #central-board-container { flex-grow: 1; display: flex; justify-content: center; align-items: center; height: 100%; padding: 0 5px; }
         
-        .player-slot { position: relative; width: 90px; height: 110px; background-image: url('https://cdn.imgurl.ir/uploads/g585174_IMG_20250913_222658_030.jpg'); background-size: contain; background-position: center; background-repeat: no-repeat; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, filter 0.3s ease; border: 3px solid transparent; }
+        .player-slot { position: relative; width: 90px; height: 110px; background-image: url('https://cdn.imgurl.ir/uploads/g585174_IMG_20250913_222658_030.jpg'); background-size: contain; background-position: center; background-repeat: no-repeat; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease; border: 3px solid transparent; }
         .player-slot.selectable:hover { transform: scale(1.05); border-color: var(--primary-gold); box-shadow: 0 0 15px var(--primary-gold); }
         .player-slot.selected { transform: scale(1.08); border-color: var(--green-ready); box-shadow: 0 0 20px var(--green-ready); }
         
-        /* START NEW: استایل برای بازیکن در حال صحبت */
-        .player-slot.speaking-turn {
-            transform: scale(1.15);
+        /* START NEW: استایل و انیمیشن برای بازیکن در حال صحبت */
+        .player-slot.speaking {
+            transform: scale(1.1);
             border-color: var(--speaker-glow);
-            box-shadow: 0 0 25px var(--speaker-glow);
-            animation: speaking-pulse 1.5s infinite;
+            animation: speaking-glow 1.5s infinite alternate;
         }
-        @keyframes speaking-pulse {
-            0% { box-shadow: 0 0 25px var(--speaker-glow); }
-            50% { box-shadow: 0 0 40px var(--speaker-glow); }
-            100% { box-shadow: 0 0 25px var(--speaker-glow); }
+        @keyframes speaking-glow {
+            from { box-shadow: 0 0 10px var(--speaker-glow), 0 0 20px var(--speaker-glow), 0 0 30px #ffffff80; }
+            to   { box-shadow: 0 0 20px var(--speaker-glow), 0 0 35px var(--speaker-glow), 0 0 50px #ffffff; }
         }
         /* END NEW */
         
@@ -240,8 +135,9 @@
         .chat-message-bubble { background-color: #332a20; padding: 8px 12px; border-radius: 12px; font-size: 0.9rem; word-wrap: break-word; }
         .chat-message.self .chat-message-bubble { background-color: #2a3a30; }
         #chat-form { display: flex; padding: 10px 15px; border-top: 1px solid var(--border-color); gap: 10px; flex-shrink: 0; }
-        #chat-input { flex-grow: 1; background-color: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-light); font-family: 'Vazirmatn', sans-serif; font-size: 0.9rem; }
+        #chat-input { flex-grow: 1; background-color: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-light); font-family: 'Vazirmatn', sans-serif; font-size: 0.9rem; transition: all 0.2s ease; }
         #chat-input:focus { outline: none; border-color: var(--primary-gold); }
+        #chat-input:disabled { background-color: rgba(0,0,0,0.5); color: #999; cursor: not-allowed; }
         #chat-send-btn { background-color: var(--primary-gold); border: none; border-radius: 8px; color: var(--darker-red); font-weight: 900; padding: 0 15px; cursor: pointer; }
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.85); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s 0.3s; }
         .modal-overlay.visible { opacity: 1; visibility: visible; transition: opacity 0.3s ease; }
@@ -263,15 +159,12 @@
         <p id="loading-text">در حال بارگذاری بازی...</p>
     </div>
 
-    <!-- START NEW: پنل انتخاب نقش -->
+    <!-- پنل انتخاب نقش -->
     <div id="role-reveal-overlay">
         <h2 id="role-reveal-title">نقش خود را انتخاب کنید</h2>
-        <div id="role-card-grid">
-            <!-- کارت‌ها توسط جاوااسکریپت ساخته می‌شوند -->
-        </div>
+        <div id="role-card-grid"></div>
         <p id="role-reveal-instructions"></p>
     </div>
-    <!-- END NEW -->
 
     <div class="game-container" style="display: none;">
         <header class="game-header">
@@ -301,7 +194,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, runTransaction, updateDoc, serverTimestamp, collection, addDoc, query, orderBy, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, runTransaction, updateDoc, serverTimestamp, collection, addDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         // --- Config & Elements ---
         const firebaseConfig = { apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg", authDomain: "mafia-9fcbf.firebaseapp.com", projectId: "mafia-9fcbf", storageBucket: "mafia-9fcbf.appspot.com", messagingSenderId: "471627157488", appId: "1:471627157488:web:92f008548a5596619a5735", };
@@ -339,7 +232,6 @@
         const chatMessagesEl = document.getElementById('chat-messages');
         const chatForm = document.getElementById('chat-form');
         const chatInput = document.getElementById('chat-input');
-        const chatSendBtn = document.getElementById('chat-send-btn');
         
         let currentUser = null;
         let currentUserData = {};
@@ -350,7 +242,9 @@
         let localSelectedPlayerUid = null;
         let timerInterval = null;
         let isChatPanelVisible = false;
-        let roleHasBeenRevealed = false;
+        let roleHasBeenRevealed = false; 
+
+        // --- Main Functions ---
 
         async function main() {
             gameId = new URLSearchParams(window.location.search).get('id');
@@ -386,6 +280,7 @@
                 currentGameState = docSnap.data();
                 
                 if (currentUser.uid === currentGameState.creatorId && !currentGameState.rolesAssigned) {
+                    console.log("شما میزبان هستید. در حال اختصاص نقش‌ها...");
                     await assignRoles(currentGameState);
                     return;
                 }
@@ -416,24 +311,31 @@
             const gameDocRef = doc(db, "games", gameId);
             const players = [...gameState.players];
             const playerCount = players.length;
+
             let rolesToAssign = [];
             if (playerCount >= 10) {
-                rolesToAssign = ['هوش سیاه', 'آموبات', 'تبدیل شونده', 'پزشک', 'شهردار', 'بادیگارد', 'چند چهره', 'شهروند', 'شهروند', 'شهروند', 'پزشک', 'بادیگارد'].slice(0, playerCount);
+                rolesToAssign = [ 'هوش سیاه', 'آموبات', 'تبدیل شونده', 'پزشک', 'شهردار', 'بادیگارد', 'چند چهره', 'شهروند', 'شهروند', 'شهروند', 'پزشک', 'بادیگارد' ].slice(0, playerCount);
             } else {
                  rolesToAssign = ['هوش سیاه', 'آموبات', 'پزشک', 'بادیگارد', 'شهروند', 'شهروند', 'شهروند', 'شهردار'].slice(0, playerCount);
             }
+
             for (let i = rolesToAssign.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [rolesToAssign[i], rolesToAssign[j]] = [rolesToAssign[j], rolesToAssign[i]];
             }
+
             const updatedPlayers = players.map((player, index) => {
                 const roleName = rolesToAssign[index];
                 const roleData = ROLES_DATA[roleName] || { team: 'unknown' };
                 return { ...player, roleName: roleName, team: roleData.team };
             });
+
             try {
                 await updateDoc(gameDocRef, { players: updatedPlayers, rolesAssigned: true });
-            } catch (error) { console.error("خطا در ثبت نقش‌ها:", error); }
+                console.log("نقش‌ها با موفقیت در سرور ثبت شد.");
+            } catch (error) {
+                console.error("خطا در ثبت نقش‌ها:", error);
+            }
         }
 
         let revealCountdownTimer = null;
@@ -445,10 +347,7 @@
             setTimeout(() => {
                 roleRevealOverlay.style.display = 'none';
                 gameContainer.style.display = 'flex';
-                // فقط میزبان، فرآیند را آغاز می‌کند
-                if (currentUser.uid === currentGameState.creatorId) {
-                    playGreetingBasedOnTimeOfDay();
-                }
+                playGreetingBasedOnTimeOfDay();
             }, 500);
         }
 
@@ -460,20 +359,26 @@
                 cardContainer.innerHTML = `<div class="role-card" data-index="${i}"><div class="card-face card-back"></div><div class="card-face card-front"></div></div>`;
                 roleCardGrid.appendChild(cardContainer);
             }
+
             roleRevealOverlay.classList.add('visible');
             const instructionsEl = document.getElementById('role-reveal-instructions');
             const cards = document.querySelectorAll('.role-card');
+
             cards.forEach(card => {
                 card.addEventListener('click', () => {
                     if (card.classList.contains('flipped') || roleRevealOverlay.classList.contains('card-focused')) return;
+
                     const frontFace = card.querySelector('.card-front');
                     frontFace.style.backgroundImage = `url('${ROLES_DATA[myRoleName].img}')`;
                     card.classList.add('flipped');
+
                     cards.forEach(c => { if (c !== card) c.parentElement.style.pointerEvents = 'none'; });
+
                     setTimeout(() => {
                         roleRevealOverlay.classList.add('card-focused');
                         card.parentElement.classList.add('has-revealed');
                         card.classList.add('revealed-and-waiting');
+                        
                         let count = 5;
                         instructionsEl.textContent = `برای ادامه روی کارت خود کلیک کنید (${count})`;
                         revealCountdownTimer = setInterval(() => {
@@ -485,6 +390,7 @@
                                 instructionsEl.textContent = `برای ادامه روی کارت خود کلیک کنید (${count})`;
                             }
                         }, 1000);
+
                         card.addEventListener('click', closeRevealPanelAndStartGame, { once: true });
                     }, 600);
                 }, { once: true });
@@ -492,57 +398,34 @@
         }
 
         async function playGreetingBasedOnTimeOfDay() {
+            // این تابع بعد از اتمام، باید به سرور اطلاع دهد که فاز نوبت‌دهی را شروع کند.
+            // در این شبیه‌سازی، ما فرض می‌کنیم سرور خودکار بعد از چند ثانیه فاز را تغییر می‌دهد.
             const daySoundUrl = 'https://raw.githubusercontent.com/abolfazl140122/mafia/58cc5df365b21b6f32f609f5c12175acce8f717c/voicravi/%D8%B3%D9%84%D8%A7%D9%85%20%D8%A8%D8%B1%20%D8%AF%D9%88%D8%B3%D8%AA%D8%A7%D9%86%20%D8%B9%D8%B2%DB%8C%D8%B2%20%D8%B1%D9%88%D8%B2%20%D9%87%D9%85%DA%AF%DB%8C%20%D8%A8%D8%AE%DB%8C%D8%B1!.wav';
             const nightSoundUrl = 'https://raw.githubusercontent.com/abolfazl140122/mafia/58cc5df365b21b6f32f609f5c12175acce8f717c/voicravi/%D8%B3%D9%84%D8%A7%D9%85%20%D8%A8%D8%B1%20%D8%AF%D9%88%D8%B3%D8%AA%D8%A7%D9%86%20%D8%B9%D8%B2%DB%8C%D8%B2%20%D8%B4%D8%A8%20%D9%87%D9%85%DA%AF%DB%8C%20%D8%A8%D8%AE%DB%8C%D8%B1!.wav';
-            // برای سادگی، فرض می‌کنیم همیشه روز است
-            const soundUrl = daySoundUrl; 
-            const audio = new Audio(soundUrl);
             try {
+                const isDay = new Date().getHours() > 6 && new Date().getHours() < 18;
+                const audio = new Audio(isDay ? daySoundUrl : nightSoundUrl);
                 await audio.play();
-                audio.onended = () => {
-                    // فقط میزبان بازی فاز بعدی را شروع می‌کند
-                    if (currentUser.uid === currentGameState.creatorId) {
-                        console.log("صدای گوینده تمام شد. شروع نوبت‌های صحبت.");
-                        startSpeakingTurns();
-                    }
-                };
+                console.log("پخش صدای خوش‌آمدگویی...");
             } catch (error) {
                 console.error("خطا در پخش صدا:", error);
-                // اگر پخش صدا به مشکل خورد، باز هم میزبان بازی را ادامه می‌دهد
-                if (currentUser.uid === currentGameState.creatorId) {
-                    startSpeakingTurns();
-                }
             }
-        }
-        
-        async function startSpeakingTurns() {
-             const firstAlivePlayerIndex = currentGameState.players.findIndex(p => p.isAlive);
-             if (firstAlivePlayerIndex === -1) return; // No one is alive
-
-             const gameDocRef = doc(db, "games", gameId);
-             await updateDoc(gameDocRef, {
-                 phase: 'day_speaking_turns',
-                 currentSpeakerIndex: firstAlivePlayerIndex,
-                 timerEndsAt: Timestamp.fromMillis(Date.now() + 30000) // 30 ثانیه برای نفر اول
-             });
         }
 
         function renderGame(data) {
             const self = data.players.find(p => p.uid === currentUser.uid);
             if (!self) return;
 
-            renderHeader(data);
-            renderAnnouncements(data);
-            renderPlayerSlots(data);
+            renderHeader(data.phase, data.day, data.timerEndsAt);
+            renderAnnouncements(data); // Pass full data
+            renderPlayerSlots(data.players, self, data.phase, data.currentSpeakerUid); // Pass speaker UID
             updateActionButton(self, data.phase);
-            updateChatPermissions(data);
+            handleTurnBasedChat(self, data.players, data.phase, data.currentSpeakerUid); // NEW: Manage chat state
         }
         
-        function renderHeader(data) {
-            const { phase, day, timerEndsAt } = data;
-            const phaseTranslations = { 'day_discussion': 'بحث روز', 'day_voting': 'رأی‌گیری', 'defense': 'دفاعیه', 'night': 'شب', 'day_speaking_turns': 'نوبت صحبت' };
+        function renderHeader(phase, day, timerEndsAt) {
+            const phaseTranslations = { 'day_discussion': 'بحث روز', 'day_voting': 'رأی‌گیری', 'defense': 'دفاعیه', 'night': 'شب', 'day_discussion_turn': 'نوبت‌دهی صحبت' };
             gamePhaseInfoEl.textContent = `${phaseTranslations[phase] || phase} - روز ${day}`;
-            
             if (timerInterval) clearInterval(timerInterval);
             if (timerEndsAt) {
                 const endTime = timerEndsAt.toDate();
@@ -553,10 +436,6 @@
                         gameTimerEl.textContent = "00:00";
                         gameTimerEl.classList.remove('critical');
                         clearInterval(timerInterval);
-                        // فقط میزبان بازی مسئول جلو بردن نوبت است
-                        if (currentUser.uid === currentGameState.creatorId && currentGameState.phase === 'day_speaking_turns') {
-                             advanceSpeakingTurn();
-                        }
                         return;
                     }
                     const minutes = Math.floor(secondsLeft / 60);
@@ -568,23 +447,25 @@
         }
         
         function renderAnnouncements(data) {
-             if (data.phase === 'day_speaking_turns') {
-                 const speaker = data.players[data.currentSpeakerIndex];
-                 if(speaker) {
-                    announcementBarEl.textContent = `نوبت صحبت: ${speaker.displayName} (بازیکن شماره ${data.currentSpeakerIndex + 1})`;
+             // START NEW: Dynamic announcements for speaking turn
+             if (data.phase === 'day_discussion_turn' && data.currentSpeakerUid) {
+                const speaker = data.players.find(p => p.uid === data.currentSpeakerUid);
+                if (speaker) {
+                    announcementBarEl.textContent = `نوبت صحبت: ${speaker.displayName}`;
                     announcementBarEl.style.display = 'block';
-                 }
+                } else {
+                    announcementBarEl.style.display = 'none';
+                }
              } else if (data.announcements && data.announcements.length > 0) {
                 announcementBarEl.textContent = data.announcements[data.announcements.length - 1];
                 announcementBarEl.style.display = 'block';
             } else {
                 announcementBarEl.style.display = 'none';
             }
+             // END NEW
         }
         
-        function renderPlayerSlots(data) {
-            const { players, phase, currentSpeakerIndex } = data;
-            const self = players.find(p => p.uid === currentUser.uid);
+        function renderPlayerSlots(players, self, phase, currentSpeakerUid) {
             leftPlayersEl.innerHTML = '';
             rightPlayersEl.innerHTML = '';
             
@@ -599,20 +480,24 @@
                 slot.className = 'player-slot';
                 slot.dataset.uid = player.uid;
 
+                // START NEW: Add 'speaking' class for the current speaker
+                if (phase === 'day_discussion_turn' && player.uid === currentSpeakerUid) {
+                    slot.classList.add('speaking');
+                }
+                // END NEW
+
                 let slotContent = `<img src="${player.avatarUrl || 'https://up.20script.ir/file/1d50-defult.png'}" alt="avatar" class="player-avatar" onerror="this.src='https://up.20script.ir/file/1d50-defult.png';"><div class="player-number">${i + 1}</div><div class="player-name">${player.displayName}</div>`;
                 
                 if (!player.isAlive) {
                     slot.classList.add('dead');
                     slotContent += `<div class="dead-overlay"><div class="dead-icon">👻</div><div class="revealed-role">${player.roleName || 'نقش نامشخص'}</div></div>`;
                 } else {
-                    if (isSelectablePhase && player.uid !== self.uid) {
-                        slot.classList.add('selectable');
-                        slot.onclick = () => handlePlayerCardClick(player.uid);
+                    if (isSelectablePhase) {
+                        if (player.uid !== self.uid) {
+                            slot.classList.add('selectable');
+                            slot.onclick = () => handlePlayerCardClick(player.uid);
+                        }
                     }
-                }
-                
-                if (phase === 'day_speaking_turns' && i === currentSpeakerIndex) {
-                    slot.classList.add('speaking-turn');
                 }
                 
                 if (player.uid === localSelectedPlayerUid) slot.classList.add('selected');
@@ -621,34 +506,6 @@
                 
                 if (i < playersPerColumn) rightPlayersEl.appendChild(slot);
                 else leftPlayersEl.appendChild(slot);
-            }
-        }
-        
-        async function advanceSpeakingTurn() {
-            const { players, currentSpeakerIndex } = currentGameState;
-            let nextSpeakerIndex = -1;
-
-            // پیدا کردن بازیکن زنده بعدی
-            for (let i = currentSpeakerIndex + 1; i < players.length; i++) {
-                if (players[i].isAlive) {
-                    nextSpeakerIndex = i;
-                    break;
-                }
-            }
-
-            const gameDocRef = doc(db, "games", gameId);
-            if (nextSpeakerIndex !== -1) {
-                // نوبت نفر بعدی
-                await updateDoc(gameDocRef, {
-                    currentSpeakerIndex: nextSpeakerIndex,
-                    timerEndsAt: Timestamp.fromMillis(Date.now() + 30000) // 30 ثانیه برای نفر بعدی
-                });
-            } else {
-                // همه صحبت کرده‌اند، رفتن به فاز رای‌گیری
-                await updateDoc(gameDocRef, {
-                    phase: 'day_voting',
-                    timerEndsAt: Timestamp.fromMillis(Date.now() + 60000) // 60 ثانیه برای رای‌گیری
-                });
             }
         }
 
@@ -667,26 +524,18 @@
                     gameActionBtn.textContent = self.ability?.actionText || 'انجام حرکت شب';
                     gameActionBtn.disabled = !localSelectedPlayerUid && self.ability?.requiresTarget;
                     break;
+                // START NEW: Disable button during discussion turn
+                case 'day_discussion_turn':
+                    gameActionBtn.textContent = 'در حال گفتگو...';
+                    gameActionBtn.disabled = true;
+                    break;
+                // END NEW
                 default:
                     gameActionBtn.textContent = 'لطفا منتظر بمانید';
                     gameActionBtn.disabled = true;
             }
         }
         
-        function updateChatPermissions(data) {
-            if (data.phase === 'day_speaking_turns') {
-                const isMyTurn = data.players[data.currentSpeakerIndex]?.uid === currentUser.uid;
-                chatInput.disabled = !isMyTurn;
-                chatSendBtn.disabled = !isMyTurn;
-                chatInput.placeholder = isMyTurn ? 'نوبت شماست، صحبت کنید...' : 'منتظر نوبت خود باشید...';
-            } else {
-                 const self = data.players.find(p => p.uid === currentUser.uid);
-                 chatInput.disabled = !self?.isAlive;
-                 chatSendBtn.disabled = !self?.isAlive;
-                 chatInput.placeholder = self?.isAlive ? "پیام خود را بنویسید..." : "شما حذف شده‌اید و نمی‌توانید پیام دهید";
-            }
-        }
-
         function setupEventListeners() {
             gameActionBtn.addEventListener('click', handleMainAction);
             toggleChatBtn.addEventListener('click', toggleChatPanel);
@@ -723,6 +572,33 @@
                  gameActionBtn.disabled = false;
             }
         }
+
+        // START NEW: Function to manage chat panel during discussion turns
+        function handleTurnBasedChat(self, players, phase, speakerUid) {
+            if (phase !== 'day_discussion_turn') {
+                chatInput.disabled = !self.isAlive;
+                chatInput.placeholder = "پیام خود را بنویسید...";
+                return;
+            }
+
+            // In discussion turn, force open the chat for everyone
+            if (!isChatPanelVisible) {
+                toggleChatPanel();
+            }
+
+            const speaker = players.find(p => p.uid === speakerUid);
+            const speakerName = speaker ? speaker.displayName : "بازیکن فعلی";
+
+            if (self.uid === speakerUid) { // It's my turn to speak
+                chatInput.disabled = false;
+                chatInput.placeholder = "نوبت شماست! صحبت کنید...";
+                chatInput.focus();
+            } else { // It's someone else's turn
+                chatInput.disabled = true;
+                chatInput.placeholder = `در حال گوش دادن به ${speakerName}...`;
+            }
+        }
+        // END NEW
         
         function listenToChatMessages() {
             const chatCollectionRef = collection(db, `games/${gameId}/chat`);
@@ -730,13 +606,8 @@
             unsubscribeChat = onSnapshot(q, (snapshot) => {
                 snapshot.docChanges().forEach(change => {
                     if (change.type === 'added') {
-                        const messageData = change.doc.data();
-                        renderMessage(messageData);
-
-                        const isSpeakerMessage = currentGameState.phase === 'day_speaking_turns' && messageData.senderUid !== currentUser.uid;
-                        if (isSpeakerMessage && !isChatPanelVisible) {
-                            openChatPanelForced();
-                        } else if (!isChatPanelVisible && messageData.senderUid !== currentUser.uid) {
+                        renderMessage(change.doc.data());
+                        if (!isChatPanelVisible && change.doc.data().senderUid !== currentUser.uid) {
                             toggleChatBtn.classList.add('new-message');
                         }
                     }
@@ -765,22 +636,28 @@
             if(isChatPanelVisible) {
                 toggleChatBtn.classList.remove('new-message');
                 chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
-                if(!chatInput.disabled) chatInput.focus();
+                if (!chatInput.disabled) chatInput.focus();
             }
-        }
-        
-        function openChatPanelForced() {
-            if (isChatPanelVisible) return;
-            isChatPanelVisible = true;
-            chatPanel.classList.add('visible');
-            chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
         }
 
         async function handleSendMessage(e) {
              e.preventDefault();
              const messageText = chatInput.value.trim();
-             if (messageText === '') return;
+             if (messageText === '' || chatInput.disabled) return;
              
+             const selfInGame = currentGameState.players.find(p => p.uid === currentUser.uid);
+             if (!selfInGame || !selfInGame.isAlive) {
+                showNotificationModal("توجه", "افراد حذف شده نمی‌توانند پیام ارسال کنند.");
+                return;
+             }
+
+             // START NEW: Extra check for speaking turn
+             if (currentGameState.phase === 'day_discussion_turn' && currentGameState.currentSpeakerUid !== currentUser.uid) {
+                showNotificationModal("توجه", "اکنون نوبت صحبت شما نیست.");
+                return;
+             }
+             // END NEW
+
              chatInput.disabled = true;
              const tempMessage = chatInput.value;
              chatInput.value = '';
@@ -797,12 +674,11 @@
                 console.error("Send message error:", error);
                 chatInput.value = tempMessage;
              } finally {
-                chatInput.disabled = false;
-                if (currentGameState.phase === 'day_speaking_turns') {
-                    const isMyTurn = currentGameState.players[currentGameState.currentSpeakerIndex]?.uid === currentUser.uid;
-                    chatInput.disabled = !isMyTurn;
+                // The re-enabling will be handled by the render loop, but we can do it here for responsiveness
+                if (currentGameState.phase !== 'day_discussion_turn' || currentGameState.currentSpeakerUid === currentUser.uid) {
+                    chatInput.disabled = false;
                 }
-                if (!chatInput.disabled) chatInput.focus();
+                chatInput.focus();
              }
         }
 
