@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>شهر مافیا - ورود به حساب</title>
+    <title>شهر مافیا - ساخت حساب کاربری</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
@@ -21,7 +21,7 @@
             background-position: center center;
             background-repeat: no-repeat;
             background-attachment: fixed;
-            color: #f0e6d2; /* رنگ متن اصلی از تم بازی */
+            color: #f0e6d2;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -31,8 +31,8 @@
 
         .auth-container {
             width: 100%;
-            max-width: 400px;
-            background: linear-gradient(145deg, rgba(60, 48, 34, 0.85), rgba(30, 23, 15, 0.9));
+            max-width: 420px;
+            background: linear-gradient(145deg, rgba(40, 32, 22, 0.9), rgba(20, 15, 10, 0.95));
             backdrop-filter: blur(8px);
             border-radius: 16px;
             padding: 40px;
@@ -44,16 +44,16 @@
         .auth-title {
             font-size: 2.5rem;
             font-weight: 900;
-            color: #ffc947; /* رنگ طلایی تاکیدی از تم بازی */
+            color: #ffc947;
             margin-bottom: 10px;
             text-shadow: 0 2px 5px rgba(0,0,0,0.7);
         }
 
         .auth-subtitle {
             font-size: 1rem;
-            color: #d1c8b7;
+            color: #e0dacc;
             margin-bottom: 35px;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+            text-shadow: 1px 1px 2px #000;
         }
 
         .input-group {
@@ -66,137 +66,139 @@
             margin-bottom: 8px;
             font-weight: 700;
             font-size: 0.9rem;
-            color: #e0dacc;
+            color: #c5a687;
         }
 
         .auth-input {
             width: 100%;
             padding: 12px 15px;
             font-size: 1rem;
+            border: 1px solid #5c4a3a;
             background-color: rgba(0, 0, 0, 0.3);
-            border: 2px solid #5c4a3a;
             color: #f0e6d2;
             border-radius: 8px;
             transition: border-color 0.3s, box-shadow 0.3s;
             font-family: 'Vazirmatn', sans-serif;
         }
 
-        .auth-input::placeholder {
-            color: rgba(240, 230, 210, 0.5);
-        }
-
         .auth-input:focus {
             outline: none;
             border-color: #ffc947;
-            box-shadow: 0 0 10px rgba(255, 201, 71, 0.3);
+            box-shadow: 0 0 0 3px rgba(255, 201, 71, 0.2);
+        }
+        
+        .age-input-wrapper { display: flex; align-items: center; gap: 10px; }
+        #age-input { text-align: center; -moz-appearance: textfield; }
+        #age-input::-webkit-outer-spin-button, #age-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .age-control-btn { width: 45px; height: 45px; flex-shrink: 0; font-size: 1.8rem; font-weight: 700; color: #ffc947; background: linear-gradient(145deg, rgba(80, 50, 48, 0.8), rgba(56, 33, 32, 0.9)); border: 1px solid #c5a687; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; display: flex; justify-content: center; align-items: center; padding-bottom: 4px; }
+        .age-control-btn:hover { border-color: #ffc947; background: linear-gradient(145deg, rgba(100, 65, 63, 0.9), rgba(74, 44, 42, 1)); }
+        .age-control-btn:active { transform: scale(0.95); }
+
+        .avatar-selection-container {
+            min-height: 80px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 1px solid #5c4a3a;
+            border-radius: 8px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 12px;
+            overflow-x: auto;
+            overflow-y: hidden;
         }
 
-        .auth-button {
-            width: 100%;
-            padding: 14px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #ffffff;
-            background: linear-gradient(145deg, #8c4843, #5a2c2a); /* گرادینت دکمه از تم بازی */
-            border: 2px solid #ffc947;
-            border-radius: 8px;
+        .avatar-selection-container::-webkit-scrollbar { height: 6px; }
+        .avatar-selection-container::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 3px; }
+        .avatar-selection-container::-webkit-scrollbar-thumb { background: #5c4a3a; border-radius: 3px; }
+        .avatar-selection-container::-webkit-scrollbar-thumb:hover { background: #c5a687; }
+
+        .avatar-item {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid transparent;
             cursor: pointer;
-            transition: all 0.3s ease;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            transition: all 0.2s ease-in-out;
+            flex-shrink: 0;
         }
-
-        .auth-button:hover {
-            background: linear-gradient(145deg, #a1534d, #6b3431);
-            box-shadow: 0 6px 15px rgba(255, 201, 71, 0.2);
+        .avatar-item:hover {
+            transform: scale(1.1);
+            border-color: #c5a687;
         }
-
-        .auth-button:active {
-            transform: scale(0.98);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+        .avatar-item.selected {
+            border-color: #ffc947;
+            transform: scale(1.15);
+            box-shadow: 0 0 15px rgba(255, 201, 71, 0.5);
         }
-
-        .auth-button:disabled {
-            background: #5c4a3a;
-            border-color: #88786a;
-            color: #a19385;
-            cursor: not-allowed;
-            box-shadow: none;
-        }
-
-        .auth-link {
-            margin-top: 20px;
-            font-size: 0.9rem;
-            color: #d1c8b7;
-        }
-
-        .auth-link a {
-            color: #ffc947;
-            font-weight: 700;
-            text-decoration: none;
-            transition: color 0.2s;
+        .avatar-loader {
+            width: 100%;
+            text-align: center;
+            color: #c5a687;
         }
         
-        .auth-link a:hover {
-            color: #fff;
-        }
-        
-        .message-box {
-            padding: 12px;
-            border-radius: 8px;
-            margin-top: 20px;
-            font-size: 0.9rem;
-            display: none; /* Hidden by default */
-        }
-
-        .error-message {
-            color: #ff9e9e;
-            background-color: rgba(217, 83, 79, 0.2);
-            border: 1px solid rgba(217, 83, 79, 0.5);
-        }
-        
-        .success-message {
-            color: #a0e0a0;
-            background-color: rgba(79, 217, 79, 0.2);
-            border: 1px solid rgba(79, 217, 79, 0.5);
-        }
+        .auth-button { width: 100%; padding: 14px; font-size: 1.1rem; font-weight: 700; color: #ffffff; background: linear-gradient(145deg, #8c4843, #5a2c2a); border: 2px solid #c5a687; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+        .auth-button:hover { border-color: #ffc947; box-shadow: 0 0 15px rgba(255, 201, 71, 0.2); }
+        .auth-button:active { transform: scale(0.98); }
+        .auth-button:disabled { background: #5c4a3a; border-color: #4a3c30; cursor: not-allowed; opacity: 0.7; }
+        .auth-link { margin-top: 25px; font-size: 0.9rem; color: #c5a687; }
+        .auth-link a { color: #ffc947; font-weight: 700; text-decoration: none; transition: color 0.2s; }
+        .auth-link a:hover { color: #fff; }
+        .error-message { color: #ffadad; background-color: rgba(217, 83, 79, 0.2); padding: 12px; border-radius: 8px; margin-top: 20px; font-size: 0.9rem; display: none; border: 1px solid #d9534f; }
     </style>
 </head>
 <body>
     <div class="auth-container">
-        <h1 class="auth-title">ورود به شهر</h1>
-        <p class="auth-subtitle">خوش آمدید! لطفاً اطلاعات خود را وارد کنید.</p>
+        <h1 class="auth-title">ثبت نام</h1>
+        <p class="auth-subtitle">برای ورود به شهر مافیا، یک حساب کاربری بسازید.</p>
         
-        <form id="login-form">
+        <form id="registration-form">
+            <div class="input-group">
+                <label for="display-name">نام نمایشی (فقط انگلیسی)</label>
+                <input type="text" id="display-name" class="auth-input" required>
+            </div>
             <div class="input-group">
                 <label for="email">ایمیل</label>
                 <input type="email" id="email" class="auth-input" required>
             </div>
             <div class="input-group">
-                <label for="password">رمز عبور</label>
+                <label for="password">رمز عبور (حداقل ۶ کاراکتر)</label>
                 <input type="password" id="password" class="auth-input" required>
             </div>
-            <button type="submit" id="login-button" class="auth-button">ورود</button>
+            <div class="input-group">
+                <label for="age-input">سن</label>
+                <div class="age-input-wrapper">
+                    <button type="button" id="decrement-age" class="age-control-btn">-</button>
+                    <input type="number" id="age-input" class="auth-input" placeholder="سن خود را وارد کنید" required>
+                    <button type="button" id="increment-age" class="age-control-btn">+</button>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>انتخاب آواتار (الزامی)</label>
+                <div id="avatar-container" class="avatar-selection-container">
+                    <p class="avatar-loader">در حال بارگذاری آواتارها...</p>
+                </div>
+            </div>
+
+            <button type="submit" id="register-button" class="auth-button">ساخت حساب</button>
         </form>
 
-        <p id="message-box" class="message-box"></p>
+        <p id="error-message" class="error-message"></p>
 
         <p class="auth-link">
-            <a href="#" id="forgot-password-link">رمز عبور خود را فراموش کرده‌اید؟</a>
-        </p>
-        <p class="auth-link">
-            هنوز عضو نشده‌اید؟ <a href="./Registration.html">ثبت‌نام کنید</a>
+            حساب کاربری دارید؟ <a href="./login.html">وارد شوید</a>
         </p>
     </div>
 
     <script type="module">
-        // --- START: Firebase Configuration ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getAuth, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, doc, setDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // Your web app's Firebase configuration
         const firebaseConfig = {
-          apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg", // This key is safe to be public
+          apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
           authDomain: "mafia-9fcbf.firebaseapp.com",
           projectId: "mafia-9fcbf",
           storageBucket: "mafia-9fcbf.appspot.com",
@@ -205,114 +207,132 @@
           measurementId: "G-0PDHDWC6NV"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        // --- END: Firebase Configuration ---
+        const db = getFirestore(app);
 
-
-        // --- START: Element Selection ---
-        const loginForm = document.getElementById('login-form');
+        const registrationForm = document.getElementById('registration-form');
+        const displayNameInput = document.getElementById('display-name');
         const emailInput = document.getElementById('email');
         const passwordInput = document.getElementById('password');
-        const loginButton = document.getElementById('login-button');
-        const messageBox = document.getElementById('message-box');
-        const forgotPasswordLink = document.getElementById('forgot-password-link');
-        // --- END: Element Selection ---
+        const ageInput = document.getElementById('age-input');
+        const incrementAgeBtn = document.getElementById('increment-age');
+        const decrementAgeBtn = document.getElementById('decrement-age');
+        const registerButton = document.getElementById('register-button');
+        const errorMessage = document.getElementById('error-message');
+        const avatarContainer = document.getElementById('avatar-container');
+        let selectedAvatarUrl = null;
 
+        incrementAgeBtn.addEventListener('click', () => {
+            let currentValue = parseInt(ageInput.value) || 8;
+            ageInput.value = Math.min(99, currentValue + 1);
+        });
+        decrementAgeBtn.addEventListener('click', () => {
+            let currentValue = parseInt(ageInput.value) || 9;
+            ageInput.value = Math.max(8, currentValue - 1);
+        });
 
-        // --- START: Event Listeners ---
+        async function loadFreeAvatars() {
+            try {
+                const q = query(collection(db, "avatars"), where("price", "==", 0));
+                const querySnapshot = await getDocs(q);
+                avatarContainer.innerHTML = '';
+                if (querySnapshot.empty) {
+                    avatarContainer.innerHTML = '<p class="avatar-loader">آواتار رایگانی یافت نشد!</p>';
+                    return;
+                }
+                querySnapshot.forEach((doc) => {
+                    const avatarData = doc.data();
+                    const imgElement = document.createElement('img');
+                    imgElement.src = avatarData.imageUrl;
+                    imgElement.alt = avatarData.name || 'Avatar';
+                    imgElement.classList.add('avatar-item');
+                    
+                    imgElement.addEventListener('click', () => {
+                        const currentSelected = document.querySelector('.avatar-item.selected');
+                        if (currentSelected) {
+                            currentSelected.classList.remove('selected');
+                        }
+                        imgElement.classList.add('selected');
+                        selectedAvatarUrl = avatarData.imageUrl;
+                    });
+                    avatarContainer.appendChild(imgElement);
+                });
+            } catch (error) {
+                console.error("Error fetching avatars: ", error);
+                avatarContainer.innerHTML = '<p class="avatar-loader">خطا در بارگذاری آواتارها!</p>';
+            }
+        }
         
-        // Listener for the main login form submission
-        loginForm.addEventListener('submit', async (e) => {
+        loadFreeAvatars();
+
+        registrationForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
+            const displayName = displayNameInput.value.trim();
             const email = emailInput.value.trim();
             const password = passwordInput.value.trim();
+            const age = parseInt(ageInput.value); // نام متغیر داخلی همچنان age است
 
-            if (!email || !password) {
-                showMessage("لطفاً ایمیل و رمز عبور را وارد کنید.", 'error'); 
-                return;
+            if (!displayName || !email || !password || !ageInput.value) {
+                showError("لطفاً تمام فیلدها را پر کنید."); return;
+            }
+            if (!selectedAvatarUrl) {
+                showError("لطفاً یک آواتار انتخاب کنید."); return;
+            }
+            if (password.length < 6) {
+                showError("رمز عبور باید حداقل ۶ کاراکتر باشد."); return;
+            }
+            if (/[^a-zA-Z0-9_.]/.test(displayName)) {
+                showError("نام نمایشی فقط می‌تواند شامل حروف و اعداد انگلیسی، نقطه و آندرلاین باشد."); return;
+            }
+            if (isNaN(age) || age < 8 || age > 99) {
+                showError("لطفاً سن معتبری بین ۸ تا ۹۹ سال وارد کنید."); return;
             }
 
-            setLoading(true);
+            registerButton.disabled = true;
+            registerButton.textContent = 'در حال ساخت...';
+            errorMessage.style.display = 'none';
 
             try {
-                await signInWithEmailAndPassword(auth, email, password);
-                window.location.href = './index.html'; // Redirect on successful login
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                
+                await updateProfile(user, { displayName: displayName });
+
+                const userDocRef = doc(db, 'users', user.uid);
+                await setDoc(userDocRef, {
+                    uid: user.uid,
+                    displayName: displayName,
+                    email: user.email,
+                    createdAt: new Date(),
+                    currentStage: 1,
+                    avatarUrl: selectedAvatarUrl,
+                    // *** تغییر اصلی اینجاست: بازگرداندن فیلد به 'old' ***
+                    old: age 
+                });
+
+                window.location.href = './index.html'; 
+
             } catch (error) {
-                let friendlyMessage = "ایمیل یا رمز عبور اشتباه است.";
-                if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-                    friendlyMessage = "ایمیل یا رمز عبور وارد شده صحیح نمی‌باشد.";
+                let friendlyMessage = "خطایی رخ داد. لطفاً دوباره تلاش کنید.";
+                if (error.code === 'auth/email-already-in-use') {
+                    friendlyMessage = "این ایمیل قبلاً ثبت شده است. لطفاً وارد شوید.";
+                } else if (error.code === 'auth/weak-password') {
+                    friendlyMessage = "رمز عبور ضعیف است. لطفاً رمز قوی‌تری انتخاب کنید.";
                 }
-                console.error("Login Error:", error.code, error.message);
-                showMessage(friendlyMessage, 'error');
+                console.error("Registration Error:", error);
+                showError(friendlyMessage);
             } finally {
-                setLoading(false);
+                registerButton.disabled = false;
+                registerButton.textContent = 'ساخت حساب';
             }
         });
 
-        // Listener for the "Forgot Password" link
-        forgotPasswordLink.addEventListener('click', async (e) => {
-            e.preventDefault();
-            const email = emailInput.value.trim();
-
-            if (!email) {
-                showMessage("برای بازیابی رمز، ابتدا ایمیل خود را در کادر بالا وارد کنید.", 'error');
-                emailInput.focus();
-                return;
-            }
-
-            setLoading(true);
-
-            try {
-                await sendPasswordResetEmail(auth, email);
-                showMessage("لینک بازیابی رمز عبور با موفقیت به ایمیل شما ارسال شد. (پوشه اسپم را نیز بررسی کنید)", 'success');
-            } catch (error) {
-                let friendlyMessage = "خطایی در ارسال ایمیل بازیابی رخ داد.";
-                if (error.code === 'auth/user-not-found') {
-                    friendlyMessage = "حسابی با این ایمیل در سیستم ثبت نشده است.";
-                } else if (error.code === 'auth/invalid-email') {
-                    friendlyMessage = "فرمت ایمیل وارد شده صحیح نمی‌باشد.";
-                }
-                console.error("Password Reset Error:", error.code, error.message);
-                showMessage(friendlyMessage, 'error');
-            } finally {
-                setLoading(false);
-            }
-        });
-        // --- END: Event Listeners ---
-
-
-        // --- START: Helper Functions ---
-
-        /**
-         * Displays a message to the user.
-         * @param {string} message The message to display.
-         * @param {'error' | 'success'} type The type of message.
-         */
-        function showMessage(message, type) {
-            messageBox.textContent = message;
-            messageBox.className = `message-box ${type}-message`; // Set class for styling
-            messageBox.style.display = 'block';
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
         }
-
-        /**
-         * Toggles the loading state of the login button.
-         * @param {boolean} isLoading Whether the form is in a loading state.
-         */
-        function setLoading(isLoading) {
-            loginButton.disabled = isLoading;
-            loginButton.textContent = isLoading ? 'در حال بررسی...' : 'ورود';
-            if (!isLoading) {
-                 // Hide message box when a new action starts, unless it's a success message
-                 if (!messageBox.classList.contains('success-message')) {
-                    messageBox.style.display = 'none';
-                 }
-            }
-        }
-        // --- END: Helper Functions ---
-
     </script>
 </body>
 </html>
