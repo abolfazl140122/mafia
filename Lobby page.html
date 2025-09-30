@@ -22,11 +22,11 @@
             --admin-spectate-blue-hover: #5dade2;
             --text-light: #f0e6d2;
             --text-secondary: #c5a687;
-            --bg-dark: #100c08;
-            --bg-card: rgba(26, 20, 14, 0.75);
+            --bg-dark: #120e0a;
+            --bg-card: rgba(26, 20, 14, 0.7);
             --border-color: rgba(92, 74, 58, 0.7);
-            --border-glow: rgba(255, 201, 71, 0.7);
-            --shadow-color: rgba(0, 0, 0, 0.8);
+            --border-glow: rgba(255, 201, 71, 0.6);
+            --shadow-color: rgba(0, 0, 0, 0.6);
         }
 
         * {
@@ -50,18 +50,8 @@
             position: relative;
         }
 
-        #background-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            overflow: hidden;
-        }
-
         #background-blurry {
-            position: absolute;
+            position: fixed;
             top: -20px;
             left: -20px;
             width: calc(100% + 40px);
@@ -69,90 +59,39 @@
             background-image: url('https://up.20script.ir/file/6195-file-000000001500622f9419de6c322df297-1-.jpg');
             background-size: cover;
             background-position: center center;
-            filter: blur(12px) brightness(0.4);
+            filter: blur(10px) brightness(0.5);
+            z-index: -1;
         }
         
-        /* --- Particle Effect --- */
-        #particles-js {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-        }
-
         /* --- Enhanced Loading Overlay --- */
         #loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, #1a140e 0%, #000000 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
             z-index: 2000;
-            transition: opacity 0.8s ease;
+            transition: opacity 0.5s ease;
         }
-
-        .loader-wrapper {
-            position: relative;
-            width: 250px;
-            height: 250px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        .loader-logo-wrapper {
+            position: relative; width: 180px; height: 180px;
+            display: flex; justify-content: center; align-items: center;
         }
-
-        .loader-ring {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            border: 3px solid transparent;
-            animation: spin 2s linear infinite;
-        }
-
-        .loader-ring:nth-child(1) {
+        .loader-logo-wrapper::before {
+            content: ''; position: absolute; top: 50%; left: 50%;
+            width: 100%; height: 100%;
+            border: 4px solid transparent;
             border-top-color: var(--primary-gold);
-            animation-delay: -0.5s;
+            border-radius: 50%;
+            animation: spin 1.5s linear infinite;
         }
-        .loader-ring:nth-child(2) {
-            border-bottom-color: var(--dark-red);
-            animation-delay: -1s;
-        }
-        .loader-ring:nth-child(3) {
-            border-left-color: var(--primary-gold);
-            animation-delay: -1.5s;
-        }
-
-        .loader-logo {
-            width: 120px;
-            height: auto;
-            animation: pulse-logo 2.5s infinite ease-in-out;
-            filter: drop-shadow(0 0 15px rgba(255, 201, 71, 0.5));
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loader-logo { width: 100px; height: auto; }
+        #loading-text {
+            margin-top: 25px; font-size: 1.1rem; font-weight: 700;
+            color: var(--text-light); text-shadow: 1px 1px 3px #000;
         }
         
-        @keyframes pulse-logo {
-            0%, 100% { transform: scale(0.95); opacity: 0.9; }
-            50% { transform: scale(1.05); opacity: 1; }
-        }
-
-        #loading-text {
-            margin-top: 30px;
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--text-light);
-            text-shadow: 1px 1px 5px #000;
-            letter-spacing: 1px;
-        }
-
         /* --- Music Download Overlay --- */
         #music-download-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -182,25 +121,24 @@
         .main-container {
             width: 100%; height: 100%; display: flex;
             flex-direction: column; padding: 15px; padding-bottom: 90px;
-            z-index: 1;
         }
 
         header {
             width: 100%; display: flex; align-items: center;
-            gap: 15px; margin-bottom: 20px; backdrop-filter: blur(5px);
+            gap: 10px; margin-bottom: 20px;
         }
         .search-bar { flex-grow: 1; position: relative; }
         .search-bar input {
             width: 100%; padding: 12px 20px 12px 50px;
-            background-color: var(--bg-card); border: 2px solid var(--border-color);
-            border-radius: 25px;
+            background-color: var(--bg-card); border: 1px solid var(--border-color);
+            backdrop-filter: blur(10px); border-radius: 25px;
             color: var(--text-light); font-size: 1rem;
             font-family: 'Vazirmatn', sans-serif; transition: all 0.3s ease;
         }
         .search-bar input::placeholder { color: var(--text-secondary); opacity: 0.7; }
         .search-bar input:focus {
             outline: none; border-color: var(--primary-gold);
-            box-shadow: 0 0 20px var(--border-glow);
+            box-shadow: 0 0 15px var(--border-glow);
         }
         .search-bar .search-icon {
             position: absolute; left: 20px; top: 50%;
@@ -208,107 +146,108 @@
         }
         .back-button {
             padding: 12px;
-            width: 48px; height: 48px; display: grid; place-items: center;
+            width: 46px; height: 46px; display: grid; place-items: center;
             background: var(--bg-card);
-            border: 2px solid var(--border-color); border-radius: 50%;
+            border: 1px solid var(--border-color); border-radius: 50%;
             color: var(--text-light); font-size: 1.2rem; cursor: pointer;
             transition: all 0.3s ease;
         }
         .back-button:hover {
             border-color: var(--primary-gold);
             color: var(--primary-gold);
-            transform: scale(1.1);
         }
 
         #lobby-list {
             flex-grow: 1; overflow-y: auto; display: flex;
-            flex-direction: column; gap: 18px; padding: 0 5px 15px 0;
+            flex-direction: column; gap: 15px; padding: 0 5px 15px 0;
         }
-        #lobby-list::-webkit-scrollbar { width: 8px; }
+        #lobby-list::-webkit-scrollbar { width: 6px; }
         #lobby-list::-webkit-scrollbar-track { background: transparent; }
         #lobby-list::-webkit-scrollbar-thumb {
             background-color: var(--primary-gold); border-radius: 10px;
-            border: 2px solid var(--bg-dark);
         }
         
         /* --- Enhanced Lobby Card --- */
         .lobby-card {
-            background: linear-gradient(145deg, rgba(30,22,15,0.8), rgba(20,15,10,0.8));
+            background: var(--bg-card);
             border: 1px solid var(--border-color);
-            backdrop-filter: blur(12px);
-            border-radius: 18px; padding: 18px;
-            display: flex; flex-direction: column; gap: 15px;
-            box-shadow: 0 8px 30px var(--shadow-color);
+            backdrop-filter: blur(10px);
+            border-radius: 16px; padding: 15px;
+            display: flex; flex-direction: column; gap: 12px;
+            box-shadow: 0 5px 20px var(--shadow-color);
             position: relative; overflow: hidden;
             opacity: 0; transform: translateY(30px);
             animation: slideInUp 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards;
             transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.4s ease, height 0.4s ease, padding 0.4s ease, margin-bottom 0.4s ease;
         }
         .lobby-card.hidden {
-            opacity: 0; transform: scale(0.95); height: 0px !important; 
-            padding-top: 0; padding-bottom: 0; margin-bottom: 0;
-            overflow: hidden; border: none;
+            opacity: 0;
+            transform: scale(0.95);
+            height: 0px !important; /* JS will set height */
+            padding-top: 0;
+            padding-bottom: 0;
+            margin-bottom: 0;
+            overflow: hidden;
+            border: none;
         }
         
         .lobby-card::before { /* Glow effect */
-            content: ''; position: absolute; top: -50%; left: -50%;
-            width: 200%; height: 200%;
-            background: radial-gradient(circle, rgba(255, 201, 71, 0.15) 0%, transparent 70%);
-            transform: rotate(0deg);
-            transition: transform 1s ease, opacity 0.5s ease;
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            border-radius: 16px;
+            background: radial-gradient(80% 80% at 50% 50%, rgba(255, 201, 71, 0.2), transparent);
             opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: -1;
         }
         .lobby-card:hover {
-            transform: translateY(-10px) scale(1.02);
-            box-shadow: 0 12px 40px var(--shadow-color), 0 0 25px var(--border-glow);
-            border-color: var(--primary-gold);
+            transform: translateY(-8px);
+            box-shadow: 0 10px 30px var(--shadow-color), 0 0 20px var(--border-glow);
         }
-        .lobby-card:hover::before { 
-            opacity: 1;
-            transform: rotate(360deg);
-        }
+        .lobby-card:hover::before { opacity: 1; }
         
         @keyframes slideInUp { to { opacity: 1; transform: translateY(0); } }
 
         .lobby-card-header { display: flex; justify-content: space-between; align-items: center; }
         .lobby-card-footer { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 12px; }
-        .lobby-card-body { padding-top: 12px; border-top: 1px solid rgba(92, 74, 58, 0.5); margin-top: 10px; }
+        .lobby-card-body { padding: 10px 0; border-top: 1px solid rgba(92, 74, 58, 0.5); margin-top: 8px; }
         
         .lobby-description {
             font-size: 0.9rem; color: var(--text-secondary);
-            line-height: 1.6; font-style: italic;
+            line-height: 1.5; font-style: italic;
         }
         .lobby-name-wrapper { display: flex; align-items: center; gap: 10px; }
         .lobby-name {
-            font-size: 1.5rem; font-weight: 900; color: var(--primary-gold);
-            text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+            font-size: 1.4rem; font-weight: 900; color: var(--primary-gold);
+            text-shadow: 0 2px 5px rgba(0,0,0,0.7);
         }
-        .lock-icon { font-size: 1.2rem; color: var(--primary-gold); }
+        .lock-icon { font-size: 1.1rem; color: var(--primary-gold); }
         .lobby-info { display: flex; gap: 15px; align-items: center; flex-wrap: wrap;}
         .lobby-scenario {
-            background: rgba(255, 201, 71, 0.15); color: var(--primary-gold);
-            padding: 5px 14px; border-radius: 20px; font-size: 0.8rem;
-            font-weight: 700; border: 1px solid rgba(255, 201, 71, 0.4);
+            background: rgba(255, 201, 71, 0.1); color: var(--primary-gold);
+            padding: 4px 12px; border-radius: 15px; font-size: 0.8rem;
+            font-weight: 700; border: 1px solid rgba(255, 201, 71, 0.3);
         }
         .player-count {
             display: flex; align-items: center; gap: 8px; font-size: 1.1rem;
-            font-weight: 700; background-color: rgba(0,0,0,0.4);
-            padding: 6px 14px; border-radius: 20px;
+            font-weight: 700; background-color: rgba(0,0,0,0.3);
+            padding: 5px 12px; border-radius: 20px;
         }
         .player-count .fa-users {
             animation: pulse-icon 2s infinite ease-in-out;
-            color: var(--primary-gold);
         }
-        @keyframes pulse-icon { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+        @keyframes pulse-icon { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
         
         .creator-info { display: flex; align-items: center; gap: 10px; min-width: 180px; }
         .creator-avatar {
-            width: 45px; height: 45px; border-radius: 50%;
+            width: 40px; height: 40px; border-radius: 50%;
             border: 2px solid var(--primary-gold); object-fit: cover;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.6);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
         }
-        .creator-details { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; }
-        .lobby-creator { font-size: 0.95rem; color: var(--text-light); font-weight: 700;}
+        .creator-details { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+        .lobby-creator { font-size: 0.9rem; color: var(--text-secondary); }
         
         .admin-password-container {
             display: flex; align-items: center; justify-content: space-between;
@@ -316,50 +255,46 @@
             border-radius: 6px; padding: 4px 8px; margin-top: 6px; cursor: pointer;
             transition: all 0.2s ease;
         }
-        .admin-password-container:hover { background-color: rgba(255, 201, 71, 0.1); border-color: var(--primary-gold); }
+        .admin-password-container:hover { background-color: var(--admin-edit-bg); border-color: var(--primary-gold); }
         .admin-password-text { font-size: 0.8rem; color: #f39c12; font-family: monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px; }
         .admin-edit-icon { font-size: 0.9rem; color: var(--text-secondary); padding-left: 8px; }
         
         .lobby-actions { display: flex; gap: 10px; flex-grow: 1; justify-content: flex-end; }
         .lobby-btn {
-            padding: 12px 18px; font-size: 0.95rem; font-weight: 700;
-            border-radius: 8px; cursor: pointer; border: 1px solid transparent;
+            padding: 10px 15px; font-size: 0.9rem; font-weight: 700;
+            border-radius: 8px; cursor: pointer; border: none;
             transition: all 0.3s ease; font-family: 'Vazirmatn', sans-serif;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.5); text-align: center;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.4); text-align: center;
             white-space: nowrap; flex-shrink: 0;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
-        .lobby-btn:active { transform: translateY(2px) scale(0.98); }
-        .lobby-btn:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.5); }
+        .lobby-btn:active { transform: translateY(1px) scale(0.98); }
         
-        .btn-join { color: var(--bg-dark); background: linear-gradient(145deg, var(--primary-gold), var(--secondary-gold)); border-color: #fff2d1; }
-        .btn-join:hover { background: linear-gradient(145deg, #ffd46e, #e6a23c); border-color: white; }
-        .btn-join:disabled { background: linear-gradient(145deg, #616161, #3a3a3a); border-color: #888; color: #aaa; cursor: not-allowed; opacity: 0.7; }
-        .btn-join:disabled:hover { transform: none; box-shadow: 0 4px 10px rgba(0,0,0,0.4); }
+        .btn-join { color: white; background: linear-gradient(145deg, var(--dark-red), var(--darker-red)); border: 1px solid var(--primary-gold); }
+        .btn-join:hover { background: linear-gradient(145deg, #d35400, #a13226); transform: translateY(-3px); }
+        .btn-join:disabled { background: linear-gradient(145deg, #616161, #3a3a3a); border-color: #888; cursor: not-allowed; opacity: 0.7; }
+        .btn-join:disabled:hover { transform: none; }
         
-        .btn-admin-delete { background: linear-gradient(145deg, var(--admin-red), #962d22); color: white; border-color: #ff7961; }
-        .btn-admin-delete:hover { background: linear-gradient(145deg, var(--admin-red-hover), var(--admin-red)); }
+        .btn-admin-delete { background: linear-gradient(145deg, var(--admin-red), #962d22); color: white; border: 1px solid #ff7961; }
+        .btn-admin-delete:hover { background: linear-gradient(145deg, var(--admin-red-hover), var(--admin-red)); transform: translateY(-3px); }
 
-        .btn-spectate { background: linear-gradient(145deg, var(--admin-spectate-blue), #20638f); color: white; border-color: #7dc2f1; }
-        .btn-spectate:hover { background: linear-gradient(145deg, var(--admin-spectate-blue-hover), var(--admin-spectate-blue)); }
+        .btn-spectate { background: linear-gradient(145deg, var(--admin-spectate-blue), #20638f); color: white; border: 1px solid #7dc2f1; }
+        .btn-spectate:hover { background: linear-gradient(145deg, var(--admin-spectate-blue-hover), var(--admin-spectate-blue)); transform: translateY(-3px); }
         
-        .btn-delete { background: linear-gradient(145deg, #555, #333); color: var(--text-light); border-color: #888; }
-        .btn-delete:hover { background: linear-gradient(145deg, #666, #444); }
+        .btn-delete { background: linear-gradient(145deg, #555, #333); color: var(--text-light); border: 1px solid #888; }
+        .btn-delete:hover { background: linear-gradient(145deg, #666, #444); transform: translateY(-3px); }
 
         /* --- Floating Action Button --- */
         #create-lobby-fab {
             position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
-            width: 65px; height: 65px;
+            width: 60px; height: 60px;
             background: linear-gradient(145deg, var(--primary-gold), var(--secondary-gold));
-            color: var(--bg-dark); border-radius: 50%; border: none; font-size: 2.5rem;
+            color: var(--bg-dark); border-radius: 50%; border: none; font-size: 2.2rem;
             display: grid; place-items: center; cursor: pointer;
             box-shadow: 0 5px 20px rgba(255, 201, 71, 0.4);
             transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1); z-index: 999;
         }
-        #create-lobby-fab:hover { 
-            transform: translateX(-50%) scale(1.1) rotate(90deg); 
-            box-shadow: 0 0 30px 10px rgba(255, 201, 71, 0.5);
-        }
+        #create-lobby-fab:hover { transform: translateX(-50%) scale(1.1) rotate(90deg); box-shadow: 0 8px 25px rgba(255, 201, 71, 0.5); }
         #create-lobby-fab:active { transform: translateX(-50%) scale(0.95) rotate(90deg); }
 
         /* --- Enhanced Modal --- */
@@ -420,19 +355,13 @@
         #lobby-password-input { margin-top: 15px; display: none; }
         .info-message, .info-message-filter {
             text-align: center; color: var(--text-secondary);
-            padding: 30px; font-size: 1.1rem;
-            background: rgba(0,0,0,0.2);
-            border-radius: 12px;
+            padding: 20px; font-size: 1.1rem;
         }
     </style>
 </head>
 <body>
 
-    <div id="background-container">
-        <div id="background-blurry"></div>
-        <div id="particles-js"></div>
-    </div>
-    
+    <div id="background-blurry"></div>
     <audio id="background-music" loop></audio>
 
     <div id="music-download-overlay">
@@ -444,10 +373,7 @@
     </div>
 
     <div id="loading-overlay">
-        <div class="loader-wrapper">
-            <div class="loader-ring"></div>
-            <div class="loader-ring"></div>
-            <div class="loader-ring"></div>
+        <div class="loader-logo-wrapper">
             <img src="https://up.20script.ir/file/eaae-Copilot-20250812-110015-removebg-preview-1-.png" alt="Loading Logo" class="loader-logo">
         </div>
         <p id="loading-text">در حال بارگذاری لابی‌ها...</p>
@@ -507,28 +433,10 @@
         </div>
     </div>
 
-    <!-- Particles.js library -->
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, query, where, getDocs, deleteDoc, doc, orderBy, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-        // Initialize Particles.js
-        particlesJS('particles-js', {
-            "particles": {
-                "number": { "value": 50, "density": { "enable": true, "value_area": 800 } },
-                "color": { "value": "#ffc947" },
-                "shape": { "type": "circle" },
-                "opacity": { "value": 0.5, "random": true, "anim": { "enable": true, "speed": 1, "opacity_min": 0.1, "sync": false } },
-                "size": { "value": 2, "random": true, "anim": { "enable": false } },
-                "line_linked": { "enable": false },
-                "move": { "enable": true, "speed": 1, "direction": "none", "random": true, "straight": false, "out_mode": "out", "bounce": false }
-            },
-            "interactivity": { "detect_on": "canvas", "events": { "onhover": { "enable": false }, "onclick": { "enable": false } } },
-            "retina_detect": true
-        });
 
         const firebaseConfig = {
             apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
@@ -724,21 +632,12 @@
             const creatorAvatar = lobbyData.creatorAvatarUrl || 'https://up.20script.ir/file/1d50-defult.png';
 
             let actionButtonsHTML = '';
+            if (currentUserIsAdmin) actionButtonsHTML += `<button class="lobby-btn btn-spectate" data-action="spectate">تماشای لابی</button>`;
+            if (isOwner) actionButtonsHTML += `<button class="lobby-btn btn-delete" data-action="delete">حذف لابی</button>`;
+            else if (canAdminDelete) actionButtonsHTML += `<button class="lobby-btn btn-admin-delete" data-action="admin-delete">بستن لابی</button>`;
             
-            if (isLobbyFull) {
-                actionButtonsHTML += `<button class="lobby-btn btn-join" disabled>لابی پر است</button>`;
-            } else {
-                actionButtonsHTML += `<button class="lobby-btn btn-join" data-action="join">پیوستن</button>`;
-            }
-
-            if (isOwner) {
-                actionButtonsHTML += `<button class="lobby-btn btn-delete" data-action="delete">حذف لابی</button>`;
-            } else if (canAdminDelete) {
-                actionButtonsHTML += `<button class="lobby-btn btn-admin-delete" data-action="admin-delete">بستن لابی</button>`;
-            }
-            if (currentUserIsAdmin) {
-                actionButtonsHTML += `<button class="lobby-btn btn-spectate" data-action="spectate">تماشا</button>`;
-            }
+            if (isLobbyFull) actionButtonsHTML += `<button class="lobby-btn btn-join" disabled>لابی پر است</button>`;
+            else actionButtonsHTML += `<button class="lobby-btn btn-join" data-action="join">پیوستن</button>`;
             
             let adminControlsHTML = '';
             if (currentUserIsAdmin && isPrivate) {
@@ -768,7 +667,7 @@
                     <div class="creator-info">
                         <img src="${creatorAvatar}" alt="آواتار سازنده" class="creator-avatar" onerror="this.src='https://up.20script.ir/file/1d50-defult.png';">
                         <div class="creator-details">
-                            <span class="lobby-creator">${lobbyData.creatorName}</span>
+                            <span class="lobby-creator">سازنده: ${lobbyData.creatorName}</span>
                             ${adminControlsHTML}
                         </div>
                     </div>
@@ -823,9 +722,7 @@
                 const q = query(collection(db, 'Lobbys_list'), orderBy("createdAt", "desc"));
 
                 onSnapshot(q, (snapshot) => {
-                    let hadChanges = false;
                     snapshot.docChanges().forEach((change) => {
-                        hadChanges = true;
                         const lobbyData = { id: change.doc.id, ...change.doc.data() };
                         if (lobbyData.gameStarted) { // Exclude started games
                             if (allLobbiesData.has(lobbyData.id)) allLobbiesData.delete(lobbyData.id);
@@ -834,16 +731,10 @@
                         if (change.type === "added" || change.type === "modified") allLobbiesData.set(lobbyData.id, lobbyData);
                         if (change.type === "removed") allLobbiesData.delete(lobbyData.id);
                     });
-
-                    if (hadChanges) {
-                        rerenderAllLobbyCards();
-                    }
-                    
+                    rerenderAllLobbyCards();
                     if (loadingOverlay.style.opacity !== '0') {
-                        setTimeout(() => {
-                           loadingOverlay.style.opacity = '0';
-                           setTimeout(() => loadingOverlay.style.display = 'none', 800);
-                        }, 500); // Small delay to ensure loading animation is seen
+                        loadingOverlay.style.opacity = '0';
+                        setTimeout(() => loadingOverlay.style.display = 'none', 500);
                     }
                 }, (error) => { console.error("Error fetching lobbies:", error); showCustomAlert('خطای شبکه', 'دریافت لیست لابی‌ها با مشکل مواجه شد.', [{text:'باشه', class:'primary'}]); });
             } else { window.location.href = './login.html'; }
@@ -853,13 +744,14 @@
         function updateLobbyListState() { /* Logic Unchanged */
             const hasCards = allLobbiesData.size > 0;
             let msgElement = lobbyList.querySelector('.info-message');
-            if (!msgElement && !hasCards) {
+            if (!msgElement) {
                 msgElement = document.createElement('p'); msgElement.className = 'info-message';
                 lobbyList.appendChild(msgElement);
-                msgElement.textContent = 'هیچ لابی فعالی وجود ندارد. اولین لابی را شما بسازید!';
-            } else if (msgElement && hasCards) {
-                msgElement.remove();
             }
+            if (!hasCards) {
+                msgElement.textContent = 'هیچ لابی فعالی وجود ندارد. اولین لابی را شما بسازید!';
+                msgElement.style.display = 'block';
+            } else { msgElement.style.display = 'none'; }
         }
         
         // --- Lobby Creation/Deletion (Unchanged Logic) ---
@@ -901,11 +793,14 @@
                 
                 if (isVisible) {
                     card.classList.remove('hidden');
+                    // We need to set the height explicitly for the animation to work from height: 0
                     card.style.height = ''; 
                     visibleCount++;
                 } else {
+                    // Set height before adding class to ensure transition works
                     card.style.height = `${card.offsetHeight}px`;
-                    card.getBoundingClientRect(); // Force repaint
+                    // Force repaint
+                    card.getBoundingClientRect();
                     card.classList.add('hidden');
                 }
             });
