@@ -101,7 +101,6 @@
             transition: all 0.3s ease;
             text-shadow: 0 2px 4px rgba(0,0,0,0.5);
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-            margin-bottom: 15px; /* Added margin */
         }
 
         .auth-button:hover {
@@ -117,40 +116,6 @@
             cursor: not-allowed;
             box-shadow: none;
         }
-        
-        /* --- START: Google Button Styles --- */
-        .google-btn {
-            width: 100%;
-            padding: 12px;
-            font-size: 1rem;
-            font-weight: 700;
-            color: #ffffff;
-            background-color: #4285F4;
-            border: 2px solid #8ab4f8;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .google-btn:hover {
-            background-color: #5a95f5;
-            box-shadow: 0 6px 15px rgba(66, 133, 244, 0.2);
-        }
-
-        .google-btn svg {
-            width: 20px;
-            height: 20px;
-            background: #fff;
-            border-radius: 50%;
-            padding: 2px;
-        }
-        /* --- END: Google Button Styles --- */
-
 
         .auth-link {
             margin-top: 20px;
@@ -187,31 +152,6 @@
             background-color: rgba(79, 217, 79, 0.2);
             border: 1px solid rgba(79, 217, 79, 0.5);
         }
-        
-        .divider {
-            display: flex;
-            align-items: center;
-            text-align: center;
-            color: #a19385;
-            margin: 20px 0;
-            font-size: 0.9rem;
-        }
-
-        .divider::before,
-        .divider::after {
-            content: '';
-            flex: 1;
-            border-bottom: 1px solid #5c4a3a;
-        }
-
-        .divider:not(:empty)::before {
-            margin-left: .5em;
-        }
-
-        .divider:not(:empty)::after {
-            margin-right: .5em;
-        }
-
 
         /* --- START: Modal Styles for Spam Guide --- */
         .modal-overlay {
@@ -295,19 +235,6 @@
             </div>
             <button type="submit" id="login-button" class="auth-button">ورود</button>
         </form>
-        
-        <div class="divider">یا</div>
-
-        <button id="google-login-button" class="google-btn">
-            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" xmlns:xlink="http://www.w3.org/1999/xlink" style="display: block;">
-                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
-                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path>
-                <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path>
-                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path>
-                <path fill="none" d="M0 0h48v48H0z"></path>
-            </svg>
-            <span>ورود با حساب گوگل</span>
-        </button>
 
         <p id="message-box" class="message-box"></p>
 
@@ -345,14 +272,7 @@
     <script type="module">
         // --- START: Firebase Configuration ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { 
-            getAuth, 
-            signInWithEmailAndPassword, 
-            sendPasswordResetEmail,
-            GoogleAuthProvider,         // <-- Import GoogleAuthProvider
-            signInWithPopup,            // <-- Import signInWithPopup
-            fetchSignInMethodsForEmail  // <-- Import fetchSignInMethodsForEmail
-        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
@@ -366,7 +286,6 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const googleProvider = new GoogleAuthProvider(); // <-- Create a provider instance
         // --- END: Firebase Configuration ---
 
         // --- START: Element Selection ---
@@ -374,7 +293,6 @@
         const emailInput = document.getElementById('email');
         const passwordInput = document.getElementById('password');
         const loginButton = document.getElementById('login-button');
-        const googleLoginButton = document.getElementById('google-login-button'); // <-- Select Google button
         const messageBox = document.getElementById('message-box');
         const forgotPasswordLink = document.getElementById('forgot-password-link');
         
@@ -386,8 +304,6 @@
         // --- END: Element Selection ---
 
         // --- START: Event Listeners ---
-        
-        // Login with Email and Password
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = emailInput.value.trim();
@@ -414,40 +330,6 @@
             }
         });
 
-        // --- START: Google Login Logic ---
-        googleLoginButton.addEventListener('click', async () => {
-            setLoading(true);
-            try {
-                // 1. Sign in with Google popup
-                const result = await signInWithPopup(auth, googleProvider);
-                const user = result.user;
-                const email = user.email;
-
-                // 2. Check if email already exists in Firebase Auth
-                const methods = await fetchSignInMethodsForEmail(auth, email);
-
-                if (methods.length === 0) {
-                    // 3. If email does NOT exist, show an error as requested
-                    await user.delete(); // Delete the newly created user because we don't want to register them
-                    showMessage("حسابی با این ایمیل ثبت نشده است. لطفاً ابتدا ثبت‌نام کنید.", 'error');
-                } else {
-                    // 4. If email EXISTS, proceed to the main page
-                    window.location.href = './index.html';
-                }
-            } catch (error) {
-                let friendlyMessage = "خطا در ورود با گوگل. لطفاً دوباره تلاش کنید.";
-                if (error.code !== 'auth/popup-closed-by-user') {
-                    console.error("Google Sign-In Error:", error.code, error.message);
-                }
-                showMessage(friendlyMessage, 'error');
-            } finally {
-                setLoading(false);
-            }
-        });
-        // --- END: Google Login Logic ---
-
-
-        // Password Reset Logic
         forgotPasswordLink.addEventListener('click', async (e) => {
             e.preventDefault();
             const email = emailInput.value.trim();
@@ -503,7 +385,6 @@
 
         function setLoading(isLoading) {
             loginButton.disabled = isLoading;
-            googleLoginButton.disabled = isLoading; // Disable Google button as well
             loginButton.textContent = isLoading ? 'در حال بررسی...' : 'ورود';
             
             // Hide previous messages when a new action starts
