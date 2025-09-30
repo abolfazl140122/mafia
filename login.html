@@ -3,138 +3,277 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>شهر مافیا - ساخت حساب کاربری</title>
+    <title>شهر مافیا - ورود به حساب</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        /* ... (تمام کدهای CSS قبلی بدون تغییر اینجا قرار می‌گیرند) ... */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Vazirmatn', sans-serif; background-image: url('https://up.20script.ir/file/6195-file-000000001500622f9419de6c322df297-1-.jpg'); background-size: cover; background-position: center center; background-repeat: no-repeat; background-attachment: fixed; color: #f0e6d2; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
-        .auth-container { width: 100%; max-width: 420px; background: linear-gradient(145deg, rgba(40, 32, 22, 0.9), rgba(20, 15, 10, 0.95)); backdrop-filter: blur(8px); border-radius: 16px; padding: 40px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); border: 2px solid #5c4a3a; text-align: center; }
-        .auth-title { font-size: 2.5rem; font-weight: 900; color: #ffc947; margin-bottom: 10px; text-shadow: 0 2px 5px rgba(0,0,0,0.7); }
-        .auth-subtitle { font-size: 1rem; color: #e0dacc; margin-bottom: 35px; text-shadow: 1px 1px 2px #000; }
-        .input-group { margin-bottom: 20px; text-align: right; }
-        .input-group label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 0.9rem; color: #c5a687; }
-        .auth-input { width: 100%; padding: 12px 15px; font-size: 1rem; border: 1px solid #5c4a3a; background-color: rgba(0, 0, 0, 0.3); color: #f0e6d2; border-radius: 8px; transition: border-color 0.3s, box-shadow 0.3s; font-family: 'Vazirmatn', sans-serif; }
-        .auth-input:focus { outline: none; border-color: #ffc947; box-shadow: 0 0 0 3px rgba(255, 201, 71, 0.2); }
-        .age-input-wrapper { display: flex; align-items: center; gap: 10px; }
-        #age-input { text-align: center; -moz-appearance: textfield; }
-        #age-input::-webkit-outer-spin-button, #age-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        .age-control-btn { width: 45px; height: 45px; flex-shrink: 0; font-size: 1.8rem; font-weight: 700; color: #ffc947; background: linear-gradient(145deg, rgba(80, 50, 48, 0.8), rgba(56, 33, 32, 0.9)); border: 1px solid #c5a687; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; display: flex; justify-content: center; align-items: center; padding-bottom: 4px; }
-        .age-control-btn:hover { border-color: #ffc947; background: linear-gradient(145deg, rgba(100, 65, 63, 0.9), rgba(74, 44, 42, 1)); }
-        .age-control-btn:active { transform: scale(0.95); }
-        .avatar-selection-container { min-height: 80px; background-color: rgba(0, 0, 0, 0.3); border: 1px solid #5c4a3a; border-radius: 8px; padding: 10px; display: flex; align-items: center; justify-content: flex-start; gap: 12px; overflow-x: auto; overflow-y: hidden; }
-        .avatar-selection-container::-webkit-scrollbar { height: 6px; }
-        .avatar-selection-container::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 3px; }
-        .avatar-selection-container::-webkit-scrollbar-thumb { background: #5c4a3a; border-radius: 3px; }
-        .avatar-selection-container::-webkit-scrollbar-thumb:hover { background: #c5a687; }
-        .avatar-item { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 3px solid transparent; cursor: pointer; transition: all 0.2s ease-in-out; flex-shrink: 0; }
-        .avatar-item:hover { transform: scale(1.1); border-color: #c5a687; }
-        .avatar-item.selected { border-color: #ffc947; transform: scale(1.15); box-shadow: 0 0 15px rgba(255, 201, 71, 0.5); }
-        .avatar-loader { width: 100%; text-align: center; color: #c5a687; }
-        .auth-button { width: 100%; padding: 14px; font-size: 1.1rem; font-weight: 700; color: #ffffff; background: linear-gradient(145deg, #8c4843, #5a2c2a); border: 2px solid #c5a687; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
-        .auth-button:hover { border-color: #ffc947; box-shadow: 0 0 15px rgba(255, 201, 71, 0.2); }
-        .auth-button:active { transform: scale(0.98); }
-        .auth-button:disabled { background: #5c4a3a; border-color: #4a3c30; cursor: not-allowed; opacity: 0.7; }
-        .google-btn { background: #ffffff; color: #202020; border: 2px solid #c5a687; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .google-btn:hover { background: #f0f0f0; border-color: #ffc947; }
-        .google-btn img { width: 24px; height: 24px; }
-        .divider { display: flex; align-items: center; text-align: center; margin: 25px 0; color: #c5a687; }
-        .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #5c4a3a; }
-        .divider:not(:empty)::before { margin-left: .25em; }
-        .divider:not(:empty)::after { margin-right: .25em; }
-        .auth-link { margin-top: 25px; font-size: 0.9rem; color: #c5a687; }
-        .auth-link a { color: #ffc947; font-weight: 700; text-decoration: none; transition: color 0.2s; }
-        .auth-link a:hover { color: #fff; }
-        .error-message { color: #ffadad; background-color: rgba(217, 83, 79, 0.2); padding: 12px; border-radius: 8px; margin-top: 20px; font-size: 0.9rem; display: none; border: 1px solid #d9534f; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-image: url('https://up.20script.ir/file/6195-file-000000001500622f9419de6c322df297-1-.jpg');
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: #f0e6d2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 400px;
+            background: linear-gradient(145deg, rgba(60, 48, 34, 0.85), rgba(30, 23, 15, 0.9));
+            backdrop-filter: blur(8px);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 2px solid #5c4a3a;
+            text-align: center;
+        }
+
+        .auth-title {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #ffc947;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.7);
+        }
+
+        .auth-subtitle {
+            font-size: 1rem;
+            color: #d1c8b7;
+            margin-bottom: 35px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: right;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #e0dacc;
+        }
+
+        .auth-input {
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 1rem;
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 2px solid #5c4a3a;
+            color: #f0e6d2;
+            border-radius: 8px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            font-family: 'Vazirmatn', sans-serif;
+        }
+
+        .auth-input::placeholder { color: rgba(240, 230, 210, 0.5); }
+        .auth-input:focus {
+            outline: none;
+            border-color: #ffc947;
+            box-shadow: 0 0 10px rgba(255, 201, 71, 0.3);
+        }
+
+        .auth-button {
+            width: 100%;
+            padding: 14px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #ffffff;
+            background: linear-gradient(145deg, #8c4843, #5a2c2a);
+            border: 2px solid #ffc947;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+        }
+
+        .auth-button:hover {
+            background: linear-gradient(145deg, #a1534d, #6b3431);
+            box-shadow: 0 6px 15px rgba(255, 201, 71, 0.2);
+        }
+
+        .auth-button:active { transform: scale(0.98); box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4); }
+        .auth-button:disabled {
+            background: #5c4a3a;
+            border-color: #88786a;
+            color: #a19385;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .auth-link {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #d1c8b7;
+        }
+
+        .auth-link a {
+            color: #ffc947;
+            font-weight: 700;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
         
-        /* --- START: Modal Styles --- */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; z-index: 1000; opacity: 0; transition: opacity 0.3s ease; }
-        .modal-overlay.show { display: flex; opacity: 1; }
-        .modal-content { background: linear-gradient(145deg, rgba(60, 48, 34, 0.95), rgba(30, 23, 15, 0.98)); padding: 30px; border-radius: 16px; border: 2px solid #ffc947; width: 90%; max-width: 450px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.6); transform: scale(0.9); transition: transform 0.3s ease; }
-        .modal-overlay.show .modal-content { transform: scale(1); }
-        .modal-title { font-size: 1.6rem; font-weight: 900; color: #ffc947; margin-bottom: 15px; }
-        .modal-body { font-size: 1rem; color: #e0dacc; line-height: 1.7; margin-bottom: 25px; }
-        .modal-body strong { color: #fff; }
-        .modal-actions { display: flex; gap: 15px; justify-content: center; }
-        .modal-btn { flex-grow: 1; padding: 12px; border-radius: 8px; border: none; font-family: 'Vazirmatn', sans-serif; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.3s; }
-        .modal-btn-confirm { background: linear-gradient(145deg, #8c4843, #5a2c2a); color: white; border: 2px solid #ffc947; }
-        .modal-btn-confirm:hover { background: linear-gradient(145deg, #a1534d, #6b3431); }
-        .modal-btn-cancel { background: none; border: 2px solid #c5a687; color: #c5a687; }
-        .modal-btn-cancel:hover { background-color: rgba(197, 166, 135, 0.1); border-color: #fff; color: #fff;}
+        .auth-link a:hover { color: #fff; }
+        
+        .message-box {
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            display: none;
+            line-height: 1.6;
+        }
+
+        .error-message {
+            color: #ff9e9e;
+            background-color: rgba(217, 83, 79, 0.2);
+            border: 1px solid rgba(217, 83, 79, 0.5);
+        }
+        
+        .success-message {
+            color: #a0e0a0;
+            background-color: rgba(79, 217, 79, 0.2);
+            border: 1px solid rgba(79, 217, 79, 0.5);
+        }
+
+        /* --- START: Modal Styles for Spam Guide --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            display: none; /* Initially hidden */
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: linear-gradient(145deg, rgba(60, 48, 34, 0.95), rgba(30, 23, 15, 0.98));
+            padding: 30px;
+            border-radius: 16px;
+            border: 2px solid #ffc947;
+            width: 90%;
+            max-width: 500px;
+            text-align: right;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #ffc947;
+            margin-bottom: 20px;
+        }
+        
+        .modal-body p {
+            font-size: 1rem;
+            color: #e0dacc;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .modal-body strong {
+            color: #fff;
+            font-weight: 700;
+        }
+
+        .close-button {
+            background: none;
+            border: 2px solid #ff9e9e;
+            color: #ff9e9e;
+            padding: 8px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Vazirmatn', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+        .close-button:hover {
+            background: rgba(217, 83, 79, 0.2);
+            color: #fff;
+        }
         /* --- END: Modal Styles --- */
+
     </style>
 </head>
 <body>
     <div class="auth-container">
-        <h1 class="auth-title">ثبت نام</h1>
-        <p class="auth-subtitle">برای ورود به شهر مافیا، یک حساب کاربری بسازید.</p>
+        <h1 class="auth-title">ورود به شهر</h1>
+        <p class="auth-subtitle">خوش آمدید! لطفاً اطلاعات خود را وارد کنید.</p>
         
-        <form id="registration-form">
-            <div class="input-group">
-                <label for="display-name">نام نمایشی (فقط انگلیسی)</label>
-                <input type="text" id="display-name" class="auth-input" required>
-            </div>
+        <form id="login-form">
             <div class="input-group">
                 <label for="email">ایمیل</label>
                 <input type="email" id="email" class="auth-input" required>
             </div>
             <div class="input-group">
-                <label for="password">رمز عبور (حداقل ۶ کاراکتر)</label>
+                <label for="password">رمز عبور</label>
                 <input type="password" id="password" class="auth-input" required>
             </div>
-            <div class="input-group">
-                <label for="age-input">سن (اجباری)</label>
-                <div class="age-input-wrapper">
-                    <button type="button" id="decrement-age" class="age-control-btn">-</button>
-                    <input type="number" id="age-input" class="auth-input" placeholder="سن خود را وارد کنید" required>
-                    <button type="button" id="increment-age" class="age-control-btn">+</button>
-                </div>
-            </div>
-            <div class="input-group">
-                <label>انتخاب آواتار (اجباری)</label>
-                <div id="avatar-container" class="avatar-selection-container">
-                    <p class="avatar-loader">در حال بارگذاری آواتارها...</p>
-                </div>
-            </div>
-            <button type="submit" id="register-button" class="auth-button">ساخت حساب</button>
+            <button type="submit" id="login-button" class="auth-button">ورود</button>
         </form>
 
-        <div class="divider">یا</div>
-        <button id="google-signin-button" class="auth-button google-btn" disabled>
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google icon">
-            <span>ورود با حساب گوگل</span>
-        </button>
-        
-        <p id="error-message" class="error-message"></p>
+        <p id="message-box" class="message-box"></p>
+
         <p class="auth-link">
-            حساب کاربری دارید؟ <a href="./login.html">وارد شوید</a>
+            <a href="#" id="forgot-password-link">رمز عبور خود را فراموش کرده‌اید؟</a>
+        </p>
+        <p class="auth-link" id="spam-guide-link-container" style="display: none;">
+            <a href="#" id="open-spam-guide">ایمیل بازیابی را پیدا نمی‌کنید؟</a>
+        </p>
+        <p class="auth-link">
+            هنوز عضو نشده‌اید؟ <a href="./Registration.html">ثبت‌نام کنید</a>
         </p>
     </div>
 
-    <!-- START: Google Sign-In Confirmation Modal -->
-    <div class="modal-overlay" id="google-confirm-modal">
+    <!-- START: Spam Guide Modal HTML -->
+    <div class="modal-overlay" id="spam-guide-modal">
         <div class="modal-content">
-            <h2 class="modal-title">تایید ورود با گوگل</h2>
-            <p class="modal-body">
-                با ادامه، حساب کاربری شما با استفاده از اطلاعات گوگل ساخته می‌شود. 
-                <strong>نام نمایشی شما</strong> به نام حساب گوگل شما تغییر خواهد کرد. آیا موافقید؟
-            </p>
-            <div class="modal-actions">
-                <button id="confirm-google-signin" class="modal-btn modal-btn-confirm">بله، ادامه بده</button>
-                <button id="cancel-google-signin" class="modal-btn modal-btn-cancel">انصراف</button>
+            <h2 class="modal-title">راهنمای پیدا کردن ایمیل بازیابی</h2>
+            <div class="modal-body">
+                <p>
+                    گاهی اوقات، ایمیل‌های خودکار (مانند لینک بازیابی رمز عبور) به اشتباه توسط سرویس‌دهنده ایمیل شما (مانند Gmail) به عنوان هرزنامه شناسایی می‌شوند.
+                </p>
+                <p>
+                    <strong>پوشه اسپم (Spam) یا هرزنامه (Junk) چیست؟</strong> این پوشه‌ای در ایمیل شماست که ایمیل‌های مشکوک یا تبلیغاتی به آنجا منتقل می‌شوند تا صندوق ورودی (Inbox) شما تمیز بماند.
+                </p>
+                <p>
+                    <strong>این فرآیند کاملاً امن است.</strong> لینک ارسال شده از طرف ما فقط به شما اجازه می‌دهد رمز عبور خود را تغییر دهید و هیچ خطری ندارد. لطفاً صندوق ورودی و سپس پوشه اسپم ایمیل خود را با دقت بررسی کنید.
+                </p>
             </div>
+            <button class="close-button" id="close-spam-guide">متوجه شدم</button>
         </div>
     </div>
-    <!-- END: Modal HTML -->
+    <!-- END: Spam Guide Modal HTML -->
 
     <script type="module">
+        // --- START: Firebase Configuration ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-        // ... (Firebase config remains the same)
         const firebaseConfig = {
           apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
           authDomain: "mafia-9fcbf.firebaseapp.com",
@@ -145,130 +284,116 @@
           measurementId: "G-0PDHDWC6NV"
         };
 
-
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app);
+        // --- END: Firebase Configuration ---
 
-        const registrationForm = document.getElementById('registration-form');
-        const displayNameInput = document.getElementById('display-name');
+        // --- START: Element Selection ---
+        const loginForm = document.getElementById('login-form');
         const emailInput = document.getElementById('email');
         const passwordInput = document.getElementById('password');
-        const ageInput = document.getElementById('age-input');
-        const incrementAgeBtn = document.getElementById('increment-age');
-        const decrementAgeBtn = document.getElementById('decrement-age');
-        const registerButton = document.getElementById('register-button');
-        const errorMessage = document.getElementById('error-message');
-        const avatarContainer = document.getElementById('avatar-container');
-        const googleSignInButton = document.getElementById('google-signin-button');
+        const loginButton = document.getElementById('login-button');
+        const messageBox = document.getElementById('message-box');
+        const forgotPasswordLink = document.getElementById('forgot-password-link');
         
-        // Modal elements
-        const googleConfirmModal = document.getElementById('google-confirm-modal');
-        const confirmGoogleBtn = document.getElementById('confirm-google-signin');
-        const cancelGoogleBtn = document.getElementById('cancel-google-signin');
-        
-        let selectedAvatarUrl = null;
+        // Spam Guide Modal Elements
+        const spamGuideContainer = document.getElementById('spam-guide-link-container');
+        const openSpamGuideLink = document.getElementById('open-spam-guide');
+        const spamGuideModal = document.getElementById('spam-guide-modal');
+        const closeSpamGuideButton = document.getElementById('close-spam-guide');
+        // --- END: Element Selection ---
 
-        // --- NEW: Function to check prerequisites for Google Sign-In ---
-        function checkGooglePrerequisites() {
-            const age = parseInt(ageInput.value);
-            const isAgeValid = !isNaN(age) && age >= 8 && age <= 99;
-            const isAvatarSelected = selectedAvatarUrl !== null;
-            
-            if (isAgeValid && isAvatarSelected) {
-                googleSignInButton.disabled = false;
-            } else {
-                googleSignInButton.disabled = true;
+        // --- START: Event Listeners ---
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
+
+            if (!email || !password) {
+                showMessage("لطفاً ایمیل و رمز عبور را وارد کنید.", 'error'); 
+                return;
             }
-        }
 
-        // --- Event Listeners for age and avatar selection ---
-        ageInput.addEventListener('input', checkGooglePrerequisites);
-        incrementAgeBtn.addEventListener('click', () => {
-            let currentValue = parseInt(ageInput.value) || 8;
-            ageInput.value = Math.min(99, currentValue + 1);
-            checkGooglePrerequisites();
-        });
-        decrementAgeBtn.addEventListener('click', () => {
-            let currentValue = parseInt(ageInput.value) || 9;
-            ageInput.value = Math.max(8, currentValue - 1);
-            checkGooglePrerequisites();
-        });
-
-        async function loadFreeAvatars() {
+            setLoading(true);
             try {
-                // ... (Avatar loading logic remains the same)
-            } catch (error) {
-                console.error("Error fetching avatars: ", error);
-                avatarContainer.innerHTML = '<p class="avatar-loader">خطا در بارگذاری آواتارها!</p>';
-            }
-        }
-        
-        loadFreeAvatars();
-        
-        // --- Manual Registration Form Submit ---
-        registrationForm.addEventListener('submit', async (e) => {
-            // ... (The entire manual registration logic remains the same)
-        });
-
-        // --- START: Google Sign-In with Modal ---
-        googleSignInButton.addEventListener('click', () => {
-            googleConfirmModal.classList.add('show');
-        });
-
-        cancelGoogleBtn.addEventListener('click', () => {
-            googleConfirmModal.classList.remove('show');
-        });
-
-        confirmGoogleBtn.addEventListener('click', async () => {
-            googleConfirmModal.classList.remove('show');
-            const provider = new GoogleAuthProvider();
-            
-            try {
-                const result = await signInWithPopup(auth, provider);
-                const user = result.user;
-
-                const userDocRef = doc(db, 'users', user.uid);
-                const userDoc = await getDoc(userDocRef);
-
-                if (!userDoc.exists()) {
-                    // This is a new user, create their profile
-                    const age = parseInt(ageInput.value); // Get the mandatory age
-                    if (isNaN(age) || age < 8 || age > 99) {
-                        showError("خطا: سن معتبر نیست. لطفاً مجدداً تلاش کنید.");
-                        return; // Stop execution if age is somehow invalid
-                    }
-
-                    await setDoc(userDocRef, {
-                        uid: user.uid,
-                        displayName: user.displayName,
-                        email: user.email,
-                        createdAt: new Date(),
-                        currentStage: 1,
-                        avatarUrl: selectedAvatarUrl, // Use the selected avatar
-                        old: age // Use the entered age
-                    });
-                }
-                
+                await signInWithEmailAndPassword(auth, email, password);
                 window.location.href = './index.html';
-
             } catch (error) {
-                console.error("Google Sign-In Error:", error);
-                let friendlyMessage = "خطایی در ورود با گوگل رخ داد.";
-                if (error.code === 'auth/popup-closed-by-user') {
-                    friendlyMessage = "پنجره ورود توسط شما بسته شد.";
-                } else if (error.code === 'auth/account-exists-with-different-credential') {
-                    friendlyMessage = "حسابی با این ایمیل اما روش ورود متفاوت (مثلاً رمز عبور) وجود دارد.";
+                let friendlyMessage = "ایمیل یا رمز عبور اشتباه است.";
+                if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+                    friendlyMessage = "ایمیل یا رمز عبور وارد شده صحیح نمی‌باشد.";
                 }
-                showError(friendlyMessage);
+                console.error("Login Error:", error.code, error.message);
+                showMessage(friendlyMessage, 'error');
+            } finally {
+                setLoading(false);
             }
         });
-        // --- END: Google Sign-In with Modal ---
 
-        function showError(message) {
-            errorMessage.textContent = message;
-            errorMessage.style.display = 'block';
+        forgotPasswordLink.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const email = emailInput.value.trim();
+
+            if (!email) {
+                showMessage("برای بازیابی رمز، ابتدا ایمیل خود را در کادر بالا وارد کنید.", 'error');
+                emailInput.focus();
+                return;
+            }
+
+            setLoading(true);
+            try {
+                await sendPasswordResetEmail(auth, email);
+                showMessage("لینک بازیابی رمز عبور به ایمیل شما ارسال شد. لطفاً صندوق ورودی (Inbox) و پوشه اسپم (Spam) را بررسی کنید.", 'success');
+                spamGuideContainer.style.display = 'block'; // Show the guide link
+            } catch (error) {
+                let friendlyMessage = "خطایی در ارسال ایمیل بازیابی رخ داد. لطفاً مجدداً تلاش کنید.";
+                if (error.code === 'auth/user-not-found') {
+                    friendlyMessage = "حسابی با این ایمیل در سیستم ثبت نشده است.";
+                } else if (error.code === 'auth/invalid-email') {
+                    friendlyMessage = "فرمت ایمیل وارد شده صحیح نمی‌باشد.";
+                }
+                console.error("Password Reset Error:", error.code, error.message);
+                showMessage(friendlyMessage, 'error');
+            } finally {
+                setLoading(false);
+            }
+        });
+        
+        // Modal Event Listeners
+        openSpamGuideLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            spamGuideModal.style.display = 'flex';
+        });
+
+        closeSpamGuideButton.addEventListener('click', () => {
+            spamGuideModal.style.display = 'none';
+        });
+
+        spamGuideModal.addEventListener('click', (e) => {
+            if (e.target === spamGuideModal) { // Close if clicked on overlay
+                spamGuideModal.style.display = 'none';
+            }
+        });
+        // --- END: Event Listeners ---
+
+        // --- START: Helper Functions ---
+        function showMessage(message, type) {
+            messageBox.textContent = message;
+            messageBox.className = `message-box ${type}-message`;
+            messageBox.style.display = 'block';
         }
+
+        function setLoading(isLoading) {
+            loginButton.disabled = isLoading;
+            loginButton.textContent = isLoading ? 'در حال بررسی...' : 'ورود';
+            
+            // Hide previous messages when a new action starts
+            if (isLoading) {
+                messageBox.style.display = 'none';
+                spamGuideContainer.style.display = 'none';
+            }
+        }
+        // --- END: Helper Functions ---
     </script>
 </body>
 </html>
