@@ -145,89 +145,17 @@
         
         .google-btn { background: #ffffff; color: #202020; border: 2px solid #c5a687; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .google-btn:hover { background: #f0f0f0; border-color: #ffc947; }
-        .google-btn:disabled { background: #a0a0a0; border-color: #707070; cursor: not-allowed; opacity: 0.6; }
-        .google-btn:disabled:hover { background: #a0a0a0; border-color: #707070; box-shadow: none; }
         .google-btn img { width: 24px; height: 24px; }
         
         .divider { display: flex; align-items: center; text-align: center; margin: 25px 0; color: #c5a687; }
         .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #5c4a3a; }
-        .divider:not(:empty)::before { margin-left: .25em; }
-        .divider:not(:empty)::after { margin-right: .25em; }
+        .divider:not(:empty)::before { margin-right: .25em; } /* Fix for RTL */
+        .divider:not(:empty)::after { margin-left: .25em; } /* Fix for RTL */
 
         .auth-link { margin-top: 25px; font-size: 0.9rem; color: #c5a687; }
         .auth-link a { color: #ffc947; font-weight: 700; text-decoration: none; transition: color 0.2s; }
         .auth-link a:hover { color: #fff; }
         .error-message { color: #ffadad; background-color: rgba(217, 83, 79, 0.2); padding: 12px; border-radius: 8px; margin-top: 20px; font-size: 0.9rem; display: none; border: 1px solid #d9534f; }
-
-        /* --- کدهای جدید برای پنل تایید --- */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(5px);
-            display: none; /* در ابتدا مخفی */
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-        .modal-content {
-            background: linear-gradient(145deg, rgba(50, 42, 32, 0.95), rgba(30, 25, 20, 0.98));
-            padding: 30px;
-            border-radius: 16px;
-            border: 2px solid #5c4a3a;
-            width: 90%;
-            max-width: 450px;
-            text-align: center;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
-            color: #e0dacc;
-        }
-        .modal-title {
-            font-size: 1.8rem;
-            font-weight: 900;
-            color: #ffc947;
-            margin-bottom: 15px;
-        }
-        .modal-text {
-            font-size: 1rem;
-            line-height: 1.6;
-            margin-bottom: 25px;
-        }
-        .modal-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-        }
-        .modal-button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            font-family: 'Vazirmatn', sans-serif;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        .modal-button.confirm {
-            background-color: #8c4843;
-            color: white;
-            border: 1px solid #c5a687;
-        }
-        .modal-button.confirm:hover {
-            background-color: #a1534d;
-        }
-        .modal-button.cancel {
-            background-color: transparent;
-            color: #c5a687;
-            border: 1px solid #5c4a3a;
-        }
-        .modal-button.cancel:hover {
-            background-color: rgba(92, 74, 58, 0.5);
-            color: #ffc947;
-        }
-        /* --- پایان کدهای جدید --- */
     </style>
 </head>
 <body>
@@ -249,7 +177,7 @@
                 <input type="password" id="password" class="auth-input" required>
             </div>
             <div class="input-group">
-                <label for="age-input">سن (الزامی)</label>
+                <label for="age-input">سن</label>
                 <div class="age-input-wrapper">
                     <button type="button" id="decrement-age" class="age-control-btn">-</button>
                     <input type="number" id="age-input" class="auth-input" placeholder="سن خود را وارد کنید" required>
@@ -266,11 +194,13 @@
 
             <button type="submit" id="register-button" class="auth-button">ساخت حساب</button>
         </form>
-
+        
         <div class="divider">یا</div>
+        
+        <!-- *** تغییر: افزودن disabled به صورت پیش‌فرض *** -->
         <button id="google-signin-button" class="auth-button google-btn" disabled>
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google icon">
-            <span>ورود با حساب گوگل</span>
+            <span>ابتدا سن و آواتار را انتخاب کنید</span>
         </button>
 
         <p id="error-message" class="error-message"></p>
@@ -279,23 +209,6 @@
             حساب کاربری دارید؟ <a href="./login.html">وارد شوید</a>
         </p>
     </div>
-
-    <!-- پنل تایید ورود با گوگل -->
-    <div id="google-confirm-overlay" class="modal-overlay">
-        <div id="google-confirm-modal" class="modal-content">
-            <h2 class="modal-title">تایید ورود با گوگل</h2>
-            <p class="modal-text">
-                با ادامه، حساب شما با نام و ایمیل گوگل ساخته می‌شود. نام نمایشی شما به نام حساب گوگل شما تغییر خواهد کرد.
-                <br><br>
-                سن و آواتاری که انتخاب کرده‌اید برای حساب شما ذخیره می‌شود. آیا موافق هستید؟
-            </p>
-            <div class="modal-buttons">
-                <button id="confirm-google-signin" class="modal-button confirm">بله، ادامه می‌دهم</button>
-                <button id="cancel-google-signin" class="modal-button cancel">خیر، دستی وارد می‌کنم</button>
-            </div>
-        </div>
-    </div>
-
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -316,7 +229,6 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // --- انتخاب عناصر صفحه ---
         const registrationForm = document.getElementById('registration-form');
         const displayNameInput = document.getElementById('display-name');
         const emailInput = document.getElementById('email');
@@ -328,39 +240,36 @@
         const errorMessage = document.getElementById('error-message');
         const avatarContainer = document.getElementById('avatar-container');
         const googleSignInButton = document.getElementById('google-signin-button');
-        const googleConfirmOverlay = document.getElementById('google-confirm-overlay');
-        const confirmGoogleSignInBtn = document.getElementById('confirm-google-signin');
-        const cancelGoogleSignInBtn = document.getElementById('cancel-google-signin');
+        const googleSignInButtonSpan = googleSignInButton.querySelector('span');
         let selectedAvatarUrl = null;
 
-        // --- توابع کمکی ---
-        function showError(message) {
-            errorMessage.textContent = message;
-            errorMessage.style.display = 'block';
-        }
-
-        function updateGoogleButtonState() {
+        // *** کد جدید: فانکشن برای بررسی و فعال‌سازی دکمه گوگل ***
+        function validateAndEnableGoogleButton() {
             const age = parseInt(ageInput.value);
             const isAgeValid = !isNaN(age) && age >= 8 && age <= 99;
             const isAvatarSelected = !!selectedAvatarUrl;
 
-            googleSignInButton.disabled = !(isAgeValid && isAvatarSelected);
+            if (isAgeValid && isAvatarSelected) {
+                googleSignInButton.disabled = false;
+                googleSignInButtonSpan.textContent = 'ورود با حساب گوگل';
+            } else {
+                googleSignInButton.disabled = true;
+                googleSignInButtonSpan.textContent = 'ابتدا سن و آواتار را انتخاب کنید';
+            }
         }
 
-        // --- رویدادهای مربوط به سن ---
         incrementAgeBtn.addEventListener('click', () => {
             let currentValue = parseInt(ageInput.value) || 8;
             ageInput.value = Math.min(99, currentValue + 1);
-            updateGoogleButtonState();
+            validateAndEnableGoogleButton(); // بررسی مجدد پس از تغییر
         });
         decrementAgeBtn.addEventListener('click', () => {
             let currentValue = parseInt(ageInput.value) || 9;
             ageInput.value = Math.max(8, currentValue - 1);
-            updateGoogleButtonState();
+            validateAndEnableGoogleButton(); // بررسی مجدد پس از تغییر
         });
-        ageInput.addEventListener('input', updateGoogleButtonState);
+        ageInput.addEventListener('input', validateAndEnableGoogleButton); // بررسی با هر بار تایپ
 
-        // --- بارگذاری آواتارها ---
         async function loadFreeAvatars() {
             try {
                 const q = query(collection(db, "avatars"), where("price", "==", 0));
@@ -384,7 +293,7 @@
                         }
                         imgElement.classList.add('selected');
                         selectedAvatarUrl = avatarData.imageUrl;
-                        updateGoogleButtonState(); // بروزرسانی وضعیت دکمه گوگل
+                        validateAndEnableGoogleButton(); // *** تغییر: فراخوانی فانکشن ولیدیشن ***
                     });
                     avatarContainer.appendChild(imgElement);
                 });
@@ -396,7 +305,6 @@
         
         loadFreeAvatars();
 
-        // --- ثبت نام با ایمیل و رمز عبور ---
         registrationForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -405,12 +313,21 @@
             const password = passwordInput.value.trim();
             const age = parseInt(ageInput.value);
 
-            // اعتبارسنجی‌ها
-            if (!displayName || !email || !password || !ageInput.value) { showError("لطفاً تمام فیلدها را پر کنید."); return; }
-            if (!selectedAvatarUrl) { showError("لطفاً یک آواتار انتخاب کنید."); return; }
-            if (password.length < 6) { showError("رمز عبور باید حداقل ۶ کاراکتر باشد."); return; }
-            if (/[^a-zA-Z0-9_.]/.test(displayName)) { showError("نام نمایشی فقط می‌تواند شامل حروف و اعداد انگلیسی، نقطه و آندرلاین باشد."); return; }
-            if (isNaN(age) || age < 8 || age > 99) { showError("لطفاً سن معتبری بین ۸ تا ۹۹ سال وارد کنید."); return; }
+            if (!displayName || !email || !password || !ageInput.value) {
+                showError("لطفاً تمام فیلدها را پر کنید."); return;
+            }
+            if (!selectedAvatarUrl) {
+                showError("لطفاً یک آواتار انتخاب کنید."); return;
+            }
+            if (password.length < 6) {
+                showError("رمز عبور باید حداقل ۶ کاراکتر باشد."); return;
+            }
+            if (/[^a-zA-Z0-9_.]/.test(displayName)) {
+                showError("نام نمایشی فقط می‌تواند شامل حروف و اعداد انگلیسی، نقطه و آندرلاین باشد."); return;
+            }
+            if (isNaN(age) || age < 8 || age > 99) {
+                showError("لطفاً سن معتبری بین ۸ تا ۹۹ سال وارد کنید."); return;
+            }
 
             registerButton.disabled = true;
             registerButton.textContent = 'در حال ساخت...';
@@ -437,8 +354,11 @@
 
             } catch (error) {
                 let friendlyMessage = "خطایی رخ داد. لطفاً دوباره تلاش کنید.";
-                if (error.code === 'auth/email-already-in-use') { friendlyMessage = "این ایمیل قبلاً ثبت شده است. لطفاً وارد شوید."; } 
-                else if (error.code === 'auth/weak-password') { friendlyMessage = "رمز عبور ضعیف است. لطفاً رمز قوی‌تری انتخاب کنید."; }
+                if (error.code === 'auth/email-already-in-use') {
+                    friendlyMessage = "این ایمیل قبلاً ثبت شده است. لطفاً وارد شوید.";
+                } else if (error.code === 'auth/weak-password') {
+                    friendlyMessage = "رمز عبور ضعیف است. لطفاً رمز قوی‌تری انتخاب کنید.";
+                }
                 console.error("Registration Error:", error);
                 showError(friendlyMessage);
             } finally {
@@ -447,23 +367,20 @@
             }
         });
 
-        // --- منطق ورود با گوگل ---
-        googleSignInButton.addEventListener('click', () => {
-            googleConfirmOverlay.style.display = 'flex'; // نمایش پنل تایید
-        });
-
-        cancelGoogleSignInBtn.addEventListener('click', () => {
-            googleConfirmOverlay.style.display = 'none'; // بستن پنل
-        });
-
-        confirmGoogleSignInBtn.addEventListener('click', async () => {
-            googleConfirmOverlay.style.display = 'none'; // بستن پنل
-            
-            const provider = new GoogleAuthProvider();
-            // گرفتن اطلاعات وارد شده قبل از باز شدن پاپ‌آپ گوگل
+        // *** کد اصلاح شده برای ورود با گوگل ***
+        googleSignInButton.addEventListener('click', async () => {
+            // یکبار دیگر اطلاعات را برای اطمینان دریافت می‌کنیم
             const age = parseInt(ageInput.value);
             const avatar = selectedAvatarUrl;
 
+            // اگر به هر دلیلی اطلاعات نامعتبر بود، عملیات متوقف می‌شود
+            if (isNaN(age) || age < 8 || age > 99 || !avatar) {
+                 showError("لطفاً قبل از ورود با گوگل، سن و آواتار را به درستی انتخاب کنید.");
+                 return;
+            }
+            
+            const provider = new GoogleAuthProvider();
+            
             try {
                 const result = await signInWithPopup(auth, provider);
                 const user = result.user;
@@ -472,15 +389,15 @@
                 const userDoc = await getDoc(userDocRef);
 
                 if (!userDoc.exists()) {
-                    // اگر کاربر جدید است، اطلاعات او را در دیتابیس ذخیره کن
+                    // اگر کاربر جدید است، اطلاعات او را به همراه سن و آواتار ذخیره کن
                     await setDoc(userDocRef, {
                         uid: user.uid,
-                        displayName: user.displayName, // استفاده از نام گوگل
+                        displayName: user.displayName,
                         email: user.email,
                         createdAt: new Date(),
                         currentStage: 1,
-                        avatarUrl: avatar, // استفاده از آواتار انتخاب شده
-                        old: age // استفاده از سن وارد شده
+                        avatarUrl: avatar, // *** استفاده از آواتار انتخابی کاربر ***
+                        old: age          // *** استفاده از سن وارد شده توسط کاربر ***
                     });
                 }
                 
@@ -488,13 +405,20 @@
 
             } catch (error) {
                 console.error("Google Sign-In Error:", error);
-                let friendlyMessage = "خطایی در ورود با گوگل رخ داد.";
-                if (error.code === 'auth/popup-closed-by-user') { friendlyMessage = "پنجره ورود توسط شما بسته شد."; } 
-                else if (error.code === 'auth/account-exists-with-different-credential') { friendlyMessage = "حسابی با این ایمیل اما با رمز عبور وجود دارد."; }
+                let friendlyMessage = "خطایی در ورود با گوگل رخ داد. لطفاً دوباره تلاش کنید.";
+                if (error.code === 'auth/popup-closed-by-user') {
+                    friendlyMessage = "پنجره ورود توسط شما بسته شد.";
+                } else if (error.code === 'auth/account-exists-with-different-credential') {
+                    friendlyMessage = "حسابی با این ایمیل اما روش ورود متفاوت (مثلاً رمز عبور) وجود دارد.";
+                }
                 showError(friendlyMessage);
             }
         });
 
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+        }
     </script>
 </body>
 </html>
