@@ -125,7 +125,7 @@
         }
 
         .auth-link {
-            margin-top: 25px;
+            margin-top: 20px;
             font-size: 0.9rem;
             color: #d1c8b7;
         }
@@ -140,16 +140,25 @@
         .auth-link a:hover {
             color: #fff;
         }
-
-        .error-message {
-            color: #ff9e9e;
-            background-color: rgba(217, 83, 79, 0.2);
+        
+        .message-box {
             padding: 12px;
             border-radius: 8px;
             margin-top: 20px;
             font-size: 0.9rem;
+            display: none; /* Hidden by default */
+        }
+
+        .error-message {
+            color: #ff9e9e;
+            background-color: rgba(217, 83, 79, 0.2);
             border: 1px solid rgba(217, 83, 79, 0.5);
-            display: none;
+        }
+        
+        .success-message {
+            color: #a0e0a0;
+            background-color: rgba(79, 217, 79, 0.2);
+            border: 1px solid rgba(79, 217, 79, 0.5);
         }
     </style>
 </head>
@@ -170,19 +179,24 @@
             <button type="submit" id="login-button" class="auth-button">ورود</button>
         </form>
 
-        <p id="error-message" class="error-message"></p>
+        <p id="message-box" class="message-box"></p>
 
+        <p class="auth-link">
+            <a href="#" id="forgot-password-link">رمز عبور خود را فراموش کرده‌اید؟</a>
+        </p>
         <p class="auth-link">
             هنوز عضو نشده‌اید؟ <a href="./Registration.html">ثبت‌نام کنید</a>
         </p>
     </div>
 
     <script type="module">
+        // --- START: Firebase Configuration ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
+        // Your web app's Firebase configuration
         const firebaseConfig = {
-          apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
+          apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg", // This key is safe to be public
           authDomain: "mafia-9fcbf.firebaseapp.com",
           projectId: "mafia-9fcbf",
           storageBucket: "mafia-9fcbf.appspot.com",
@@ -191,15 +205,25 @@
           measurementId: "G-0PDHDWC6NV"
         };
 
+        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        // --- END: Firebase Configuration ---
 
+
+        // --- START: Element Selection ---
         const loginForm = document.getElementById('login-form');
         const emailInput = document.getElementById('email');
         const passwordInput = document.getElementById('password');
         const loginButton = document.getElementById('login-button');
-        const errorMessage = document.getElementById('error-message');
+        const messageBox = document.getElementById('message-box');
+        const forgotPasswordLink = document.getElementById('forgot-password-link');
+        // --- END: Element Selection ---
 
+
+        // --- START: Event Listeners ---
+        
+        // Listener for the main login form submission
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -207,33 +231,88 @@
             const password = passwordInput.value.trim();
 
             if (!email || !password) {
-                showError("لطفاً ایمیل و رمز عبور را وارد کنید."); return;
+                showMessage("لطفاً ایمیل و رمز عبور را وارد کنید.", 'error'); 
+                return;
             }
 
-            loginButton.disabled = true;
-            loginButton.textContent = 'در حال ورود...';
-            errorMessage.style.display = 'none';
+            setLoading(true);
 
             try {
                 await signInWithEmailAndPassword(auth, email, password);
-                window.location.href = './index.html';
+                window.location.href = './index.html'; // Redirect on successful login
             } catch (error) {
                 let friendlyMessage = "ایمیل یا رمز عبور اشتباه است.";
                 if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
                     friendlyMessage = "ایمیل یا رمز عبور وارد شده صحیح نمی‌باشد.";
                 }
-                console.error("Login Error:", error);
-                showError(friendlyMessage);
+                console.error("Login Error:", error.code, error.message);
+                showMessage(friendlyMessage, 'error');
             } finally {
-                loginButton.disabled = false;
-                loginButton.textContent = 'ورود';
+                setLoading(false);
             }
         });
 
-        function showError(message) {
-            errorMessage.textContent = message;
-            errorMessage.style.display = 'block';
+        // Listener for the "Forgot Password" link
+        forgotPasswordLink.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const email = emailInput.value.trim();
+
+            if (!email) {
+                showMessage("برای بازیابی رمز، ابتدا ایمیل خود را در کادر بالا وارد کنید.", 'error');
+                emailInput.focus();
+                return;
+            }
+
+            setLoading(true);
+
+            try {
+                await sendPasswordResetEmail(auth, email);
+                showMessage("لینک بازیابی رمز عبور با موفقیت به ایمیل شما ارسال شد. (پوشه اسپم را نیز بررسی کنید)", 'success');
+            } catch (error) {
+                let friendlyMessage = "خطایی در ارسال ایمیل بازیابی رخ داد.";
+                if (error.code === 'auth/user-not-found') {
+                    friendlyMessage = "حسابی با این ایمیل در سیستم ثبت نشده است.";
+                } else if (error.code === 'auth/invalid-email') {
+                    friendlyMessage = "فرمت ایمیل وارد شده صحیح نمی‌باشد.";
+                }
+                console.error("Password Reset Error:", error.code, error.message);
+                showMessage(friendlyMessage, 'error');
+            } finally {
+                setLoading(false);
+            }
+        });
+        // --- END: Event Listeners ---
+
+
+        // --- START: Helper Functions ---
+
+        /**
+         * Displays a message to the user.
+         * @param {string} message The message to display.
+         * @param {'error' | 'success'} type The type of message.
+         */
+        function showMessage(message, type) {
+            messageBox.textContent = message;
+            messageBox.className = `message-box ${type}-message`; // Set class for styling
+            messageBox.style.display = 'block';
         }
+
+        /**
+         * Toggles the loading state of the login button.
+         * @param {boolean} isLoading Whether the form is in a loading state.
+         */
+        function setLoading(isLoading) {
+            loginButton.disabled = isLoading;
+            loginButton.textContent = isLoading ? 'در حال بررسی...' : 'ورود';
+            if (!isLoading) {
+                 // Hide message box when a new action starts, unless it's a success message
+                 if (!messageBox.classList.contains('success-message')) {
+                    messageBox.style.display = 'none';
+                 }
+            }
+        }
+        // --- END: Helper Functions ---
+
     </script>
 </body>
 </html>
