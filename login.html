@@ -152,12 +152,6 @@
             background-color: rgba(79, 217, 79, 0.2);
             border: 1px solid rgba(79, 217, 79, 0.5);
         }
-        
-        .warning-message {
-            color: #ffd966;
-            background-color: rgba(255, 201, 71, 0.15);
-            border: 1px solid rgba(255, 201, 71, 0.4);
-        }
 
         /* --- START: Modal Styles for Spam Guide --- */
         .modal-overlay {
@@ -279,7 +273,6 @@
         // --- START: Firebase Configuration ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, collection, query, where, getDocs, doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
@@ -293,7 +286,6 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app); // Initialize Firestore
         // --- END: Firebase Configuration ---
 
         // --- START: Element Selection ---
@@ -310,8 +302,6 @@
         const spamGuideModal = document.getElementById('spam-guide-modal');
         const closeSpamGuideButton = document.getElementById('close-spam-guide');
         // --- END: Element Selection ---
-        
-        let countdownInterval = null; // To hold the interval for the timer
 
         // --- START: Event Listeners ---
         loginForm.addEventListener('submit', async (e) => {
@@ -351,59 +341,18 @@
             }
 
             setLoading(true);
-            
             try {
-                // 1. Check if a user with this email exists in Firestore
-                const usersRef = collection(db, "users");
-                const q = query(usersRef, where("email", "==", email));
-                const querySnapshot = await getDocs(q);
-
-                if (querySnapshot.empty) {
-                    showMessage("حسابی با این ایمیل در سیستم ثبت نشده است.", 'error');
-                    setLoading(false);
-                    return;
-                }
-
-                const userDoc = querySnapshot.docs[0];
-                const userData = userDoc.data();
-                const resetData = userData.passwordReset || { count: 0, lastRequested: null };
-                
-                // 2. Check for cooldown period
-                const now = new Date();
-                if (resetData.lastRequested) {
-                    const lastRequestedDate = resetData.lastRequested.toDate();
-                    const cooldowns = [1, 5, 15, 60, 180]; // Cooldown in minutes
-                    const cooldownMinutes = cooldowns[Math.min(resetData.count - 1, cooldowns.length - 1)] || 0;
-                    const nextAvailableTime = new Date(lastRequestedDate.getTime() + cooldownMinutes * 60 * 1000);
-
-                    if (now < nextAvailableTime) {
-                        startCountdown(nextAvailableTime);
-                        setLoading(false);
-                        return;
-                    }
-                }
-
-                // 3. Send password reset email
                 await sendPasswordResetEmail(auth, email);
-
-                // 4. Update the user's document in Firestore
-                const newResetData = {
-                    count: (resetData.count || 0) + 1,
-                    lastRequested: serverTimestamp() // Use server timestamp for accuracy
-                };
-                await updateDoc(doc(db, "users", userDoc.id), {
-                    passwordReset: newResetData
-                });
-
                 showMessage("لینک بازیابی رمز عبور به ایمیل شما ارسال شد. لطفاً صندوق ورودی (Inbox) و پوشه اسپم (Spam) را بررسی کنید.", 'success');
-                spamGuideContainer.style.display = 'block';
-
+                spamGuideContainer.style.display = 'block'; // Show the guide link
             } catch (error) {
-                console.error("Password Reset Error:", error.code, error.message);
-                let friendlyMessage = "خطایی در فرآیند بازیابی رخ داد. لطفاً مجدداً تلاش کنید.";
-                 if (error.code === 'auth/invalid-email') {
+                let friendlyMessage = "خطایی در ارسال ایمیل بازیابی رخ داد. لطفاً مجدداً تلاش کنید.";
+                if (error.code === 'auth/user-not-found') {
+                    friendlyMessage = "حسابی با این ایمیل در سیستم ثبت نشده است.";
+                } else if (error.code === 'auth/invalid-email') {
                     friendlyMessage = "فرمت ایمیل وارد شده صحیح نمی‌باشد.";
                 }
+                console.error("Password Reset Error:", error.code, error.message);
                 showMessage(friendlyMessage, 'error');
             } finally {
                 setLoading(false);
@@ -429,58 +378,20 @@
 
         // --- START: Helper Functions ---
         function showMessage(message, type) {
-            // Clear any existing countdown
-            if (countdownInterval) {
-                clearInterval(countdownInterval);
-                countdownInterval = null;
-            }
-            messageBox.innerHTML = message; // Use innerHTML to render formatted time
+            messageBox.textContent = message;
             messageBox.className = `message-box ${type}-message`;
             messageBox.style.display = 'block';
         }
 
         function setLoading(isLoading) {
             loginButton.disabled = isLoading;
-            forgotPasswordLink.style.pointerEvents = isLoading ? 'none' : 'auto'; // Disable link during loading
-            forgotPasswordLink.style.opacity = isLoading ? '0.6' : '1';
+            loginButton.textContent = isLoading ? 'در حال بررسی...' : 'ورود';
             
             // Hide previous messages when a new action starts
             if (isLoading) {
                 messageBox.style.display = 'none';
                 spamGuideContainer.style.display = 'none';
-                // Clear any running countdown when a new action starts
-                 if (countdownInterval) {
-                    clearInterval(countdownInterval);
-                    countdownInterval = null;
-                }
             }
-        }
-        
-        function startCountdown(endTime) {
-            if (countdownInterval) {
-                clearInterval(countdownInterval);
-            }
-
-            function updateTimer() {
-                const now = new Date().getTime();
-                const distance = endTime - now;
-
-                if (distance < 0) {
-                    clearInterval(countdownInterval);
-                    showMessage("اکنون می‌توانید مجدداً درخواست دهید.", 'success');
-                    return;
-                }
-
-                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-                const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                
-                showMessage(`شما به تازگی درخواست داده‌اید. لطفاً <strong>${timeString}</strong> دیگر صبر کنید.`, 'warning');
-            }
-
-            updateTimer(); // Initial call
-            countdownInterval = setInterval(updateTimer, 1000);
         }
         // --- END: Helper Functions ---
     </script>
