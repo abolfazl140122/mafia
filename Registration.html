@@ -143,16 +143,14 @@
         .auth-button:active { transform: scale(0.98); }
         .auth-button:disabled { background: #5c4a3a; border-color: #4a3c30; cursor: not-allowed; opacity: 0.7; }
         
-        /* --- کدهای جدید --- */
         .google-btn { background: #ffffff; color: #202020; border: 2px solid #c5a687; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .google-btn:hover { background: #f0f0f0; border-color: #ffc947; }
         .google-btn img { width: 24px; height: 24px; }
         
         .divider { display: flex; align-items: center; text-align: center; margin: 25px 0; color: #c5a687; }
         .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #5c4a3a; }
-        .divider:not(:empty)::before { margin-left: .25em; }
-        .divider:not(:empty)::after { margin-right: .25em; }
-        /* --- پایان کدهای جدید --- */
+        .divider:not(:empty)::before { margin-right: .25em; } /* Fix for RTL */
+        .divider:not(:empty)::after { margin-left: .25em; } /* Fix for RTL */
 
         .auth-link { margin-top: 25px; font-size: 0.9rem; color: #c5a687; }
         .auth-link a { color: #ffc947; font-weight: 700; text-decoration: none; transition: color 0.2s; }
@@ -196,14 +194,14 @@
 
             <button type="submit" id="register-button" class="auth-button">ساخت حساب</button>
         </form>
-
-        <!-- دکمه ورود با گوگل -->
+        
         <div class="divider">یا</div>
-        <button id="google-signin-button" class="auth-button google-btn">
+        
+        <!-- *** تغییر: افزودن disabled به صورت پیش‌فرض *** -->
+        <button id="google-signin-button" class="auth-button google-btn" disabled>
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google icon">
-            <span>ورود با حساب گوگل</span>
+            <span>ابتدا سن و آواتار را انتخاب کنید</span>
         </button>
-        <!-- پایان دکمه ورود با گوگل -->
 
         <p id="error-message" class="error-message"></p>
 
@@ -214,9 +212,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        // --- تغییر: افزودن متدهای جدید ---
         import { getAuth, createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        // --- تغییر: افزودن متد getDoc ---
         import { getFirestore, doc, setDoc, collection, query, where, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -243,18 +239,36 @@
         const registerButton = document.getElementById('register-button');
         const errorMessage = document.getElementById('error-message');
         const avatarContainer = document.getElementById('avatar-container');
-        // --- کد جدید ---
         const googleSignInButton = document.getElementById('google-signin-button');
+        const googleSignInButtonSpan = googleSignInButton.querySelector('span');
         let selectedAvatarUrl = null;
+
+        // *** کد جدید: فانکشن برای بررسی و فعال‌سازی دکمه گوگل ***
+        function validateAndEnableGoogleButton() {
+            const age = parseInt(ageInput.value);
+            const isAgeValid = !isNaN(age) && age >= 8 && age <= 99;
+            const isAvatarSelected = !!selectedAvatarUrl;
+
+            if (isAgeValid && isAvatarSelected) {
+                googleSignInButton.disabled = false;
+                googleSignInButtonSpan.textContent = 'ورود با حساب گوگل';
+            } else {
+                googleSignInButton.disabled = true;
+                googleSignInButtonSpan.textContent = 'ابتدا سن و آواتار را انتخاب کنید';
+            }
+        }
 
         incrementAgeBtn.addEventListener('click', () => {
             let currentValue = parseInt(ageInput.value) || 8;
             ageInput.value = Math.min(99, currentValue + 1);
+            validateAndEnableGoogleButton(); // بررسی مجدد پس از تغییر
         });
         decrementAgeBtn.addEventListener('click', () => {
             let currentValue = parseInt(ageInput.value) || 9;
             ageInput.value = Math.max(8, currentValue - 1);
+            validateAndEnableGoogleButton(); // بررسی مجدد پس از تغییر
         });
+        ageInput.addEventListener('input', validateAndEnableGoogleButton); // بررسی با هر بار تایپ
 
         async function loadFreeAvatars() {
             try {
@@ -279,6 +293,7 @@
                         }
                         imgElement.classList.add('selected');
                         selectedAvatarUrl = avatarData.imageUrl;
+                        validateAndEnableGoogleButton(); // *** تغییر: فراخوانی فانکشن ولیدیشن ***
                     });
                     avatarContainer.appendChild(imgElement);
                 });
@@ -352,32 +367,40 @@
             }
         });
 
-        // --- کد جدید برای ورود با گوگل ---
+        // *** کد اصلاح شده برای ورود با گوگل ***
         googleSignInButton.addEventListener('click', async () => {
+            // یکبار دیگر اطلاعات را برای اطمینان دریافت می‌کنیم
+            const age = parseInt(ageInput.value);
+            const avatar = selectedAvatarUrl;
+
+            // اگر به هر دلیلی اطلاعات نامعتبر بود، عملیات متوقف می‌شود
+            if (isNaN(age) || age < 8 || age > 99 || !avatar) {
+                 showError("لطفاً قبل از ورود با گوگل، سن و آواتار را به درستی انتخاب کنید.");
+                 return;
+            }
+            
             const provider = new GoogleAuthProvider();
             
             try {
                 const result = await signInWithPopup(auth, provider);
                 const user = result.user;
 
-                // بررسی اینکه آیا کاربر از قبل در دیتابیس وجود دارد یا خیر
                 const userDocRef = doc(db, 'users', user.uid);
                 const userDoc = await getDoc(userDocRef);
 
                 if (!userDoc.exists()) {
-                    // اگر کاربر جدید است، اطلاعات او را در دیتابیس ذخیره کن
+                    // اگر کاربر جدید است، اطلاعات او را به همراه سن و آواتار ذخیره کن
                     await setDoc(userDocRef, {
                         uid: user.uid,
                         displayName: user.displayName,
                         email: user.email,
                         createdAt: new Date(),
                         currentStage: 1,
-                        avatarUrl: user.photoURL, // استفاده از عکس پروفایل گوگل
-                        // فیلد سن (old) در اینجا تنظیم نمی‌شود
+                        avatarUrl: avatar, // *** استفاده از آواتار انتخابی کاربر ***
+                        old: age          // *** استفاده از سن وارد شده توسط کاربر ***
                     });
                 }
                 
-                // هدایت کاربر به صفحه اصلی
                 window.location.href = './index.html';
 
             } catch (error) {
@@ -391,7 +414,6 @@
                 showError(friendlyMessage);
             }
         });
-        // --- پایان کد جدید ---
 
         function showError(message) {
             errorMessage.textContent = message;
