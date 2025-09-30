@@ -317,6 +317,9 @@
             setLoading(true);
             try {
                 await signInWithEmailAndPassword(auth, email, password);
+                // On successful login, clear the password reset limiter
+                localStorage.removeItem('passwordResetAttempts');
+                localStorage.removeItem('passwordResetCooldownUntil');
                 window.location.href = './index.html';
             } catch (error) {
                 let friendlyMessage = "ایمیل یا رمز عبور اشتباه است.";
@@ -332,6 +335,18 @@
 
         forgotPasswordLink.addEventListener('click', async (e) => {
             e.preventDefault();
+            
+            // --- START: Rate Limiting Logic ---
+            const now = Date.now();
+            const cooldownUntil = parseInt(localStorage.getItem('passwordResetCooldownUntil') || '0', 10);
+
+            if (now < cooldownUntil) {
+                const remainingSeconds = Math.ceil((cooldownUntil - now) / 1000);
+                showMessage(`شما به تازگی درخواست داده‌اید. لطفاً ${remainingSeconds} ثانیه دیگر دوباره امتحان کنید.`, 'error');
+                return;
+            }
+            // --- END: Rate Limiting Logic ---
+            
             const email = emailInput.value.trim();
 
             if (!email) {
@@ -344,7 +359,23 @@
             try {
                 await sendPasswordResetEmail(auth, email);
                 showMessage("لینک بازیابی رمز عبور به ایمیل شما ارسال شد. لطفاً صندوق ورودی (Inbox) و پوشه اسپم (Spam) را بررسی کنید.", 'success');
-                spamGuideContainer.style.display = 'block'; // Show the guide link
+                spamGuideContainer.style.display = 'block';
+                
+                // --- START: Set Next Cooldown ---
+                let attempts = parseInt(localStorage.getItem('passwordResetAttempts') || '0', 10);
+                attempts++;
+                
+                // Cooldown periods in seconds: 1 min, 2 mins, 5 mins, 10 mins (and 10 mins for subsequent requests)
+                const cooldownPeriodsInSeconds = [60, 120, 300, 600];
+                const cooldownIndex = Math.min(attempts - 1, cooldownPeriodsInSeconds.length - 1);
+                const currentCooldown = cooldownPeriodsInSeconds[cooldownIndex] * 1000;
+                
+                const newCooldownUntil = Date.now() + currentCooldown;
+                
+                localStorage.setItem('passwordResetAttempts', attempts.toString());
+                localStorage.setItem('passwordResetCooldownUntil', newCooldownUntil.toString());
+                // --- END: Set Next Cooldown ---
+                
             } catch (error) {
                 let friendlyMessage = "خطایی در ارسال ایمیل بازیابی رخ داد. لطفاً مجدداً تلاش کنید.";
                 if (error.code === 'auth/user-not-found') {
@@ -385,6 +416,9 @@
 
         function setLoading(isLoading) {
             loginButton.disabled = isLoading;
+            // Also disable the forgot password link while processing
+            forgotPasswordLink.style.pointerEvents = isLoading ? 'none' : 'auto';
+            
             loginButton.textContent = isLoading ? 'در حال بررسی...' : 'ورود';
             
             // Hide previous messages when a new action starts
