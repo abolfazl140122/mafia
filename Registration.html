@@ -142,6 +142,18 @@
         .auth-button:hover { border-color: #ffc947; box-shadow: 0 0 15px rgba(255, 201, 71, 0.2); }
         .auth-button:active { transform: scale(0.98); }
         .auth-button:disabled { background: #5c4a3a; border-color: #4a3c30; cursor: not-allowed; opacity: 0.7; }
+        
+        /* --- کدهای جدید --- */
+        .google-btn { background: #ffffff; color: #202020; border: 2px solid #c5a687; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .google-btn:hover { background: #f0f0f0; border-color: #ffc947; }
+        .google-btn img { width: 24px; height: 24px; }
+        
+        .divider { display: flex; align-items: center; text-align: center; margin: 25px 0; color: #c5a687; }
+        .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #5c4a3a; }
+        .divider:not(:empty)::before { margin-left: .25em; }
+        .divider:not(:empty)::after { margin-right: .25em; }
+        /* --- پایان کدهای جدید --- */
+
         .auth-link { margin-top: 25px; font-size: 0.9rem; color: #c5a687; }
         .auth-link a { color: #ffc947; font-weight: 700; text-decoration: none; transition: color 0.2s; }
         .auth-link a:hover { color: #fff; }
@@ -185,6 +197,14 @@
             <button type="submit" id="register-button" class="auth-button">ساخت حساب</button>
         </form>
 
+        <!-- دکمه ورود با گوگل -->
+        <div class="divider">یا</div>
+        <button id="google-signin-button" class="auth-button google-btn">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google icon">
+            <span>ورود با حساب گوگل</span>
+        </button>
+        <!-- پایان دکمه ورود با گوگل -->
+
         <p id="error-message" class="error-message"></p>
 
         <p class="auth-link">
@@ -194,8 +214,10 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, setDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        // --- تغییر: افزودن متدهای جدید ---
+        import { getAuth, createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        // --- تغییر: افزودن متد getDoc ---
+        import { getFirestore, doc, setDoc, collection, query, where, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
@@ -221,6 +243,8 @@
         const registerButton = document.getElementById('register-button');
         const errorMessage = document.getElementById('error-message');
         const avatarContainer = document.getElementById('avatar-container');
+        // --- کد جدید ---
+        const googleSignInButton = document.getElementById('google-signin-button');
         let selectedAvatarUrl = null;
 
         incrementAgeBtn.addEventListener('click', () => {
@@ -272,7 +296,7 @@
             const displayName = displayNameInput.value.trim();
             const email = emailInput.value.trim();
             const password = passwordInput.value.trim();
-            const age = parseInt(ageInput.value); // نام متغیر داخلی همچنان age است
+            const age = parseInt(ageInput.value);
 
             if (!displayName || !email || !password || !ageInput.value) {
                 showError("لطفاً تمام فیلدها را پر کنید."); return;
@@ -308,7 +332,6 @@
                     createdAt: new Date(),
                     currentStage: 1,
                     avatarUrl: selectedAvatarUrl,
-                    // *** تغییر اصلی اینجاست: بازگرداندن فیلد به 'old' ***
                     old: age 
                 });
 
@@ -328,6 +351,47 @@
                 registerButton.textContent = 'ساخت حساب';
             }
         });
+
+        // --- کد جدید برای ورود با گوگل ---
+        googleSignInButton.addEventListener('click', async () => {
+            const provider = new GoogleAuthProvider();
+            
+            try {
+                const result = await signInWithPopup(auth, provider);
+                const user = result.user;
+
+                // بررسی اینکه آیا کاربر از قبل در دیتابیس وجود دارد یا خیر
+                const userDocRef = doc(db, 'users', user.uid);
+                const userDoc = await getDoc(userDocRef);
+
+                if (!userDoc.exists()) {
+                    // اگر کاربر جدید است، اطلاعات او را در دیتابیس ذخیره کن
+                    await setDoc(userDocRef, {
+                        uid: user.uid,
+                        displayName: user.displayName,
+                        email: user.email,
+                        createdAt: new Date(),
+                        currentStage: 1,
+                        avatarUrl: user.photoURL, // استفاده از عکس پروفایل گوگل
+                        // فیلد سن (old) در اینجا تنظیم نمی‌شود
+                    });
+                }
+                
+                // هدایت کاربر به صفحه اصلی
+                window.location.href = './index.html';
+
+            } catch (error) {
+                console.error("Google Sign-In Error:", error);
+                let friendlyMessage = "خطایی در ورود با گوگل رخ داد. لطفاً دوباره تلاش کنید.";
+                if (error.code === 'auth/popup-closed-by-user') {
+                    friendlyMessage = "پنجره ورود توسط شما بسته شد.";
+                } else if (error.code === 'auth/account-exists-with-different-credential') {
+                    friendlyMessage = "حسابی با این ایمیل اما روش ورود متفاوت (مثلاً رمز عبور) وجود دارد.";
+                }
+                showError(friendlyMessage);
+            }
+        });
+        // --- پایان کد جدید ---
 
         function showError(message) {
             errorMessage.textContent = message;
