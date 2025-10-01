@@ -127,7 +127,7 @@
             color: #ffc947;
             font-weight: 700;
             text-decoration: none;
-            transition: color 0.2s;
+            transition: color 0.2s, opacity 0.2s;
         }
         
         .auth-link a:hover { color: #fff; }
@@ -162,7 +162,7 @@
             height: 100%;
             background-color: rgba(0, 0, 0, 0.8);
             backdrop-filter: blur(5px);
-            display: none; /* Initially hidden */
+            display: none;
             align-items: center;
             justify-content: center;
             z-index: 1000;
@@ -208,7 +208,6 @@
             font-weight: 700;
         }
         
-        /* [جدید] استایل بخش تایید کاربر */
         #confirm-user-info {
             display: flex;
             flex-direction: column;
@@ -228,7 +227,6 @@
             font-weight: 700;
         }
         
-        /* [جدید] استایل دکمه‌های مودال */
         .modal-buttons {
             display: flex;
             gap: 15px;
@@ -298,7 +296,10 @@
             <button type="submit" id="login-button" class="auth-button">ورود</button>
         </form>
 
-        <p id="message-box" class="message-box"></p>
+        <div id="message-box" class="message-box">
+             <span id="message-text"></span>
+             <span id="countdown-timer" style="font-weight: bold; margin-right: 5px;"></span>
+        </div>
 
         <p class="auth-link">
             <a href="#" id="forgot-password-link">رمز عبور خود را فراموش کرده‌اید؟</a>
@@ -311,7 +312,7 @@
         </p>
     </div>
 
-    <!-- [جدید] مودال تایید حساب کاربری -->
+    <!-- مودال تایید حساب کاربری -->
     <div class="modal-overlay" id="account-confirm-modal">
         <div class="modal-content" style="text-align: center;">
             <h2 class="modal-title">تایید حساب کاربری</h2>
@@ -330,7 +331,7 @@
         </div>
     </div>
     
-    <!-- مودال راهنمای اسپم (از کد اصلی شما) -->
+    <!-- مودال راهنمای اسپم -->
     <div class="modal-overlay" id="spam-guide-modal">
         <div class="modal-content" style="text-align: right;">
             <h2 class="modal-title">راهنمای پیدا کردن ایمیل بازیابی</h2>
@@ -347,7 +348,7 @@
         // --- START: Firebase Configuration ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, collection, query, where, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
@@ -371,19 +372,25 @@
         const messageBox = document.getElementById('message-box');
         const forgotPasswordLink = document.getElementById('forgot-password-link');
         
-        // Spam Guide Modal Elements
         const spamGuideContainer = document.getElementById('spam-guide-link-container');
         const openSpamGuideLink = document.getElementById('open-spam-guide');
         const spamGuideModal = document.getElementById('spam-guide-modal');
         const closeSpamGuideButton = document.getElementById('close-spam-guide');
 
-        // [جدید] Account Confirmation Modal Elements
         const accountConfirmModal = document.getElementById('account-confirm-modal');
         const confirmAvatar = document.getElementById('confirm-avatar');
         const confirmName = document.getElementById('confirm-name');
         const confirmYesBtn = document.getElementById('confirm-yes-btn');
         const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
+        
+        const messageText = document.getElementById('message-text');
+        const countdownTimer = document.getElementById('countdown-timer');
         // --- END: Element Selection ---
+
+        // --- START: State Variables ---
+        let countdownInterval = null;
+        // --- END: State Variables ---
+        
 
         // --- START: Event Listeners ---
         loginForm.addEventListener('submit', async (e) => {
@@ -412,7 +419,6 @@
             }
         });
 
-        // [منطق بهبود یافته]
         forgotPasswordLink.addEventListener('click', async (e) => {
             e.preventDefault();
             const email = emailInput.value.trim();
@@ -433,16 +439,27 @@
                     throw new Error("auth/user-not-found");
                 }
                 
-                const userData = querySnapshot.docs[0].data();
+                const userDoc = querySnapshot.docs[0];
+                const userData = userDoc.data();
                 
+                // منطق بررسی تایمر محدودیت
+                const now = new Date();
+                const cooldownUntil = userData.passwordResetCooldownUntil?.toDate();
+                
+                if (cooldownUntil && cooldownUntil > now) {
+                    startCountdown(cooldownUntil);
+                    return; // Stop execution
+                }
+
+                // اگر تایمر محدودیت فعال نبود، مودال تایید را نشان بده
                 confirmAvatar.src = userData.avatarUrl || 'https://i.imgur.com/T2bT1tG.png';
                 confirmName.textContent = userData.displayName || 'کاربر ناشناس';
                 accountConfirmModal.classList.add('visible');
                 
-                confirmYesBtn.onclick = () => handleSendResetEmail(email);
+                confirmYesBtn.onclick = () => handleSendResetEmail(email, userDoc.id, userData.passwordResetRequestCount || 0);
 
             } catch (error) {
-                let friendlyMessage = "خطایی در بررسی ایمیل رخ داد. لطفاً مجدداً تلاش کنید.";
+                let friendlyMessage = "خطایی در بررسی ایمیل رخ داد. (توجه: ممکن است به دلیل قوانین امنیتی پایگاه داده باشد. لطفاً از تنظیم صحیح آن‌ها اطمینان حاصل کنید)";
                 if (error.message === 'auth/user-not-found') {
                     friendlyMessage = "حسابی با این ایمیل در سیستم ثبت نشده است.";
                 } else if (error.code === 'auth/invalid-email') {
@@ -455,23 +472,7 @@
             }
         });
         
-        // [جدید] تابع برای ارسال ایمیل پس از تایید
-        async function handleSendResetEmail(email) {
-            accountConfirmModal.classList.remove('visible');
-            setLoading(true);
-            try {
-                await sendPasswordResetEmail(auth, email);
-                showMessage("لینک بازیابی رمز عبور به ایمیل شما ارسال شد. لطفاً صندوق ورودی (Inbox) و پوشه اسپم (Spam) را بررسی کنید.", 'success');
-                spamGuideContainer.style.display = 'block';
-            } catch (error) {
-                console.error("Password Reset Error:", error.code, error.message);
-                showMessage("خطایی در ارسال ایمیل بازیابی رخ داد.", 'error');
-            } finally {
-                setLoading(false);
-            }
-        }
-        
-        // Event Listeners for Modals
+        // Modal Event Listeners
         openSpamGuideLink.addEventListener('click', (e) => {
             e.preventDefault();
             spamGuideModal.classList.add('visible');
@@ -495,8 +496,67 @@
         // --- END: Event Listeners ---
 
         // --- START: Helper Functions ---
-        function showMessage(message, type) {
-            messageBox.textContent = message;
+        
+        async function handleSendResetEmail(email, userId, currentRequestCount) {
+            accountConfirmModal.classList.remove('visible');
+            setLoading(true);
+
+            try {
+                // محاسبه زمان محدودیت جدید و آپدیت پایگاه داده
+                const newRequestCount = currentRequestCount + 1;
+                const cooldownSeconds = 60 * Math.pow(2, currentRequestCount); // 60s, 120s, 240s, ...
+                const newCooldownDate = new Date(Date.now() + cooldownSeconds * 1000);
+                
+                const userDocRef = doc(db, 'users', userId);
+                await updateDoc(userDocRef, {
+                    passwordResetCooldownUntil: newCooldownDate,
+                    passwordResetRequestCount: newRequestCount
+                });
+
+                // ارسال ایمیل بازیابی
+                await sendPasswordResetEmail(auth, email);
+
+                showMessage("لینک بازیابی رمز عبور به ایمیل شما ارسال شد. لطفاً صندوق ورودی (Inbox) و پوشه اسپم (Spam) را بررسی کنید.", 'success');
+                spamGuideContainer.style.display = 'block';
+
+            } catch (error) {
+                console.error("Password Reset Send/Update Error:", error);
+                showMessage("خطایی در ارسال ایمیل بازیابی یا به‌روزرسانی اطلاعات رخ داد.", 'error');
+            } finally {
+                setLoading(false);
+            }
+        }
+        
+        function startCountdown(cooldownEndDate) {
+            if (countdownInterval) clearInterval(countdownInterval);
+
+            const updateTimer = () => {
+                const now = new Date();
+                const remainingSeconds = Math.round((cooldownEndDate.getTime() - now.getTime()) / 1000);
+
+                if (remainingSeconds <= 0) {
+                    clearInterval(countdownInterval);
+                    countdownInterval = null;
+                    messageBox.style.display = 'none';
+                } else {
+                    const minutes = Math.floor(remainingSeconds / 60);
+                    const seconds = remainingSeconds % 60;
+                    const timerString = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                    showMessage(`شما به تازگی درخواست بازیابی ارسال کرده‌اید. لطفاً تا پایان زمان زیر صبر کنید: `, 'error', timerString);
+                }
+            };
+            
+            updateTimer(); 
+            countdownInterval = setInterval(updateTimer, 1000);
+        }
+
+        function showMessage(message, type, countdownString = '') {
+            if (countdownInterval && !countdownString) {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
+            }
+            messageText.textContent = message;
+            countdownTimer.textContent = countdownString;
             messageBox.className = `message-box ${type}-message`;
             messageBox.style.display = 'block';
         }
@@ -510,6 +570,10 @@
             if (isLoading) {
                 messageBox.style.display = 'none';
                 spamGuideContainer.style.display = 'none';
+                if (countdownInterval) {
+                    clearInterval(countdownInterval);
+                    countdownInterval = null;
+                }
             }
         }
         // --- END: Helper Functions ---
