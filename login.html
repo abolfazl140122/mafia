@@ -153,7 +153,7 @@
             border: 1px solid rgba(79, 217, 79, 0.5);
         }
 
-        /* --- START: Modal Styles for Spam Guide --- */
+        /* --- START: Modal Styles --- */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -162,10 +162,11 @@
             height: 100%;
             background-color: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(5px);
-            display: none; /* Initially hidden */
+            display: none;
             align-items: center;
             justify-content: center;
             z-index: 1000;
+            padding: 20px;
         }
 
         .modal-content {
@@ -173,9 +174,9 @@
             padding: 30px;
             border-radius: 16px;
             border: 2px solid #ffc947;
-            width: 90%;
+            width: 100%;
             max-width: 500px;
-            text-align: right;
+            text-align: center; /* Centered for confirm modal */
             box-shadow: 0 10px 40px rgba(0,0,0,0.6);
         }
         
@@ -191,29 +192,51 @@
             color: #e0dacc;
             line-height: 1.8;
             margin-bottom: 15px;
+            text-align: right; /* Right align for text */
         }
 
-        .modal-body strong {
-            color: #fff;
-            font-weight: 700;
-        }
-
-        .close-button {
+        .modal-body strong { color: #fff; font-weight: 700; }
+        
+        .modal-button {
             background: none;
-            border: 2px solid #ff9e9e;
-            color: #ff9e9e;
-            padding: 8px 20px;
+            border: 2px solid #888;
+            color: #ddd;
+            padding: 10px 22px;
             border-radius: 8px;
             cursor: pointer;
             font-family: 'Vazirmatn', sans-serif;
             font-weight: 700;
             font-size: 1rem;
-            margin-top: 20px;
+            margin: 10px 5px 0;
             transition: all 0.3s;
         }
-        .close-button:hover {
-            background: rgba(217, 83, 79, 0.2);
+
+        .confirm-button { border-color: #a0e0a0; color: #a0e0a0; }
+        .confirm-button:hover { background: rgba(79, 217, 79, 0.2); color: #fff; }
+        
+        .close-button { border-color: #ff9e9e; color: #ff9e9e; }
+        .close-button:hover { background: rgba(217, 83, 79, 0.2); color: #fff; }
+
+        /* Styles for User Confirmation Modal */
+        #confirm-avatar {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            border: 3px solid #ffc947;
+            object-fit: cover;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        #confirm-displayName {
+            font-size: 1.4rem;
+            font-weight: 700;
             color: #fff;
+            margin-bottom: 5px;
+        }
+        #confirm-question {
+            font-size: 1rem;
+            color: #d1c8b7;
+            margin-bottom: 25px;
         }
         /* --- END: Modal Styles --- */
 
@@ -249,6 +272,21 @@
         </p>
     </div>
 
+    <!-- START: User Confirmation Modal HTML -->
+    <div class="modal-overlay" id="confirm-user-modal">
+        <div class="modal-content">
+            <h2 class="modal-title">تأیید هویت حساب کاربری</h2>
+            <img src="https://via.placeholder.com/90" alt="Avatar" id="confirm-avatar">
+            <p id="confirm-displayName">نام کاربر</p>
+            <p id="confirm-question">آیا این حساب کاربری شماست؟</p>
+            <div>
+                <button class="modal-button confirm-button" id="confirm-send-email">بله، ارسال ایمیل بازیابی</button>
+                <button class="modal-button close-button" id="cancel-confirmation">خیر، این من نیستم</button>
+            </div>
+        </div>
+    </div>
+    <!-- END: User Confirmation Modal HTML -->
+
     <!-- START: Spam Guide Modal HTML -->
     <div class="modal-overlay" id="spam-guide-modal">
         <div class="modal-content">
@@ -264,7 +302,7 @@
                     <strong>این فرآیند کاملاً امن است.</strong> لینک ارسال شده از طرف ما فقط به شما اجازه می‌دهد رمز عبور خود را تغییر دهید و هیچ خطری ندارد. لطفاً صندوق ورودی و سپس پوشه اسپم ایمیل خود را با دقت بررسی کنید.
                 </p>
             </div>
-            <button class="close-button" id="close-spam-guide">متوجه شدم</button>
+            <button class="modal-button close-button" id="close-spam-guide">متوجه شدم</button>
         </div>
     </div>
     <!-- END: Spam Guide Modal HTML -->
@@ -273,6 +311,7 @@
         // --- START: Firebase Configuration ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
@@ -286,6 +325,7 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const db = getFirestore(app); // Initialize Firestore
         // --- END: Firebase Configuration ---
 
         // --- START: Element Selection ---
@@ -301,7 +341,16 @@
         const openSpamGuideLink = document.getElementById('open-spam-guide');
         const spamGuideModal = document.getElementById('spam-guide-modal');
         const closeSpamGuideButton = document.getElementById('close-spam-guide');
+
+        // User Confirmation Modal Elements
+        const confirmUserModal = document.getElementById('confirm-user-modal');
+        const confirmAvatar = document.getElementById('confirm-avatar');
+        const confirmDisplayName = document.getElementById('confirm-displayName');
+        const confirmSendEmailBtn = document.getElementById('confirm-send-email');
+        const cancelConfirmationBtn = document.getElementById('cancel-confirmation');
         // --- END: Element Selection ---
+        
+        let userEmailForReset = ''; // Variable to store email for confirmation step
 
         // --- START: Event Listeners ---
         loginForm.addEventListener('submit', async (e) => {
@@ -330,6 +379,7 @@
             }
         });
 
+        // MODIFIED: Forgot Password Logic
         forgotPasswordLink.addEventListener('click', async (e) => {
             e.preventDefault();
             const email = emailInput.value.trim();
@@ -339,24 +389,61 @@
                 emailInput.focus();
                 return;
             }
-
-            setLoading(true);
+            
+            setLoading(true, 'در حال جستجوی حساب...');
             try {
-                await sendPasswordResetEmail(auth, email);
-                showMessage("لینک بازیابی رمز عبور به ایمیل شما ارسال شد. لطفاً صندوق ورودی (Inbox) و پوشه اسپم (Spam) را بررسی کنید.", 'success');
-                spamGuideContainer.style.display = 'block'; // Show the guide link
+                // Query Firestore to find the user by email
+                const usersRef = collection(db, "users");
+                const q = query(usersRef, where("email", "==", email));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    // If no user is found in Firestore
+                    showMessage("حسابی با این ایمیل در سیستم ثبت نشده است.", 'error');
+                } else {
+                    // If user is found, show confirmation modal
+                    const userDoc = querySnapshot.docs[0].data();
+                    userEmailForReset = userDoc.email; // Store the email
+                    
+                    confirmAvatar.src = userDoc.avatarUrl || 'https://via.placeholder.com/90'; // Use a default if no avatar
+                    confirmDisplayName.textContent = userDoc.displayName || 'بدون نام';
+                    
+                    confirmUserModal.style.display = 'flex';
+                }
             } catch (error) {
-                let friendlyMessage = "خطایی در ارسال ایمیل بازیابی رخ داد. لطفاً مجدداً تلاش کنید.";
-                if (error.code === 'auth/user-not-found') {
-                    friendlyMessage = "حسابی با این ایمیل در سیستم ثبت نشده است.";
-                } else if (error.code === 'auth/invalid-email') {
-                    friendlyMessage = "فرمت ایمیل وارد شده صحیح نمی‌باشد.";
+                console.error("Error searching for user:", error);
+                showMessage("خطایی در ارتباط با سرور رخ داد. لطفاً مجدداً تلاش کنید.", 'error');
+            } finally {
+                setLoading(false);
+            }
+        });
+
+        // NEW: Event listener for the final confirmation to send email
+        confirmSendEmailBtn.addEventListener('click', async () => {
+            if (!userEmailForReset) return;
+
+            confirmUserModal.style.display = 'none'; // Hide modal immediately
+            setLoading(true, 'در حال ارسال ایمیل...');
+
+            try {
+                await sendPasswordResetEmail(auth, userEmailForReset);
+                showMessage("لینک بازیابی رمز عبور به ایمیل شما ارسال شد. لطفاً صندوق ورودی (Inbox) و پوشه اسپم (Spam) را بررسی کنید.", 'success');
+                spamGuideContainer.style.display = 'block'; // Show the spam guide link
+            } catch (error) {
+                let friendlyMessage = "خطایی در ارسال ایمیل بازیابی رخ داد.";
+                if (error.code === 'auth/invalid-email') {
+                    friendlyMessage = "فرمت ایمیل ذخیره شده در حساب شما صحیح نمی‌باشد.";
                 }
                 console.error("Password Reset Error:", error.code, error.message);
                 showMessage(friendlyMessage, 'error');
             } finally {
                 setLoading(false);
+                userEmailForReset = ''; // Clear the stored email
             }
+        });
+
+        cancelConfirmationBtn.addEventListener('click', () => {
+            confirmUserModal.style.display = 'none';
         });
         
         // Modal Event Listeners
@@ -369,10 +456,13 @@
             spamGuideModal.style.display = 'none';
         });
 
-        spamGuideModal.addEventListener('click', (e) => {
-            if (e.target === spamGuideModal) { // Close if clicked on overlay
-                spamGuideModal.style.display = 'none';
-            }
+        // Close modals if clicked on overlay
+        [spamGuideModal, confirmUserModal].forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
         });
         // --- END: Event Listeners ---
 
@@ -383,11 +473,10 @@
             messageBox.style.display = 'block';
         }
 
-        function setLoading(isLoading) {
+        function setLoading(isLoading, text = 'در حال بررسی...') {
             loginButton.disabled = isLoading;
-            loginButton.textContent = isLoading ? 'در حال بررسی...' : 'ورود';
+            loginButton.textContent = isLoading ? text : 'ورود';
             
-            // Hide previous messages when a new action starts
             if (isLoading) {
                 messageBox.style.display = 'none';
                 spamGuideContainer.style.display = 'none';
