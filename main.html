@@ -168,21 +168,18 @@
         .top-right-container { width: 100%; display: flex; justify-content: flex-end; align-items: flex-start; }
         .profile-and-menu-wrapper { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
         
-        /* --- START: کانتینر جدید برای پنل‌های بالا --- */
         .top-panel-container {
             display: flex;
             gap: 10px;
             align-items: center;
         }
-        /* --- END: کانتینر جدید برای پنل‌های بالا --- */
-
+        
         .profile-section { display: flex; align-items: center; background-color: rgba(0, 0, 0, 0.5); padding: 10px 15px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 3px 8px rgba(0,0,0,0.3); }
         .avatar-container { display: flex; align-items: center; gap: 12px; }
         #user-avatar { width: 50px; height: 50px; border-radius: 50%; border: 2px solid #c5a687; object-fit: cover; cursor: pointer; transition: all 0.2s ease-in-out; }
         #user-avatar:hover { transform: scale(1.1); border-color: #ffc947; box-shadow: 0 0 10px rgba(255, 201, 71, 0.5); }
         #user-display-name { font-size: 1rem; font-weight: 700; text-shadow: 1px 1px 3px #000; }
         
-        /* --- START: استایل‌های جدید برای پنل الماس --- */
         .gems-section {
             display: flex;
             align-items: center;
@@ -193,7 +190,7 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
             box-shadow: 0 3px 8px rgba(0,0,0,0.3);
             transition: all 0.3s ease;
-            flex-shrink: 0; /* جلوگیری از فشرده شدن پنل */
+            flex-shrink: 0;
         }
         .gems-section:hover {
             border-color: #ffc947;
@@ -205,20 +202,18 @@
             filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
         }
         #user-gems-count {
-            font-size: 1.2rem; /* اندازه فونت پایه */
+            font-size: 1.2rem; 
             font-weight: 900;
             color: #ffc947;
             text-shadow: 0 1px 4px rgba(0,0,0,0.6);
-            white-space: nowrap; /* جلوگیری از شکستن عدد به خط بعدی */
+            white-space: nowrap;
         }
-        /* --- END: استایل‌های جدید برای پنل الماس --- */
 
         .menu-buttons { display: flex; flex-direction: column; gap: 10px; align-items: flex-end; }
         .menu-button { background: linear-gradient(145deg, rgba(80, 50, 48, 0.8), rgba(56, 33, 32, 0.9)); color: #e0dacc; border: 1px solid #c5a687; padding: 8px 15px; border-radius: 8px; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; text-align: center; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); box-shadow: 0 2px 5px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05); }
         .menu-button:hover { background: linear-gradient(145deg, rgba(100, 65, 63, 0.9), rgba(74, 44, 42, 1)); border-color: #ffc947; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1); }
         .menu-button:active { transform: translateY(0) scale(0.98); box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
         
-        /* --- START: استایل‌های بخش دکمه‌های اصلی --- */
         .start-game-container { width: 100%; display: flex; justify-content: center; padding-bottom: 20px; }
         .main-action-buttons { display: flex; justify-content: center; align-items: center; gap: 20px; width: 100%; }
         
@@ -249,7 +244,6 @@
             transform: translateY(0) scale(0.98);
             box-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
-        /* --- END: استایل‌های بخش دکمه‌های اصلی --- */
         
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); }
         .modal-overlay.visible { opacity: 1; visibility: visible; }
@@ -269,15 +263,12 @@
         .confirm-buttons-container { display: flex; gap: 15px; margin-top: 25px; }
 
 
-        /* --- استایل‌های پنل منوی آواتار --- */
         #avatar-menu-content { display: flex; flex-direction: column; gap: 15px; padding: 30px; }
         
-        /* --- استایل‌های پنل انتخاب نوع بازی --- */
         #game-mode-modal-content { display: flex; flex-direction: column; }
         .game-mode-buttons { display: flex; flex-direction: column; gap: 15px; width: 100%; }
         .game-mode-button { padding: 15px; font-size: 1.1rem; }
 
-        /* --- استایل‌های پنل پروفایل --- */
         #profile-modal-content { background: radial-gradient(circle, #3a2e22 0%, #1a140e 100%); border: 4px solid transparent; border-image: linear-gradient(145deg, #ffc947, #a47d54) 1; max-width: 400px; padding: 0; overflow: hidden; box-shadow: 0 15px 40px rgba(0,0,0,0.7), inset 0 0 15px rgba(0,0,0,0.5); }
         .profile-header { background-color: #1a140e; background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.02) 10px, rgba(255,255,255,0.02) 20px); padding: 30px 25px; text-align: center; position: relative; border-bottom: 2px solid; border-image: linear-gradient(to right, transparent, #ffc947, transparent) 1; overflow: hidden; }
         .profile-header::before, .profile-header::after { content: ''; position: absolute; width: 150px; height: 2px; background: linear-gradient(to right, rgba(255, 201, 71, 0), rgba(255, 201, 71, 0.8), rgba(255, 201, 71, 0)); }
@@ -314,7 +305,6 @@
             }
         }
         
-        /* --- سایر پنل‌ها (کد بدون تغییر باقی می‌ماند) --- */
         #admin-panel-content .modal-button { margin-top: 10px; }
         .search-bar-container { width: 100%; margin-bottom: 20px; }
         #user-search-input, #ranking-search-input { width: 100%; padding: 12px 15px; background-color: rgba(0,0,0,0.3); border: 1px solid #5c4a3a; border-radius: 8px; color: #f0e6d2; font-family: 'Vazirmatn', sans-serif; font-size: 1rem; transition: all 0.3s ease; }
@@ -371,9 +361,28 @@
         input:disabled + .slider { opacity: 0.5; cursor: not-allowed; }
         #game-modes-panel-content .buttons-group { display: flex; gap: 10px; }
 
-        #ranking-modal-content { max-width: 520px; padding: 0; }
-        .ranking-header { padding: 25px 30px; position: relative; border-bottom: 1px solid #5c4a3a;}
-        #ranking-list-container { width: 100%; max-height: 60vh; overflow-y: auto; padding: 10px; }
+        /* START: اصلاح استایل پنل رده بندی */
+        #ranking-modal-content {
+            max-width: 520px;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            max-height: 85vh; /* محدودیت ارتفاع برای کل مودال */
+        }
+        .ranking-header {
+            padding: 25px 30px;
+            position: relative;
+            border-bottom: 1px solid #5c4a3a;
+            flex-shrink: 0; /* جلوگیری از کوچک شدن هدر */
+        }
+        #ranking-list-container {
+            width: 100%;
+            overflow-y: auto; /* اسکرول فقط برای این بخش */
+            padding: 10px;
+            flex-grow: 1; /* این بخش فضای باقی‌مانده را پر می‌کند */
+        }
+        /* END: اصلاح استایل پنل رده بندی */
+        
         .ranking-list-item { display: flex; align-items: center; padding: 10px 15px; margin-bottom: 5px; border-radius: 8px; background-color: rgba(255, 255, 255, 0.03); border: 1px solid #5c4a3a; transition: all 0.2s ease; }
         .ranking-list-item.current-user-rank { background-color: rgba(255, 201, 71, 0.15); border-color: #ffc947; box-shadow: 0 0 10px rgba(255, 201, 71, 0.2); }
         .rank-number { font-size: 1.3rem; font-weight: 900; color: #ffc947; width: 40px; text-align: center; margin-left: 15px; flex-shrink: 0; }
@@ -408,7 +417,7 @@
         #settings-content .form-group { margin-bottom: 20px; }
         .range-slider-container { display: flex; flex-direction: column; gap: 10px; align-items: center; }
         .range-slider-label { display: flex; justify-content: space-between; width: 100%; font-size: 1rem; font-weight: 700; color: #c5a687; }
-        #animation-intensity-value { color: #ffc947; }
+        #animation-intensity-value, #music-volume-value { color: #ffc947; }
         input[type="range"] { -webkit-appearance: none; width: 100%; height: 8px; background: rgba(0,0,0,0.4); border-radius: 5px; border: 1px solid #5c4a3a; outline: none; transition: opacity .2s; cursor: pointer; }
         input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 22px; height: 22px; background: #c5a687; border-radius: 50%; border: 3px solid #1e170f; box-shadow: 0 0 5px rgba(0,0,0,0.5); transition: background 0.2s, transform 0.2s; }
         input[type="range"]::-webkit-slider-thumb:hover { background: #ffc947; transform: scale(1.1); }
@@ -417,6 +426,20 @@
         input[type="range"]::-moz-range-thumb:hover { background: #ffc947; transform: scale(1.1); }
         
         #settings-content .toggle-switch-container { padding: 0; background-color: transparent; border: none; }
+        /* START: استایل دکمه جدید در تنظیمات */
+        #reset-tutorial-btn {
+            background: transparent;
+            border: 1px solid #c5a687;
+            color: #c5a687;
+            margin-top: 15px;
+        }
+        #reset-tutorial-btn:hover {
+            background: rgba(197, 166, 135, 0.1);
+            border-color: #ffc947;
+            color: #ffc947;
+        }
+        /* END: استایل دکمه جدید در تنظیمات */
+        
         #tutorial-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2000; opacity: 0; visibility: hidden; transition: all 0.5s ease-in-out; pointer-events: none; }
         #tutorial-overlay.visible { opacity: 1; visibility: visible; pointer-events: all; }
         #tutorial-highlight-box { position: absolute; border-radius: 12px; box-shadow: 0 0 0 200vmax rgba(0, 0, 0, 0.8); border: 2px solid #ffc947; pointer-events: none; transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
@@ -469,14 +492,11 @@
     <div class="main-content">
         <div class="top-right-container">
             <div class="profile-and-menu-wrapper">
-                <!-- START: کانتینر جدید برای قرار دادن پنل پروفایل و الماس در کنار هم -->
                 <div class="top-panel-container">
-                    <!-- START: پنل نمایش الماس -->
                     <div class="gems-section">
                         <span class="gems-icon">💎</span>
                         <span id="user-gems-count">0</span>
                     </div>
-                    <!-- END: پنل نمایش الماس -->
                     <div class="profile-section">
                         <div class="avatar-container">
                             <img id="user-avatar" src="" alt="آواتار کاربر">
@@ -484,7 +504,6 @@
                         </div>
                     </div>
                 </div>
-                <!-- END: کانتینر جدید -->
                 <div class="menu-buttons">
                     <button class="menu-button">سازندگان</button>
                     <button id="ranking-button" class="menu-button">رده بندی</button>
@@ -493,18 +512,16 @@
             </div>
         </div>
         <div class="start-game-container">
-            <!-- START: کانتینر جدید برای دکمه‌های اصلی -->
             <div class="main-action-buttons">
                 <button id="shop-button" class="secondary-action-button">فروشگاه</button>
                 <button id="start-game-button">شروع بازی</button>
                 <button id="clan-button" class="secondary-action-button">کلن</button>
             </div>
-            <!-- END: کانتینر جدید برای دکمه‌های اصلی -->
         </div>
     </div>
     <audio id="background-music" loop></audio>
     
-    <!-- تمامی مودال‌ها و پنل‌های دیگر بدون تغییر در اینجا قرار می‌گیرند -->
+    <!-- Modals -->
     <div id="custom-alert-overlay" class="modal-overlay"> <div class="modal-content"> <h2 class="modal-title">توجه!</h2> <p id="custom-alert-message" class="modal-message"></p> <button id="custom-alert-confirm-btn" class="modal-button">تایید</button> </div> </div>
     <div id="custom-confirm-overlay" class="modal-overlay"> <div class="modal-content"> <h2 class="modal-title">تایید عملیات</h2> <p id="custom-confirm-message" class="modal-message"></p> <div class="confirm-buttons-container"> <button id="custom-confirm-cancel-btn" class="modal-button cancel-button" style="width: 50%;">انصراف</button> <button id="custom-confirm-ok-btn" class="modal-button" style="width: 50%;">تایید</button> </div> </div> </div>
     <div id="avatar-menu-overlay" class="modal-overlay"> <div id="avatar-menu-content" class="modal-content"> <button id="avatar-menu-profile-btn" class="modal-button">پروفایل</button> <button id="avatar-menu-shop-btn" class="modal-button">فروشگاه</button> <button id="change-name-btn" class="modal-button">تغییر نام</button> <button id="settings-btn" class="modal-button">تنظیمات</button> </div> </div>
@@ -518,7 +535,7 @@
     <div id="ranking-modal-overlay" class="modal-overlay"> <div id="ranking-modal-content" class="modal-content"> <div class="ranking-header"> <h2 class="modal-title">رده بندی بازیکنان</h2> <span id="ranking-modal-close-btn" class="modal-close-btn">&times;</span> </div> <div class="search-bar-container admin-only-ranking-feature"> <input type="text" id="ranking-search-input" placeholder="جستجوی بازیکن در رده‌بندی..."> </div> <div id="ranking-list-container"></div> <div class="banned-users-section admin-only-ranking-feature"> <h3 class="banned-users-title">کاربران حذف شده از رده‌بندی</h3> <div id="banned-ranking-list-container"></div> </div> </div> </div>
     <div id="edit-rank-modal-overlay" class="modal-overlay"> <div id="edit-rank-modal-content" class="modal-content"> <div id="edit-rank-header"> <img id="edit-rank-avatar-preview" src="" alt="آواتار کاربر"> <h3 id="edit-rank-name-preview"></h3> </div> <h2 class="modal-title">ویرایش امتیاز</h2> <form id="edit-rank-form"> <input type="hidden" id="edit-rank-uid"> <div class="form-group"> <label for="edit-rank-diamonds" class="form-label">تعداد جدید الماس (امتیاز):</label> <input type="number" id="edit-rank-diamonds" class="form-input" required min="0"> </div> <button type="submit" id="save-rank-changes-btn" class="modal-button">ذخیره تغییرات</button> <button type="button" id="edit-rank-cancel-btn" class="modal-button cancel-button">انصراف</button> </form> </div> </div>
     <div id="change-name-overlay" class="modal-overlay"> <div id="change-name-content" class="modal-content"> <h2 class="modal-title">تغییر نام نمایشی</h2> <form id="change-name-form" style="width: 100%;" novalidate> <div class="form-group"> <label for="new-display-name-input" class="form-label" style="margin-bottom: 8px;">نام جدید:</label> <input type="text" id="new-display-name-input" class="form-input" required minlength="3" maxlength="15" placeholder="نام جدید را وارد کنید..."> </div> <div id="name-check-result" class="name-check-result-container"></div> <div class="confirm-buttons-container" style="margin-top: 20px;"> <button type="button" id="cancel-new-name-btn" class="modal-button cancel-button" style="width: 50%;">انصراف</button> <button type="submit" id="save-new-name-btn" class="modal-button" style="width: 50%;">ذخیره تغییرات</button> </div> </form> </div> </div>
-    <div id="settings-overlay" class="modal-overlay"> <div id="settings-content" class="modal-content"> <h2 class="modal-title">تنظیمات</h2> <div class="form-group"> <div class="range-slider-container"> <div class="range-slider-label"> <span>انیمیشن پس‌زمینه</span> <span id="animation-intensity-value">50%</span> </div> <input type="range" min="0" max="100" value="50" class="range-slider" id="animation-intensity-slider"> </div> </div> <div class="form-group"> <div class="toggle-switch-container"> <span class="toggle-label">جلوه بصری</span> <label class="toggle-switch"> <input type="checkbox" id="visual-effect-toggle"> <span class="slider"></span> </label> </div> </div> <div class="confirm-buttons-container" style="margin-top: 20px;"> <button type="button" id="cancel-settings-btn" class="modal-button cancel-button" style="width: 50%;">انصراف</button> <button type="button" id="save-settings-btn" class="modal-button" style="width: 50%;">ذخیره</button> </div> </div> </div>
+    <div id="settings-overlay" class="modal-overlay"> <div id="settings-content" class="modal-content"> <h2 class="modal-title">تنظیمات</h2> <div class="form-group"> <div class="range-slider-container"> <div class="range-slider-label"> <span>انیمیشن پس‌زمینه</span> <span id="animation-intensity-value">50%</span> </div> <input type="range" min="0" max="100" value="50" class="range-slider" id="animation-intensity-slider"> </div> </div> <div class="form-group"> <div class="range-slider-container"> <div class="range-slider-label"> <span>صدای موسیقی</span> <span id="music-volume-value">40%</span> </div> <input type="range" min="0" max="100" value="40" class="range-slider" id="music-volume-slider"> </div> </div> <div class="form-group"> <div class="toggle-switch-container"> <span class="toggle-label">جلوه بصری</span> <label class="toggle-switch"> <input type="checkbox" id="visual-effect-toggle"> <span class="slider"></span> </label> </div> </div> <div class="form-group"> <div class="toggle-switch-container"> <span class="toggle-label">افکت‌های صوتی</span> <label class="toggle-switch"> <input type="checkbox" id="sfx-toggle"> <span class="slider"></span> </label> </div> </div> <button id="reset-tutorial-btn" class="modal-button">مشاهده مجدد آموزش</button> <div class="confirm-buttons-container" style="margin-top: 20px;"> <button type="button" id="cancel-settings-btn" class="modal-button cancel-button" style="width: 50%;">انصراف</button> <button type="button" id="save-settings-btn" class="modal-button" style="width: 50%;">ذخیره</button> </div> </div> </div>
     <div id="tutorial-overlay"> <div id="tutorial-highlight-box"></div> <div id="tutorial-panel"> <h3 id="tutorial-title"></h3> <p id="tutorial-text" class="typing-text"></p> <div id="tutorial-button-container"> <button id="tutorial-next-btn"></button> </div> </div> </div>
     <div id="dialogue-guide-overlay" class="modal-overlay"> <div id="dialogue-guide-wrapper"> <div id="dialogue-guide-character-container"> <img id="dialogue-guide-character-img" src="" alt="راهنما"> </div> <div id="dialogue-guide-box"> <p id="dialogue-guide-text" class="typing-text"></p> <button id="dialogue-guide-button">ادامه</button> </div> </div> </div>
 
@@ -547,10 +564,8 @@
         const userAvatar = document.getElementById('user-avatar');
         const userGemsCount = document.getElementById('user-gems-count');
         const startGameButton = document.getElementById('start-game-button');
-        // START: المان‌های دکمه‌های جدید
         const shopButton = document.getElementById('shop-button');
         const clanButton = document.getElementById('clan-button');
-        // END: المان‌های دکمه‌های جدید
         const menuButtons = document.querySelectorAll('.menu-button');
         const loadingOverlay = document.getElementById('loading-overlay');
         const loaderSpinner = loadingOverlay.querySelector('.loader');
@@ -656,6 +671,12 @@
         const banDurationInput = document.getElementById('ban-duration');
         const banUnitSelect = document.getElementById('ban-unit');
         const banCancelBtn = document.getElementById('ban-cancel-btn');
+        // START: المان‌های جدید پنل تنظیمات
+        const musicVolumeSlider = document.getElementById('music-volume-slider');
+        const musicVolumeValue = document.getElementById('music-volume-value');
+        const sfxToggle = document.getElementById('sfx-toggle');
+        const resetTutorialBtn = document.getElementById('reset-tutorial-btn');
+        // END: المان‌های جدید پنل تنظیمات
 
         // متغیرها
         const MUSIC_URL = "https://raw.githubusercontent.com/abolfazl140122/mafia/main/dark-music-249503.mp3";
@@ -674,25 +695,20 @@
         let currentActiveDialogueId = null; 
         let currentlyEditingUser = null; 
 
-        // --- START: تابع جدید برای تنظیم اندازه فونت الماس ---
         function adjustGemFontSize(element) {
             const container = element.parentElement;
-            // فضای اشغال شده توسط آیکون و فاصله‌ها
             const reservedSpace = container.querySelector('.gems-icon').offsetWidth + 20; 
             const maxTextWidth = container.clientWidth - reservedSpace;
             
-            // بازنشانی فونت به حالت اولیه برای محاسبه مجدد
             element.style.fontSize = '1.2rem';
             let currentFontSize = 1.2;
             const minFontSize = 0.6; 
 
-            // کوچک کردن فونت تا زمانی که متن در کانتینر جا شود
             while (element.scrollWidth > maxTextWidth && currentFontSize > minFontSize) {
                 currentFontSize -= 0.05;
                 element.style.fontSize = `${currentFontSize}rem`;
             }
         }
-        // --- END: تابع جدید برای تنظیم اندازه فونت الماس ---
 
         // --- توابع عمومی ---
         function showModal(modalElement) { modalElement.classList.add('visible'); }
@@ -706,10 +722,10 @@
         function populateProfileModal() { if (!currentUserData) return; profileModalAvatar.src = currentUserData.avatarUrl || DEFAULT_AVATAR; profileModalName.textContent = currentUserData.displayName || "کاربر ناشناس"; if (currentUserData.isAdmin === true) { profileStatLevel.textContent = "ادمین"; profileStatLevel.classList.add('stat-value-admin'); } else { profileStatLevel.textContent = "کاربر"; profileStatLevel.classList.remove('stat-value-admin'); }
             profileStatAge.textContent = currentUserData.old || "نامشخص"; profileStatAvatars.textContent = (currentUserData.ownedAvatars?.length || 0) + " عدد"; profileStatDiamonds.textContent = currentUserData.game || 0; profileStatEmail.textContent = currentUserData.email || "ثبت نشده"; if (currentUserData.createdAt && typeof currentUserData.createdAt.toDate === 'function') { const date = currentUserData.createdAt.toDate(); profileStatDate.textContent = new Intl.DateTimeFormat('fa-IR', { year: 'numeric', month: 'long', day: 'numeric' }).format(date); } else { profileStatDate.textContent = "نامشخص"; } }
         const playMusicAfterUserInteraction = () => { if (!isMusicPlaying && backgroundMusic.src && backgroundMusic.paused) { backgroundMusic.play().then(() => { isMusicPlaying = true; document.body.removeEventListener('click', playMusicAfterUserInteraction, true); document.body.removeEventListener('keydown', playMusicAfterUserInteraction, true); }).catch(e => console.error("خطا در پخش موسیقی.", e)); } else { document.body.removeEventListener('click', playMusicAfterUserInteraction, true); document.body.removeEventListener('keydown', playMusicAfterUserInteraction, true); } };
-        function playMusicFromBlob(blob) { const objectUrl = URL.createObjectURL(blob); backgroundMusic.src = objectUrl; backgroundMusic.volume = 0.4; const playPromise = backgroundMusic.play(); if (playPromise !== undefined) { playPromise.then(() => { isMusicPlaying = true; }).catch(error => { console.warn("پخش خودکار موسیقی مسدود شد.", error); isMusicPlaying = false; document.body.addEventListener('click', playMusicAfterUserInteraction, true); document.body.addEventListener('keydown', playMusicAfterUserInteraction, true); }); } }
+        function playMusicFromBlob(blob) { const objectUrl = URL.createObjectURL(blob); backgroundMusic.src = objectUrl; const savedVolume = localStorage.getItem('mafia-music-volume'); backgroundMusic.volume = savedVolume !== null ? savedVolume / 100 : 0.4; const playPromise = backgroundMusic.play(); if (playPromise !== undefined) { playPromise.then(() => { isMusicPlaying = true; }).catch(error => { console.warn("پخش خودکار موسیقی مسدود شد.", error); isMusicPlaying = false; document.body.addEventListener('click', playMusicAfterUserInteraction, true); document.body.addEventListener('keydown', playMusicAfterUserInteraction, true); }); } }
         function downloadAndCacheMusic() { return new Promise((resolve, reject) => { musicDownloadOverlay.classList.add('visible'); const xhr = new XMLHttpRequest(); xhr.open('GET', MUSIC_URL, true); xhr.responseType = 'blob'; xhr.onprogress = (event) => { if (event.lengthComputable) { const percentComplete = Math.round((event.loaded / event.total) * 100); progressBar.style.width = percentComplete + '%'; progressText.textContent = `در حال دانلود... ${percentComplete}%`; } }; xhr.onload = async () => { if (xhr.status === 200) { const musicBlob = xhr.response; try { const cache = await caches.open(MUSIC_CACHE_NAME); await cache.put(MUSIC_URL, new Response(musicBlob)); localStorage.setItem(MUSIC_VERSION_KEY, MUSIC_URL); musicDownloadOverlay.classList.remove('visible'); resolve(musicBlob); } catch (cacheError) { reject(cacheError); } } else { reject(new Error(`خطای شبکه: ${xhr.statusText}`)); } }; xhr.onerror = () => { musicDownloadOverlay.classList.remove('visible'); showCustomAlert("دانلود موسیقی پس‌زمینه با خطا مواجه شد.", () => {}); reject(new Error('خطای شبکه در دانلود موسیقی.')); }; xhr.send(); }); }
         async function handleBackgroundMusic() { const cachedVersion = localStorage.getItem(MUSIC_VERSION_KEY); if (cachedVersion === MUSIC_URL) { try { const cache = await caches.open(MUSIC_CACHE_NAME); const cachedResponse = await cache.match(MUSIC_URL); if (cachedResponse) { playMusicFromBlob(await cachedResponse.blob()); } else { playMusicFromBlob(await downloadAndCacheMusic()); } } catch (error) { playMusicFromBlob(await downloadAndCacheMusic()); } } else { try { playMusicFromBlob(await downloadAndCacheMusic()); } catch (error) { console.error('فرایند دانلود و پخش موسیقی با خطا مواجه شد:', error); } } }
-        const ANIMATION_INTENSITY_KEY = 'mafia-animation-intensity'; const VISUAL_EFFECT_KEY = 'mafia-visual-effect-enabled'; const DEFAULT_ANIMATION_INTENSITY = 50; let particlesArray = []; let animationFrameId = null;
+        const ANIMATION_INTENSITY_KEY = 'mafia-animation-intensity'; const VISUAL_EFFECT_KEY = 'mafia-visual-effect-enabled'; const MUSIC_VOLUME_KEY = 'mafia-music-volume'; const SFX_ENABLED_KEY = 'mafia-sfx-enabled'; const DEFAULT_ANIMATION_INTENSITY = 50; const DEFAULT_MUSIC_VOLUME = 40; let particlesArray = []; let animationFrameId = null;
         function applyAnimationSettings(intensity) { if (intensity == 0) { backgroundContainer.style.animation = 'none'; } else { const minDuration = 15; const maxDuration = 40; const duration = maxDuration - (intensity / 100) * (maxDuration - minDuration); backgroundContainer.style.animation = `kenBurnsEffect ${duration}s ease-in-out infinite alternate`; } }
         class Particle { constructor() { this.x = Math.random() * particleCanvas.width; this.y = Math.random() * particleCanvas.height; this.size = Math.random() * 2.5 + 1; this.speedX = (Math.random() * 1 - 0.5) * 0.5; this.speedY = (Math.random() * 1 - 0.5) * 0.5; this.color = `rgba(255, 201, 71, ${Math.random() * 0.5 + 0.3})`; }
             update() { if (this.x > particleCanvas.width || this.x < 0) this.speedX = -this.speedX; if (this.y > particleCanvas.height || this.y < 0) this.speedY = -this.speedY; this.x += this.speedX; this.y += this.speedY; }
@@ -722,7 +738,8 @@
         function stopParticleEffect() { particleCanvas.classList.remove('visible'); if (animationFrameId) { cancelAnimationFrame(animationFrameId); animationFrameId = null; }
             setTimeout(() => { if (!animationFrameId) { ctx.clearRect(0, 0, particleCanvas.width, particleCanvas.height); } }, 800); }
         window.addEventListener('resize', () => { if(animationFrameId) { resizeCanvas(); initParticles(); } });
-        function loadAndApplySettings() { const savedIntensity = localStorage.getItem(ANIMATION_INTENSITY_KEY); const intensity = savedIntensity !== null ? parseInt(savedIntensity, 10) : DEFAULT_ANIMATION_INTENSITY; animationIntensitySlider.value = intensity; animationIntensityValue.textContent = `${intensity}%`; applyAnimationSettings(intensity); const isEffectEnabled = localStorage.getItem(VISUAL_EFFECT_KEY) === 'true'; visualEffectToggle.checked = isEffectEnabled; if (isEffectEnabled) { startParticleEffect(); } else { stopParticleEffect(); } }
+        function loadAndApplySettings() { const savedIntensity = localStorage.getItem(ANIMATION_INTENSITY_KEY); const intensity = savedIntensity !== null ? parseInt(savedIntensity, 10) : DEFAULT_ANIMATION_INTENSITY; animationIntensitySlider.value = intensity; animationIntensityValue.textContent = `${intensity}%`; applyAnimationSettings(intensity); const isEffectEnabled = localStorage.getItem(VISUAL_EFFECT_KEY) === 'true'; visualEffectToggle.checked = isEffectEnabled; if (isEffectEnabled) { startParticleEffect(); } else { stopParticleEffect(); }
+            const savedVolume = localStorage.getItem(MUSIC_VOLUME_KEY); const volume = savedVolume !== null ? parseInt(savedVolume, 10) : DEFAULT_MUSIC_VOLUME; musicVolumeSlider.value = volume; musicVolumeValue.textContent = `${volume}%`; backgroundMusic.volume = volume / 100; const isSfxEnabled = localStorage.getItem(SFX_ENABLED_KEY) === 'true'; sfxToggle.checked = isSfxEnabled; }
         function typeWriterEffect(element, text, callback) { let i = 0; element.innerHTML = ''; element.classList.remove('typing-done'); const typingInterval = setInterval(() => { if (i < text.length) { element.innerHTML += text.charAt(i); i++; } else { clearInterval(typingInterval); element.classList.add('typing-done'); if (callback) callback(); } }, 40); }
         function initializeDialogueListener() { if (dialogueListenerUnsubscribe) dialogueListenerUnsubscribe(); const dialogueDocRef = doc(db, 'settings', 'activeDialogue'); dialogueListenerUnsubscribe = onSnapshot(dialogueDocRef, (docSnap) => { if (!auth.currentUser || !currentUserData) return; if (docSnap.exists()) { const serverDialogue = docSnap.data(); const userLastSeenId = currentUserData.lastSeenDialogueId || null; if (serverDialogue.isActive && serverDialogue.id !== userLastSeenId) { showActiveDialogue(serverDialogue); } else { hideModal(dialogueGuideOverlay); } } else { hideModal(dialogueGuideOverlay); } }, (error) => { console.error("خطا در شنونده دیالوگ:", error); }); }
         function showActiveDialogue(dialogueData) { hideAllAdminModals(); hideModal(avatarMenuOverlay); hideModal(profileModalOverlay); hideModal(gameModeModalOverlay); currentActiveDialogueId = dialogueData.id; dialogueGuideButton.classList.remove('visible'); dialogueGuideCharacterImg.src = dialogueData.imageUrl || ''; dialogueGuideButton.textContent = dialogueData.buttonText || 'ادامه'; typeWriterEffect(dialogueGuideText, dialogueData.text, () => { dialogueGuideButton.classList.add('visible'); }); showModal(dialogueGuideOverlay); }
@@ -793,8 +810,8 @@
                     }
                     if (isInitialLoad) {
                         document.body.classList.add('loaded');
-                        handleBackgroundMusic();
                         loadAndApplySettings();
+                        handleBackgroundMusic();
                         isInitialLoad = false;
                         
                         initializeDialogueListener(); 
@@ -817,16 +834,8 @@
         profileModalCloseBtn.addEventListener('click', () => hideModal(profileModalOverlay));
         profileModalOverlay.addEventListener('click', (e) => { if (e.target === profileModalOverlay) hideModal(profileModalOverlay); });
         startGameButton.addEventListener('click', () => checkMaintenanceAndProceed(() => showModal(gameModeModalOverlay)));
-        
-        // START: رویدادهای کلیک برای دکمه‌های جدید
-        shopButton.addEventListener('click', () => checkMaintenanceAndProceed(() => {
-            window.location.href = './Avatar shop.html';
-        }));
-        clanButton.addEventListener('click', () => checkMaintenanceAndProceed(() => {
-            window.location.href = './clan_list.html';
-        }));
-        // END: رویدادهای کلیک برای دکمه‌های جدید
-        
+        shopButton.addEventListener('click', () => checkMaintenanceAndProceed(() => { window.location.href = './Avatar shop.html'; }));
+        clanButton.addEventListener('click', () => checkMaintenanceAndProceed(() => { window.location.href = './clan_list.html'; }));
         gameModeModalOverlay.addEventListener('click', (e) => { if(e.target === gameModeModalOverlay) hideModal(gameModeModalOverlay); });
         friendlyGameBtn.addEventListener('click', () => checkMaintenanceAndProceed(() => { window.location.href = './Lobby page.html'; }));
         rankedGameBtn.addEventListener('click', () => checkMaintenanceAndProceed(() => { window.location.href = './users search.html'; }));
@@ -863,20 +872,28 @@
         settingsOverlay.addEventListener('click', (e) => { if (e.target === settingsOverlay) hideModal(settingsOverlay); });
         cancelSettingsBtn.addEventListener('click', () => { hideModal(settingsOverlay); loadAndApplySettings(); });
         saveSettingsBtn.addEventListener('click', () => {
-            const newIntensity = animationIntensitySlider.value;
-            localStorage.setItem(ANIMATION_INTENSITY_KEY, newIntensity);
-            applyAnimationSettings(newIntensity);
-            const effectEnabled = visualEffectToggle.checked;
-            localStorage.setItem(VISUAL_EFFECT_KEY, effectEnabled);
-            if(effectEnabled) startParticleEffect(); else stopParticleEffect();
+            localStorage.setItem(ANIMATION_INTENSITY_KEY, animationIntensitySlider.value);
+            localStorage.setItem(VISUAL_EFFECT_KEY, visualEffectToggle.checked);
+            localStorage.setItem(MUSIC_VOLUME_KEY, musicVolumeSlider.value);
+            localStorage.setItem(SFX_ENABLED_KEY, sfxToggle.checked);
+            
+            loadAndApplySettings(); // Re-apply all settings from storage
             hideModal(settingsOverlay);
             showCustomAlert("تنظیمات با موفقیت ذخیره شد.");
         });
-        animationIntensitySlider.addEventListener('input', (e) => {
+        animationIntensitySlider.addEventListener('input', (e) => { const value = e.target.value; animationIntensityValue.textContent = `${value}%`; applyAnimationSettings(value); });
+        // START: رویدادهای جدید پنل تنظیمات
+        musicVolumeSlider.addEventListener('input', (e) => {
             const value = e.target.value;
-            animationIntensityValue.textContent = `${value}%`;
-            applyAnimationSettings(value); 
+            musicVolumeValue.textContent = `${value}%`;
+            backgroundMusic.volume = value / 100;
         });
+        resetTutorialBtn.addEventListener('click', () => {
+            localStorage.removeItem(TUTORIAL_COMPLETED_KEY);
+            hideModal(settingsOverlay);
+            showCustomAlert("آماده‌سازی انجام شد! آموزش در ورود بعدی نمایش داده می‌شود.");
+        });
+        // END: رویدادهای جدید پنل تنظیمات
         tutorialNextBtn.addEventListener('click', () => { showTutorialStep(currentTutorialStep + 1); });
         dialogueGuideButton.addEventListener('click', async () => {
             hideModal(dialogueGuideOverlay);
