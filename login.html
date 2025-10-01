@@ -348,7 +348,8 @@
         // --- START: Firebase Configuration ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, collection, query, where, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        // --- START: **تغییر** - وارد کردن getDoc برای خواندن یک سند واحد ---
+        import { getFirestore, collection, query, where, getDocs, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
@@ -405,7 +406,28 @@
 
             setLoading(true);
             try {
-                await signInWithEmailAndPassword(auth, email, password);
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                // --- START: **رفع مشکل** بازنویسی تاریخ ثبت نام ---
+                // این بخش تاریخ ثبت نام اصلی کاربر را از پروفایل احراز هویت او می‌خواند
+                // و در صورت نیاز، آن را در پایگاه داده بازیابی می‌کند تا از بازنویسی شدن آن جلوگیری شود.
+                if (user) {
+                    const userDocRef = doc(db, 'users', user.uid);
+                    const userDocSnap = await getDoc(userDocRef);
+
+                    // فقط در صورتی که فیلد createdAt در دیتابیس وجود نداشته باشد، آن را بازنویسی می‌کنیم.
+                    if (userDocSnap.exists() && !userDocSnap.data().createdAt) {
+                        // تاریخ ساخت حساب کاربری را از متادیتا می‌خوانیم
+                        const creationTime = new Date(user.metadata.creationTime);
+                        // سند کاربر را با تاریخ صحیح آپدیت می‌کنیم
+                        await updateDoc(userDocRef, {
+                            createdAt: creationTime
+                        });
+                    }
+                }
+                // --- END: **رفع مشکل** ---
+
                 window.location.href = './index.html';
             } catch (error) {
                 let friendlyMessage = "ایمیل یا رمز عبور اشتباه است.";
