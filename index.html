@@ -54,7 +54,7 @@
         .time-value { font-size: 3rem; font-weight: 900; color: white; line-height: 1; }
         .time-label { font-size: 0.8rem; font-weight: 400; color: var(--text-light); margin-top: 8px; }
 
-        /* --- [NEW] Suspension Panel Styles --- */
+        /* --- Suspension Panel Styles --- */
         #suspension-panel { border-color: var(--suspension-border); box-shadow: 0 0 25px var(--suspension-glow), 0 15px 45px rgba(0, 0, 0, 0.7); padding: 35px; }
         
         #suspension-user-info { display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; }
@@ -96,7 +96,6 @@
         </div>
     </div>
 
-    <!-- [NEW] Improved Suspension Panel -->
     <div id="suspension-panel" class="panel" style="display: none;">
         <div id="suspension-user-info">
             <img id="suspension-avatar" src="" alt="آواتار کاربر">
@@ -184,17 +183,29 @@
             } catch (error) { console.error('فرایند مدیریت موسیقی با خطا مواجه شد:', error); statusMessage.textContent = 'خطا در دریافت موسیقی پس‌زمینه.'; }
         }
         
-        // --- [NEW] Suspension Panel Functions ---
-        function showSuspensionPanel(config, auth) {
+        // --- [NEW] Function to handle smooth transition from suspension to game ---
+        async function transitionToGame(displayName) {
+            suspensionPanel.style.display = 'none';
+            loadingPanel.style.display = 'block';
+            loadingPanel.style.animation = 'none';
+            requestAnimationFrame(() => { loadingPanel.style.animation = 'panel-intro 1s cubic-bezier(0.25, 1, 0.5, 1)'; });
+            
+            updateProgress(100, `مسدودیت شما رفع شد. خوش آمدید، ${displayName}!`);
+            await delay(2000);
+            window.location.href = './main.html';
+        }
+
+        // --- Suspension Panel Functions ---
+        function showSuspensionPanel(config, auth, db) { // [MODIFIED] Added db
             loadingPanel.style.display = 'none';
             suspensionPanel.style.display = 'block';
 
-            // Populate user info
+            const displayName = config.displayName || 'کاربر';
             document.getElementById('suspension-avatar').src = config.avatarUrl || DEFAULT_AVATAR;
-            document.getElementById('suspension-username').textContent = config.displayName || 'کاربر';
+            document.getElementById('suspension-username').textContent = displayName;
             document.getElementById('suspension-reason').textContent = `دلیل: ${config.banReason || 'نامشخص'}`;
             
-            startSuspensionCountdown(config.banExpiresAt.toDate(), auth);
+            startSuspensionCountdown(config.banExpiresAt.toDate(), auth, db, displayName); // [MODIFIED] Pass db and displayName
             
             logoutBtn.onclick = () => {
                 signOut(auth).then(() => {
@@ -205,20 +216,25 @@
                 });
             };
         }
-        function startSuspensionCountdown(targetDate, auth) {
+        
+        function startSuspensionCountdown(targetDate, auth, db, displayName) { // [MODIFIED] Signature updated
             const countdownElements = { days: document.getElementById('s-days'), hours: document.getElementById('s-hours'), minutes: document.getElementById('s-minutes'), seconds: document.getElementById('s-seconds') };
             const interval = setInterval(async () => {
                 const distance = targetDate.getTime() - new Date().getTime();
+
+                // [MODIFIED] This is the core logic change.
                 if (distance < 0) {
                     clearInterval(interval);
                     try {
-                        const userDocRef = doc(getFirestore(), 'users', auth.currentUser.uid);
-                        await updateDoc(userDocRef, { isBanned: false });
+                        const userDocRef = doc(db, 'users', auth.currentUser.uid);
+                        // Clean up all ban-related fields in Firestore.
+                        await updateDoc(userDocRef, { isBanned: false, banReason: null, banExpiresAt: null });
                         console.log("مسدودیت کاربر به صورت خودکار رفع شد.");
                     } catch(e) {
                         console.error("خطا در رفع خودکار مسدودیت:", e);
                     }
-                    window.location.reload();
+                    // Instead of reloading, call the smooth transition function.
+                    await transitionToGame(displayName); 
                     return;
                 }
                 const f = (n) => String(Math.floor(n)).padStart(2, '0');
@@ -242,8 +258,8 @@
                             if (userDocSnap.exists()) {
                                 const userData = userDocSnap.data();
                                 if (userData.isBanned === true && userData.banExpiresAt && userData.banExpiresAt.toDate() > new Date()) {
-                                    // Reject with user data to show in suspension panel
-                                    reject({ type: 'BANNED', config: userData }); 
+                                    // [MODIFIED] Reject with db instance for later use
+                                    reject({ type: 'BANNED', config: userData, db: db }); 
                                     return;
                                 }
                             }
@@ -262,7 +278,8 @@
                 window.location.href = './main.html';
             } catch (rejection) {
                 if (rejection.type === 'BANNED') {
-                    showSuspensionPanel(rejection.config, auth);
+                    // [MODIFIED] Pass db to the handler function
+                    showSuspensionPanel(rejection.config, auth, rejection.db);
                 } else if (rejection.type === 'NO_USER') {
                     updateProgress(100, 'احراز هویت انجام نشد، در حال هدایت به صفحه ورود...');
                     await delay(2000);
