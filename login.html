@@ -8,6 +8,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --suspension-red: #e74c3c;
+            --suspension-border: #c0392b;
+            --suspension-glow: rgba(231, 76, 60, 0.5);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -277,6 +283,85 @@
         }
         /* --- END: Modal Styles --- */
 
+        /* --- START: [NEW] Suspension Modal Styles --- */
+        .modal-content.suspension {
+            border-color: var(--suspension-border);
+            box-shadow: 0 0 25px var(--suspension-glow), 0 15px 45px rgba(0, 0, 0, 0.7);
+        }
+        #suspension-user-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        #suspension-avatar {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--suspension-red);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            margin-bottom: 15px;
+        }
+        #suspension-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #e0dacc;
+            text-shadow: 1px 1px 3px #000;
+        }
+        #suspension-title {
+            font-size: 2rem;
+            color: var(--suspension-red);
+            margin-bottom: 15px;
+            font-weight: 900;
+        }
+        #suspension-reason {
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            padding: 12px;
+            background-color: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            font-style: italic;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .countdown-timer {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: center;
+            gap: 15px;
+            margin: 25px 0;
+        }
+        .time-block {
+            background-color: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid #5c4a3a;
+            min-width: 70px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        #suspension-countdown-timer .time-block {
+            border-color: var(--suspension-border);
+            background-color: rgba(231, 76, 60, 0.1);
+        }
+        .time-value {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: white;
+            line-height: 1;
+        }
+         #suspension-countdown-timer .time-value { color: #f8d7da; }
+        .time-label {
+            font-size: 0.8rem;
+            font-weight: 400;
+            color: #e0dacc;
+            margin-top: 8px;
+        }
+        #suspension-countdown-timer .time-label { color: #f5c6cb; }
+        /* --- END: [NEW] Suspension Modal Styles --- */
+
     </style>
 </head>
 <body>
@@ -344,11 +429,31 @@
         </div>
     </div>
 
+    <!-- [NEW] مودال کاربر مسدود شده -->
+    <div class="modal-overlay" id="suspension-notice-modal">
+        <div class="modal-content suspension" style="text-align: center;">
+            <div id="suspension-user-info">
+                <img id="suspension-avatar" src="" alt="آواتار کاربر">
+                <h3 id="suspension-name"></h3>
+            </div>
+            <h1 id="suspension-title">حساب کاربری مسدود است</h1>
+            <p id="suspension-reason"></p>
+            <p class="modal-body">شما در حال حاضر قادر به درخواست بازیابی رمز عبور نیستید. زمان باقی‌مانده تا رفع مسدودیت:</p>
+            <div id="suspension-countdown-timer" class="countdown-timer">
+                 <div class="time-block"><div id="s-days" class="time-value">00</div><div class="time-label">روز</div></div>
+                 <div class="time-block"><div id="s-hours" class="time-value">00</div><div class="time-label">ساعت</div></div>
+                 <div class="time-block"><div id="s-minutes" class="time-value">00</div><div class="time-label">دقیقه</div></div>
+                 <div class="time-block"><div id="s-seconds" class="time-value">00</div><div class="time-label">ثانیه</div></div>
+            </div>
+            <button class="close-button" id="close-suspension-notice">متوجه شدم</button>
+        </div>
+    </div>
+
+
     <script type="module">
         // --- START: Firebase Configuration ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        // --- START: **تغییر** - وارد کردن getDoc برای خواندن یک سند واحد ---
         import { getFirestore, collection, query, where, getDocs, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -383,6 +488,10 @@
         const confirmName = document.getElementById('confirm-name');
         const confirmYesBtn = document.getElementById('confirm-yes-btn');
         const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
+
+        // [NEW] Suspension Modal Elements
+        const suspensionModal = document.getElementById('suspension-notice-modal');
+        const closeSuspensionButton = document.getElementById('close-suspension-notice');
         
         const messageText = document.getElementById('message-text');
         const countdownTimer = document.getElementById('countdown-timer');
@@ -390,6 +499,7 @@
 
         // --- START: State Variables ---
         let countdownInterval = null;
+        let suspensionCountdownInterval = null; // [NEW]
         // --- END: State Variables ---
         
 
@@ -409,24 +519,16 @@
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
 
-                // --- START: **رفع مشکل** بازنویسی تاریخ ثبت نام ---
-                // این بخش تاریخ ثبت نام اصلی کاربر را از پروفایل احراز هویت او می‌خواند
-                // و در صورت نیاز، آن را در پایگاه داده بازیابی می‌کند تا از بازنویسی شدن آن جلوگیری شود.
                 if (user) {
                     const userDocRef = doc(db, 'users', user.uid);
                     const userDocSnap = await getDoc(userDocRef);
-
-                    // فقط در صورتی که فیلد createdAt در دیتابیس وجود نداشته باشد، آن را بازنویسی می‌کنیم.
                     if (userDocSnap.exists() && !userDocSnap.data().createdAt) {
-                        // تاریخ ساخت حساب کاربری را از متادیتا می‌خوانیم
                         const creationTime = new Date(user.metadata.creationTime);
-                        // سند کاربر را با تاریخ صحیح آپدیت می‌کنیم
                         await updateDoc(userDocRef, {
                             createdAt: creationTime
                         });
                     }
                 }
-                // --- END: **رفع مشکل** ---
 
                 window.location.href = './index.html';
             } catch (error) {
@@ -464,16 +566,22 @@
                 const userDoc = querySnapshot.docs[0];
                 const userData = userDoc.data();
                 
-                // منطق بررسی تایمر محدودیت
+                // --- [NEW] Ban Check ---
+                // بررسی می‌کند که آیا کاربر مسدود است و زمان مسدودیت هنوز تمام نشده است.
+                if (userData.isBanned === true && userData.banExpiresAt && userData.banExpiresAt.toDate() > new Date()) {
+                    showSuspensionNotice(userData);
+                    return; // اجرای تابع متوقف می‌شود
+                }
+                // --- [END NEW] Ban Check ---
+
                 const now = new Date();
                 const cooldownUntil = userData.passwordResetCooldownUntil?.toDate();
                 
                 if (cooldownUntil && cooldownUntil > now) {
                     startCountdown(cooldownUntil);
-                    return; // Stop execution
+                    return; 
                 }
 
-                // اگر تایمر محدودیت فعال نبود، مودال تایید را نشان بده
                 confirmAvatar.src = userData.avatarUrl || 'https://i.imgur.com/T2bT1tG.png';
                 confirmName.textContent = userData.displayName || 'کاربر ناشناس';
                 accountConfirmModal.classList.add('visible');
@@ -481,7 +589,7 @@
                 confirmYesBtn.onclick = () => handleSendResetEmail(email, userDoc.id, userData.passwordResetRequestCount || 0);
 
             } catch (error) {
-                let friendlyMessage = "خطایی در بررسی ایمیل رخ داد. (توجه: ممکن است به دلیل قوانین امنیتی پایگاه داده باشد. لطفاً از تنظیم صحیح آن‌ها اطمینان حاصل کنید)";
+                let friendlyMessage = "خطایی در بررسی ایمیل رخ داد.";
                 if (error.message === 'auth/user-not-found') {
                     friendlyMessage = "حسابی با این ایمیل در سیستم ثبت نشده است.";
                 } else if (error.code === 'auth/invalid-email') {
@@ -500,15 +608,11 @@
             spamGuideModal.classList.add('visible');
         });
 
-        closeSpamGuideButton.addEventListener('click', () => {
-            spamGuideModal.classList.remove('visible');
-        });
-        
-        confirmCancelBtn.addEventListener('click', () => {
-            accountConfirmModal.classList.remove('visible');
-        });
+        closeSpamGuideButton.addEventListener('click', () => spamGuideModal.classList.remove('visible'));
+        closeSuspensionButton.addEventListener('click', () => suspensionModal.classList.remove('visible')); // [NEW]
+        confirmCancelBtn.addEventListener('click', () => accountConfirmModal.classList.remove('visible'));
 
-        [spamGuideModal, accountConfirmModal].forEach(modal => {
+        [spamGuideModal, accountConfirmModal, suspensionModal].forEach(modal => { // [NEW] suspensionModal added
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) {
                     modal.classList.remove('visible');
@@ -524,9 +628,8 @@
             setLoading(true);
 
             try {
-                // محاسبه زمان محدودیت جدید و آپدیت پایگاه داده
                 const newRequestCount = currentRequestCount + 1;
-                const cooldownSeconds = 60 * Math.pow(2, currentRequestCount); // 60s, 120s, 240s, ...
+                const cooldownSeconds = 60 * Math.pow(2, currentRequestCount); 
                 const newCooldownDate = new Date(Date.now() + cooldownSeconds * 1000);
                 
                 const userDocRef = doc(db, 'users', userId);
@@ -535,7 +638,6 @@
                     passwordResetRequestCount: newRequestCount
                 });
 
-                // ارسال ایمیل بازیابی
                 await sendPasswordResetEmail(auth, email);
 
                 showMessage("لینک بازیابی رمز عبور به ایمیل شما ارسال شد. لطفاً صندوق ورودی (Inbox) و پوشه اسپم (Spam) را بررسی کنید.", 'success');
@@ -571,6 +673,49 @@
             updateTimer(); 
             countdownInterval = setInterval(updateTimer, 1000);
         }
+
+        // --- [START NEW] Suspension Functions ---
+        function showSuspensionNotice(userData) {
+            document.getElementById('suspension-avatar').src = userData.avatarUrl || 'https://i.imgur.com/T2bT1tG.png';
+            document.getElementById('suspension-name').textContent = userData.displayName || 'کاربر';
+            document.getElementById('suspension-reason').textContent = `دلیل مسدودیت: ${userData.banReason || 'نامشخص'}`;
+            suspensionModal.classList.add('visible');
+            startSuspensionCountdown(userData.banExpiresAt.toDate());
+        }
+
+        function startSuspensionCountdown(targetDate) {
+            if (suspensionCountdownInterval) clearInterval(suspensionCountdownInterval);
+
+            const countdownElements = {
+                days: document.getElementById('s-days'),
+                hours: document.getElementById('s-hours'),
+                minutes: document.getElementById('s-minutes'),
+                seconds: document.getElementById('s-seconds')
+            };
+
+            const updateTimer = () => {
+                const distance = targetDate.getTime() - new Date().getTime();
+
+                if (distance < 0) {
+                    clearInterval(suspensionCountdownInterval);
+                    suspensionCountdownInterval = null;
+                    Object.values(countdownElements).forEach(el => el.textContent = '00');
+                    // Optionally close the modal after countdown
+                    // suspensionModal.classList.remove('visible');
+                    return;
+                }
+
+                const f = (n) => String(Math.floor(n)).padStart(2, '0');
+                countdownElements.days.textContent = f(distance / (1000 * 60 * 60 * 24));
+                countdownElements.hours.textContent = f((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                countdownElements.minutes.textContent = f((distance % (1000 * 60 * 60)) / (1000 * 60));
+                countdownElements.seconds.textContent = f((distance % (1000 * 60)) / 1000);
+            };
+
+            updateTimer();
+            suspensionCountdownInterval = setInterval(updateTimer, 1000);
+        }
+        // --- [END NEW] Suspension Functions ---
 
         function showMessage(message, type, countdownString = '') {
             if (countdownInterval && !countdownString) {
