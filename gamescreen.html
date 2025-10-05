@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>بازی - معامله‌گر</title>
+    <title>بازی معامله‌گر - شهر مافیا</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
+        /* === متغیرهای رنگی پایه === */
         :root {
             --primary-gold: #ffc947;
             --dark-red: #8c4843;
@@ -16,10 +17,12 @@
             --text-secondary: #c5a687;
             --bg-dark: #1a140e;
             --border-color: #5c4a3a;
-            --blue-cooperate: #3498db;
+            --green-cooperate: #2ecc71;
             --red-betray: #e74c3c;
+            --blue-info: #3498db;
         }
 
+        /* === ریست و استایل‌های کلی === */
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html, body { height: 100%; width: 100%; overflow: hidden; }
         body { 
@@ -39,91 +42,103 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         #loading-text { margin-top: 20px; font-size: 1.1rem; font-weight: 700; }
 
+        /* === ساختار اصلی صفحه بازی === */
         .game-container { width: 100%; height: 100%; display: flex; flex-direction: column; padding: 10px 5px; gap: 10px; }
 
+        /* === هدر بازی (اطلاعات و تایمر) === */
         .game-header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding: 5px 15px; background-color: rgba(0, 0, 0, 0.4); border: 1px solid var(--border-color); border-radius: 12px; height: 60px; }
-        #game-info { font-size: 1.3rem; font-weight: 900; color: var(--primary-gold); text-shadow: 1px 1px 3px rgba(0,0,0,0.7); }
+        #game-phase-info { font-size: 1.3rem; font-weight: 900; color: var(--primary-gold); text-shadow: 1px 1px 3px rgba(0,0,0,0.7); }
         #game-timer { font-size: 1.5rem; font-weight: 700; background-color: var(--darker-red); color: white; padding: 5px 15px; border-radius: 8px; border: 1px solid var(--primary-gold); min-width: 80px; text-align: center; }
         #game-timer.critical { animation: pulse-timer 1s infinite; }
         @keyframes pulse-timer { 0% { transform: scale(1); box-shadow: 0 0 5px #e74c3c; } 50% { transform: scale(1.05); box-shadow: 0 0 15px #e74c3c; } 100% { transform: scale(1); box-shadow: 0 0 5px #e74c3c; } }
 
-        .main-content { display: flex; flex-grow: 1; gap: 10px; overflow: hidden; }
-        
-        #scoreboard { width: 220px; flex-shrink: 0; background-color: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; }
-        #scoreboard h2 { text-align: center; color: var(--primary-gold); margin-bottom: 10px; font-size: 1.2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
-        #player-list { list-style: none; overflow-y: auto; }
-        .player-score-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 5px; border-radius: 6px; transition: background-color 0.3s; }
-        .player-score-item:nth-child(odd) { background-color: rgba(255,255,255,0.05); }
-        .player-score-item.is-self { background-color: rgba(255, 201, 71, 0.2); border: 1px solid var(--primary-gold); }
+        /* === نوار اعلانات === */
+        .announcement-bar { flex-shrink: 0; width: 100%; padding: 10px; background-color: rgba(140, 72, 67, 0.5); border-radius: 8px; text-align: center; font-size: 1rem; font-weight: 700; display: none; transition: all 0.3s ease; }
+
+        /* === چیدمان اصلی بازی (امتیازات و صفحه مرکزی) === */
+        .players-area { flex-grow: 1; display: flex; gap: 10px; overflow: hidden; }
+        #scoreboard { width: 150px; flex-shrink: 0; background-color: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; overflow-y: auto; }
+        #scoreboard h3 { text-align: center; color: var(--primary-gold); margin-bottom: 10px; font-size: 1.1rem; }
+        .scoreboard-player { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px solid #5c4a3a50; }
+        .scoreboard-player:last-child { border-bottom: none; }
         .player-info { display: flex; align-items: center; gap: 8px; }
-        .player-info img { width: 30px; height: 30px; border-radius: 50%; }
-        .player-info span { font-weight: 700; font-size: 0.9rem; }
-        .player-score { font-size: 1.1rem; font-weight: 900; }
+        .player-info img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; }
+        .player-info span { font-size: 0.9rem; font-weight: 700; }
+        .player-score { font-size: 1rem; font-weight: 900; color: var(--primary-gold); }
 
-        .center-panel { flex-grow: 1; display: flex; flex-direction: column; gap: 10px; }
-        #status-display { flex-grow: 1; background-color: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
-        #status-title { font-size: 1.8rem; font-weight: 900; color: var(--primary-gold); margin-bottom: 15px; }
-        #status-description { font-size: 1.1rem; line-height: 1.7; }
-
-        #decision-panel { display: flex; gap: 15px; padding: 15px; background-color: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 12px; }
-        .decision-btn { flex-grow: 1; padding: 15px; font-size: 1.4rem; font-weight: 900; border-radius: 12px; border: 2px solid; cursor: pointer; transition: all 0.3s ease; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-        .decision-btn:disabled { cursor: not-allowed; opacity: 0.5; }
-        .decision-btn:not(:disabled):hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        #btn-cooperate { background-color: var(--blue-cooperate); border-color: #85c1e9; }
-        #btn-betray { background-color: var(--red-betray); border-color: #f5b7b1; }
-        #btn-cooperate.selected { box-shadow: 0 0 20px var(--blue-cooperate); transform: scale(1.05); }
-        #btn-betray.selected { box-shadow: 0 0 20px var(--red-betray); transform: scale(1.05); }
-
-        .game-footer { flex-shrink: 0; display: flex; justify-content: flex-end; padding: 5px; }
-        #toggle-chat-btn { width: 50px; height: 50px; border-radius: 50%; background-color: rgba(0,0,0,0.5); color: white; border: 1px solid var(--primary-gold); display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; }
-        #toggle-chat-btn.new-message::after { content: ''; position: absolute; bottom: 0; right: 0; width: 14px; height: 14px; background-color: #e53e3e; border-radius: 50%; border: 2px solid var(--bg-dark); }
-        #toggle-chat-btn svg { width: 24px; height: 24px; fill: currentColor; }
-
-        /* --- مودال‌ها --- */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.85); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s 0.3s; }
-        .modal-overlay.visible { opacity: 1; visibility: visible; transition: opacity 0.3s ease; }
-        .modal-content { background: linear-gradient(145deg, #3c3022, var(--bg-dark)); border: 2px solid var(--border-color); border-radius: 16px; padding: 25px; width: 90%; max-width: 550px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; }
-        .modal-overlay.visible .modal-content { transform: scale(1); }
-        .modal-title { font-size: 1.5rem; font-weight: 900; color: var(--primary-gold); margin-bottom: 20px; text-align: center; }
+        #central-board { flex-grow: 1; background-color: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; }
         
-        /* استایل‌های چت (مشترک برای عمومی و خصوصی) */
-        #chat-panel, #private-chat-modal .modal-content { height: 70%; max-height: 500px; }
-        .chat-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
+        /* === استایل‌های صفحه مرکزی === */
+        #central-board .waiting-text { font-size: 1.5rem; color: var(--text-secondary); }
+        .voting-pair-container { display: none; flex-direction: column; align-items: center; gap: 20px; }
+        .voting-pair-title { font-size: 1.3rem; font-weight: 700; }
+        .pair-display { display: flex; gap: 30px; align-items: center; }
+        .pair-player-card { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .pair-player-card img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--border-color); }
+        .pair-player-card span { font-weight: 700; font-size: 1rem; }
+        .pair-separator { font-size: 2rem; font-weight: 900; color: var(--primary-gold); }
+        .public-voting-options { margin-top: 20px; display: flex; gap: 15px; }
+        .public-voting-options button { padding: 10px 20px; font-size: 1rem; font-weight: 700; border-radius: 8px; border: 2px solid var(--primary-gold); cursor: pointer; transition: all 0.2s ease; }
+        .public-voting-options button.cooperate { background-color: #27ae60; color: white; }
+        .public-voting-options button.betray { background-color: #c0392b; color: white; }
+        .public-voting-options button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* === استایل‌های نمایش نتایج === */
+        .results-container { display: none; flex-direction: column; align-items: center; gap: 15px; }
+        .result-pair-card { background-color: rgba(0,0,0,0.4); padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); width: 250px; text-align: center; }
+        .result-player-info { display: flex; justify-content: space-between; align-items: center; }
+        .result-player-name { font-weight: 700; }
+        .result-player-choice { font-weight: 900; font-size: 1.1rem; }
+        .result-player-choice.cooperate { color: var(--green-cooperate); }
+        .result-player-choice.betray { color: var(--red-betray); }
+        .points-change { font-size: 1.2rem; margin-top: 10px; }
+        .points-change.positive { color: var(--green-cooperate); }
+        .points-change.negative { color: var(--red-betray); }
+        .public-vote-result { margin-top: 20px; font-size: 1rem; font-weight: 700; }
+
+
+        /* === فوتر بازی (دکمه‌های اقدام) === */
+        .game-footer { flex-shrink: 0; display: flex; gap: 10px; align-items: center; padding: 10px; background-color: rgba(0,0,0,0.3); border-top: 1px solid var(--border-color); }
+        .action-buttons-container { flex-grow: 1; display: flex; justify-content: center; gap: 20px; }
+        .action-button { padding: 14px 28px; font-size: 1.2rem; font-weight: 900; border-radius: 12px; border: 2px solid var(--primary-gold); cursor: pointer; transition: all 0.3s ease; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .cooperate-btn { background: linear-gradient(145deg, var(--green-cooperate), #27ae60); }
+        .betray-btn { background: linear-gradient(145deg, var(--red-betray), #c0392b); }
+        .action-button:disabled { background: linear-gradient(145deg, #7f8c8d, #626567); border-color: #95a5a6; cursor: not-allowed; opacity: 0.6; }
+        .action-button:not(:disabled):hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        #start-game-btn { background: linear-gradient(145deg, var(--dark-red), var(--darker-red)); }
+        
+        #toggle-chat-btn { flex-shrink: 0; width: 50px; height: 50px; border-radius: 50%; background-color: #4a5568; color: white; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: all 0.3s ease; position: relative; }
+        #toggle-chat-btn:hover { background-color: #2d3748; transform: scale(1.1); }
+        #toggle-chat-btn.new-message::after { content: ''; position: absolute; bottom: 0; right: 0; width: 14px; height: 14px; background-color: #e53e3e; border-radius: 50%; border: 2px solid var(--bg-dark); }
+        
+        /* === استایل‌های چت و مودال‌ها (بدون تغییر زیاد) === */
+        #chat-panel, #private-chat-panel { position: fixed; top: 50%; left: 50%; width: 90%; max-width: 550px; height: 70%; max-height: 500px; background-color: rgba(26, 20, 14, 0.95); backdrop-filter: blur(10px); border: 1px solid var(--border-color); border-radius: 16px; display: flex; flex-direction: column; z-index: 999; box-shadow: 0 8px 30px rgba(0,0,0,0.6); opacity: 0; transform: translate(-50%, -50%) scale(0.9); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease; pointer-events: none; }
+        #chat-panel.visible, #private-chat-panel.visible { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; }
+        .chat-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
         .chat-header h3 { font-size: 1.1rem; color: var(--primary-gold); font-weight: 700; }
-        .close-btn { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1.5rem; line-height: 1; padding: 5px; }
-        .chat-messages { flex-grow: 1; overflow-y: auto; padding: 10px 5px; display: flex; flex-direction: column; gap: 12px; margin: 10px 0; }
-        .chat-message { display: flex; align-items: flex-start; gap: 10px; max-width: 85%; }
+        #close-chat-btn, #close-private-chat-btn { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1.5rem; line-height: 1; padding: 5px; }
+        #chat-messages, #private-chat-messages { flex-grow: 1; overflow-y: auto; padding: 10px 15px; display: flex; flex-direction: column; gap: 12px; }
+        .chat-message { display: flex; align-items: flex-start; gap: 10px; }
         .chat-message.self { align-self: flex-end; flex-direction: row-reverse; }
         .chat-message-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
         .chat-message-content { display: flex; flex-direction: column; }
         .chat-message-sender { font-size: 0.8rem; font-weight: 700; color: var(--primary-gold); margin-bottom: 3px; }
-        .chat-message.self .chat-message-sender { color: #2ecc71; text-align: right; }
+        .chat-message.self .chat-message-sender { color: var(--green-cooperate); text-align: right; }
         .chat-message-bubble { background-color: #332a20; padding: 8px 12px; border-radius: 12px; font-size: 0.9rem; word-wrap: break-word; }
         .chat-message.self .chat-message-bubble { background-color: #2a3a30; }
-        .chat-form { display: flex; border-top: 1px solid var(--border-color); gap: 10px; flex-shrink: 0; padding-top: 10px; }
-        .chat-input { flex-grow: 1; background-color: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-light); font-family: 'Vazirmatn', sans-serif; font-size: 0.9rem; }
-        .chat-input:focus { outline: none; border-color: var(--primary-gold); }
-        .chat-send-btn { background-color: var(--primary-gold); border: none; border-radius: 8px; color: var(--darker-red); font-weight: 900; padding: 0 15px; cursor: pointer; }
-
-        /* استایل خاص مودال نتایج */
-        #reveal-modal .pair-reveal-container { display: flex; justify-content: space-around; align-items: center; margin: 20px 0; }
-        #reveal-modal .player-reveal-card { text-align: center; }
-        #reveal-modal .player-reveal-card img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--border-color); }
-        #reveal-modal .player-reveal-card p { font-weight: 700; margin-top: 10px; }
-        #reveal-modal .reveal-choice { font-size: 1.2rem; font-weight: 900; padding: 5px 10px; border-radius: 8px; color: white; margin-top: 5px; }
-        #reveal-modal .reveal-choice.cooperate { background-color: var(--blue-cooperate); }
-        #reveal-modal .reveal-choice.betray { background-color: var(--red-betray); }
-        #reveal-modal .vs-separator { font-size: 3rem; font-weight: 900; color: var(--primary-gold); }
-        #reveal-modal .result-summary { text-align: center; font-size: 1.1rem; margin-top: 20px; line-height: 1.8; }
-        #reveal-modal .modal-buttons { display: flex; justify-content: center; margin-top: 20px; }
-        .modal-button { padding: 12px 25px; font-size: 1rem; font-weight: 700; border-radius: 8px; cursor: pointer; border: 1px solid var(--primary-gold); color: white; background: linear-gradient(145deg, var(--dark-red), var(--darker-red)); }
-        
-        @media (max-width: 768px) {
-            .main-content { flex-direction: column; }
-            #scoreboard { width: 100%; order: 2; height: 150px; }
-            .center-panel { order: 1; }
-            .game-footer { justify-content: center; }
-        }
+        #chat-form, #private-chat-form { display: flex; padding: 10px 15px; border-top: 1px solid var(--border-color); gap: 10px; flex-shrink: 0; }
+        #chat-input, #private-chat-input { flex-grow: 1; background-color: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-light); font-family: 'Vazirmatn', sans-serif; font-size: 0.9rem; }
+        #chat-input:focus, #private-chat-input:focus { outline: none; border-color: var(--primary-gold); }
+        #chat-send-btn, #private-chat-send-btn { background-color: var(--primary-gold); border: none; border-radius: 8px; color: var(--darker-red); font-weight: 900; padding: 0 15px; cursor: pointer; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.85); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s 0.3s; }
+        .modal-overlay.visible { opacity: 1; visibility: visible; transition: opacity 0.3s ease; }
+        .modal-content { background: linear-gradient(145deg, #3c3022, var(--bg-dark)); border: 2px solid var(--border-color); border-radius: 16px; padding: 25px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .modal-overlay.visible .modal-content { transform: scale(1); }
+        .modal-title { font-size: 1.5rem; font-weight: 900; color: var(--primary-gold); margin-bottom: 20px; }
+        .modal-message { font-size: 1rem; line-height: 1.6; margin-bottom: 25px; }
+        .modal-buttons { display: flex; gap: 10px; }
+        .modal-button { width: 100%; padding: 12px; font-size: 1rem; font-weight: 700; border-radius: 8px; cursor: pointer; border: 1px solid; }
+        .modal-button.primary { color: white; background: linear-gradient(145deg, var(--dark-red), var(--darker-red)); border-color: var(--primary-gold); }
     </style>
 </head>
 <body>
@@ -131,141 +146,144 @@
     <div id="background-blurry"></div>
     <div id="loading-overlay">
         <div class="loader"></div>
-        <p id="loading-text">در حال آماده‌سازی بازی معامله‌گر...</p>
+        <p id="loading-text">در حال بارگذاری بازی معامله‌گر...</p>
     </div>
 
     <div class="game-container" style="display: none;">
         <header class="game-header">
-            <div id="game-info">دور ۱ - مذاکره خصوصی</div>
+            <div id="game-phase-info">دور ۱ - انتظار برای شروع</div>
             <div id="game-timer">00:00</div>
         </header>
 
-        <main class="main-content">
-            <aside id="scoreboard">
-                <h2>امتیازات</h2>
-                <ul id="player-list"></ul>
-            </aside>
+        <div id="announcement-bar" class="announcement-bar"></div>
 
-            <div class="center-panel">
-                <section id="status-display">
-                    <h2 id="status-title">به بازی معامله‌گر خوش آمدید!</h2>
-                    <p id="status-description">بازی به زودی با جفت‌بندی بازیکنان آغاز خواهد شد. هدف شما کسب بیشترین امتیاز با همکاری یا خیانت به شریک خود در هر دور است.</p>
-                </section>
-                <section id="decision-panel">
-                    <button id="btn-cooperate" class="decision-btn">همکاری</button>
-                    <button id="btn-betray" class="decision-btn">خیانت</button>
-                </section>
+        <main class="players-area">
+            <div id="scoreboard">
+                <h3>امتیازات</h3>
+                <!-- بازیکنان توسط جاوااسکریپت اینجا اضافه می‌شوند -->
+            </div>
+            <div id="central-board">
+                 <p class="waiting-text" id="central-board-waiting-text">منتظر شروع بازی توسط میزبان باشید...</p>
+                
+                <div class="voting-pair-container" id="voting-pair-container">
+                    <h3 class="voting-pair-title">تصمیم گروه زیر را حدس بزنید:</h3>
+                    <div class="pair-display">
+                        <div class="pair-player-card">
+                            <img id="vote-player1-avatar" src="https://up.20script.ir/file/1d50-defult.png" alt="Avatar">
+                            <span id="vote-player1-name">بازیکن ۱</span>
+                        </div>
+                        <div class="pair-separator">&</div>
+                        <div class="pair-player-card">
+                            <img id="vote-player2-avatar" src="https://up.20script.ir/file/1d50-defult.png" alt="Avatar">
+                            <span id="vote-player2-name">بازیکن ۲</span>
+                        </div>
+                    </div>
+                    <div class="public-voting-options" id="public-voting-options">
+                        <button class="cooperate" data-vote="cooperate">هر دو همکاری</button>
+                        <button class="betray" data-vote="betray">حداقل یک خیانت</button>
+                    </div>
+                </div>
+
+                <div class="results-container" id="results-container">
+                    <!-- نتایج توسط جاوااسکریپت اینجا ساخته می‌شود -->
+                </div>
             </div>
         </main>
         
         <footer class="game-footer">
-            <button id="toggle-chat-btn" title="چت عمومی">
+            <button id="toggle-chat-btn" title="باز کردن چت عمومی">
                 <svg viewBox="0 0 24 24"><path d="M20,2H4A2,2,0,0,0,2,4V22l4-4H20a2,2,0,0,0,2-2V4A2,2,0,0,0,20,2Z"/></svg>
             </button>
+            <div id="action-buttons-container" class="action-buttons-container">
+                <button id="start-game-btn" class="action-button">شروع بازی</button>
+                <button id="cooperate-btn" class="action-button cooperate-btn" style="display: none;">همکاری</button>
+                <button id="betray-btn" class="action-button betray-btn" style="display: none;">خیانت</button>
+            </div>
         </footer>
     </div>
     
-    <!-- مودال چت عمومی -->
-    <div id="chat-panel" class="modal-overlay">
-        <div class="modal-content">
-            <div class="chat-header">
-                <h3>چت عمومی</h3>
-                <button id="close-chat-btn" class="close-btn" title="بستن">&times;</button>
-            </div>
-            <div id="chat-messages" class="chat-messages"></div>
-            <form id="chat-form" class="chat-form">
-                <input type="text" id="chat-input" class="chat-input" placeholder="پیام عمومی..." autocomplete="off">
-                <button type="submit" class="chat-send-btn">ارسال</button>
-            </form>
-        </div>
+    <!-- پنل چت عمومی -->
+    <div id="chat-panel">
+        <div class="chat-header"> <h3>چت عمومی</h3> <button id="close-chat-btn" title="بستن چت">&times;</button> </div>
+        <div id="chat-messages"></div>
+        <form id="chat-form"> <input type="text" id="chat-input" placeholder="پیام خود را بنویسید..." autocomplete="off"> <button type="submit" id="chat-send-btn">ارسال</button> </form>
     </div>
     
-    <!-- مودال چت خصوصی -->
-    <div id="private-chat-modal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="chat-header">
-                <h3 id="private-chat-title">چت خصوصی با ...</h3>
-                <div id="private-chat-timer" style="color: var(--primary-gold); font-weight: 700;"></div>
-            </div>
-            <div id="private-chat-messages" class="chat-messages"></div>
-            <form id="private-chat-form" class="chat-form">
-                <input type="text" id="private-chat-input" class="chat-input" placeholder="پیام خصوصی..." autocomplete="off">
-                <button type="submit" class="chat-send-btn">ارسال</button>
-            </form>
-        </div>
-    </div>
-    
-    <!-- مودال نمایش نتایج -->
-    <div id="reveal-modal" class="modal-overlay">
-        <div class="modal-content">
-            <h2 id="reveal-modal-title" class="modal-title">نتیجه مذاکره</h2>
-            <div class="pair-reveal-container">
-                <div class="player-reveal-card" id="reveal-player1">
-                    <img src="" alt="avatar">
-                    <p>نام بازیکن ۱</p>
-                    <div class="reveal-choice"></div>
-                </div>
-                <div class="vs-separator">VS</div>
-                <div class="player-reveal-card" id="reveal-player2">
-                    <img src="" alt="avatar">
-                    <p>نام بازیکن ۲</p>
-                    <div class="reveal-choice"></div>
-                </div>
-            </div>
-            <p id="result-summary" class="result-summary"></p>
-            <div class="modal-buttons">
-                <button id="reveal-next-btn" class="modal-button">جفت بعدی</button>
-            </div>
-        </div>
+    <!-- پنل چت خصوصی -->
+    <div id="private-chat-panel">
+        <div class="chat-header"> <h3 id="private-chat-title">چت خصوصی با ...</h3> </div>
+        <div id="private-chat-messages"></div>
+        <form id="private-chat-form"> <input type="text" id="private-chat-input" placeholder="پیام خصوصی..." autocomplete="off"> <button type="submit" id="private-chat-send-btn">ارسال</button> </form>
     </div>
 
-    <!-- مودال نوتیفیکیشن عمومی -->
+    <!-- مودال اعلان‌ها -->
     <div id="notification-modal" class="modal-overlay">
-         <div class="modal-content" style="max-width: 380px; text-align: center;">
-             <h2 id="notification-modal-title" class="modal-title">توجه</h2>
-             <p id="notification-modal-message" class="modal-message"></p>
-             <div class="modal-buttons">
-                 <button id="notification-modal-ok-btn" class="modal-button primary">متوجه شدم</button>
-             </div>
-         </div>
-     </div>
+        <div class="modal-content">
+            <h2 id="notification-modal-title" class="modal-title">توجه</h2>
+            <p id="notification-modal-message" class="modal-message"></p>
+            <div class="modal-buttons"> <button id="notification-modal-ok-btn" class="modal-button primary">متوجه شدم</button> </div>
+        </div>
+    </div>
     
     <script type="module">
-        // --- ماژول‌های Firebase ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, runTransaction, updateDoc, serverTimestamp, collection, addDoc, query, orderBy, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, runTransaction, updateDoc, serverTimestamp, collection, addDoc, query, orderBy, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // --- کانفیگ و متغیرهای اصلی ---
-        const firebaseConfig = { apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg", authDomain: "mafia-9fcbf.firebaseapp.com", projectId: "mafia-9fcbf", storageBucket: "mafia-9fcbf.appspot.com", messagingSenderId: "471627157488", appId: "1:471627157488:web:92f008548a5596619a5735" };
+        // --- Config & Elements ---
+        const firebaseConfig = { apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg", authDomain: "mafia-9fcbf.firebaseapp.com", projectId: "mafia-9fcbf", storageBucket: "mafia-9fcbf.appspot.com", messagingSenderId: "471627157488", appId: "1:471627157488:web:92f008548a5596619a5735", };
         
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // --- المان‌های DOM ---
+        const TOTAL_ROUNDS = 5;
+        const PHASE_DURATIONS = {
+            PRIVATE_CHAT: 60,
+            PUBLIC_CHAT: 120,
+            VOTING: 30, // زمان برای هر رأی‌گیری
+            REVEAL: 10,  // زمان نمایش نتایج
+        };
+
+        // --- Elements ---
         const loadingOverlay = document.getElementById('loading-overlay');
         const gameContainer = document.querySelector('.game-container');
-        const gameInfoEl = document.getElementById('game-info');
+        const gamePhaseInfoEl = document.getElementById('game-phase-info');
         const gameTimerEl = document.getElementById('game-timer');
-        const playerListEl = document.getElementById('player-list');
-        const statusTitleEl = document.getElementById('status-title');
-        const statusDescriptionEl = document.getElementById('status-description');
-        const cooperateBtn = document.getElementById('btn-cooperate');
-        const betrayBtn = document.getElementById('btn-betray');
+        const announcementBarEl = document.getElementById('announcement-bar');
+        const scoreboardEl = document.getElementById('scoreboard');
+        const centralBoardWaitingText = document.getElementById('central-board-waiting-text');
+        const votingPairContainer = document.getElementById('voting-pair-container');
+        const resultsContainer = document.getElementById('results-container');
+        const actionButtonsContainer = document.getElementById('action-buttons-container');
+        const startGameBtn = document.getElementById('start-game-btn');
+        const cooperateBtn = document.getElementById('cooperate-btn');
+        const betrayBtn = document.getElementById('betray-btn');
         const toggleChatBtn = document.getElementById('toggle-chat-btn');
+
+        // Chat Elements
         const chatPanel = document.getElementById('chat-panel');
+        const closeChatBtn = document.getElementById('close-chat-btn');
+        const chatMessagesEl = document.getElementById('chat-messages');
+        const chatForm = document.getElementById('chat-form');
+        const chatInput = document.getElementById('chat-input');
+
+        // Private Chat Elements
+        const privateChatPanel = document.getElementById('private-chat-panel');
+        const privateChatTitle = document.getElementById('private-chat-title');
+        const privateChatMessagesEl = document.getElementById('private-chat-messages');
+        const privateChatForm = document.getElementById('private-chat-form');
+        const privateChatInput = document.getElementById('private-chat-input');
         
-        // --- متغیرهای وضعیت بازی ---
         let currentUser = null;
+        let currentUserData = {};
         let gameId = null;
         let unsubscribeGame = null;
-        let unsubscribePublicChat = null;
         let unsubscribePrivateChat = null;
         let currentGameState = {};
         let timerInterval = null;
 
-        // --- تابع اصلی ---
+        // --- Main Functions ---
         async function main() {
             gameId = new URLSearchParams(window.location.search).get('id');
             if (!gameId) {
@@ -276,9 +294,9 @@
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
                     currentUser = user;
-                    setupEventListeners();
+                    currentUserData = { displayName: user.displayName, avatarUrl: user.photoURL }; 
                     listenToGameStateChanges();
-                    listenToPublicChat();
+                    setupEventListeners();
                 } else {
                     window.location.href = './login.html';
                 }
@@ -289,15 +307,14 @@
             const gameDocRef = doc(db, "games", gameId);
             unsubscribeGame = onSnapshot(gameDocRef, (docSnap) => {
                 if (!docSnap.exists()) {
-                    // مدیریت بازی حذف شده
+                    if (unsubscribeGame) unsubscribeGame();
+                    showNotificationModal("بازی پایان یافت", "این بازی دیگر فعال نیست.", () => window.location.href = './Lobby page.html');
                     return;
                 }
                 
-                const previousState = currentGameState;
                 currentGameState = docSnap.data();
 
-                // اولین بارگذاری
-                if (Object.keys(previousState).length === 0) {
+                if (loadingOverlay.style.display !== 'none') {
                     loadingOverlay.style.opacity = '0';
                     setTimeout(() => {
                         loadingOverlay.style.display = 'none';
@@ -305,361 +322,409 @@
                     }, 500);
                 }
                 
-                // رندر کردن بازی بر اساس وضعیت جدید
-                renderGameUI(currentGameState, previousState);
+                renderGame(currentGameState);
+
+            }, (error) => {
+                console.error("Firestore listen error:", error);
+                showNotificationModal("خطای ارتباط", "ارتباط با سرور بازی قطع شد.", () => window.location.reload());
             });
         }
-        
-        // --- توابع رندر و آپدیت UI ---
 
-        function renderGameUI(state, prevState = {}) {
-            const self = state.players.find(p => p.uid === currentUser.uid);
+        // --- Rendering Functions ---
+
+        function renderGame(data) {
+            const self = data.players.find(p => p.uid === currentUser.uid);
             if (!self) return;
 
-            // آپدیت هدر (دور و تایمر)
-            renderHeader(state);
-            // آپدیت جدول امتیازات
-            renderScoreboard(state.players, currentUser.uid);
-            // آپدیت پنل وضعیت و دکمه‌ها
-            updateCenterPanel(state, self);
-
-            // مدیریت مودال‌ها و چت‌ها بر اساس تغییر فاز
-            handlePhaseChange(state, prevState, self);
+            renderHeader(data);
+            renderScoreboard(data.players);
+            renderCentralBoard(data, self);
+            renderFooter(data, self);
         }
 
-        function renderHeader(state) {
+        function renderHeader(data) {
             const phaseTranslations = {
-                'private_chat': 'مذاکره خصوصی',
-                'public_chat': 'مذاکره عمومی',
-                'decision': 'زمان تصمیم‌گیری',
-                'reveal': 'نمایش نتایج',
-                'finished': 'پایان بازی'
+                'WAITING': 'در انتظار شروع',
+                'PRIVATE_CHAT': 'مذاکره خصوصی',
+                'PUBLIC_CHAT': 'بحث عمومی',
+                'VOTING': 'رأی‌گیری عمومی',
+                'REVEAL': 'نمایش نتایج',
+                'FINISHED': 'پایان بازی'
             };
-            const phaseText = phaseTranslations[state.phase] || 'در انتظار...';
-            gameInfoEl.textContent = `دور ${state.currentRound} - ${phaseText}`;
-
+            gamePhaseInfoEl.textContent = `دور ${data.currentRound || 1} - ${phaseTranslations[data.phase] || 'نامشخص'}`;
+            
             if (timerInterval) clearInterval(timerInterval);
-            if (state.phaseEndTime) {
-                const endTime = state.phaseEndTime.toDate();
+            if (data.phaseEndTime) {
+                const endTime = data.phaseEndTime.toDate();
                 timerInterval = setInterval(() => {
                     const now = new Date();
                     const secondsLeft = Math.round((endTime - now) / 1000);
                     if (secondsLeft <= 0) {
                         gameTimerEl.textContent = "00:00";
+                        gameTimerEl.classList.remove('critical');
                         clearInterval(timerInterval);
-                    } else {
-                        const minutes = Math.floor(secondsLeft / 60);
-                        const seconds = secondsLeft % 60;
-                        gameTimerEl.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-                        gameTimerEl.classList.toggle('critical', secondsLeft <= 10);
+                        return;
                     }
+                    const minutes = Math.floor(secondsLeft / 60);
+                    const seconds = secondsLeft % 60;
+                    gameTimerEl.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                    gameTimerEl.classList.toggle('critical', secondsLeft <= 10);
                 }, 1000);
-            } else {
-                gameTimerEl.textContent = "--:--";
             }
         }
 
-        function renderScoreboard(players, selfUid) {
-            playerListEl.innerHTML = '';
+        function renderScoreboard(players) {
             const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
+            scoreboardEl.innerHTML = '<h3>امتیازات</h3>';
             sortedPlayers.forEach(player => {
-                const li = document.createElement('li');
-                li.className = 'player-score-item';
-                if (player.uid === selfUid) li.classList.add('is-self');
-                li.innerHTML = `
-                    <div class="player-info">
-                        <img src="${player.avatarUrl || 'https://up.20script.ir/file/1d50-defult.png'}" alt="avatar" onerror="this.src='https://up.20script.ir/file/1d50-defult.png';">
-                        <span>${player.displayName}</span>
+                scoreboardEl.innerHTML += `
+                    <div class="scoreboard-player">
+                        <div class="player-info">
+                            <img src="${player.avatarUrl || 'https://up.20script.ir/file/1d50-defult.png'}" alt="${player.displayName}">
+                            <span>${player.displayName}</span>
+                        </div>
+                        <strong class="player-score">${player.score}</strong>
                     </div>
-                    <div class="player-score">${player.score}</div>
                 `;
-                playerListEl.appendChild(li);
             });
         }
+        
+        function renderCentralBoard(data, self) {
+            centralBoardWaitingText.style.display = 'none';
+            votingPairContainer.style.display = 'none';
+            resultsContainer.style.display = 'none';
 
-        function updateCenterPanel(state, self) {
-            // آپدیت پنل وضعیت
-            switch(state.phase) {
-                case 'private_chat':
-                    const myPair = state.pairings.find(p => p.players.includes(self.uid));
-                    const partnerUid = myPair.players.find(uid => uid !== self.uid);
-                    const partner = state.players.find(p => p.uid === partnerUid);
-                    statusTitleEl.textContent = `در حال مذاکره با ${partner.displayName}`;
-                    statusDescriptionEl.textContent = "از زمان خود برای متقاعد کردن شریکتان استفاده کنید. چت شما کاملاً خصوصی است.";
-                    break;
-                case 'public_chat':
-                case 'decision':
-                     statusTitleEl.textContent = "مذاکره عمومی و تصمیم‌گیری";
-                     statusDescriptionEl.textContent = "با همه صحبت کنید و تصمیم نهایی خود را برای این دور بگیرید. آیا به شریکتان اعتماد می‌کنید؟";
-                    break;
-                case 'reveal':
-                    statusTitleEl.textContent = "رونمایی از نتایج!";
-                    statusDescriptionEl.textContent = "نتایج مذاکرات در حال نمایش است. ببینید چه کسانی همکاری کردند و چه کسانی خیانت...";
-                    break;
-
-                case 'finished':
-                    const winner = state.players.sort((a, b) => b.score - a.score)[0];
-                    statusTitleEl.textContent = "بازی تمام شد!";
-                    statusDescriptionEl.textContent = `برنده نهایی ${winner.displayName} با ${winner.score} امتیاز است!`;
-                    break;
-
-                default:
-                    statusTitleEl.textContent = "لطفاً منتظر بمانید...";
-                    statusDescriptionEl.textContent = "دور جدید به زودی آغاز خواهد شد.";
+            if (data.phase === 'WAITING') {
+                centralBoardWaitingText.textContent = "منتظر شروع بازی توسط میزبان...";
+                centralBoardWaitingText.style.display = 'block';
+            } else if (data.phase === 'PRIVATE_CHAT') {
+                centralBoardWaitingText.textContent = "در حال مذاکره خصوصی... لطفا انتخاب خود را ثبت کنید.";
+                centralBoardWaitingText.style.display = 'block';
+                handlePrivateChat(data, self);
+            } else if (data.phase === 'PUBLIC_CHAT') {
+                if (privateChatPanel.classList.contains('visible')) {
+                    privateChatPanel.classList.remove('visible');
+                    if (unsubscribePrivateChat) unsubscribePrivateChat();
+                }
+                centralBoardWaitingText.textContent = "زمان بحث و گفتگوی عمومی. آماده رأی‌گیری شوید.";
+                centralBoardWaitingText.style.display = 'block';
+            } else if (data.phase === 'VOTING') {
+                handlePublicVoting(data, self);
+            } else if (data.phase === 'REVEAL') {
+                handleReveal(data);
+            } else if (data.phase === 'FINISHED') {
+                centralBoardWaitingText.textContent = `بازی تمام شد! برنده نهایی: ${data.players.sort((a,b) => b.score - a.score)[0].displayName}`;
+                centralBoardWaitingText.style.display = 'block';
             }
-
-            // مدیریت دکمه‌های تصمیم
-            const canDecide = ['private_chat', 'public_chat', 'decision'].includes(state.phase);
-            const myPair = state.pairings.find(p => p.players.includes(self.uid));
-            const myChoice = myPair ? myPair.choices[self.uid] : null;
-
-            cooperateBtn.disabled = !canDecide || !!myChoice;
-            betrayBtn.disabled = !canDecide || !!myChoice;
-            
-            cooperateBtn.classList.remove('selected');
-            betrayBtn.classList.remove('selected');
-
-            if (myChoice === 'cooperate') cooperateBtn.classList.add('selected');
-            if (myChoice === 'betray') betrayBtn.classList.add('selected');
         }
 
-        // --- مدیریت فازهای بازی ---
-        
-        async function handlePhaseChange(state, prevState, self) {
-            if (state.phase === prevState.phase) return; // فاز تغییری نکرده
+        function renderFooter(data, self) {
+            startGameBtn.style.display = 'none';
+            cooperateBtn.style.display = 'none';
+            betrayBtn.style.display = 'none';
 
-            // بستن تمام مودال‌ها در ابتدای تغییر فاز
-            document.querySelectorAll('.modal-overlay.visible').forEach(modal => modal.classList.remove('visible'));
-            if(unsubscribePrivateChat) unsubscribePrivateChat();
-
-            switch(state.phase) {
-                case 'private_chat':
-                    const myPair = state.pairings.find(p => p.players.includes(self.uid));
-                    if (myPair) {
-                        const partnerUid = myPair.players.find(uid => uid !== self.uid);
-                        const partner = state.players.find(p => p.uid === partnerUid);
-                        showPrivateChatModal(myPair.pairId, partner, state.phaseEndTime);
-                    }
-                    break;
+            if (data.phase === 'WAITING' && currentUser.uid === data.creatorId) {
+                startGameBtn.style.display = 'block';
+            } else if (data.phase === 'PRIVATE_CHAT') {
+                cooperateBtn.style.display = 'block';
+                betrayBtn.style.display = 'block';
                 
-                case 'reveal':
-                    if (currentUser.uid === state.hostId) {
-                         // میزبان، نمایش نتایج را کنترل می‌کند
-                         revealNextPair(state, 0);
-                    }
-                    break;
+                const currentPair = data.rounds[data.currentRound].pairs.find(p => p.player1_uid === self.uid || p.player2_uid === self.uid);
+                const myChoice = currentPair?.player1_uid === self.uid ? currentPair?.player1_choice : currentPair?.player2_choice;
+
+                cooperateBtn.disabled = myChoice === 'cooperate';
+                betrayBtn.disabled = myChoice === 'betray';
             }
         }
-        
-        // --- مدیریت مودال‌ها و چت‌ها ---
-        
-        function showPrivateChatModal(pairId, partner, endTime) {
-            const modal = document.getElementById('private-chat-modal');
-            document.getElementById('private-chat-title').textContent = `چت خصوصی با ${partner.displayName}`;
-            const timerEl = document.getElementById('private-chat-timer');
-            
-            // نمایش تایمر در مودال
-            const privateTimerInterval = setInterval(() => {
-                const now = new Date();
-                const secondsLeft = Math.round((endTime.toDate() - now) / 1000);
-                 if (secondsLeft <= 0) {
-                    timerEl.textContent = "00:00";
-                    clearInterval(privateTimerInterval);
-                } else {
-                    timerEl.textContent = `00:${String(secondsLeft).padStart(2, '0')}`;
-                }
-            }, 1000);
 
-            // پاک کردن پیام‌های قبلی
-            document.getElementById('private-chat-messages').innerHTML = '';
-            // گوش دادن به پیام‌های جدید
-            listenToPrivateChat(pairId);
-            modal.classList.add('visible');
-        }
+        // --- Game Logic Handlers ---
 
-        function showRevealModal(pair, players) {
-            const modal = document.getElementById('reveal-modal');
-            const [p1, p2] = pair.players.map(uid => players.find(p => p.uid === uid));
-            const choice1 = pair.choices[p1.uid];
-            const choice2 = pair.choices[p2.uid];
-            
-            // امتیازدهی
-            let score1 = 0, score2 = 0;
-            if (choice1 === 'cooperate' && choice2 === 'cooperate') { score1 = 3; score2 = 3; }
-            else if (choice1 === 'betray' && choice2 === 'cooperate') { score1 = 5; score2 = 0; }
-            else if (choice1 === 'cooperate' && choice2 === 'betray') { score1 = 0; score2 = 5; }
-            else if (choice1 === 'betray' && choice2 === 'betray') { score1 = 1; score2 = 1; }
-
-            const renderPlayerCard = (elId, player, choice, score) => {
-                const card = document.getElementById(elId);
-                card.querySelector('img').src = player.avatarUrl || 'defult.png';
-                card.querySelector('p').textContent = player.displayName;
-                const choiceEl = card.querySelector('.reveal-choice');
-                choiceEl.textContent = choice === 'cooperate' ? 'همکاری' : 'خیانت';
-                choiceEl.className = `reveal-choice ${choice}`;
-            };
-
-            renderPlayerCard('reveal-player1', p1, choice1, score1);
-            renderPlayerCard('reveal-player2', p2, choice2, score2);
-
-            document.getElementById('result-summary').innerHTML = 
-                `<b>${p1.displayName}</b> ${score1} امتیاز گرفت.<br><b>${p2.displayName}</b> ${score2} امتیاز گرفت.`;
-            
-            modal.classList.add('visible');
-        }
-
-        async function revealNextPair(state, pairIndex) {
-            if (pairIndex >= state.pairings.length) {
-                // تمام جفت‌ها نمایش داده شدند، به دور بعد برو
-                if (currentUser.uid === state.hostId) {
-                    // محاسبه و ثبت امتیازات نهایی دور و شروع دور جدید
-                    // این بخش پیچیده است و نیاز به تراکنش دارد تا امتیازات درست جمع شوند.
-                    // برای سادگی، فرض می‌کنیم یک تابع ابری این کار را انجام می‌دهد.
-                    // در این نسخه، میزبان این کار را با یک آپدیت انجام می‌دهد.
-                    console.log("تمام نتایج نمایش داده شد. شروع دور بعدی...");
-                    // در یک پروژه واقعی، یک تابع ابری باید این منطق را اجرا کند.
-                }
-                return;
-            }
-            
-            const pairToShow = state.pairings[pairIndex];
-            showRevealModal(pairToShow, state.players);
-
-            // دکمه برای نمایش جفت بعدی
-            const nextBtn = document.getElementById('reveal-next-btn');
-            nextBtn.onclick = () => revealNextPair(state, pairIndex + 1);
-        }
-
-        // --- توابع تعامل با Firestore ---
-
-        function listenToPublicChat() {
-            const chatCollectionRef = collection(db, `games/${gameId}/public_chat`);
-            const q = query(chatCollectionRef, orderBy('timestamp', 'asc'));
-            unsubscribePublicChat = onSnapshot(q, (snapshot) => {
-                snapshot.docChanges().forEach(change => {
-                    if (change.type === 'added') {
-                        renderMessage(change.doc.data(), 'chat-messages');
-                        // LATER: Add new message notification
-                    }
-                });
-            });
-        }
-        
-        function listenToPrivateChat(pairId) {
-            const chatCollectionRef = collection(db, `games/${gameId}/private_chats/${pairId}/messages`);
-            const q = query(chatCollectionRef, orderBy('timestamp', 'asc'));
-            unsubscribePrivateChat = onSnapshot(q, (snapshot) => {
-                 snapshot.docChanges().forEach(change => {
-                    if (change.type === 'added') {
-                        renderMessage(change.doc.data(), 'private-chat-messages');
-                    }
-                });
-            });
-        }
-
-        async function makeDecision(choice) {
-            cooperateBtn.disabled = true;
-            betrayBtn.disabled = true;
-
+        async function handleStartGame() {
+            startGameBtn.disabled = true;
             const gameDocRef = doc(db, "games", gameId);
             try {
                 await runTransaction(db, async (transaction) => {
                     const gameDoc = await transaction.get(gameDocRef);
                     if (!gameDoc.exists()) throw "Game does not exist!";
-                    
-                    const data = gameDoc.data();
-                    const myPairIndex = data.pairings.findIndex(p => p.players.includes(currentUser.uid));
-                    if (myPairIndex === -1) throw "You are not in a pair this round.";
+                    const players = gameDoc.data().players;
 
-                    // آپدیت choice در دیتابیس
-                    const updatedPairings = [...data.pairings];
-                    updatedPairings[myPairIndex].choices[currentUser.uid] = choice;
+                    // Initialize scores and shuffle players for first pairing
+                    players.forEach(p => p.score = 0);
+                    let shuffled = players.map(value => ({ value, sort: Math.random() })).sort((a, b) => a.sort - b.sort).map(({ value }) => value);
                     
-                    transaction.update(gameDocRef, { pairings: updatedPairings });
+                    const pairs = [];
+                    for(let i=0; i < shuffled.length; i+=2) {
+                        if (shuffled[i+1]) { // Make sure there's a pair
+                            pairs.push({
+                                player1_uid: shuffled[i].uid,
+                                player2_uid: shuffled[i+1].uid,
+                                player1_choice: null,
+                                player2_choice: null,
+                                votes: {},
+                                revealed: false
+                            });
+                        }
+                    }
+
+                    transaction.update(gameDocRef, {
+                        phase: "PRIVATE_CHAT",
+                        currentRound: 1,
+                        phaseEndTime: serverTimestamp(PHASE_DURATIONS.PRIVATE_CHAT * 1000),
+                        rounds: {
+                            "1": { pairs: pairs, currentVotingPairIndex: 0 }
+                        }
+                    });
                 });
             } catch (error) {
-                console.error("Error making decision:", error);
-                showNotificationModal("خطا", "ثبت تصمیم شما با مشکل مواجه شد.");
-                // فعال کردن مجدد دکمه‌ها در صورت خطا
-                cooperateBtn.disabled = false;
-                betrayBtn.disabled = false;
+                console.error("Failed to start game:", error);
+                showNotificationModal("خطا", "شروع بازی با مشکل مواجه شد.");
+                startGameBtn.disabled = false;
+            }
+        }
+        
+        function handlePrivateChat(data, self) {
+            const currentRoundData = data.rounds[data.currentRound];
+            const myPair = currentRoundData.pairs.find(p => p.player1_uid === self.uid || p.player2_uid === self.uid);
+            
+            if (!myPair) { // If user is not in a pair (odd number of players)
+                privateChatPanel.classList.remove('visible');
+                return;
+            }
+
+            const partnerUid = myPair.player1_uid === self.uid ? myPair.player2_uid : myPair.player1_uid;
+            const partner = data.players.find(p => p.uid === partnerUid);
+
+            if (!partner) return;
+            
+            const pairId = [self.uid, partner.uid].sort().join('-');
+            privateChatTitle.textContent = `چت خصوصی با ${partner.displayName}`;
+
+            if (!privateChatPanel.classList.contains('visible')) {
+                privateChatMessagesEl.innerHTML = '';
+                privateChatPanel.classList.add('visible');
+                listenToPrivateChatMessages(pairId);
             }
         }
 
-        // --- توابع کمکی ---
+        async function handleChoice(choice) {
+            cooperateBtn.disabled = true;
+            betrayBtn.disabled = true;
 
-        function setupEventListeners() {
-            cooperateBtn.addEventListener('click', () => makeDecision('cooperate'));
-            betrayBtn.addEventListener('click', () => makeDecision('betray'));
+            const gameDocRef = doc(db, "games", gameId);
+            try {
+                const round = currentGameState.currentRound;
+                const myPairIndex = currentGameState.rounds[round].pairs.findIndex(p => p.player1_uid === currentUser.uid || p.player2_uid === currentUser.uid);
+                
+                if (myPairIndex === -1) throw new Error("Pair not found");
+
+                const isPlayer1 = currentGameState.rounds[round].pairs[myPairIndex].player1_uid === currentUser.uid;
+                const fieldToUpdate = isPlayer1 ? `rounds.${round}.pairs.${myPairIndex}.player1_choice` : `rounds.${round}.pairs.${myPairIndex}.player2_choice`;
+
+                await updateDoc(gameDocRef, { [fieldToUpdate]: choice });
+            } catch (error) {
+                console.error("Error making choice:", error);
+                showNotificationModal("خطا", "ثبت انتخاب شما با مشکل مواجه شد.");
+            }
+        }
+
+        function handlePublicVoting(data, self) {
+            const roundData = data.rounds[data.currentRound];
+            const pairToVoteOn = roundData.pairs[roundData.currentVotingPairIndex];
+
+            if (!pairToVoteOn) return;
+
+            const isMyPair = pairToVoteOn.player1_uid === self.uid || pairToVoteOn.player2_uid === self.uid;
+
+            if (isMyPair) {
+                 centralBoardWaitingText.textContent = "دیگران در حال رأی دادن به تصمیم گروه شما هستند...";
+                 centralBoardWaitingText.style.display = 'block';
+                 return;
+            }
             
-            toggleChatBtn.addEventListener('click', () => chatPanel.classList.add('visible'));
-            document.getElementById('close-chat-btn').addEventListener('click', () => chatPanel.classList.remove('visible'));
+            votingPairContainer.style.display = 'flex';
+            const player1 = data.players.find(p => p.uid === pairToVoteOn.player1_uid);
+            const player2 = data.players.find(p => p.uid === pairToVoteOn.player2_uid);
 
-            document.getElementById('chat-form').addEventListener('submit', (e) => handleSendMessage(e, 'public_chat', 'chat-input'));
-            document.getElementById('private-chat-form').addEventListener('submit', (e) => {
-                const myPair = currentGameState.pairings.find(p => p.players.includes(currentUser.uid));
-                handleSendMessage(e, `private_chats/${myPair.pairId}/messages`, 'private-chat-input');
+            document.getElementById('vote-player1-avatar').src = player1.avatarUrl || 'https://up.20script.ir/file/1d50-defult.png';
+            document.getElementById('vote-player1-name').textContent = player1.displayName;
+            document.getElementById('vote-player2-avatar').src = player2.avatarUrl || 'https://up.20script.ir/file/1d50-defult.png';
+            document.getElementById('vote-player2-name').textContent = player2.displayName;
+            
+            const myVote = pairToVoteOn.votes[self.uid];
+            document.querySelectorAll('#public-voting-options button').forEach(btn => {
+                btn.disabled = !!myVote;
             });
         }
         
-        async function handleSendMessage(e, collectionPath, inputId) {
-            e.preventDefault();
-            const inputEl = document.getElementById(inputId);
-            const messageText = inputEl.value.trim();
-            if (messageText === '') return;
+        async function handlePublicVoteSubmit(vote) {
+             document.querySelectorAll('#public-voting-options button').forEach(btn => btn.disabled = true);
+             const gameDocRef = doc(db, "games", gameId);
+             try {
+                const round = currentGameState.currentRound;
+                const pairIndex = currentGameState.rounds[round].currentVotingPairIndex;
+                const fieldToUpdate = `rounds.${round}.pairs.${pairIndex}.votes.${currentUser.uid}`;
+                await updateDoc(gameDocRef, { [fieldToUpdate]: vote });
+             } catch(error) {
+                 console.error("Error submitting public vote:", error);
+             }
+        }
 
-            const tempMessage = inputEl.value;
-            inputEl.value = '';
-            inputEl.disabled = true;
+        function handleReveal(data) {
+            resultsContainer.innerHTML = '';
+            resultsContainer.style.display = 'flex';
 
-            try {
-                const chatCollectionRef = collection(db, `games/${gameId}/${collectionPath}`);
-                await addDoc(chatCollectionRef, { 
-                    text: messageText, 
-                    senderName: currentUser.displayName, 
-                    senderUid: currentUser.uid, 
-                    senderAvatarUrl: currentUser.photoURL,
-                    timestamp: serverTimestamp() 
-                });
-            } catch (error) {
-                console.error("Send message error:", error);
-                inputEl.value = tempMessage;
-            } finally {
-                inputEl.disabled = false;
-                inputEl.focus();
+            const roundData = data.rounds[data.currentRound];
+            const revealedPair = roundData.pairs[roundData.currentVotingPairIndex];
+            
+            const player1 = data.players.find(p => p.uid === revealedPair.player1_uid);
+            const player2 = data.players.find(p => p.uid === revealedPair.player2_uid);
+
+            const p1Choice = revealedPair.player1_choice || 'خیانت'; // Default to betray if no choice
+            const p2Choice = revealedPair.player2_choice || 'خیانت';
+            
+            let p1Points = 0, p2Points = 0;
+            if (p1Choice === 'cooperate' && p2Choice === 'cooperate') { p1Points = 3; p2Points = 3; }
+            else if (p1Choice === 'betray' && p2Choice === 'cooperate') { p1Points = 5; p2Points = 0; }
+            else if (p1Choice === 'cooperate' && p2Choice === 'betray') { p1Points = 0; p2Points = 5; }
+            else if (p1Choice === 'betray' && p2Choice === 'betray') { p1Points = 1; p2Points = 1; }
+            
+            const actualOutcome = (p1Choice === 'cooperate' && p2Choice === 'cooperate') ? 'cooperate' : 'betray';
+            let correctVotes = 0;
+            Object.values(revealedPair.votes).forEach(vote => {
+                if (vote === actualOutcome) correctVotes++;
+            });
+
+            resultsContainer.innerHTML = `
+                <div class="result-pair-card">
+                    <div class="result-player-info">
+                        <span class="result-player-name">${player1.displayName}</span>
+                        <span class="result-player-choice ${p1Choice}">${p1Choice === 'cooperate' ? 'همکاری' : 'خیانت'}</span>
+                    </div>
+                    <div class="points-change ${p1Points > 0 ? 'positive' : 'negative'}">امتیاز: ${p1Points > 0 ? '+' : ''}${p1Points}</div>
+                </div>
+                 <div class="result-pair-card">
+                    <div class="result-player-info">
+                        <span class="result-player-name">${player2.displayName}</span>
+                        <span class="result-player-choice ${p2Choice}">${p2Choice === 'cooperate' ? 'همکاری' : 'خیانت'}</span>
+                    </div>
+                    <div class="points-change ${p2Points > 0 ? 'positive' : 'negative'}">امتیاز: ${p2Points > 0 ? '+' : ''}${p2Points}</div>
+                </div>
+                <div class="public-vote-result">
+                    ${correctVotes} نفر نتیجه را درست حدس زدند و هرکدام 1 امتیاز گرفتند.
+                </div>
+            `;
+        }
+
+
+        // --- Chat Functions ---
+        function setupEventListeners() {
+            startGameBtn.addEventListener('click', handleStartGame);
+            cooperateBtn.addEventListener('click', () => handleChoice('cooperate'));
+            betrayBtn.addEventListener('click', () => handleChoice('betray'));
+            document.querySelectorAll('#public-voting-options button').forEach(btn => {
+                btn.addEventListener('click', () => handlePublicVoteSubmit(btn.dataset.vote));
+            });
+
+            // General Chat
+            toggleChatBtn.addEventListener('click', () => toggleChatPanel(chatPanel));
+            closeChatBtn.addEventListener('click', () => toggleChatPanel(chatPanel));
+            chatForm.addEventListener('submit', (e) => handleSendMessage(e, chatInput, 'public'));
+
+            // Private Chat
+            privateChatForm.addEventListener('submit', (e) => {
+                const roundData = currentGameState.rounds[currentGameState.currentRound];
+                const myPair = roundData.pairs.find(p => p.player1_uid === currentUser.uid || p.player2_uid === currentUser.uid);
+                const partnerUid = myPair.player1_uid === currentUser.uid ? myPair.player2_uid : myPair.player1_uid;
+                const pairId = [currentUser.uid, partnerUid].sort().join('-');
+                handleSendMessage(e, privateChatInput, 'private', pairId);
+            });
+        }
+
+        function toggleChatPanel(panel) { 
+            const isVisible = panel.classList.contains('visible');
+            panel.classList.toggle('visible', !isVisible); 
+            if(!isVisible) {
+                if(panel.id === 'chat-panel') toggleChatBtn.classList.remove('new-message');
+                panel.querySelector('input').focus();
             }
         }
         
-        function renderMessage(data, containerId) {
-            const containerEl = document.getElementById(containerId);
+        async function handleSendMessage(e, inputElement, chatType, pairId = null) {
+             e.preventDefault();
+             const messageText = inputElement.value.trim();
+             if (messageText === '') return;
+
+             inputElement.disabled = true;
+             const tempMessage = inputElement.value;
+             inputElement.value = '';
+
+             let chatCollectionRef;
+             if (chatType === 'private') {
+                 chatCollectionRef = collection(db, `games/${gameId}/private_chats/${pairId}/messages`);
+             } else {
+                 chatCollectionRef = collection(db, `games/${gameId}/chat`);
+             }
+
+             try {
+                await addDoc(chatCollectionRef, { 
+                    text: messageText, 
+                    senderName: currentUserData.displayName || "بازیکن", 
+                    senderUid: currentUser.uid, 
+                    senderAvatarUrl: currentUserData.avatarUrl || "https://up.20script.ir/file/1d50-defult.png",
+                    timestamp: serverTimestamp() 
+                });
+             } catch (error) {
+                console.error("Send message error:", error);
+                inputElement.value = tempMessage;
+             } finally {
+                inputElement.disabled = false;
+                inputElement.focus();
+             }
+        }
+        
+        function listenToPrivateChatMessages(pairId) {
+            if (unsubscribePrivateChat) unsubscribePrivateChat();
+            const chatCollectionRef = collection(db, `games/${gameId}/private_chats/${pairId}/messages`);
+            const q = query(chatCollectionRef, orderBy('timestamp', 'asc'));
+            unsubscribePrivateChat = onSnapshot(q, (snapshot) => {
+                snapshot.docChanges().forEach(change => {
+                    if (change.type === 'added') {
+                        renderMessage(change.doc.data(), privateChatMessagesEl);
+                    }
+                });
+            });
+        }
+
+
+        function renderMessage(data, messagesContainer) {
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('chat-message');
-            if (data.senderUid === currentUser.uid) messageDiv.classList.add('self');
-            
+            const isSelf = data.senderUid === currentUser.uid;
+            if (isSelf) messageDiv.classList.add('self');
             messageDiv.innerHTML = `
-                <img src="${data.senderAvatarUrl || 'defult.png'}" class="chat-message-avatar" onerror="this.src='defult.png';">
+                <img src="${data.senderAvatarUrl || 'https://up.20script.ir/file/1d50-defult.png'}" class="chat-message-avatar">
                 <div class="chat-message-content">
                     <span class="chat-message-sender">${data.senderName}</span>
                     <div class="chat-message-bubble">${data.text}</div>
                 </div>`;
-            containerEl.appendChild(messageDiv);
-            containerEl.scrollTop = containerEl.scrollHeight;
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
-        
+
+        // --- Utility ---
         function showNotificationModal(title, message, onOk) { 
             const modal = document.getElementById('notification-modal'); 
             document.getElementById('notification-modal-title').textContent = title; 
             document.getElementById('notification-modal-message').textContent = message; 
             const okBtn = document.getElementById('notification-modal-ok-btn'); 
-            const newOkBtn = okBtn.cloneNode(true);
-            okBtn.parentNode.replaceChild(newOkBtn, okBtn);
-            const closeModal = () => { modal.classList.remove('visible'); if (onOk) onOk(); };
-            newOkBtn.onclick = closeModal;
-            modal.onclick = (e) => { if (e.target === modal) closeModal(); };
-            modal.classList.add('visible');
+            const newOkBtn = okBtn.cloneNode(true); 
+            okBtn.parentNode.replaceChild(newOkBtn, okBtn); 
+            const closeModal = () => { modal.classList.remove('visible'); if (onOk) onOk(); }; 
+            newOkBtn.onclick = closeModal; 
+            modal.onclick = (e) => { if (e.target === modal) closeModal(); }; 
+            modal.classList.add('visible'); 
         }
 
-        // --- اجرای بازی ---
         main();
     </script>
 </body>
