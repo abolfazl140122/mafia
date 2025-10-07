@@ -94,6 +94,7 @@
         .player-info { display: flex; align-items: center; gap: 10px; }
         .player-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--text-secondary); }
         .player-name { font-weight: 700; font-size: 1rem; }
+        .player-name .bot-tag { font-size: 0.8rem; color: var(--text-secondary); margin-right: 5px;}
         .player-score { font-size: 1.2rem; font-weight: 900; color: var(--primary-gold); }
         .player-score-item.is-self { background-color: var(--darker-red); border-left: 4px solid var(--primary-gold); }
 
@@ -212,7 +213,7 @@
         <aside class="players-sidebar">
             <h2 class="sidebar-title">امتیازات</h2>
             <div id="players-list">
-                <!-- لیست بازیکنان توسط جاوااسکریپت ساخته می‌شود -->
+                <!-- لیست بازیکنان توسط جاوااسکریپت از دیتابیس بازی خوانده می‌شود -->
             </div>
         </aside>
 
@@ -222,9 +223,9 @@
                     <h2 class="overlay-title">هم‌پیمان شما</h2>
                     <p class="overlay-subtitle">در این دور، سرنوشت شما به این بازیکن گره خورده است!</p>
                     <div class="partner-display">
-                        <img id="my-avatar-pairing" src="" class="partner-avatar" alt="آواتار شما">
+                        <img id="my-avatar-pairing" src="https://up.20script.ir/file/1d50-defult.png" class="partner-avatar" alt="آواتار شما">
                         <span class="plus-icon">+</span>
-                        <img id="partner-avatar-pairing" src="" class="partner-avatar" alt="آواتار هم‌پیمان">
+                        <img id="partner-avatar-pairing" src="https://up.20script.ir/file/1d50-defult.png" class="partner-avatar" alt="آواتار هم‌پیمان">
                     </div>
                      <p id="partner-name-display" style="font-size: 1.2rem; font-weight: 700;"></p>
                 </div>
@@ -252,20 +253,11 @@
 
     <!-- Firebase SDK -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-        import { getFirestore, doc, onSnapshot, updateDoc, setDoc, getDoc, collection, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
-            authDomain: "mafia-9fcbf.firebaseapp.com",
-            databaseURL: "https://mafia-9fcbf-default-rtdb.firebaseio.com",
-            projectId: "mafia-9fcbf",
-            storageBucket: "mafia-9fcbf.firebasestorage.app",
-            messagingSenderId: "471627157488",
-            appId: "1:471627157488:web:92f008548a5596619a5735",
-            measurementId: "G-0PDHDWC6NV"
-        };
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, doc, onSnapshot, updateDoc, getDoc, collection, writeBatch, serverTimestamp, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        
+        const firebaseConfig = { apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg", authDomain: "mafia-9fcbf.firebaseapp.com", projectId: "mafia-9fcbf", storageBucket: "mafia-9fcbf.appspot.com", messagingSenderId: "471627157488", appId: "1:471627157488:web:92f008548a5596619a5735", };
 
         // --- مقداردهی اولیه Firebase ---
         const app = initializeApp(firebaseConfig);
@@ -291,13 +283,20 @@
         // --- متغیرهای وضعیت بازی ---
         let currentGameState = {};
         let currentUser = null; // اطلاعات کاربر لاگین کرده
-        let gameId = "active_game_01"; // آیدی بازی - می‌توانید این را به صورت داینامیک تعیین کنید
+        let gameId = null; // آیدی بازی از URL خوانده می‌شود
         let gameRef = null;
         let timerInterval = null;
         let unsubscribeGame = null; // برای قطع شنونده در زمان خروج
 
         // --- تابع اصلی اجرای بازی ---
         async function main() {
+            // [تغییر کلیدی] خواندن آیدی بازی از URL
+            gameId = new URLSearchParams(window.location.search).get('id');
+            if (!gameId) {
+                loadingText.textContent = 'خطا: شناسه بازی یافت نشد!';
+                return;
+            }
+
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
                     loadingText.textContent = 'در حال دریافت اطلاعات کاربر...';
@@ -311,7 +310,7 @@
                     }
                 } else {
                     loadingText.textContent = 'لطفا ابتدا وارد حساب کاربری خود شوید.';
-                    // در یک برنامه واقعی، کاربر را به صفحه لاگین هدایت می‌کنید
+                    window.location.href = './login.html'; // هدایت به صفحه لاگین
                 }
             });
         }
@@ -320,14 +319,18 @@
             gameRef = doc(db, "games", gameId);
             const gameSnap = await getDoc(gameRef);
 
+            // [تغییر کلیدی] بازی باید از قبل توسط لابی ساخته شده باشد
             if (!gameSnap.exists()) {
-                 loadingText.textContent = 'بازی یافت نشد. در حال ساخت بازی جدید...';
-                 await createNewGame();
+                 loadingText.textContent = 'خطا: بازی مورد نظر یافت نشد!';
+                 return;
             }
 
             // شنونده وضعیت بازی را فعال کن
             unsubscribeGame = onSnapshot(gameRef, (doc) => {
                 handleGameStateChange(doc.data());
+            }, (error) => {
+                console.error("Error listening to game state:", error);
+                loadingText.textContent = 'ارتباط با سرور قطع شد.';
             });
 
             // نمایش رابط کاربری
@@ -338,43 +341,6 @@
             }, 500);
         }
         
-        async function createNewGame() {
-            // در یک سناریوی واقعی، لیست بازیکنان از لابی یا صف matchmaking می‌آید
-            // برای این مثال، چند کاربر تصادفی از کالکشن users می‌خوانیم
-            const usersSnapshot = await getDocs(collection(db, "users"));
-            let players = [];
-            usersSnapshot.forEach(userDoc => {
-                players.push({
-                    uid: userDoc.id,
-                    displayName: userDoc.data().displayName || "بدون نام",
-                    avatarUrl: userDoc.data().avatarUrl || `https://i.pravatar.cc/150?u=${userDoc.id}`,
-                    score: 0
-                });
-            });
-
-            // اطمینان حاصل کنید که کاربر فعلی در لیست است
-            if (!players.find(p => p.uid === currentUser.uid)) {
-                players.push({
-                    uid: currentUser.uid,
-                    displayName: currentUser.displayName,
-                    avatarUrl: currentUser.avatarUrl,
-                    score: 0
-                });
-            }
-
-            const initialGameState = {
-                round: 1,
-                phase: 'initial', // فاز اولیه
-                players: players, // لیست کامل بازیکنان
-                pairs: [],
-                choices: {},
-                chat: []
-            };
-            await setDoc(gameRef, initialGameState);
-            addAnnouncementMessage("راوی: به بازی معامله‌گر خوش آمدید!");
-            setTimeout(startGame, 2000); // بازی را با تاخیر شروع کن
-        }
-
         function handleGameStateChange(state) {
             if (!state) return;
             currentGameState = state;
@@ -386,30 +352,43 @@
             if (!state.players) return;
 
             playersListEl.innerHTML = '';
-            [...state.players].sort((a, b) => b.score - a.score).forEach(p => {
+            // [تغییر] مرتب‌سازی بازیکنان بر اساس امتیاز
+            const sortedPlayers = [...state.players].sort((a, b) => (b.score || 0) - (a.score || 0));
+            
+            sortedPlayers.forEach(p => {
                 const isSelf = p.uid === currentUser.uid;
                 const playerEl = document.createElement('div');
                 playerEl.className = `player-score-item ${isSelf ? 'is-self' : ''}`;
+                
+                // [تغییر کلیدی] بررسی اینکه بازیکن ربات است یا خیر
+                const botTag = p.isBot ? '<span class="bot-tag">🤖 (ربات)</span>' : '';
+
                 playerEl.innerHTML = `
                     <div class="player-info">
-                        <img src="${p.avatarUrl}" alt="${p.displayName}" class="player-avatar">
-                        <span class="player-name">${p.displayName}</span>
+                        <img src="${p.avatarUrl || 'https://up.20script.ir/file/1d50-defult.png'}" alt="${p.displayName}" class="player-avatar" onerror="this.src='https://up.20script.ir/file/1d50-defult.png';">
+                        <span class="player-name">${p.displayName}${botTag}</span>
                     </div>
-                    <span class="player-score">${p.score}</span>
+                    <span class="player-score">${p.score || 0}</span>
                 `;
                 playersListEl.appendChild(playerEl);
             });
 
             // رندر کردن پیام‌های چت
             chatMessagesEl.innerHTML = '';
-            if(state.chat) {
+            if(state.announcements) { // نام فیلد در دیتابیس announcements است
+                 state.announcements.forEach(msg => addMessageToChatUI({announcement: true, text: msg}));
+            }
+             if(state.chat) {
                 state.chat.forEach(msg => addMessageToChatUI(msg));
             }
         }
 
         function handleGamePhase(state) {
             const self = state.players.find(p => p.uid === currentUser.uid);
-            const myPair = state.pairs.find(p => p.includes(currentUser.uid));
+            if (!self) return;
+
+            const myPair = state.pairs?.find(p => p.includes(currentUser.uid));
+            const amIBot = self.isBot === true;
 
             // مخفی کردن پنل‌ها به صورت پیش‌فرض
             pairingPanel.classList.remove('visible');
@@ -423,90 +402,76 @@
                     break;
                 case 'choice':
                     roundInfoEl.textContent = `دور ${state.round} - انتخاب`;
-                    // اگر کاربر هنوز انتخاب نکرده، پنل را نشان بده
-                    if (myPair && !state.choices[currentUser.uid]) {
+                    // اگر کاربر واقعی است و هنوز انتخاب نکرده، پنل را نشان بده
+                    if (myPair && !amIBot && !state.choices?.[currentUser.uid]) {
                         showChoicePanel();
+                    }
+                    // [تغییر کلیدی] اگر کاربر فعلی میزبان است، تصمیم‌گیری ربات‌ها را اجرا کن
+                    if (currentUser.uid === state.creatorId) {
+                        handleBotChoices(state);
                     }
                     break;
                 case 'public_chat':
                     roundInfoEl.textContent = `دور ${state.round} - چت عمومی`;
-                    enableChat(false);
+                    if (!amIBot) enableChat(false);
                     break;
                 case 'private_chat':
                     roundInfoEl.textContent = `دور ${state.round} - چت خصوصی`;
-                    enableChat(true);
+                    if (!amIBot) enableChat(true);
                     break;
                 case 'results':
                     roundInfoEl.textContent = `دور ${state.round} - نتایج`;
                     break;
                 default:
-                    roundInfoEl.textContent = `دور ${state.round} - در انتظار...`;
+                    roundInfoEl.textContent = `دور ${state.round || 1} - در انتظار...`;
             }
         }
-
-        // --- توابع کنترل جریان بازی ---
         
-        // این تابع باید توسط ادمین یا سازنده لابی فراخوانی شود
-        async function startGame() {
-            if (!currentGameState.players || currentGameState.players.length === 0) return;
+        /**
+         * [تابع جدید] این تابع توسط میزبان بازی اجرا شده و برای ربات‌ها تصمیم‌گیری می‌کند
+         */
+        async function handleBotChoices(state) {
+            const batch = writeBatch(db);
+            let choicesMade = false;
 
-            await addAnnouncementMessage("راوی: گروه‌بندی در حال انجام است...");
-            let playersToPair = [...currentGameState.players];
-            let pairs = [];
-            playersToPair.sort(() => Math.random() - 0.5);
-            while(playersToPair.length > 1) {
-                const p1 = playersToPair.pop();
-                const p2 = playersToPair.pop();
-                pairs.push([p1.uid, p2.uid]);
+            // تمام بازیکنان ربات را پیدا کن
+            const bots = state.players.filter(p => p.isBot);
+            
+            bots.forEach(bot => {
+                // اگر ربات در یک زوج قرار دارد و هنوز تصمیمی برایش ثبت نشده
+                const isPaired = state.pairs?.some(p => p.includes(bot.uid));
+                const hasChosen = state.choices?.[bot.uid];
+                
+                if (isPaired && !hasChosen) {
+                    // با احتمال 50/50 یک تصمیم بگیر
+                    const choice = Math.random() < 0.5 ? 'cooperate' : 'betray';
+                    // فیلد جدید را به مپ choices اضافه کن
+                    batch.update(gameRef, { [`choices.${bot.uid}`]: choice });
+                    choicesMade = true;
+                }
+            });
+
+            if (choicesMade) {
+                try {
+                    await batch.commit();
+                    console.log("تصمیم ربات‌ها ثبت شد.");
+                } catch (error) {
+                    console.error("خطا در ثبت تصمیم ربات‌ها:", error);
+                }
             }
-            await updateDoc(gameRef, { phase: 'pairing', pairs: pairs, choices: {} });
-
-            setTimeout(async () => {
-                 await updateDoc(gameRef, { phase: 'choice' });
-                 // در یک بازی واقعی، نیازی به شبیه‌سازی انتخاب ربات نیست
-            }, 5000); // 5 ثانیه نمایش پنل هم‌پیمانی
         }
+
 
         async function handlePlayerChoice(choice) {
             cooperateBtn.classList.add('selected');
             betrayBtn.classList.add('selected');
-            await addAnnouncementMessage(`شما "${choice === 'cooperate' ? 'همکاری' : 'خیانت'}" را انتخاب کردید.`);
             
-            let choices = currentGameState.choices || {};
-            choices[currentUser.uid] = choice;
-            await updateDoc(gameRef, { choices: choices });
+            // از فیلد داینامیک برای آپدیت مپ استفاده می‌کنیم
+            await updateDoc(gameRef, {
+                [`choices.${currentUser.uid}`]: choice
+            });
 
-            // بررسی اینکه آیا همه انتخاب کرده‌اند یا نه، باید در سمت سرور یا cloud function انجام شود
-            // اما برای سادگی، اینجا هم چک می‌کنیم
-            checkAllChoicesMade();
-        }
-
-        async function checkAllChoicesMade() {
-             const pairedPlayersCount = currentGameState.pairs.flat().length;
-             const totalChoices = Object.keys(currentGameState.choices).length;
-             
-             if (totalChoices >= pairedPlayersCount) {
-                 await addAnnouncementMessage("راوی: تصمیم‌گیری‌ها انجام شد.");
-                 setTimeout(startPublicChatPhase, 2000); 
-             }
-        }
-        
-        async function startPublicChatPhase() {
-            await updateDoc(gameRef, { phase: 'public_chat' });
-            await addAnnouncementMessage("چت عمومی فعال شد. شما 90 ثانیه فرصت دارید.");
-            startTimer(90, startPrivateChatPhase);
-        }
-        
-        async function startPrivateChatPhase() {
-            await updateDoc(gameRef, { phase: 'private_chat' });
-            await addAnnouncementMessage("چت خصوصی فعال شد. 60 ثانیه فرصت دارید با هم‌پیمان خود صحبت کنید.");
-            startTimer(60, endRound);
-        }
-
-        async function endRound() {
-            await updateDoc(gameRef, { phase: 'results' });
-            await addAnnouncementMessage("زمان این دور به پایان رسید. در حال محاسبه نتایج...");
-            // اینجا منطق محاسبه امتیازات و نمایش نتایج اضافه می‌شود
+            await addAnnouncementMessage(`شما "${choice === 'cooperate' ? 'همکاری' : 'خیانت'}" را انتخاب کردید.`);
         }
 
         // --- توابع رابط کاربری (UI) ---
@@ -516,8 +481,8 @@
             const partner = allPlayers.find(p => p.uid === partnerId);
             if (!partner) return;
 
-            document.getElementById('my-avatar-pairing').src = self.avatarUrl;
-            document.getElementById('partner-avatar-pairing').src = partner.avatarUrl;
+            document.getElementById('my-avatar-pairing').src = self.avatarUrl || 'https://up.20script.ir/file/1d50-defult.png';
+            document.getElementById('partner-avatar-pairing').src = partner.avatarUrl || 'https://up.20script.ir/file/1d50-defult.png';
             document.getElementById('partner-name-display').textContent = `هم‌پیمان شما: ${partner.displayName}`;
             pairingPanel.classList.add('visible');
         }
@@ -529,26 +494,7 @@
         }
         
         function startTimer(duration, onComplete) {
-            if (timerInterval) clearInterval(timerInterval);
-            let timeLeft = duration;
-            const endTime = Date.now() + duration * 1000;
-
-            // برای جلوگیری از تاخیر شبکه، تایمر را به صورت محلی به‌روز می‌کنیم
-            // اما می‌توان endTime را هم در دیتابیس ذخیره کرد
-            timerInterval = setInterval(() => {
-                timeLeft = Math.round((endTime - Date.now()) / 1000);
-                timerEl.textContent = formatTime(timeLeft);
-                timerEl.classList.toggle('critical', timeLeft <= 10);
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    timerEl.textContent = "00:00";
-                    // فقط ادمین یا یک بازیکن مسئول باید فاز بعدی را شروع کند
-                    // برای جلوگیری از فراخوانی چندباره onComplete
-                    if(currentUser.uid === currentGameState.players[0].uid) {
-                        if (onComplete) onComplete();
-                    }
-                }
-            }, 1000);
+            // این تابع فعلا در جریان بازی استفاده نمی‌شود اما برای آینده مفید است
         }
 
         function formatTime(seconds) {
@@ -578,12 +524,11 @@
                 senderAvatar: currentUser.avatarUrl,
                 text: text,
                 isPrivate: isPrivateChat,
-                timestamp: new Date()
+                timestamp: serverTimestamp()
             };
-
-            // افزودن پیام به آرایه چت در دیتابیس
-            const newChat = [...(currentGameState.chat || []), newMessage];
-            await updateDoc(gameRef, { chat: newChat });
+            
+            // افزودن پیام به آرایه چت در دیتابیس با arrayUnion
+            await updateDoc(gameRef, { chat: arrayUnion(newMessage) });
 
             chatInput.value = '';
         }
@@ -604,7 +549,7 @@
             
             // فیلتر کردن پیام‌های خصوصی
             if (isPrivate) {
-                const myPair = currentGameState.pairs.find(p => p.includes(currentUser.uid));
+                const myPair = currentGameState.pairs?.find(p => p.includes(currentUser.uid));
                 if (!myPair || !myPair.includes(senderUid)) {
                     return; // اگر پیام خصوصی برای من نیست، نمایش نده
                 }
@@ -613,7 +558,7 @@
             const msgEl = document.createElement('div');
             msgEl.className = `chat-message ${isSelf ? 'self' : ''} ${isPrivate ? 'private' : ''}`;
             msgEl.innerHTML = `
-                <img src="${senderAvatar}" class="chat-message-avatar">
+                <img src="${senderAvatar || 'https://up.20script.ir/file/1d50-defult.png'}" class="chat-message-avatar">
                 <div class="chat-message-content">
                     <span class="chat-message-sender">${senderName}</span>
                     <div class="chat-message-bubble">${text}</div>
@@ -623,9 +568,9 @@
         }
 
         async function addAnnouncementMessage(text) {
-             const newMessage = { announcement: true, text: text, timestamp: new Date() };
-             const newChat = [...(currentGameState.chat || []), newMessage];
-             await updateDoc(gameRef, { chat: newChat });
+             await updateDoc(gameRef, {
+                announcements: arrayUnion(`[${new Date().toLocaleTimeString('fa-IR', { hour: '2-digit', minute:'2-digit'})}] ${text}`)
+             });
         }
         
         function setupEventListeners() {
