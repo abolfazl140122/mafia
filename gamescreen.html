@@ -242,7 +242,7 @@
             gameId: 'negotiator123',
             gameState: {
                 round: 1,
-                phase: 'initial', // initial -> pairing -> choice -> public_chat -> private_chat -> results
+                phase: 'initial',
                 players: [],
                 pairs: [],
                 choices: {},
@@ -254,11 +254,9 @@
         // --- شبیه‌ساز بازیکنان (برای تست) ---
         function generateFakePlayers() {
             const names = ["حسین", "سارا", "نیما", "مریم", "رضا", "الهه", "امیر", "فاطمه", "علی", "زهرا"];
-            // افزودن بازیکن واقعی
             FAKE_DB.gameState.players.push({ uid: 'player123', displayName: 'شما', avatarUrl: 'https://i.pravatar.cc/150?u=player123', score: 0, isBot: false });
-            // افزودن 11 بازیکن دیگر (ترکیبی از ربات و بازیکن)
             for (let i = 0; i < 11; i++) {
-                const isBot = true; // در این شبیه‌سازی، همه به جز بازیکن اصلی ربات هستند
+                const isBot = true;
                 const uid = `player${i}`;
                 FAKE_DB.gameState.players.push({
                     uid: uid,
@@ -273,9 +271,16 @@
 
         // --- توابع شبیه‌ساز سرور ---
         const firestore = {
-            onSnapshot: (callback) => { FAKE_DB.listeners.push(callback); },
+            // *** تغییر کلیدی در اینجا ***
+            // این تابع حالا واقعی‌تر عمل می‌کند: بلافاصله داده‌های اولیه را برمی‌گرداند
+            onSnapshot: (callback) => {
+                FAKE_DB.listeners.push(callback);
+                // بلافاصله شنونده را با داده‌های فعلی فراخوانی کن
+                callback({ data: () => FAKE_DB.gameState });
+            },
             updateDoc: (newData) => {
                 FAKE_DB.gameState = { ...FAKE_DB.gameState, ...newData };
+                // تمام شنونده‌ها را از تغییرات جدید مطلع کن
                 FAKE_DB.listeners.forEach(cb => cb({ data: () => FAKE_DB.gameState }));
                 console.log("پایگاه داده آپدیت شد:", FAKE_DB.gameState);
             }
@@ -305,8 +310,11 @@
             generateFakePlayers();
             currentUser = FAKE_DB.currentUser;
 
+            // این شنونده حالا بلافاصله اجرا شده و currentGameState را پر می‌کند
             firestore.onSnapshot((doc) => {
                 currentGameState = doc.data();
+                if (!currentGameState) return; // اگر داده‌ای وجود نداشت، ادامه نده
+                
                 renderUI(currentGameState);
                 handleGamePhase(currentGameState);
             });
@@ -316,6 +324,7 @@
             setTimeout(() => {
                 loadingOverlay.style.display = 'none';
                 gameWrapper.classList.add('visible');
+                // حالا با خیال راحت می‌توانیم بازی را شروع کنیم چون داده‌ها بارگذاری شده‌اند
                 setTimeout(startGame, 1000);
             }, 500);
 
@@ -323,8 +332,12 @@
         }
 
         function renderUI(state) {
+            // *** اضافه کردن یک خط محافظ ***
+            if (!state.players) return; // اگر لیستی وجود ندارد، چیزی رندر نکن
+
             playersListEl.innerHTML = '';
-            state.players.sort((a, b) => b.score - a.score).forEach(p => {
+            // کپی کردن آرایه قبل از مرتب‌سازی برای جلوگیری از تغییر ناخواسته در state اصلی
+            [...state.players].sort((a, b) => b.score - a.score).forEach(p => {
                 const playerEl = document.createElement('div');
                 playerEl.className = 'player-score-item';
                 playerEl.innerHTML = `
@@ -339,6 +352,9 @@
         }
         
         function handleGamePhase(state) {
+            // *** اضافه کردن یک خط محافظ ***
+            if (!state.players || !state.pairs) return;
+
             const self = state.players.find(p => p.uid === currentUser.uid);
             const myPair = state.pairs.find(p => p.includes(currentUser.uid));
 
@@ -352,7 +368,6 @@
                     break;
                 case 'choice':
                      roundInfoEl.textContent = `دور ${state.round} - انتخاب`;
-                     // فقط اگر بازیکن واقعی هنوز انتخاب نکرده، پنل را نشان بده
                      if (myPair && !self.isBot && !state.choices[currentUser.uid]) {
                          showChoicePanel();
                      }
@@ -376,14 +391,21 @@
             addAnnouncementMessage("راوی: به شهر ما خوش آمدید!");
             const greetingSoundUrl = 'https://raw.githubusercontent.com/abolfazl140122/mafia/58cc5df365b21b6f32f609f5c12175acce8f717c/voicravi/%D8%B3%D9%84%D8%A7%D9%85%20%D8%A8%D8%B1%20%D8%AF%D9%88%D8%B3%D8%AA%D8%A7%D9%86%20%D8%B9%D8%B2%DB%8C%D8%B2%20%D8%B1%D9%88%D8%B2%20%D9%87%D9%85%DA%AF%DB%8C%20%D8%A8%D8%AE%DB%8C%D8%B1!.wav';
             try {
-                const audio = new Audio(greetingSoundUrl);
-                await audio.play();
+                // برای جلوگیری از خطای autoplay در مرورگرها، پخش صدا را موقتا کامنت می‌کنیم
+                // const audio = new Audio(greetingSoundUrl);
+                // await audio.play();
             } catch (error) {
                 console.error("خطا در پخش صدای راوی:", error);
             }
         }
 
         function startGame() {
+            // *** اضافه کردن یک خط محافظ ***
+            if (!currentGameState.players || !Array.isArray(currentGameState.players) || currentGameState.players.length === 0) {
+                console.error("لیست بازیکنان برای شروع بازی آماده نیست!");
+                return;
+            }
+
             addAnnouncementMessage("راوی: گروه‌بندی در حال انجام است...");
             let playersToPair = [...currentGameState.players];
             let pairs = [];
@@ -397,9 +419,8 @@
 
             setTimeout(() => {
                  firestore.updateDoc({ phase: 'choice' });
-                 // ربات‌ها به صورت خودکار انتخاب می‌کنند
                  simulateBotChoices();
-            }, 5000); // 5 ثانیه برای نمایش پنل هم‌پیمانی
+            }, 5000);
         }
 
         function handlePlayerChoice(choice) {
@@ -411,13 +432,11 @@
             checkAllChoicesMade();
         }
         
-        // **تابع جدید برای تصمیم‌گیری خودکار ربات‌ها**
         function simulateBotChoices() {
             let choices = { ...currentGameState.choices };
             let botsMadeChoice = false;
             currentGameState.players.forEach(p => {
                 if (p.isBot && !choices[p.uid]) {
-                     // 60% احتمال همکاری، 40% احتمال خیانت
                      const botChoice = Math.random() > 0.4 ? 'cooperate' : 'betray';
                      choices[p.uid] = botChoice;
                      botsMadeChoice = true;
@@ -428,21 +447,16 @@
                 setTimeout(() => {
                     firestore.updateDoc({ choices: choices });
                     checkAllChoicesMade();
-                }, 1500); // تاخیر برای واقعی‌تر شدن
+                }, 1500);
             }
         }
 
-        // **بررسی می‌کند که آیا همه انتخاب کرده‌اند یا نه**
         function checkAllChoicesMade() {
              const pairedPlayersCount = currentGameState.pairs.flat().length;
              const totalChoices = Object.keys(currentGameState.choices).length;
              
-             console.log(`تعداد انتخاب‌ها: ${totalChoices} / ${pairedPlayersCount}`);
-
              if (totalChoices >= pairedPlayersCount) {
-                 // **پیام جدید در اینجا اضافه شده است**
                  addAnnouncementMessage("راوی: گروه‌بندی و تصمیم‌گیری‌ها انجام شد.");
-                 // تاخیر کوتاه برای نمایش پیام قبل از شروع تایمر
                  setTimeout(startPublicChatPhase, 2000); 
              }
         }
@@ -464,7 +478,6 @@
             addAnnouncementMessage("زمان این دور به پایان رسید. در حال محاسبه نتایج...");
         }
 
-        // --- توابع کمکی UI ---
         function showPairingPanel(self, allPlayers, pair) {
             const partnerId = pair.find(id => id !== self.uid);
             const partner = allPlayers.find(p => p.uid === partnerId);
@@ -508,7 +521,6 @@
              chatInput.placeholder = isDisabled ? "چت غیرفعال است" : (isPrivate ? "با هم‌پیمان خود چت کنید..." : "با همه صحبت کنید...");
         }
 
-        // --- توابع مربوط به چت ---
         function addMessageToChat(msgData) {
             const { senderName, senderAvatar, text, senderUid, isPrivate, announcement } = msgData;
             
