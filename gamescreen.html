@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>بازی معامله‌گر - نسخه جدید</title>
+    <title>بازی معامله‌گر - دوراهی زندانی</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
@@ -97,6 +97,7 @@
         .player-score { font-size: 1.2rem; font-weight: 900; color: var(--primary-gold); }
         .player-score-item.is-self { background-color: var(--darker-red); border-left: 4px solid var(--primary-gold); }
 
+
         /* === بخش اصلی (چت و پنل اقدام) === */
         .main-content {
             grid-area: main;
@@ -111,11 +112,21 @@
 
         /* === پنل‌های هم‌پیمانی و انتخاب === */
         .overlay-panel {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background-color: rgba(0, 0, 0, 0.85);
             backdrop-filter: blur(8px);
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            text-align: center; z-index: 100; opacity: 0; visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
             transition: opacity 0.5s, visibility 0.5s;
         }
         .overlay-panel.visible { opacity: 1; visibility: visible; }
@@ -129,9 +140,14 @@
 
         .choice-buttons { display: flex; gap: 20px; }
         .choice-btn {
-            padding: 15px 40px; font-size: 1.5rem; font-weight: 900;
-            border-radius: 12px; border: 3px solid; cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s; min-width: 180px;
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            font-weight: 900;
+            border-radius: 12px;
+            border: 3px solid;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            min-width: 180px;
         }
         .choice-btn:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
         #cooperate-btn { background-color: var(--green-cooperate); border-color: #58d68d; color: white; }
@@ -143,6 +159,7 @@
         .chat-message { display: flex; align-items: flex-start; gap: 10px; max-width: 70%; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .chat-message.self { align-self: flex-end; flex-direction: row-reverse; }
+        .chat-message.private .chat-message-bubble { background-color: rgba(52, 152, 219, 0.2); border: 1px solid var(--blue-accent); }
         .chat-message.announcement { align-self: center; background-color: var(--darker-red); color: var(--primary-gold); padding: 8px 15px; border-radius: 20px; font-weight: 700; max-width: 80%; text-align: center; border: 1px solid var(--primary-gold);}
         .chat-message-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
         .chat-message-content { display: flex; flex-direction: column; }
@@ -162,7 +179,10 @@
             .game-wrapper {
                 grid-template-columns: 1fr;
                 grid-template-rows: 60px 180px 1fr;
-                grid-template-areas: "header" "sidebar" "main";
+                grid-template-areas:
+                    "header"
+                    "sidebar"
+                    "main";
                 gap: 10px;
             }
             #players-list { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; align-content: flex-start;}
@@ -191,7 +211,9 @@
 
         <aside class="players-sidebar">
             <h2 class="sidebar-title">امتیازات</h2>
-            <div id="players-list"></div>
+            <div id="players-list">
+                <!-- لیست بازیکنان توسط جاوااسکریپت ساخته می‌شود -->
+            </div>
         </aside>
 
         <main class="main-content">
@@ -220,7 +242,7 @@
 
             <div id="chat-messages"></div>
             <form id="chat-form" action="javascript:void(0);">
-                <input type="text" id="chat-input" placeholder="چت غیرفعال است" autocomplete="off" disabled>
+                <input type="text" id="chat-input" placeholder="پیام خود را بنویسید..." autocomplete="off" disabled>
                 <button type="submit" id="chat-send-btn" disabled>
                     <svg fill="currentColor" width="24" height="24" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
                 </button>
@@ -231,8 +253,8 @@
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-        import { getFirestore, doc, onSnapshot, updateDoc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
-        import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+        import { getFirestore, doc, onSnapshot, updateDoc, setDoc, getDoc, collection, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
@@ -267,83 +289,102 @@
         const betrayBtn = document.getElementById('betray-btn');
 
         // --- متغیرهای وضعیت بازی ---
-        let currentUser = null;
-        let gameId = "active_game_02"; // آیدی جدید برای جلوگیری از تداخل با بازی قبلی
-        let gameRef = doc(db, "games", gameId);
-        let unsubscribeGame = null;
-        let localTimerInterval = null;
+        let currentGameState = {};
+        let currentUser = null; // اطلاعات کاربر لاگین کرده
+        let gameId = "active_game_01"; // آیدی بازی - می‌توانید این را به صورت داینامیک تعیین کنید
+        let gameRef = null;
+        let timerInterval = null;
+        let unsubscribeGame = null; // برای قطع شنونده در زمان خروج
 
         // --- تابع اصلی اجرای بازی ---
         async function main() {
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
-                    currentUser = user;
-                    loadingText.textContent = 'در حال پیوستن به بازی...';
-                    await joinGame();
+                    loadingText.textContent = 'در حال دریافت اطلاعات کاربر...';
+                    const userDoc = await getDoc(doc(db, "users", user.uid));
+                    if (userDoc.exists()) {
+                        currentUser = { uid: user.uid, ...userDoc.data() };
+                        loadingText.textContent = 'در حال پیوستن به بازی...';
+                        await initializeGame();
+                    } else {
+                        loadingText.textContent = 'خطا: اطلاعات کاربر یافت نشد.';
+                    }
                 } else {
-                    loadingText.textContent = 'در حال ورود ناشناس...';
-                    await signInAnonymously(auth); // برای تست، ورود ناشناس را فعال می‌کنیم
+                    loadingText.textContent = 'لطفا ابتدا وارد حساب کاربری خود شوید.';
+                    // در یک برنامه واقعی، کاربر را به صفحه لاگین هدایت می‌کنید
                 }
             });
         }
 
-        async function joinGame() {
-            unsubscribeGame = onSnapshot(gameRef, (docSnap) => {
-                if (docSnap.exists()) {
-                    handleGameStateChange(docSnap.data());
-                } else {
-                    // فقط بازیکن اول (رهبر لابی) بازی را ایجاد می‌کند
-                    // برای این مثال، فرض می‌کنیم یک بازیکن خاص این کار را می‌کند
-                    // در یک سیستم واقعی، این منطق باید پیچیده‌تر باشد
-                    // برای سادگی، هر کسی که اول بیاید بازی را می‌سازد
-                    createNewGame();
-                }
-            });
-        }
+        async function initializeGame() {
+            gameRef = doc(db, "games", gameId);
+            const gameSnap = await getDoc(gameRef);
 
+            if (!gameSnap.exists()) {
+                 loadingText.textContent = 'بازی یافت نشد. در حال ساخت بازی جدید...';
+                 await createNewGame();
+            }
+
+            // شنونده وضعیت بازی را فعال کن
+            unsubscribeGame = onSnapshot(gameRef, (doc) => {
+                handleGameStateChange(doc.data());
+            });
+
+            // نمایش رابط کاربری
+            loadingOverlay.style.opacity = '0';
+            setTimeout(() => {
+                loadingOverlay.style.display = 'none';
+                gameWrapper.classList.add('visible');
+            }, 500);
+        }
+        
         async function createNewGame() {
-            loadingText.textContent = 'بازی یافت نشد. در حال ساخت بازی جدید...';
-            
-            // شبیه‌سازی بازیکنان حاضر در لابی (شامل بازیکن فعلی و چند ربات)
-            const lobbyPlayers = [
-                { uid: currentUser.uid, displayName: `بازیکن ${currentUser.uid.substring(0, 4)}`, avatarUrl: `https://i.pravatar.cc/150?u=${currentUser.uid}`, score: 0, isBot: false },
-                { uid: 'bot_alpha', displayName: 'آلفا', avatarUrl: 'https://i.pravatar.cc/150?u=bot_alpha', score: 0, isBot: true },
-                { uid: 'bot_beta', displayName: 'بتا', avatarUrl: 'https://i.pravatar.cc/150?u=bot_beta', score: 0, isBot: true },
-                { uid: 'bot_gamma', displayName: 'گاما', avatarUrl: 'https://i.pravatar.cc/150?u=bot_gamma', score: 0, isBot: true }
-            ];
+            // در یک سناریوی واقعی، لیست بازیکنان از لابی یا صف matchmaking می‌آید
+            // برای این مثال، چند کاربر تصادفی از کالکشن users می‌خوانیم
+            const usersSnapshot = await getDocs(collection(db, "users"));
+            let players = [];
+            usersSnapshot.forEach(userDoc => {
+                players.push({
+                    uid: userDoc.id,
+                    displayName: userDoc.data().displayName || "بدون نام",
+                    avatarUrl: userDoc.data().avatarUrl || `https://i.pravatar.cc/150?u=${userDoc.id}`,
+                    score: 0
+                });
+            });
+
+            // اطمینان حاصل کنید که کاربر فعلی در لیست است
+            if (!players.find(p => p.uid === currentUser.uid)) {
+                players.push({
+                    uid: currentUser.uid,
+                    displayName: currentUser.displayName,
+                    avatarUrl: currentUser.avatarUrl,
+                    score: 0
+                });
+            }
 
             const initialGameState = {
                 round: 1,
-                phase: 'WAITING', // فاز اولیه انتظار
-                players: lobbyPlayers,
+                phase: 'initial', // فاز اولیه
+                players: players, // لیست کامل بازیکنان
                 pairs: [],
                 choices: {},
-                chat: [],
-                gameLeader: currentUser.uid // اولین بازیکن، رهبر بازی است
+                chat: []
             };
-
             await setDoc(gameRef, initialGameState);
-            // پس از ساخت بازی، شنونده onSnapshot بقیه کار را انجام خواهد داد
+            addAnnouncementMessage("راوی: به بازی معامله‌گر خوش آمدید!");
+            setTimeout(startGame, 2000); // بازی را با تاخیر شروع کن
         }
 
         function handleGameStateChange(state) {
+            if (!state) return;
+            currentGameState = state;
             renderUI(state);
             handleGamePhase(state);
-            
-            // نمایش رابط کاربری پس از دریافت اولین وضعیت
-            if (loadingOverlay.style.display !== 'none') {
-                loadingOverlay.style.opacity = '0';
-                setTimeout(() => {
-                    loadingOverlay.style.display = 'none';
-                    gameWrapper.classList.add('visible');
-                }, 500);
-            }
         }
 
         function renderUI(state) {
-            roundInfoEl.textContent = `دور ${state.round}`;
-            
-            // رندر لیست بازیکنان
+            if (!state.players) return;
+
             playersListEl.innerHTML = '';
             [...state.players].sort((a, b) => b.score - a.score).forEach(p => {
                 const isSelf = p.uid === currentUser.uid;
@@ -352,201 +393,124 @@
                 playerEl.innerHTML = `
                     <div class="player-info">
                         <img src="${p.avatarUrl}" alt="${p.displayName}" class="player-avatar">
-                        <span class="player-name">${p.displayName} ${p.isBot ? '(ربات)' : ''}</span>
+                        <span class="player-name">${p.displayName}</span>
                     </div>
                     <span class="player-score">${p.score}</span>
                 `;
                 playersListEl.appendChild(playerEl);
             });
 
-            // رندر پیام‌های چت
-             chatMessagesEl.innerHTML = '';
-             if(state.chat) {
-                state.chat.forEach(msg => addMessageToChatUI(msg, state));
+            // رندر کردن پیام‌های چت
+            chatMessagesEl.innerHTML = '';
+            if(state.chat) {
+                state.chat.forEach(msg => addMessageToChatUI(msg));
             }
         }
 
         function handleGamePhase(state) {
-            const isLeader = state.gameLeader === currentUser.uid;
             const self = state.players.find(p => p.uid === currentUser.uid);
             const myPair = state.pairs.find(p => p.includes(currentUser.uid));
-            const hasMadeChoice = !!state.choices[currentUser.uid];
 
             // مخفی کردن پنل‌ها به صورت پیش‌فرض
             pairingPanel.classList.remove('visible');
             choicePanel.classList.remove('visible');
-            enableChat(false); // غیرفعال کردن چت
+            enableChat(false, true); // غیرفعال کردن چت به صورت پیش‌فرض
 
             switch(state.phase) {
-                case 'WAITING':
-                    roundInfoEl.textContent = "در انتظار شروع بازی...";
-                    if (isLeader) {
-                        setTimeout(() => startGame(state), 3000); // رهبر بازی را شروع می‌کند
-                    }
-                    break;
-
-                case 'PAIRING':
+                case 'pairing':
                     roundInfoEl.textContent = `دور ${state.round} - هم‌پیمانی`;
                     if (myPair) showPairingPanel(self, state.players, myPair);
-                    if (isLeader) {
-                        setTimeout(() => updatePhase('CHOICE'), 5000); // 5 ثانیه نمایش
-                    }
                     break;
-                
-                case 'CHOICE':
+                case 'choice':
                     roundInfoEl.textContent = `دور ${state.round} - انتخاب`;
-                    // اگر بازیکن واقعی هستم و هنوز انتخاب نکرده‌ام، پنل را نشان بده
-                    if (self && !self.isBot && !hasMadeChoice) {
+                    // اگر کاربر هنوز انتخاب نکرده، پنل را نشان بده
+                    if (myPair && !state.choices[currentUser.uid]) {
                         showChoicePanel();
                     }
-                    // رهبر بازی، تصمیم ربات‌ها را می‌گیرد
-                    if (isLeader) {
-                        runBotDecisions(state);
-                    }
-                    // رهبر بازی بررسی می‌کند که آیا همه انتخاب کرده‌اند
-                    if (isLeader) {
-                        checkAllChoicesMade(state);
-                    }
-                    startTimer(state, 30, () => updatePhase('RESULTS')); // تایمر ۳۰ ثانیه‌ای برای انتخاب
                     break;
-
-                case 'RESULTS':
+                case 'public_chat':
+                    roundInfoEl.textContent = `دور ${state.round} - چت عمومی`;
+                    enableChat(false);
+                    break;
+                case 'private_chat':
+                    roundInfoEl.textContent = `دور ${state.round} - چت خصوصی`;
+                    enableChat(true);
+                    break;
+                case 'results':
                     roundInfoEl.textContent = `دور ${state.round} - نتایج`;
-                    if (isLeader) {
-                        calculateAndShowResults(state);
-                    }
                     break;
-                
-                case 'END_ROUND':
-                     roundInfoEl.textContent = `دور ${state.round} - پایان`;
-                     if(isLeader){
-                         setTimeout(() => startNextRound(state), 5000);
-                     }
-                     break;
+                default:
+                    roundInfoEl.textContent = `دور ${state.round} - در انتظار...`;
             }
         }
+
+        // --- توابع کنترل جریان بازی ---
         
-        // =======================================================
-        // === توابع کنترل جریان بازی (فقط توسط رهبر فراخوانی می‌شوند) ===
-        // =======================================================
+        // این تابع باید توسط ادمین یا سازنده لابی فراخوانی شود
+        async function startGame() {
+            if (!currentGameState.players || currentGameState.players.length === 0) return;
 
-        async function updatePhase(newPhase) {
-            await updateDoc(gameRef, { phase: newPhase });
-        }
-
-        async function startGame(currentState) {
-            if (currentState.phase !== 'WAITING') return;
-
-            await addAnnouncementMessage("راوی: به بازی معامله‌گر خوش آمدید! گروه‌بندی در حال انجام است...");
-            
-            let playersToPair = [...currentState.players];
+            await addAnnouncementMessage("راوی: گروه‌بندی در حال انجام است...");
+            let playersToPair = [...currentGameState.players];
             let pairs = [];
-            playersToPair.sort(() => Math.random() - 0.5); // رندوم کردن آرایه
+            playersToPair.sort(() => Math.random() - 0.5);
             while(playersToPair.length > 1) {
                 const p1 = playersToPair.pop();
                 const p2 = playersToPair.pop();
                 pairs.push([p1.uid, p2.uid]);
             }
-            
-            await updateDoc(gameRef, { phase: 'PAIRING', pairs: pairs, choices: {}, timerEnd: 0 });
+            await updateDoc(gameRef, { phase: 'pairing', pairs: pairs, choices: {} });
+
+            setTimeout(async () => {
+                 await updateDoc(gameRef, { phase: 'choice' });
+                 // در یک بازی واقعی، نیازی به شبیه‌سازی انتخاب ربات نیست
+            }, 5000); // 5 ثانیه نمایش پنل هم‌پیمانی
         }
-        
-        async function runBotDecisions(state) {
-            for (const player of state.players) {
-                // اگر بازیکن ربات است و هنوز تصمیمی نگرفته
-                if (player.isBot && !state.choices[player.uid]) {
-                    // 70% احتمال همکاری, 30% خیانت
-                    const choice = Math.random() < 0.7 ? 'cooperate' : 'betray';
-                    // تاخیر تصادفی برای طبیعی‌تر جلوه دادن
-                    await new Promise(resolve => setTimeout(resolve, Math.random() * 2000 + 500));
-                    
-                    const currentDoc = await getDoc(gameRef); // دریافت آخرین وضعیت
-                    if (currentDoc.exists() && !currentDoc.data().choices[player.uid]) {
-                         let choices = currentDoc.data().choices;
-                         choices[player.uid] = choice;
-                         await updateDoc(gameRef, { choices: choices });
-                    }
-                }
-            }
-        }
-
-        function checkAllChoicesMade(state) {
-            const pairedPlayersCount = state.pairs.flat().length;
-            const totalChoices = Object.keys(state.choices).length;
-            
-            if (totalChoices >= pairedPlayersCount) {
-                updatePhase('RESULTS');
-            }
-        }
-
-        async function calculateAndShowResults(state) {
-            if (state.phase !== 'RESULTS') return; // فقط در فاز نتایج اجرا شود
-            
-            let players = [...state.players];
-            let newScores = {};
-
-            for(const pair of state.pairs){
-                const [p1_uid, p2_uid] = pair;
-                const c1 = state.choices[p1_uid];
-                const c2 = state.choices[p2_uid];
-
-                let p1_score_change = 0;
-                let p2_score_change = 0;
-
-                if(c1 === 'cooperate' && c2 === 'cooperate'){
-                    p1_score_change = 2; p2_score_change = 2; // هر دو همکاری: هر کدام ۲ امتیاز
-                } else if (c1 === 'betray' && c2 === 'cooperate'){
-                    p1_score_change = 3; p2_score_change = -1; // اولی خیانت: اولی ۳، دومی -۱
-                } else if (c1 === 'cooperate' && c2 === 'betray'){
-                    p1_score_change = -1; p2_score_change = 3; // دومی خیانت: اولی -۱، دومی ۳
-                } else if (c1 === 'betray' && c2 === 'betray'){
-                    p1_score_change = 0; p2_score_change = 0; // هر دو خیانت: صفر امتیاز
-                }
-                
-                const p1_index = players.findIndex(p => p.uid === p1_uid);
-                const p2_index = players.findIndex(p => p.uid === p2_uid);
-                
-                players[p1_index].score += p1_score_change;
-                players[p2_index].score += p2_score_change;
-
-                // نمایش نتیجه برای هر زوج
-                const p1_name = players[p1_index].displayName;
-                const p2_name = players[p2_index].displayName;
-                const c1_text = c1 === 'cooperate' ? 'همکاری' : 'خیانت';
-                const c2_text = c2 === 'cooperate' ? 'همکاری' : 'خیانت';
-                await addAnnouncementMessage(`${p1_name} (${c1_text}) | ${p2_name} (${c2_text})`);
-            }
-            
-            await updateDoc(gameRef, { players: players, phase: 'END_ROUND' });
-        }
-        
-        async function startNextRound(state){
-            await updateDoc(gameRef, {
-                round: state.round + 1,
-                phase: 'WAITING'
-            });
-        }
-
-
-        // ==================================
-        // === توابع مربوط به بازیکن محلی ===
-        // ==================================
 
         async function handlePlayerChoice(choice) {
             cooperateBtn.classList.add('selected');
             betrayBtn.classList.add('selected');
+            await addAnnouncementMessage(`شما "${choice === 'cooperate' ? 'همکاری' : 'خیانت'}" را انتخاب کردید.`);
             
-            const currentDoc = await getDoc(gameRef);
-            if (!currentDoc.exists()) return;
+            let choices = currentGameState.choices || {};
+            choices[currentUser.uid] = choice;
+            await updateDoc(gameRef, { choices: choices });
 
-            let choices = currentDoc.data().choices || {};
-            if (!choices[currentUser.uid]) { // فقط اگر قبلا انتخاب نکرده
-                choices[currentUser.uid] = choice;
-                await updateDoc(gameRef, { choices: choices });
-            }
+            // بررسی اینکه آیا همه انتخاب کرده‌اند یا نه، باید در سمت سرور یا cloud function انجام شود
+            // اما برای سادگی، اینجا هم چک می‌کنیم
+            checkAllChoicesMade();
+        }
+
+        async function checkAllChoicesMade() {
+             const pairedPlayersCount = currentGameState.pairs.flat().length;
+             const totalChoices = Object.keys(currentGameState.choices).length;
+             
+             if (totalChoices >= pairedPlayersCount) {
+                 await addAnnouncementMessage("راوی: تصمیم‌گیری‌ها انجام شد.");
+                 setTimeout(startPublicChatPhase, 2000); 
+             }
+        }
+        
+        async function startPublicChatPhase() {
+            await updateDoc(gameRef, { phase: 'public_chat' });
+            await addAnnouncementMessage("چت عمومی فعال شد. شما 90 ثانیه فرصت دارید.");
+            startTimer(90, startPrivateChatPhase);
+        }
+        
+        async function startPrivateChatPhase() {
+            await updateDoc(gameRef, { phase: 'private_chat' });
+            await addAnnouncementMessage("چت خصوصی فعال شد. 60 ثانیه فرصت دارید با هم‌پیمان خود صحبت کنید.");
+            startTimer(60, endRound);
+        }
+
+        async function endRound() {
+            await updateDoc(gameRef, { phase: 'results' });
+            await addAnnouncementMessage("زمان این دور به پایان رسید. در حال محاسبه نتایج...");
+            // اینجا منطق محاسبه امتیازات و نمایش نتایج اضافه می‌شود
         }
 
         // --- توابع رابط کاربری (UI) ---
+
         function showPairingPanel(self, allPlayers, pair) {
             const partnerId = pair.find(id => id !== self.uid);
             const partner = allPlayers.find(p => p.uid === partnerId);
@@ -554,7 +518,7 @@
 
             document.getElementById('my-avatar-pairing').src = self.avatarUrl;
             document.getElementById('partner-avatar-pairing').src = partner.avatarUrl;
-            document.getElementById('partner-name-display').textContent = `هم‌پیمان شما: ${partner.displayName} ${partner.isBot ? '(ربات)' : ''}`;
+            document.getElementById('partner-name-display').textContent = `هم‌پیمان شما: ${partner.displayName}`;
             pairingPanel.classList.add('visible');
         }
 
@@ -564,33 +528,27 @@
             choicePanel.classList.add('visible');
         }
         
-        function startTimer(state, duration, onComplete) {
-            if (localTimerInterval) clearInterval(localTimerInterval);
+        function startTimer(duration, onComplete) {
+            if (timerInterval) clearInterval(timerInterval);
+            let timeLeft = duration;
+            const endTime = Date.now() + duration * 1000;
 
-            // اگر تایمر قبلا در دیتابیس ست نشده، آن را ست کن
-            let endTime = state.timerEnd || 0;
-            if (endTime === 0 && state.gameLeader === currentUser.uid) {
-                endTime = Date.now() + duration * 1000;
-                updateDoc(gameRef, { timerEnd: endTime });
-            } else if (endTime === 0) {
-                 return; // منتظر بمان تا رهبر تایمر را ست کند
-            }
-
-
-            localTimerInterval = setInterval(() => {
-                const timeLeft = Math.max(0, Math.round((endTime - Date.now()) / 1000));
+            // برای جلوگیری از تاخیر شبکه، تایمر را به صورت محلی به‌روز می‌کنیم
+            // اما می‌توان endTime را هم در دیتابیس ذخیره کرد
+            timerInterval = setInterval(() => {
+                timeLeft = Math.round((endTime - Date.now()) / 1000);
                 timerEl.textContent = formatTime(timeLeft);
                 timerEl.classList.toggle('critical', timeLeft <= 10);
-                
                 if (timeLeft <= 0) {
-                    clearInterval(localTimerInterval);
+                    clearInterval(timerInterval);
                     timerEl.textContent = "00:00";
-                    // فقط رهبر بازی فاز بعدی را شروع می‌کند
-                    if (state.gameLeader === currentUser.uid) {
+                    // فقط ادمین یا یک بازیکن مسئول باید فاز بعدی را شروع کند
+                    // برای جلوگیری از فراخوانی چندباره onComplete
+                    if(currentUser.uid === currentGameState.players[0].uid) {
                         if (onComplete) onComplete();
                     }
                 }
-            }, 500);
+            }, 1000);
         }
 
         function formatTime(seconds) {
@@ -599,45 +557,81 @@
             return `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
         }
         
-        function enableChat(isEnabled) {
-             chatInput.disabled = !isEnabled;
-             chatSendBtn.disabled = !isEnabled;
-             chatInput.placeholder = isEnabled ? "پیام خود را بنویسید..." : "چت غیرفعال است";
+        function enableChat(isPrivate, isDisabled = false) {
+             chatInput.disabled = isDisabled;
+             chatSendBtn.disabled = isDisabled;
+             chatInput.placeholder = isDisabled ? "چت غیرفعال است" : (isPrivate ? "با هم‌پیمان خود چت کنید..." : "با همه صحبت کنید...");
         }
 
         // --- مدیریت چت ---
-        async function handleSendMessage(e) { e.preventDefault(); /* چت در این نسخه غیرفعال است */ }
 
-        function addMessageToChatUI(msgData, state) {
-            const { senderUid, senderName, senderAvatar, text, announcement } = msgData;
+        async function handleSendMessage(e) {
+            e.preventDefault();
+            const text = chatInput.value.trim();
+            if (text === '') return;
+
+            const isPrivateChat = currentGameState.phase === 'private_chat';
+            
+            const newMessage = {
+                senderUid: currentUser.uid,
+                senderName: currentUser.displayName,
+                senderAvatar: currentUser.avatarUrl,
+                text: text,
+                isPrivate: isPrivateChat,
+                timestamp: new Date()
+            };
+
+            // افزودن پیام به آرایه چت در دیتابیس
+            const newChat = [...(currentGameState.chat || []), newMessage];
+            await updateDoc(gameRef, { chat: newChat });
+
+            chatInput.value = '';
+        }
+
+        function addMessageToChatUI(msgData) {
+            const { senderName, senderAvatar, text, senderUid, isPrivate, announcement } = msgData;
             
             if (announcement) {
                 const msgEl = document.createElement('div');
                 msgEl.className = 'chat-message announcement';
                 msgEl.textContent = text;
                 chatMessagesEl.appendChild(msgEl);
-            } else {
-                // منطق چت عمومی یا خصوصی در اینجا اضافه می‌شود
+                chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+                return;
             }
+
+            const isSelf = senderUid === currentUser.uid;
+            
+            // فیلتر کردن پیام‌های خصوصی
+            if (isPrivate) {
+                const myPair = currentGameState.pairs.find(p => p.includes(currentUser.uid));
+                if (!myPair || !myPair.includes(senderUid)) {
+                    return; // اگر پیام خصوصی برای من نیست، نمایش نده
+                }
+            }
+
+            const msgEl = document.createElement('div');
+            msgEl.className = `chat-message ${isSelf ? 'self' : ''} ${isPrivate ? 'private' : ''}`;
+            msgEl.innerHTML = `
+                <img src="${senderAvatar}" class="chat-message-avatar">
+                <div class="chat-message-content">
+                    <span class="chat-message-sender">${senderName}</span>
+                    <div class="chat-message-bubble">${text}</div>
+                </div>`;
+            chatMessagesEl.appendChild(msgEl);
             chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
         }
 
         async function addAnnouncementMessage(text) {
-             const currentDoc = await getDoc(gameRef);
-             if (!currentDoc.exists()) return;
-             const newChat = [...(currentDoc.data().chat || [])];
-             // جلوگیری از پیام تکراری
-             if (newChat.length > 0 && newChat[newChat.length - 1].text === text) return;
-
              const newMessage = { announcement: true, text: text, timestamp: new Date() };
-             newChat.push(newMessage);
+             const newChat = [...(currentGameState.chat || []), newMessage];
              await updateDoc(gameRef, { chat: newChat });
         }
         
         function setupEventListeners() {
+            chatForm.addEventListener('submit', handleSendMessage);
             cooperateBtn.addEventListener('click', () => handlePlayerChoice('cooperate'));
             betrayBtn.addEventListener('click', () => handlePlayerChoice('betray'));
-            // chatForm.addEventListener('submit', handleSendMessage); // چت فعلا غیرفعال است
         }
 
         // --- شروع برنامه ---
