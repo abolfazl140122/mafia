@@ -3,819 +3,586 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>لابی بازی - شهر مافیا</title>
+    <title>بازی معامله‌گر - دوراهی زندانی</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        /* === متغیرهای رنگی پایه === */
+        /* === متغیرهای رنگی === */
         :root {
             --primary-gold: #ffc947;
             --dark-red: #8c4843;
             --darker-red: #5a2c2a;
             --text-light: #f0e6d2;
             --text-secondary: #c5a687;
-            --bg-dark: #1a140e;
-            --border-color: #5c4a3a;
-            --green-ready: #2ecc71;
-            --green-join: #27ae60;
-            --green-join-darker: #229954;
-            --temp-blue: #2980b9; /* رنگ برای دکمه موقت ربات */
+            --bg-dark: #121212;
+            --bg-surface: #1e1e1e;
+            --border-color: #4a4a4a;
+            --green-cooperate: #2ecc71;
+            --red-betray: #e74c3c;
+            --blue-accent: #3498db;
         }
 
         /* === ریست و استایل‌های کلی === */
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
-        html, body { 
-            height: 100%; 
-            width: 100%;
-            overflow: hidden; 
+        html, body { height: 100%; width: 100%; overflow: hidden; }
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            color: var(--text-light);
+            background-color: var(--bg-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
         }
 
-        body { 
-            font-family: 'Vazirmatn', sans-serif; 
-            color: var(--text-light); 
-            display: flex; 
-            flex-direction: column; 
-            position: relative; 
-            background-image: url('https://up.20script.ir/file/d1c7-InShot-۲۰۲۵۰۹۱۱-۱۲۲۵۲۰۷۶۰.jpg');
-            background-size: cover;
-            background-position: center center;
-        }
-
-        #background-blurry { position: fixed; top: -20px; left: -20px; width: calc(100% + 40px); height: calc(100% + 40px); background-image: url('https://up.20script.ir/file/d1c7-InShot-۲۰۲۵۰۹۱۱-۱۲۲۵۲۰۷۶۰.jpg'); background-size: cover; background-position: center center; filter: blur(8px) brightness(0.6); z-index: -1; }
-        #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.9); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2000; transition: opacity 0.5s ease; }
+        /* === لودینگ اولیه === */
+        #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--bg-dark); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2000; transition: opacity 0.5s ease; }
         .loader { border: 6px solid #f3f3f330; border-top: 6px solid var(--primary-gold); border-radius: 50%; width: 60px; height: 60px; animation: spin 1.5s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         #loading-text { margin-top: 20px; font-size: 1.1rem; font-weight: 700; }
 
-        /* === کانتینر اصلی صفحه === */
-        .lobby-container { 
-            width: 100%; 
-            height: 100%; 
-            display: flex; 
-            flex-direction: column; 
-            padding: 10px 5px; 
-            gap: 10px; 
-        }
-        
-        /* === بازطراحی کامل هدر با Flexbox === */
-        .lobby-header {
+        /* === ساختار اصلی صفحه بازی === */
+        .game-wrapper {
             width: 100%;
-            height: 70px;
-            flex-shrink: 0;
-            background-image: url('https://cdn.imgurl.ir/uploads/l25615_IMG_20250913_223507_986.jpg');
-            background-size: contain;
-            background-position: center;
-            background-repeat: no-repeat;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 10px;
-        }
-
-        .header-buttons-wrapper {
-            display: flex;
-            gap: 10px;
-            flex-basis: 120px;
-            justify-content: flex-start;
-        }
-        
-        #lobby-name {
-            font-size: clamp(1rem, 4vw, 1.3rem);
-            font-weight: 900;
-            color: var(--primary-gold);
-            text-shadow: 1px 1px 0px var(--darker-red), 2px 2px 5px rgba(0,0,0,0.7);
-            text-align: center;
-            flex-grow: 1;
-        }
-
-        .header-spacer {
-            flex-basis: 120px;
-        }
-
-        .leave-button { background: linear-gradient(145deg, #a13d3d, #7c1f1f); border: 1px solid #ff8f8f; color: white; padding: 6px 12px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: all 0.2s ease; }
-        .leave-button:hover { transform: scale(1.05); }
-        .admin-join-button { background: linear-gradient(145deg, var(--green-join), var(--green-join-darker)); border: 1px solid #58d68d; color: white; padding: 6px 12px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; cursor: pointer; display: none; }
-        
-        .add-bot-button { background: linear-gradient(145deg, #3498db, var(--temp-blue)); border: 1px solid #85c1e9; color: white; padding: 6px 12px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; cursor: pointer; display: none; }
-       
-        /* === محتوای اصلی بازی (جایگاه‌ها و تابلو) === */
-        .players-area { flex-grow: 1; width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 5px; overflow: hidden; }
-        .players-column { display: flex; flex-direction: column; justify-content: space-around; align-items: center; height: 100%; flex-shrink: 0; width: 100px; }
-        #central-board-container { flex-grow: 1; display: flex; justify-content: center; align-items: center; height: 100%; padding: 0 5px; }
-        .player-slot { position: relative; width: 90px; height: 110px; background-image: url('https://cdn.imgurl.ir/uploads/g585174_IMG_20250913_222658_030.jpg'); background-size: contain; background-position: center; background-repeat: no-repeat; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: transform 0.2s ease; }
-        .player-slot:hover { transform: scale(1.05); }
-        .player-slot.empty { opacity: 0.5; cursor: default; }
-        .player-slot.empty .player-avatar, .player-slot.empty .player-number, .player-slot.empty .player-name { display: none; }
-        .player-avatar { position: absolute; top: 15px; width: 68px; height: 68px; border-radius: 50%; object-fit: cover; border: 3px solid #a47d54; transition: border-color 0.3s ease; }
-        .player-number { position: absolute; top: 2px; left: 2px; width: 28px; height: 28px; background-color: rgba(0, 0, 0, 0.5); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.9rem; font-weight: 700; color: var(--primary-gold); border: 1px solid var(--primary-gold); pointer-events: none; }
-        .player-name { position: absolute; bottom: 5px; left: 0; width: 100%; text-align: center; font-size: 0.8rem; font-weight: 700; color: var(--text-light); text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7); padding: 0 5px; line-height: 1.2; overflow-wrap: break-word; pointer-events: none; }
-        .host-crown { position: absolute; top: 2px; right: 2px; width: 28px; height: 28px; font-size: 1.2rem; text-shadow: 0 2px 4px black; }
-        .player-slot.ready .player-avatar { border-color: var(--green-ready); box-shadow: 0 0 15px var(--green-ready); }
-        .ready-indicator { display: none; }
-
-        /* === فوتر و دکمه‌ها === */
-        .lobby-footer { flex-shrink: 0; display: flex; gap: 10px; align-items: center; padding: 10px; background-color: rgba(0,0,0,0.3); border-top: 1px solid var(--border-color); }
-        .action-button { flex-grow: 1; padding: 14px; font-size: 1.2rem; font-weight: 900; border-radius: 12px; border: none; cursor: pointer; transition: all 0.3s ease; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.5); position: relative; overflow: hidden; }
-        .action-button::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(to bottom, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 20%); transform: rotate(25deg); }
-        .action-button.ready-btn { background: linear-gradient(145deg, var(--green-join), var(--green-join-darker)); border: 2px solid #58d68d; }
-        .action-button.unready-btn { background: linear-gradient(145deg, #c0392b, #a93226); border: 2px solid #e67e22; }
-        .action-button.start-btn { background: linear-gradient(145deg, var(--dark-red), var(--darker-red)); border: 2px solid var(--primary-gold); }
-        .action-button:disabled { background: linear-gradient(145deg, #7f8c8d, #626567); border-color: #95a5a6; cursor: not-allowed; opacity: 0.6; }
-        .action-button:not(:disabled):hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        .action-button.start-btn:not(:disabled) { animation: pulse-start 2s infinite; }
-        @keyframes pulse-start { 0% { box-shadow: 0 0 0 0 rgba(255, 201, 71, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(255, 201, 71, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 201, 71, 0); } }
-        #toggle-chat-btn { flex-shrink: 0; width: 50px; height: 50px; border-radius: 50%; background-color: #4a5568; color: white; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: all 0.3s ease; }
-        #toggle-chat-btn:hover { background-color: #2d3748; transform: scale(1.1); }
-        #toggle-chat-btn.new-message::after { content: ''; position: absolute; bottom: 0; right: 0; width: 14px; height: 14px; background-color: #e53e3e; border-radius: 50%; border: 2px solid var(--bg-dark); animation: pulse-new-message 1.5s infinite; }
-        @keyframes pulse-new-message { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
-        #toggle-chat-btn svg { width: 24px; height: 24px; fill: currentColor; }
-
-        /* === پنل چت === */
-        #chat-panel { position: fixed; top: 50%; left: 50%; width: 90%; max-width: 550px; height: 70%; max-height: 500px; background-color: rgba(26, 20, 14, 0.95); backdrop-filter: blur(10px); border: 1px solid var(--border-color); border-radius: 16px; display: flex; flex-direction: column; z-index: 999; box-shadow: 0 8px 30px rgba(0,0,0,0.6); opacity: 0; transform: translate(-50%, -50%) scale(0.9); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease; pointer-events: none; }
-        #chat-panel.visible { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; }
-        .chat-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
-        .chat-header h3 { font-size: 1.1rem; color: var(--primary-gold); font-weight: 700; }
-        .chat-header-buttons { display: flex; align-items: center; gap: 10px; }
-        #clear-chat-btn { background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 1.2rem; display: none; }
-        #clear-chat-btn:hover { color: #ff7675; }
-        #close-chat-btn { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1.5rem; line-height: 1; padding: 5px; }
-        #close-chat-btn:hover { color: white; }
-        #chat-messages { flex-grow: 1; overflow-y: auto; padding: 10px 15px; display: flex; flex-direction: column; gap: 12px; }
-        #chat-messages::-webkit-scrollbar { width: 6px; }
-        #chat-messages::-webkit-scrollbar-track { background: transparent; }
-        #chat-messages::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 3px; }
-        .chat-message { display: flex; align-items: flex-start; gap: 10px; }
-        .chat-message.self { align-self: flex-end; flex-direction: row-reverse; }
-        .chat-message-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 2px solid var(--border-color); }
-        .chat-message-content { display: flex; flex-direction: column; max-width: calc(100% - 42px); }
-        .chat-message-sender { font-size: 0.8rem; font-weight: 700; color: var(--primary-gold); margin-bottom: 3px; }
-        .chat-message.self .chat-message-sender { color: var(--green-ready); text-align: right; }
-        .chat-message-bubble { background-color: #332a20; padding: 8px 12px; border-radius: 12px; font-size: 0.9rem; line-height: 1.5; word-wrap: break-word; position: relative; }
-        .chat-message.self .chat-message-bubble { background-color: #2a3a30; }
-        .delete-msg-btn { position: absolute; top: -8px; left: -8px; width: 20px; height: 20px; background-color: #c0392b; color: white; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; opacity: 0; transition: all 0.2s ease; }
-        .chat-message.self:hover .delete-msg-btn { opacity: 1; }
-        #chat-form { display: flex; padding: 10px 15px; border-top: 1px solid var(--border-color); gap: 10px; flex-shrink: 0; }
-        #chat-input { flex-grow: 1; background-color: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-light); font-family: 'Vazirmatn', sans-serif; font-size: 0.9rem; }
-        #chat-input:focus { outline: none; border-color: var(--primary-gold); }
-        #chat-send-btn { background-color: var(--primary-gold); border: none; border-radius: 8px; color: var(--darker-red); font-weight: 900; padding: 0 15px; cursor: pointer; transition: background-color 0.2s ease; }
-        #chat-send-btn:hover { background-color: #ffd46d; }
-
-        /* === مودال‌ها و پروفایل === */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.85); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s 0.3s; }
-        .modal-overlay.visible { opacity: 1; visibility: visible; transition: opacity 0.3s ease; }
-        .modal-content { background: linear-gradient(145deg, #3c3022, var(--bg-dark)); border: 2px solid var(--border-color); border-radius: 16px; padding: 25px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .modal-overlay.visible .modal-content { transform: scale(1); }
-        .modal-title { font-size: 1.5rem; font-weight: 900; color: var(--primary-gold); margin-bottom: 20px; }
-        .modal-message { font-size: 1rem; line-height: 1.6; margin-bottom: 25px; }
-        .modal-buttons { display: flex; flex-direction: column; gap: 10px; }
-        .modal-button { width: 100%; padding: 12px; font-size: 1rem; font-weight: 700; border-radius: 8px; cursor: pointer; border: 1px solid; }
-        .modal-button.primary { color: white; background: linear-gradient(145deg, var(--dark-red), var(--darker-red)); border-color: var(--primary-gold); }
-        .modal-button.secondary { color: var(--text-light); background: linear-gradient(145deg, #504436, #332a20); border-color: var(--border-color); }
-        .modal-button.danger { background: linear-gradient(145deg, #c0392b, #a93226); border-color: #e67e22; color: white; }
-        .modal-close-btn { position: absolute; top: 10px; left: 15px; font-size: 2.2rem; color: #c5a687; cursor: pointer; transition: all 0.2s ease; line-height: 1; text-shadow: 0 0 5px rgba(0,0,0,0.7); z-index: 10; }
-        .modal-close-btn:hover { color: #ffc947; transform: scale(1.2) rotate(90deg); }
-        
-        #view-profile-modal-content { background: radial-gradient(circle, #3a2e22 0%, #1a140e 100%); border: 4px solid transparent; border-image: linear-gradient(145deg, #ffc947, #a47d54) 1; max-width: 400px; padding: 0; overflow: hidden; box-shadow: 0 15px 40px rgba(0,0,0,0.7), inset 0 0 15px rgba(0,0,0,0.5); }
-        .profile-header { background-color: #1a140e; background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.02) 10px, rgba(255,255,255,0.02) 20px); padding: 30px 25px; text-align: center; position: relative; border-bottom: 2px solid; border-image: linear-gradient(to right, transparent, #ffc947, transparent) 1; overflow: hidden; }
-        #profile-modal-avatar { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin-bottom: 25px; position: relative; border: none; box-shadow: 0 0 0 4px #1a140e, 0 0 0 8px #a47d54, 0 5px 25px rgba(0,0,0,0.6); }
-        .profile-name-banner { background-color: #8c4843; padding: 5px 40px; display: inline-block; position: relative; box-shadow: 0 3px 10px rgba(0,0,0,0.5); border-top: 1px solid #c5a687; border-bottom: 1px solid #c5a687; }
-        .profile-name-banner::before, .profile-name-banner::after { content: ''; position: absolute; top: 0; width: 0; height: 0; border-style: solid; border-color: #5a2c2a transparent; }
-        .profile-name-banner::before { left: -19px; border-width: 19px 20px 19px 0; }
-        .profile-name-banner::after { right: -19px; border-width: 19px 0 19px 20px; }
-        #profile-modal-name { font-size: 1.8rem; font-weight: 900; color: #f0e6d2; text-shadow: 2px 2px 0px #000, 3px 3px 5px rgba(0,0,0,0.7); }
-        .profile-body { padding: 20px 30px 30px; display: flex; flex-direction: column; gap: 18px; }
-        .profile-stat-item { display: flex; align-items: center; justify-content: space-between; font-size: 1rem; padding-bottom: 18px; border: none; background-image: linear-gradient(to right, transparent, rgba(122, 92, 67, 0.4) 50%, transparent 100%); background-size: 100% 1px; background-position: bottom; background-repeat: no-repeat; }
-        .profile-stat-item:last-child { background: none; padding-bottom: 0; }
-        .stat-label { font-weight: 700; color: #c5a687; display: flex; align-items: center; gap: 12px; }
-        .stat-label span:first-child { font-size: 1.4rem; line-height: 1; }
-        .stat-value { font-weight: 400; color: #e0dacc; direction: ltr; text-align: right; font-size: 1.1rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
-        .stat-value.stat-value-admin { font-weight: 900; color: var(--primary-gold); text-shadow: 0 0 8px rgba(255, 201, 71, 0.6), 0 1px 2px rgba(0,0,0,0.8); animation: admin-glow 2s ease-in-out infinite alternate; }
-        @keyframes admin-glow { from { text-shadow: 0 0 6px rgba(255, 201, 71, 0.5), 0 1px 2px rgba(0,0,0,0.8); } to { text-shadow: 0 0 12px rgba(255, 201, 71, 0.8), 0 1px 3px rgba(0,0,0,0.9); } }
-        
-        /* استایل‌های مسدود کردن کاربر */
-        #lobby-ban-user-modal-content .form-group { display: flex; flex-direction: column; gap: 5px; text-align: right; margin-bottom: 15px; }
-        #lobby-ban-user-modal-content .form-label { font-weight: 700; color: var(--text-secondary); font-size: 0.9rem; }
-        #lobby-ban-user-modal-content .form-input, #lobby-ban-user-modal-content .form-select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); background-color: var(--bg-dark); color: var(--text-light); font-family: 'Vazirmatn', sans-serif; font-size: 1rem; transition: all 0.3s ease; }
-        #lobby-ban-user-modal-content .form-input:focus { outline: none; border-color: var(--primary-gold); }
-        #lobby-ban-user-modal-content .form-group-horizontal { flex-direction: row; align-items: center; gap: 10px; }
-        #lobby-ban-user-modal-content .form-group-horizontal .form-input { width: 80px; flex-shrink: 0; text-align: center; }
-        #lobby-ban-user-modal-content .form-group-horizontal .form-select { flex-grow: 1; }
-        #lobby-ban-user-modal-content .confirm-buttons-container { display: flex; gap: 15px; margin-top: 25px; }
-
-        /* === NEW & IMPROVED: استایل‌های پنل انتخاب آواتار === */
-        #avatar-selection-modal-content {
-            background: linear-gradient(160deg, #2c2118, #1a140e 80%);
-            border: 2px solid var(--border-color);
-            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-            padding: 0;
-            height: 80%;
-            max-height: 600px;
-            width: 95%;
-            max-width: 450px;
-            display: flex;
-            flex-direction: column;
-        }
-        .avatar-modal-header {
-            padding: 15px 20px;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-shrink: 0;
-        }
-        #avatar-selection-grid {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 20px;
+            height: 100%;
+            max-width: 1200px;
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            grid-template-columns: 280px 1fr;
+            grid-template-rows: 60px 1fr;
+            grid-template-areas:
+                "header header"
+                "sidebar main";
             gap: 15px;
-            justify-content: center;
-            background-image: repeating-linear-gradient(45deg, transparent, transparent 15px, rgba(255,255,255,0.01) 15px, rgba(255,255,255,0.01) 30px);
+            opacity: 0;
+            transition: opacity 0.5s ease;
         }
-        #avatar-selection-grid::-webkit-scrollbar { width: 8px; }
-        #avatar-selection-grid::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 4px; }
-        #avatar-selection-grid::-webkit-scrollbar-thumb { background: var(--text-secondary); border-radius: 4px; }
-        #avatar-selection-grid::-webkit-scrollbar-thumb:hover { background: var(--primary-gold); }
-        
-        .avatar-select-card {
-            aspect-ratio: 1 / 1;
-            border-radius: 12px;
-            border: 3px solid transparent;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-            opacity: 0; /* Initial state for animation */
+        .game-wrapper.visible {
+            opacity: 1;
         }
-        .avatar-select-card:hover {
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
-        }
-        .avatar-select-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .avatar-select-card.equipped {
-            border-color: var(--primary-gold);
-            box-shadow: 0 0 20px var(--primary-gold);
-        }
-        .avatar-select-card.equipped::after {
-            content: '✔';
-            position: absolute;
-            bottom: 5px;
-            right: 5px;
-            width: 24px;
-            height: 24px;
-            background-color: var(--primary-gold);
-            color: var(--darker-red);
-            border-radius: 50%;
+
+        /* === هدر (اطلاعات دور و تایمر) === */
+        .game-header {
+            grid-area: header;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            font-weight: 900;
-            font-size: 1rem;
-            text-shadow: none;
-        }
-
-        /* NEW: Animation for avatar cards appearing */
-        @keyframes avatar-card-appear {
-            from {
-                opacity: 0;
-                transform: scale(0.8) translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
-        }
-
-        /* NEW: Beautiful Skeleton Loader for Avatars */
-        .avatar-skeleton-card {
-            aspect-ratio: 1 / 1;
+            padding: 0 20px;
+            background-color: var(--bg-surface);
             border-radius: 12px;
-            background-color: rgba(255, 255, 255, 0.05);
-            animation: pulse-skeleton 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            border: 1px solid var(--border-color);
         }
-        @keyframes pulse-skeleton {
-            0%, 100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: .5;
-            }
-        }
+        #game-round-info { font-size: 1.5rem; font-weight: 900; color: var(--primary-gold); }
+        #game-timer { font-size: 1.6rem; font-weight: 700; color: white; min-width: 90px; text-align: center; }
+        #game-timer.critical { color: var(--red-betray); animation: pulse-timer 1s infinite; }
+        @keyframes pulse-timer { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
-        /* NEW: Improved styling for no-avatars message */
-        #no-avatars-message {
-            font-size: 1.1rem;
-            color: var(--text-secondary);
-            text-align: center;
-            padding: 40px 20px;
-            grid-column: 1 / -1; /* Spans the full width of the grid */
+        /* === سایدبار (لیست بازیکنان و امتیازات) === */
+        .players-sidebar {
+            grid-area: sidebar;
+            background-color: var(--bg-surface);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            height: 100%;
+            overflow: hidden;
         }
-        #no-avatars-message::before {
-            content: '🖼️';
-            font-size: 3rem;
-            filter: grayscale(80%);
+        .sidebar-title { padding: 15px; font-size: 1.2rem; font-weight: 700; text-align: center; color: var(--primary-gold); border-bottom: 1px solid var(--border-color); }
+        #players-list { flex-grow: 1; overflow-y: auto; padding: 10px; }
+        .player-score-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 10px; border-radius: 8px; transition: background-color 0.2s; }
+        .player-score-item:not(:last-child) { margin-bottom: 5px; }
+        .player-info { display: flex; align-items: center; gap: 10px; }
+        .player-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--text-secondary); }
+        .player-name { font-weight: 700; font-size: 1rem; }
+        .player-name .bot-tag { font-size: 0.8rem; color: var(--text-secondary); margin-right: 5px;}
+        .player-score { font-size: 1.2rem; font-weight: 900; color: var(--primary-gold); }
+        .player-score-item.is-self { background-color: var(--darker-red); border-left: 4px solid var(--primary-gold); }
+
+
+        /* === بخش اصلی (چت و پنل اقدام) === */
+        .main-content {
+            grid-area: main;
+            background-color: var(--bg-surface);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
         }
 
+        /* === پنل‌های هم‌پیمانی و انتخاب === */
+        .overlay-panel {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s, visibility 0.5s;
+        }
+        .overlay-panel.visible { opacity: 1; visibility: visible; }
+        .overlay-content { padding: 20px; animation: fadeInScale 0.5s ease-out; }
+        @keyframes fadeInScale { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        .overlay-title { font-size: 2.5rem; font-weight: 900; color: var(--primary-gold); margin-bottom: 15px; }
+        .overlay-subtitle { font-size: 1.5rem; margin-bottom: 30px; }
+        .partner-display { display: flex; align-items: center; gap: 20px; margin-bottom: 40px; }
+        .partner-avatar { width: 100px; height: 100px; border-radius: 50%; border: 4px solid var(--primary-gold); }
+        .plus-icon { font-size: 3rem; color: var(--text-secondary); }
+
+        .choice-buttons { display: flex; gap: 20px; }
+        .choice-btn {
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            font-weight: 900;
+            border-radius: 12px;
+            border: 3px solid;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            min-width: 180px;
+        }
+        .choice-btn:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+        #cooperate-btn { background-color: var(--green-cooperate); border-color: #58d68d; color: white; }
+        #betray-btn { background-color: var(--red-betray); border-color: #ec7063; color: white; }
+        .choice-btn.selected { transform: scale(0.95); opacity: 0.7; cursor: not-allowed; }
+
+        /* === سیستم چت === */
+        #chat-messages { flex-grow: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px; }
+        .chat-message { display: flex; align-items: flex-start; gap: 10px; max-width: 70%; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .chat-message.self { align-self: flex-end; flex-direction: row-reverse; }
+        .chat-message.private .chat-message-bubble { background-color: rgba(52, 152, 219, 0.2); border: 1px solid var(--blue-accent); }
+        .chat-message.announcement { align-self: center; background-color: var(--darker-red); color: var(--primary-gold); padding: 8px 15px; border-radius: 20px; font-weight: 700; max-width: 80%; text-align: center; border: 1px solid var(--primary-gold);}
+        .chat-message-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+        .chat-message-content { display: flex; flex-direction: column; }
+        .chat-message-sender { font-size: 0.9rem; font-weight: 700; color: var(--primary-gold); margin-bottom: 4px; }
+        .chat-message.self .chat-message-sender { color: var(--green-cooperate); text-align: right; }
+        .chat-message-bubble { background-color: #2c2c2e; padding: 10px 15px; border-radius: 18px; font-size: 1rem; word-wrap: break-word; }
+        #chat-form { display: flex; padding: 10px; border-top: 1px solid var(--border-color); gap: 10px; }
+        #chat-input { flex-grow: 1; background-color: #3a3a3c; border: 1px solid var(--border-color); border-radius: 20px; padding: 10px 15px; color: var(--text-light); font-family: 'Vazirmatn', sans-serif; font-size: 1rem; }
+        #chat-input:focus { outline: none; border-color: var(--primary-gold); }
+        #chat-send-btn { background-color: var(--primary-gold); border: none; border-radius: 50%; color: var(--bg-dark); font-weight: 900; width: 45px; height: 45px; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: transform 0.2s; }
+        #chat-send-btn:hover { transform: scale(1.1); }
+        #chat-input:disabled, #chat-send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* ریسپانسیو */
+        @media (max-width: 768px) {
+            body { padding: 5px; }
+            .game-wrapper {
+                grid-template-columns: 1fr;
+                grid-template-rows: 60px 180px 1fr;
+                grid-template-areas:
+                    "header"
+                    "sidebar"
+                    "main";
+                gap: 10px;
+            }
+            #players-list { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; align-content: flex-start;}
+            .player-score-item { flex-direction: column; padding: 8px; width: 80px; }
+            .player-info { flex-direction: column; gap: 5px; }
+            .overlay-title { font-size: 1.8rem; }
+            .overlay-subtitle { font-size: 1.1rem; }
+            .partner-avatar { width: 80px; height: 80px; }
+            .choice-btn { padding: 12px 25px; font-size: 1.2rem; min-width: 140px; }
+            #game-round-info, #game-timer { font-size: 1.2rem; }
+        }
     </style>
 </head>
 <body>
 
-    <div id="background-blurry"></div>
     <div id="loading-overlay">
         <div class="loader"></div>
-        <p id="loading-text">در حال ورود به لابی...</p>
+        <p id="loading-text">در حال اتصال به سرور...</p>
     </div>
 
-    <div class="lobby-container" style="display: none;">
-        <header class="lobby-header">
-            <div class="header-buttons-wrapper">
-                <button id="leave-lobby-btn" class="leave-button">خروج</button>
-                <button id="add-bot-btn" class="add-bot-button">افزودن ربات</button>
-                <button id="admin-join-btn" class="admin-join-button">پیوستن</button>
-            </div>
-            <h1 id="lobby-name">نام لابی...</h1>
-            <div class="header-spacer"></div>
+    <div class="game-wrapper" id="game-wrapper">
+        <header class="game-header">
+            <h1 id="game-round-info">دور ۱ - شروع</h1>
+            <div id="game-timer">00:00</div>
         </header>
 
-        <main class="players-area">
-            <div id="right-players" class="players-column"></div>
-            <div id="central-board-container"></div>
-            <div id="left-players" class="players-column"></div>
+        <aside class="players-sidebar">
+            <h2 class="sidebar-title">امتیازات</h2>
+            <div id="players-list">
+                <!-- لیست بازیکنان توسط جاوااسکریپت از دیتابیس بازی خوانده می‌شود -->
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div id="pairing-panel" class="overlay-panel">
+                <div class="overlay-content">
+                    <h2 class="overlay-title">هم‌پیمان شما</h2>
+                    <p class="overlay-subtitle">در این دور، سرنوشت شما به این بازیکن گره خورده است!</p>
+                    <div class="partner-display">
+                        <img id="my-avatar-pairing" src="https://up.20script.ir/file/1d50-defult.png" class="partner-avatar" alt="آواتار شما">
+                        <span class="plus-icon">+</span>
+                        <img id="partner-avatar-pairing" src="https://up.20script.ir/file/1d50-defult.png" class="partner-avatar" alt="آواتار هم‌پیمان">
+                    </div>
+                     <p id="partner-name-display" style="font-size: 1.2rem; font-weight: 700;"></p>
+                </div>
+            </div>
+             <div id="choice-panel" class="overlay-panel">
+                 <div class="overlay-content">
+                    <h2 class="overlay-title">انتخاب کنید</h2>
+                    <p class="overlay-subtitle">آیا به هم‌پیمان خود اعتماد می‌کنید یا به او خیانت خواهید کرد؟</p>
+                    <div class="choice-buttons">
+                        <button id="cooperate-btn" class="choice-btn">همکاری</button>
+                        <button id="betray-btn" class="choice-btn">خیانت</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="chat-messages"></div>
+            <form id="chat-form" action="javascript:void(0);">
+                <input type="text" id="chat-input" placeholder="پیام خود را بنویسید..." autocomplete="off" disabled>
+                <button type="submit" id="chat-send-btn" disabled>
+                    <svg fill="currentColor" width="24" height="24" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
+                </button>
+            </form>
         </main>
-        
-        <footer class="lobby-footer">
-            <button id="toggle-chat-btn" title="باز کردن چت">
-                <svg viewBox="0 0 24 24"><path d="M20,2H4A2,2,0,0,0,2,4V22l4-4H20a2,2,0,0,0,2-2V4A2,2,0,0,0,20,2Z"/></svg>
-            </button>
-            <button id="action-btn" class="action-button ready-btn">آماده</button>
-        </footer>
-    </div>
-    
-    <!-- پنل چت و مودال‌ها -->
-    <div id="chat-panel"> <div class="chat-header"> <h3>چت لابی</h3> <div class="chat-header-buttons"> <button id="clear-chat-btn" title="پاک کردن کل چت">🗑️</button> <button id="close-chat-btn" title="بستن چت">&times;</button> </div> </div> <div id="chat-messages"></div> <form id="chat-form"> <input type="text" id="chat-input" placeholder="پیام خود را بنویسید..." autocomplete="off"> <button type="submit" id="chat-send-btn">ارسال</button> </form> </div>
-    <div id="confirm-modal" class="modal-overlay"> <div class="modal-content"> <h2 id="confirm-modal-title" class="modal-title"></h2> <p id="confirm-modal-message" class="modal-message"></p> <div class="modal-buttons" style="flex-direction: row;"> <button id="confirm-modal-yes-btn" class="modal-button primary" style="width: 50%;">بله</button> <button id="confirm-modal-no-btn" class="modal-button secondary" style="width: 50%;">خیر</button> </div> </div> </div>
-    <div id="notification-modal" class="modal-overlay"> <div class="modal-content"> <h2 id="notification-modal-title" class="modal-title">توجه</h2> <p id="notification-modal-message" class="modal-message"></p> <div class="modal-buttons"> <button id="notification-modal-ok-btn" class="modal-button primary">متوجه شدم</button> </div> </div> </div>
-    <div id="player-action-modal" class="modal-overlay"> <div class="modal-content"> <h2 id="player-action-title" class="modal-title"></h2> <div id="player-action-buttons" class="modal-buttons"></div> </div> </div>
-    <div id="view-profile-modal-overlay" class="modal-overlay"> <div id="view-profile-modal-content" class="modal-content"> <div class="profile-header"> <span id="profile-modal-close-btn" class="modal-close-btn">&times;</span> <img id="profile-modal-avatar" src="" alt="آواتار پروفایل"> <div class="profile-name-banner"> <h2 id="profile-modal-name"></h2> </div> </div> <div class="profile-body"> <div class="profile-stat-item"> <span class="stat-label"><span>👑</span><span>سطح:</span></span> <span id="profile-stat-level" class="stat-value"></span> </div> <div class="profile-stat-item"> <span class="stat-label"><span>📜</span><span>تاریخ ثبت نام:</span></span> <span id="profile-stat-date" class="stat-value"></span> </div> <div class="profile-stat-item"> <span class="stat-label"><span>🎂</span><span>سن:</span></span> <span id="profile-stat-age" class="stat-value"></span> </div> <div class="profile-stat-item" id="profile-stat-diamonds-container"> <span class="stat-label"><span>💎</span><span>تعداد الماس:</span></span> <span id="profile-stat-diamonds" class="stat-value"></span> </div> <div class="profile-stat-item" id="profile-stat-email-container"> <span class="stat-label"><span>📧</span><span>ایمیل:</span></span> <span id="profile-stat-email" class="stat-value"></span> </div> </div> </div> </div>
-    <div id="lobby-ban-user-modal-overlay" class="modal-overlay"> <div id="lobby-ban-user-modal-content" class="modal-content"> <h2 class="modal-title">مسدود کردن کاربر</h2> <form id="ban-user-form"> <div class="form-group"> <label for="ban-reason" class="form-label">دلیل مسدودیت:</label> <input type="text" id="ban-reason" class="form-input" required placeholder="مثال: استفاده از الفاظ نامناسب"> </div> <div class="form-group form-group-horizontal"> <label class="form-label">مدت زمان:</label> <input type="number" id="ban-duration" class="form-input" required value="1"> <select id="ban-unit" class="form-select"> <option value="hours">ساعت</option> <option value="days">روز</option> <option value="weeks">هفته</option> </select> </div> <div class="confirm-buttons-container"> <button type="button" id="ban-cancel-btn" class="modal-button secondary" style="width: 50%;">انصراف</button> <button type="submit" class="modal-button danger" style="width: 50%;">اعمال مسدودیت</button> </div> </form> </div> </div>
-    
-    <!-- NEW & IMPROVED: پنل انتخاب آواتار -->
-    <div id="avatar-selection-modal-overlay" class="modal-overlay">
-        <div id="avatar-selection-modal-content" class="modal-content">
-            <header class="avatar-modal-header">
-                <h2 class="modal-title" style="margin-bottom: 0;">تغییر آواتار</h2>
-                <span id="avatar-modal-close-btn" class="modal-close-btn">&times;</span>
-            </header>
-            <main id="avatar-selection-grid">
-                <!-- آواتارها به صورت داینامیک اینجا اضافه می شوند -->
-            </main>
-        </div>
     </div>
 
-    <audio id="sound-player-join" src="https://assets.mixkit.co/sfx/preview/mixkit-unlock-game-notification-253.mp3" preload="auto"></audio>
-    <audio id="sound-player-leave" src="https://assets.mixkit.co/sfx/preview/mixkit-player-losing-or-failing-2042.mp3" preload="auto"></audio>
-    <audio id="sound-ready" src="https://assets.mixkit.co/sfx/preview/mixkit-quick-positive-video-game-notification-interface-265.mp3" preload="auto"></audio>
-    <audio id="sound-new-message" src="https://assets.mixkit.co/sfx/preview/mixkit-message-pop-alert-2354.mp3" preload="auto"></audio>
-    
+    <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, doc, onSnapshot, updateDoc, getDoc, collection, writeBatch, serverTimestamp, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, runTransaction, getDoc, collection, addDoc, writeBatch, deleteDoc, getDocs, serverTimestamp, orderBy, query, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-        // --- Config & Elements ---
-        const MAX_PLAYERS = 12;
+        
         const firebaseConfig = { apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg", authDomain: "mafia-9fcbf.firebaseapp.com", projectId: "mafia-9fcbf", storageBucket: "mafia-9fcbf.appspot.com", messagingSenderId: "471627157488", appId: "1:471627157488:web:92f008548a5596619a5735", };
-        
+
+        // --- مقداردهی اولیه Firebase ---
         const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
         const db = getFirestore(app);
+        const auth = getAuth(app);
 
+        // --- المان‌های DOM ---
         const loadingOverlay = document.getElementById('loading-overlay');
-        const lobbyContainer = document.querySelector('.lobby-container');
-        const lobbyNameEl = document.getElementById('lobby-name');
-        const leftPlayersEl = document.getElementById('left-players');
-        const rightPlayersEl = document.getElementById('right-players');
-        const actionBtn = document.getElementById('action-btn');
-        const leaveLobbyBtn = document.getElementById('leave-lobby-btn');
-        const toggleChatBtn = document.getElementById('toggle-chat-btn');
-        const chatPanel = document.getElementById('chat-panel');
-        const closeChatBtn = document.getElementById('close-chat-btn');
+        const loadingText = document.getElementById('loading-text');
+        const gameWrapper = document.getElementById('game-wrapper');
+        const roundInfoEl = document.getElementById('game-round-info');
+        const timerEl = document.getElementById('game-timer');
+        const playersListEl = document.getElementById('players-list');
         const chatMessagesEl = document.getElementById('chat-messages');
-        const chatForm = document.getElementById('chat-form');
         const chatInput = document.getElementById('chat-input');
-        const clearChatBtn = document.getElementById('clear-chat-btn');
-        
-        let currentUser = null;
-        let currentUserData = {};
-        let lobbyId = null;
-        let unsubscribeLobby = null;
-        let unsubscribeChat = null;
-        let unsubscribeSelf = null;
-        let isHost = false;
-        let isCurrentUserAdmin = false;
-        let isReady = false;
-        let lastPlayerCount = 0;
-        let isChatPanelVisible = false;
-        let isCurrentUserInLobby = true;
-        let targetUserForAction = null;
-        let currentLobbyData = null;
-        let allShopAvatars = []; // Cache for shop avatars
+        const chatSendBtn = document.getElementById('chat-send-btn');
+        const chatForm = document.getElementById('chat-form');
+        const pairingPanel = document.getElementById('pairing-panel');
+        const choicePanel = document.getElementById('choice-panel');
+        const cooperateBtn = document.getElementById('cooperate-btn');
+        const betrayBtn = document.getElementById('betray-btn');
 
-        /**
-         * Renders the entire lobby state based on Firestore data.
-         */
-        function renderLobby(data) {
-            lobbyNameEl.textContent = data.lobbyName;
-            const allPlayers = data.players || [];
-            isHost = currentUser.uid === data.creatorId;
-            const visiblePlayers = allPlayers.filter(p => !p.isSpectator);
-            
-            const addBotBtn = document.getElementById('add-bot-btn');
-            addBotBtn.style.display = isHost ? 'block' : 'none';
-            
-            leftPlayersEl.innerHTML = '';
-            rightPlayersEl.innerHTML = '';
-            
-            const playersPerColumn = MAX_PLAYERS / 2;
+        // --- متغیرهای وضعیت بازی ---
+        let currentGameState = {};
+        let currentUser = null; // اطلاعات کاربر لاگین کرده
+        let gameId = null; // آیدی بازی از URL خوانده می‌شود
+        let gameRef = null;
+        let timerInterval = null;
+        let unsubscribeGame = null; // برای قطع شنونده در زمان خروج
 
-            for (let i = 0; i < MAX_PLAYERS; i++) {
-                const player = visiblePlayers.find(p => visiblePlayers.indexOf(p) === i);
-                const slot = document.createElement('div');
-                slot.className = 'player-slot';
-                
-                if (player) {
-                    slot.dataset.uid = player.uid;
-                    slot.onclick = () => showPlayerActionModal(player);
-                    if (player.isReady) slot.classList.add('ready');
-                    
-                    const hostCrown = player.uid === data.creatorId ? `<div class="host-crown">👑</div>` : '';
-                    
-                    slot.innerHTML = `
-                        ${hostCrown}
-                        <img src="${player.avatarUrl || 'https://up.20script.ir/file/1d50-defult.png'}" alt="avatar" class="player-avatar" onerror="this.src='https://up.20script.ir/file/1d50-defult.png';">
-                        <div class="player-number">${i + 1}</div>
-                        <div class="player-name">${player.displayName}</div>
-                    `;
-                } else {
-                    slot.classList.add('empty');
-                }
-
-                if (i < playersPerColumn) {
-                    rightPlayersEl.appendChild(slot);
-                } else {
-                    leftPlayersEl.appendChild(slot);
-                }
+        // --- تابع اصلی اجرای بازی ---
+        async function main() {
+            // [تغییر کلیدی] خواندن آیدی بازی از URL
+            gameId = new URLSearchParams(window.location.search).get('id');
+            if (!gameId) {
+                loadingText.textContent = 'خطا: شناسه بازی یافت نشد!';
+                return;
             }
-            
-            const self = allPlayers.find(p => p.uid === currentUser.uid);
-            isReady = self ? self.isReady : false;
 
-            if (self && !self.isSpectator) {
-                actionBtn.style.display = 'block';
-                if (isHost) {
-                    const isLobbyFull = visiblePlayers.length === MAX_PLAYERS;
-                    const allOthersReady = visiblePlayers.every(p => p.uid === currentUser.uid || p.isReady);
-                    actionBtn.textContent = 'شروع بازی';
-                    actionBtn.className = 'action-button start-btn';
-                    actionBtn.disabled = !(isLobbyFull && allOthersReady);
-                } else {
-                    actionBtn.textContent = isReady ? 'لغو آمادگی' : 'آماده';
-                    actionBtn.className = `action-button ${isReady ? 'unready-btn' : 'ready-btn'}`;
-                    actionBtn.disabled = false;
-                }
-            } else {
-                actionBtn.style.display = 'none';
-            }
-            updateAdminUI(allPlayers);
-        }
-        
-        async function main() { lobbyId = new URLSearchParams(window.location.search).get('id'); if (!lobbyId) { showNotificationModal("خطا", "شناسه لابی نامعتبر است.", () => window.location.href = './Lobby page.html'); return; } onAuthStateChanged(auth, async (user) => { if (user) { currentUser = user; const userDocRef = doc(db, 'users', user.uid); const userDocSnap = await getDoc(userDocRef); if (userDocSnap.exists()) { currentUserData = userDocSnap.data(); isCurrentUserAdmin = currentUserData.isAdmin === true; } else { currentUserData = { displayName: user.displayName, avatarUrl: user.photoURL }; } listenToSelfChanges(); await joinLobby(); listenToLobbyChanges(); listenToChatMessages(); setupEventListeners(); } else { window.location.href = './login.html'; } }); }
-        async function joinLobby() { const lobbyDocRef = doc(db, "Lobbys_list", lobbyId); try { await runTransaction(db, async (transaction) => { const lobbyDoc = await transaction.get(lobbyDocRef); if (!lobbyDoc.exists()) throw new Error("لابی یافت نشد!"); let players = lobbyDoc.data().players || []; const playerExists = players.some(p => p.uid === currentUser.uid); if (!playerExists) { if (players.length >= MAX_PLAYERS) throw new Error("لابی پر است!"); const newPlayer = { uid: currentUser.uid, displayName: currentUserData.displayName || "بازیکن", avatarUrl: currentUserData.avatarUrl || "https://up.20script.ir/file/1d50-defult.png", isReady: false, isSpectator: isCurrentUserAdmin }; players.push(newPlayer); transaction.update(lobbyDocRef, { players: players, playerCount: players.length }); } }); } catch (error) { showNotificationModal("خطا در ورود", `خطا: ${error.message}`, () => window.location.href = './Lobby page.html'); } }
-        
-        function listenToLobbyChanges() {
-            const lobbyDocRef = doc(db, "Lobbys_list", lobbyId);
-            unsubscribeLobby = onSnapshot(lobbyDocRef, (docSnap) => {
-                if (!isCurrentUserInLobby) return;
-                
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    if (data.gameStarted && data.gameId) {
-                        if (unsubscribeLobby) unsubscribeLobby();
-                        if (unsubscribeChat) unsubscribeChat();
-                        if (unsubscribeSelf) unsubscribeSelf();
-                        window.removeEventListener('beforeunload', handleLeaveLobbyOnExit);
-                        window.location.href = `./gamescreen.html?id=${data.gameId}`;
-                        return;
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    loadingText.textContent = 'در حال دریافت اطلاعات کاربر...';
+                    const userDoc = await getDoc(doc(db, "users", user.uid));
+                    if (userDoc.exists()) {
+                        currentUser = { uid: user.uid, ...userDoc.data() };
+                        loadingText.textContent = 'در حال پیوستن به بازی...';
+                        await initializeGame();
+                    } else {
+                        loadingText.textContent = 'خطا: اطلاعات کاربر یافت نشد.';
                     }
+                } else {
+                    loadingText.textContent = 'لطفا ابتدا وارد حساب کاربری خود شوید.';
+                    window.location.href = './login.html'; // هدایت به صفحه لاگین
                 }
-
-                if (!docSnap.exists()) {
-                    if (unsubscribeLobby) unsubscribeLobby();
-                    showNotificationModal("لابی حذف شد", "این لابی توسط سازنده حذف شده است.", () => window.location.href = './Lobby page.html');
-                    return;
-                }
-                currentLobbyData = docSnap.data();
-                const players = currentLobbyData.players || [];
-                const wasInLobby = isCurrentUserInLobby;
-                isCurrentUserInLobby = players.some(p => p.uid === currentUser.uid);
-                if (wasInLobby && !isCurrentUserInLobby) {
-                    cleanUpAndLeave("شما توسط سازنده لابی اخراج شدید.", './Lobby page.html');
-                    return;
-                }
-                const visiblePlayerCount = players.filter(p => !p.isSpectator).length;
-                if (visiblePlayerCount > lastPlayerCount) playSound('sound-player-join');
-                else if (visiblePlayerCount < lastPlayerCount) playSound('sound-player-leave');
-                lastPlayerCount = visiblePlayerCount;
-                renderLobby(currentLobbyData);
-                if (loadingOverlay.style.display !== 'none') {
-                    loadingOverlay.style.opacity = '0';
-                    setTimeout(() => {
-                        loadingOverlay.style.display = 'none';
-                        lobbyContainer.style.display = 'flex';
-                    }, 500);
-                }
-            }, (error) => {
-                console.error("Firestore listen error:", error);
-                showNotificationModal("خطای ارتباط", "ارتباط با لابی قطع شد.", () => window.location.reload());
             });
         }
-        function listenToSelfChanges() { if (unsubscribeSelf) unsubscribeSelf(); const selfDocRef = doc(db, 'users', currentUser.uid); unsubscribeSelf = onSnapshot(selfDocRef, (docSnap) => { if (docSnap.exists()) { const latestSelfData = docSnap.data(); if (latestSelfData.isBanned && latestSelfData.banExpiresAt && latestSelfData.banExpiresAt.toDate() > new Date()) { cleanUpAndLeave("حساب کاربری شما مسدود شد!", './index.html'); return; } const newAdminStatus = latestSelfData.isAdmin === true; if (newAdminStatus !== isCurrentUserAdmin) { isCurrentUserAdmin = newAdminStatus; if (currentLobbyData) updateAdminUI(currentLobbyData.players || []); } currentUserData = latestSelfData; } }); }
-        function playSound(soundId) { try { document.getElementById(soundId).play(); } catch(e) { console.warn("Sound play failed", e); } }
-        function updateAdminUI(allPlayers = []) { const adminJoinBtn = document.getElementById('admin-join-btn'); const self = allPlayers.find(p => p.uid === currentUser.uid); const isSpectating = self && self.isSpectator; if (isCurrentUserAdmin && isSpectating) { adminJoinBtn.style.display = 'block'; } else { adminJoinBtn.style.display = 'none'; } clearChatBtn.style.display = (isHost || isCurrentUserAdmin) ? 'block' : 'none'; }
-        function handleAdminJoinGame() { showConfirmModal('پیوستن به بازی', 'آیا می‌خواهید به عنوان بازیکن به لابی ملحق شوید؟', async () => { const lobbyDocRef = doc(db, "Lobbys_list", lobbyId); try { await runTransaction(db, async (transaction) => { const lobbyDoc = await transaction.get(lobbyDocRef); if (!lobbyDoc.exists()) throw new Error("لابی دیگر وجود ندارد."); let players = lobbyDoc.data().players || []; const visiblePlayerCount = players.filter(p => !p.isSpectator).length; if (visiblePlayerCount >= MAX_PLAYERS) throw new Error("لابی پر است و نمی‌توانید ملحق شوید."); const playerIndex = players.findIndex(p => p.uid === currentUser.uid); if (playerIndex > -1) { players[playerIndex].isSpectator = false; transaction.update(lobbyDocRef, { players: players }); } else throw new Error("اطلاعات شما در لابی یافت نشد."); }); } catch (error) { showNotificationModal("خطا", error.message); } }); }
-        
-        async function showPlayerActionModal(player) {
-            targetUserForAction = player;
-            const modal = document.getElementById('player-action-modal');
-            document.getElementById('player-action-title').textContent = player.displayName;
-            const buttonsContainer = document.getElementById('player-action-buttons');
-            buttonsContainer.innerHTML = '';
-            
-            if (player.isBot) {
-                if (isHost) {
-                    const kickBotBtn = document.createElement('button');
-                    kickBotBtn.className = 'modal-button danger';
-                    kickBotBtn.textContent = 'اخراج ربات';
-                    kickBotBtn.onclick = () => {
-                        modal.classList.remove('visible');
-                        showKickConfirm(player.displayName, player.uid);
-                    };
-                    buttonsContainer.appendChild(kickBotBtn);
-                }
-            } else {
-                const profileBtn = document.createElement('button');
-                profileBtn.className = 'modal-button primary';
-                profileBtn.textContent = 'مشاهده پروفایل';
-                profileBtn.onclick = () => {
-                    modal.classList.remove('visible');
-                    showPlayerProfile(player.uid);
-                };
-                buttonsContainer.appendChild(profileBtn);
 
-                // Add "Change Avatar" button for self with the same theme
-                if (player.uid === currentUser.uid) {
-                    const changeAvatarBtn = document.createElement('button');
-                    changeAvatarBtn.className = 'modal-button primary'; // CHANGED: from 'secondary' to 'primary'
-                    changeAvatarBtn.textContent = 'تغییر آواتار';
-                    changeAvatarBtn.onclick = () => {
-                        modal.classList.remove('visible');
-                        showAvatarSelectionModal();
-                    };
-                    buttonsContainer.appendChild(changeAvatarBtn);
-                }
+        async function initializeGame() {
+            gameRef = doc(db, "games", gameId);
+            const gameSnap = await getDoc(gameRef);
 
-                if (player.uid !== currentUser.uid) {
-                    if (isHost || isCurrentUserAdmin) {
-                        const transferBtn = document.createElement('button');
-                        transferBtn.className = 'modal-button secondary';
-                        transferBtn.textContent = 'انتقال مالکیت';
-                        transferBtn.onclick = () => {
-                            modal.classList.remove('visible');
-                            showTransferOwnershipConfirm(player);
-                        };
-                        buttonsContainer.appendChild(transferBtn);
-
-                        const kickBtn = document.createElement('button');
-                        kickBtn.className = 'modal-button secondary';
-                        kickBtn.textContent = 'اخراج از لابی';
-                        kickBtn.onclick = () => {
-                            modal.classList.remove('visible');
-                            showKickConfirm(player.displayName, player.uid);
-                        };
-                        buttonsContainer.appendChild(kickBtn);
-                    }
-                    
-                    if (isCurrentUserAdmin) {
-                        const banBtn = document.createElement('button');
-                        banBtn.className = 'modal-button danger';
-                        banBtn.textContent = 'مسدود کردن کاربر';
-                        banBtn.onclick = () => {
-                            modal.classList.remove('visible');
-                            showBanModal();
-                        };
-                        buttonsContainer.appendChild(banBtn);
-                    }
-                }
+            // [تغییر کلیدی] بازی باید از قبل توسط لابی ساخته شده باشد
+            if (!gameSnap.exists()) {
+                 loadingText.textContent = 'خطا: بازی مورد نظر یافت نشد!';
+                 return;
             }
 
-            modal.onclick = (e) => { if (e.target === modal) modal.classList.remove('visible'); };
-            modal.classList.add('visible');
-        }
-        
-        // --- NEW & IMPROVED: Avatar Selection Logic ---
-        async function showAvatarSelectionModal() {
-            const modal = document.getElementById('avatar-selection-modal-overlay');
-            const grid = document.getElementById('avatar-selection-grid');
-            
-            // Show new beautiful skeleton loader
-            grid.innerHTML = ''; // Clear previous content
-            for (let i = 0; i < 8; i++) {
-                const skeleton = document.createElement('div');
-                skeleton.className = 'avatar-skeleton-card';
-                skeleton.style.animationDelay = `${i * 0.05}s`;
-                grid.appendChild(skeleton);
-            }
-            
-            modal.classList.add('visible');
+            // شنونده وضعیت بازی را فعال کن
+            unsubscribeGame = onSnapshot(gameRef, (doc) => {
+                handleGameStateChange(doc.data());
+            }, (error) => {
+                console.error("Error listening to game state:", error);
+                loadingText.textContent = 'ارتباط با سرور قطع شد.';
+            });
 
-            try {
-                // Fetch all avatars from the shop if not already cached
-                if (allShopAvatars.length === 0) {
-                    const avatarsSnapshot = await getDocs(collection(db, 'avatars'));
-                    avatarsSnapshot.forEach(doc => allShopAvatars.push(doc.data()));
-                }
-
-                const ownedAvatarIds = currentUserData.ownedAvatars || [];
-                const ownedAvatars = allShopAvatars.filter(avatar => ownedAvatarIds.includes(avatar.id));
-
-                // A short delay to let the user appreciate the loader
-                setTimeout(() => {
-                    grid.innerHTML = ''; // Clear loader
-                    if (ownedAvatars.length === 0) {
-                        grid.innerHTML = `<div id="no-avatars-message">شما هنوز آواتار خریداری شده‌ای ندارید. برای خرید به فروشگاه مراجعه کنید.</div>`;
-                    } else {
-                        ownedAvatars.forEach((avatar, index) => {
-                            const card = document.createElement('div');
-                            card.className = 'avatar-select-card';
-                            if (avatar.imageUrl === currentUserData.avatarUrl) {
-                                card.classList.add('equipped');
-                            }
-                            card.innerHTML = `<img src="${avatar.imageUrl}" alt="${avatar.name}" class="avatar-select-img">`;
-                            card.onclick = () => handleAvatarSelect(avatar);
-
-                            // Apply staggered entrance animation
-                            card.style.animation = 'avatar-card-appear 0.5s cubic-bezier(0.25, 0.8, 0.25, 1) forwards';
-                            card.style.animationDelay = `${index * 0.05}s`;
-                            
-                            grid.appendChild(card);
-                        });
-                    }
-                }, 700); // delay in milliseconds
-
-            } catch (error) {
-                console.error("Error loading avatars:", error);
-                grid.innerHTML = `<div id="no-avatars-message" style="color: #e74c3c;">خطا در بارگذاری آواتارها.</div>`;
-            }
-        }
-
-        async function handleAvatarSelect(avatar) {
-            if (avatar.imageUrl === currentUserData.avatarUrl) return; // Don't do anything if it's already equipped
-
-            const modal = document.getElementById('avatar-selection-modal-overlay');
-            modal.classList.remove('visible');
-            loadingOverlay.style.display = 'flex';
-            loadingOverlay.querySelector('#loading-text').textContent = 'در حال تغییر آواتار...';
-            
-            const userDocRef = doc(db, 'users', currentUser.uid);
-            const lobbyDocRef = doc(db, 'Lobbys_list', lobbyId);
-
-            try {
-                // Update user document
-                await updateDoc(userDocRef, { avatarUrl: avatar.imageUrl });
-                
-                // Update player in lobby document
-                await runTransaction(db, async (transaction) => {
-                    const lobbyDoc = await transaction.get(lobbyDocRef);
-                    if (!lobbyDoc.exists()) throw new Error("لابی یافت نشد!");
-
-                    let players = lobbyDoc.data().players;
-                    const playerIndex = players.findIndex(p => p.uid === currentUser.uid);
-                    if (playerIndex > -1) {
-                        players[playerIndex].avatarUrl = avatar.imageUrl;
-                        transaction.update(lobbyDocRef, { players: players });
-                    }
-                });
-
-                currentUserData.avatarUrl = avatar.imageUrl; // Update local data
-                showNotificationModal("موفقیت", "آواتار شما با موفقیت تغییر کرد.");
-
-            } catch (error) {
-                console.error("Error changing avatar:", error);
-                showNotificationModal("خطا", "تغییر آواتار با مشکل مواجه شد.");
-            } finally {
+            // نمایش رابط کاربری
+            loadingOverlay.style.opacity = '0';
+            setTimeout(() => {
                 loadingOverlay.style.display = 'none';
-                loadingOverlay.querySelector('#loading-text').textContent = 'در حال ورود به لابی...';
+                gameWrapper.classList.add('visible');
+            }, 500);
+        }
+        
+        function handleGameStateChange(state) {
+            if (!state) return;
+            currentGameState = state;
+            renderUI(state);
+            handleGamePhase(state);
+        }
+
+        function renderUI(state) {
+            if (!state.players) return;
+
+            playersListEl.innerHTML = '';
+            // [تغییر] مرتب‌سازی بازیکنان بر اساس امتیاز
+            const sortedPlayers = [...state.players].sort((a, b) => (b.score || 0) - (a.score || 0));
+            
+            sortedPlayers.forEach(p => {
+                const isSelf = p.uid === currentUser.uid;
+                const playerEl = document.createElement('div');
+                playerEl.className = `player-score-item ${isSelf ? 'is-self' : ''}`;
+                
+                // [تغییر کلیدی] بررسی اینکه بازیکن ربات است یا خیر
+                const botTag = p.isBot ? '<span class="bot-tag">🤖 (ربات)</span>' : '';
+
+                playerEl.innerHTML = `
+                    <div class="player-info">
+                        <img src="${p.avatarUrl || 'https://up.20script.ir/file/1d50-defult.png'}" alt="${p.displayName}" class="player-avatar" onerror="this.src='https://up.20script.ir/file/1d50-defult.png';">
+                        <span class="player-name">${p.displayName}${botTag}</span>
+                    </div>
+                    <span class="player-score">${p.score || 0}</span>
+                `;
+                playersListEl.appendChild(playerEl);
+            });
+
+            // رندر کردن پیام‌های چت
+            chatMessagesEl.innerHTML = '';
+            if(state.announcements) { // نام فیلد در دیتابیس announcements است
+                 state.announcements.forEach(msg => addMessageToChatUI({announcement: true, text: msg}));
+            }
+             if(state.chat) {
+                state.chat.forEach(msg => addMessageToChatUI(msg));
             }
         }
-        // --- End of Avatar Selection Logic ---
 
+        function handleGamePhase(state) {
+            const self = state.players.find(p => p.uid === currentUser.uid);
+            if (!self) return;
 
-        async function showPlayerProfile(uid) { const userDocRef = doc(db, 'users', uid); const docSnap = await getDoc(userDocRef); if (!docSnap.exists()) { showNotificationModal("خطا", "اطلاعات این کاربر یافت نشد."); return; } const userData = docSnap.data(); document.getElementById('profile-modal-avatar').src = userData.avatarUrl || 'https://up.20script.ir/file/1d50-defult.png'; document.getElementById('profile-modal-name').textContent = userData.displayName || "کاربر ناشناس"; const profileStatLevel = document.getElementById('profile-stat-level'); if (userData.isAdmin === true) { profileStatLevel.textContent = "ادمین"; profileStatLevel.classList.add('stat-value-admin'); } else { profileStatLevel.textContent = "کاربر"; profileStatLevel.classList.remove('stat-value-admin'); } document.getElementById('profile-stat-age').textContent = userData.old || "نامشخص"; if (userData.createdAt && typeof userData.createdAt.toDate === 'function') { const date = userData.createdAt.toDate(); document.getElementById('profile-stat-date').textContent = new Intl.DateTimeFormat('fa-IR', { year: 'numeric', month: 'long', day: 'numeric' }).format(date); } else { document.getElementById('profile-stat-date').textContent = "نامشخص"; } const diamondsContainer = document.getElementById('profile-stat-diamonds-container'); const emailContainer = document.getElementById('profile-stat-email-container'); if (isCurrentUserAdmin) { diamondsContainer.style.display = 'flex'; emailContainer.style.display = 'flex'; document.getElementById('profile-stat-diamonds').textContent = userData.game || 0; document.getElementById('profile-stat-email').textContent = userData.email || "ثبت نشده"; } else { diamondsContainer.style.display = 'none'; emailContainer.style.display = 'none'; } const modal = document.getElementById('view-profile-modal-overlay'); document.getElementById('profile-modal-close-btn').onclick = () => modal.classList.remove('visible'); modal.onclick = (e) => { if (e.target === modal) modal.classList.remove('visible'); }; modal.classList.add('visible'); }
-        function showBanModal() { const modal = document.getElementById('lobby-ban-user-modal-overlay'); document.getElementById('ban-user-form').reset(); modal.onclick = e => { if (e.target === modal) modal.classList.remove('visible'); }; document.getElementById('ban-cancel-btn').onclick = () => modal.classList.remove('visible'); modal.classList.add('visible'); }
-        async function handleBanFormSubmit(e) { e.preventDefault(); const reason = document.getElementById('ban-reason').value.trim(); const duration = parseInt(document.getElementById('ban-duration').value, 10); const unit = document.getElementById('ban-unit').value; if (!reason || !duration || duration <= 0) { showNotificationModal('خطا', 'لطفاً دلیل و مدت زمان معتبر وارد کنید.'); return; } const now = new Date(); let expiryDate = new Date(now); if (unit === 'hours') expiryDate.setHours(now.getHours() + duration); else if (unit === 'days') expiryDate.setDate(now.getDate() + duration); else if (unit === 'weeks') expiryDate.setDate(now.getDate() + (duration * 7)); const banData = { isBanned: true, banReason: reason, banExpiresAt: expiryDate }; const userToBanRef = doc(db, 'users', targetUserForAction.uid); try { await updateDoc(userToBanRef, banData); document.getElementById('lobby-ban-user-modal-overlay').classList.remove('visible'); showNotificationModal('موفقیت', `کاربر ${targetUserForAction.displayName} با موفقیت مسدود شد.`); } catch (error) { showNotificationModal('خطا', 'اعمال مسدودیت با مشکل مواجه شد.'); console.error("Ban Error:", error); } }
-        function showTransferOwnershipConfirm(player) { showConfirmModal( `انتقال مالکیت به ${player.displayName}`, 'آیا مطمئن هستید که می‌خواهید مالکیت لابی را به این کاربر منتقل کنید؟ این عمل غیرقابل بازگشت است.', () => transferOwnership(player.uid) ); }
-        async function transferOwnership(newOwnerUid) { const lobbyDocRef = doc(db, "Lobbys_list", lobbyId); try { await updateDoc(lobbyDocRef, { creatorId: newOwnerUid }); } catch (error) { console.error("Error transferring ownership:", error); showNotificationModal('خطا', 'انتقال مالکیت با مشکل مواجه شد.'); } }
-        function cleanUpAndLeave(notificationMessage, redirectUrl) { if (unsubscribeLobby) unsubscribeLobby(); if (unsubscribeChat) unsubscribeChat(); if (unsubscribeSelf) unsubscribeSelf(); window.removeEventListener('beforeunload', handleLeaveLobbyOnExit); actionBtn.disabled = true; leaveLobbyBtn.disabled = true; chatInput.disabled = true; chatInput.placeholder = notificationMessage; showNotificationModal("توجه", notificationMessage, () => { window.location.href = redirectUrl; }); }
-        async function handleLeaveLobbyOnExit() { window.removeEventListener('beforeunload', handleLeaveLobbyOnExit); if (!isCurrentUserInLobby) return; const lobbyDocRef = doc(db, "Lobbys_list", lobbyId); try { const docSnap = await getDoc(lobbyDocRef); if (docSnap.exists()) { if (isHost) { await deleteDoc(lobbyDocRef); } else { await runTransaction(db, async (transaction) => { const lobbyDoc = await transaction.get(lobbyDocRef); if (!lobbyDoc.exists()) return; let players = lobbyDoc.data().players.filter(p => p.uid !== currentUser.uid); transaction.update(lobbyDocRef, { players: players, playerCount: players.length }); }); } } } catch (error) { console.error("Error on leave:", error); } }
-        
-        async function handleAddBot() {
-            const lobbyDocRef = doc(db, "Lobbys_list", lobbyId);
-            try {
-                await runTransaction(db, async (transaction) => {
-                    const lobbyDoc = await transaction.get(lobbyDocRef);
-                    if (!lobbyDoc.exists()) throw new Error("لابی یافت نشد!");
-                    let players = lobbyDoc.data().players || [];
-                    const visiblePlayerCount = players.filter(p => !p.isSpectator).length;
-                    if (visiblePlayerCount >= MAX_PLAYERS) {
-                        throw new Error("لابی پر است و نمی‌توان ربات اضافه کرد.");
+            const myPair = state.pairs?.find(p => p.includes(currentUser.uid));
+            const amIBot = self.isBot === true;
+
+            // مخفی کردن پنل‌ها به صورت پیش‌فرض
+            pairingPanel.classList.remove('visible');
+            choicePanel.classList.remove('visible');
+            enableChat(false, true); // غیرفعال کردن چت به صورت پیش‌فرض
+
+            switch(state.phase) {
+                case 'pairing':
+                    roundInfoEl.textContent = `دور ${state.round} - هم‌پیمانی`;
+                    if (myPair) showPairingPanel(self, state.players, myPair);
+                    break;
+                case 'choice':
+                    roundInfoEl.textContent = `دور ${state.round} - انتخاب`;
+                    // اگر کاربر واقعی است و هنوز انتخاب نکرده، پنل را نشان بده
+                    if (myPair && !amIBot && !state.choices?.[currentUser.uid]) {
+                        showChoicePanel();
                     }
-                    const botCount = players.filter(p => p.isBot).length;
-                    const newBot = { uid: `bot_${Date.now()}`, displayName: `ربات ${botCount + 1}`, avatarUrl: 'https://cdn-icons-png.flaticon.com/512/1693/1693746.png', isReady: true, isSpectator: false, isBot: true };
-                    players.push(newBot);
-                    transaction.update(lobbyDocRef, { players: players, playerCount: players.length });
-                });
-            } catch (error) {
-                showNotificationModal("خطا", `خطا در افزودن ربات: ${error.message}`);
+                    // [تغییر کلیدی] اگر کاربر فعلی میزبان است، تصمیم‌گیری ربات‌ها را اجرا کن
+                    if (currentUser.uid === state.creatorId) {
+                        handleBotChoices(state);
+                    }
+                    break;
+                case 'public_chat':
+                    roundInfoEl.textContent = `دور ${state.round} - چت عمومی`;
+                    if (!amIBot) enableChat(false);
+                    break;
+                case 'private_chat':
+                    roundInfoEl.textContent = `دور ${state.round} - چت خصوصی`;
+                    if (!amIBot) enableChat(true);
+                    break;
+                case 'results':
+                    roundInfoEl.textContent = `دور ${state.round} - نتایج`;
+                    break;
+                default:
+                    roundInfoEl.textContent = `دور ${state.round || 1} - در انتظار...`;
+            }
+        }
+        
+        /**
+         * [تابع جدید] این تابع توسط میزبان بازی اجرا شده و برای ربات‌ها تصمیم‌گیری می‌کند
+         */
+        async function handleBotChoices(state) {
+            const batch = writeBatch(db);
+            let choicesMade = false;
+
+            // تمام بازیکنان ربات را پیدا کن
+            const bots = state.players.filter(p => p.isBot);
+            
+            bots.forEach(bot => {
+                // اگر ربات در یک زوج قرار دارد و هنوز تصمیمی برایش ثبت نشده
+                const isPaired = state.pairs?.some(p => p.includes(bot.uid));
+                const hasChosen = state.choices?.[bot.uid];
+                
+                if (isPaired && !hasChosen) {
+                    // با احتمال 50/50 یک تصمیم بگیر
+                    const choice = Math.random() < 0.5 ? 'cooperate' : 'betray';
+                    // فیلد جدید را به مپ choices اضافه کن
+                    batch.update(gameRef, { [`choices.${bot.uid}`]: choice });
+                    choicesMade = true;
+                }
+            });
+
+            if (choicesMade) {
+                try {
+                    await batch.commit();
+                    console.log("تصمیم ربات‌ها ثبت شد.");
+                } catch (error) {
+                    console.error("خطا در ثبت تصمیم ربات‌ها:", error);
+                }
             }
         }
 
-        function setupEventListeners() { 
-            actionBtn.addEventListener('click', () => isHost ? startGame() : toggleReadyStatus()); 
-            leaveLobbyBtn.addEventListener('click', showLeaveConfirm); 
-            window.addEventListener('beforeunload', handleLeaveLobbyOnExit); 
-            toggleChatBtn.addEventListener('click', toggleChatPanel); 
-            closeChatBtn.addEventListener('click', toggleChatPanel); 
-            chatForm.addEventListener('submit', handleSendMessage); 
-            clearChatBtn.addEventListener('click', handleClearAllMessages); 
-            document.getElementById('ban-user-form').addEventListener('submit', handleBanFormSubmit); 
-            document.getElementById('admin-join-btn').addEventListener('click', handleAdminJoinGame);
-            document.getElementById('add-bot-btn').addEventListener('click', handleAddBot);
-            // NEW: Event listeners for Avatar Selection Modal
-            const avatarModal = document.getElementById('avatar-selection-modal-overlay');
-            document.getElementById('avatar-modal-close-btn').onclick = () => avatarModal.classList.remove('visible');
-            avatarModal.onclick = (e) => { if (e.target === avatarModal) avatarModal.classList.remove('visible'); };
+
+        async function handlePlayerChoice(choice) {
+            cooperateBtn.classList.add('selected');
+            betrayBtn.classList.add('selected');
+            
+            // از فیلد داینامیک برای آپدیت مپ استفاده می‌کنیم
+            await updateDoc(gameRef, {
+                [`choices.${currentUser.uid}`]: choice
+            });
+
+            await addAnnouncementMessage(`شما "${choice === 'cooperate' ? 'همکاری' : 'خیانت'}" را انتخاب کردید.`);
         }
 
-        async function kickPlayer(uidToKick) { const lobbyDocRef = doc(db, "Lobbys_list", lobbyId); await runTransaction(db, async (transaction) => { const lobbyDoc = await transaction.get(lobbyDocRef); if (!lobbyDoc.exists()) return; let players = lobbyDoc.data().players.filter(p => p.uid !== uidToKick); transaction.update(lobbyDocRef, { players: players, playerCount: players.length }); }); }
-        async function toggleReadyStatus() { playSound('sound-ready'); const lobbyDocRef = doc(db, "Lobbys_list", lobbyId); await runTransaction(db, async (transaction) => { const lobbyDoc = await transaction.get(lobbyDocRef); if (!lobbyDoc.exists()) throw new Error("لابی یافت نشد!"); let players = lobbyDoc.data().players || []; const playerIndex = players.findIndex(p => p.uid === currentUser.uid); if (playerIndex > -1) { players[playerIndex].isReady = !players[playerIndex].isReady; transaction.update(lobbyDocRef, { players: players }); } }); }
+        // --- توابع رابط کاربری (UI) ---
+
+        function showPairingPanel(self, allPlayers, pair) {
+            const partnerId = pair.find(id => id !== self.uid);
+            const partner = allPlayers.find(p => p.uid === partnerId);
+            if (!partner) return;
+
+            document.getElementById('my-avatar-pairing').src = self.avatarUrl || 'https://up.20script.ir/file/1d50-defult.png';
+            document.getElementById('partner-avatar-pairing').src = partner.avatarUrl || 'https://up.20script.ir/file/1d50-defult.png';
+            document.getElementById('partner-name-display').textContent = `هم‌پیمان شما: ${partner.displayName}`;
+            pairingPanel.classList.add('visible');
+        }
+
+        function showChoicePanel() {
+            cooperateBtn.classList.remove('selected');
+            betrayBtn.classList.remove('selected');
+            choicePanel.classList.add('visible');
+        }
         
-        function assignRoles(lobbyPlayers) {
-            const roles = [
-                { roleName: 'پدرخوانده', team: 'mafia', ability: { actionText: 'شلیک', canTarget: true, requiresTarget: true } }, { roleName: 'مافیا ساده', team: 'mafia', ability: { actionText: 'شلیک', canTarget: true, requiresTarget: true } }, { roleName: 'مافیا ساده', team: 'mafia', ability: { actionText: 'شلیک', canTarget: true, requiresTarget: true } }, { roleName: 'دکتر', team: 'citizen', ability: { actionText: 'نجات دادن', canTarget: true, requiresTarget: true } }, { roleName: 'کارآگاه', team: 'citizen', ability: { actionText: 'استعلام', canTarget: true, requiresTarget: true } }, { roleName: 'شهروند ساده', team: 'citizen', ability: null }, { roleName: 'شهروند ساده', team: 'citizen', ability: null }, { roleName: 'شهروند ساده', team: 'citizen', ability: null }, { roleName: 'شهروند ساده', team: 'citizen', ability: null }, { roleName: 'شهروند ساده', team: 'citizen', ability: null }, { roleName: 'شهروند ساده', team: 'citizen', ability: null }, { roleName: 'شهروند ساده', team: 'citizen', ability: null },
-            ];
-            const shuffledPlayers = [...lobbyPlayers].sort(() => Math.random() - 0.5);
-            return shuffledPlayers.map((player, index) => ({ uid: player.uid, displayName: player.displayName, avatarUrl: player.avatarUrl, isAlive: true, ...roles[index] }));
+        function startTimer(duration, onComplete) {
+            // این تابع فعلا در جریان بازی استفاده نمی‌شود اما برای آینده مفید است
         }
 
-        async function startGame() {
-            actionBtn.disabled = true; actionBtn.textContent = 'در حال ساخت بازی...';
-            try {
-                const lobbyDocRef = doc(db, "Lobbys_list", lobbyId); const lobbyDocSnap = await getDoc(lobbyDocRef);
-                if (!lobbyDocSnap.exists()) { throw new Error("لابی دیگر وجود ندارد!"); }
-                const lobbyData = lobbyDocSnap.data();
-                const gamePlayers = assignRoles(lobbyData.players.filter(p => !p.isSpectator));
-                const gameData = { creatorId: lobbyData.creatorId, players: gamePlayers, day: 1, phase: 'day_discussion', timerEndsAt: new Date(Date.now() + 60000), announcements: ['بازی شروع شد! همه در روز اول فرصت صحبت دارند.'], createdAt: serverTimestamp() };
-                const gameCollectionRef = collection(db, 'games'); const newGameDocRef = await addDoc(gameCollectionRef, gameData);
-                await updateDoc(lobbyDocRef, { gameStarted: true, gameId: newGameDocRef.id });
-            } catch (error) { console.error("Error starting game:", error); showNotificationModal("خطا", `مشکلی در شروع بازی پیش آمد: ${error.message}`); actionBtn.disabled = false; actionBtn.textContent = 'شروع بازی'; }
+        function formatTime(seconds) {
+            const min = Math.floor(seconds / 60);
+            const sec = seconds % 60;
+            return `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+        }
+        
+        function enableChat(isPrivate, isDisabled = false) {
+             chatInput.disabled = isDisabled;
+             chatSendBtn.disabled = isDisabled;
+             chatInput.placeholder = isDisabled ? "چت غیرفعال است" : (isPrivate ? "با هم‌پیمان خود چت کنید..." : "با همه صحبت کنید...");
         }
 
-        function showLeaveConfirm() { showConfirmModal("خروج از لابی", "آیا مطمئن هستید؟" + (isHost ? " (چون شما سازنده هستید، لابی حذف خواهد شد)" : ""), () => { window.removeEventListener('beforeunload', handleLeaveLobbyOnExit); handleLeaveLobbyOnExit().then(() => window.location.href = './Lobby page.html'); }); }
-        function showKickConfirm(playerName, playerUid) { showConfirmModal(`اخراج ${playerName}`, `آیا از اخراج این بازیکن مطمئن هستید؟`, () => kickPlayer(playerUid)); }
-        function toggleChatPanel() { isChatPanelVisible = !isChatPanelVisible; chatPanel.classList.toggle('visible', isChatPanelVisible); if (isChatPanelVisible) { toggleChatBtn.classList.remove('new-message'); chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight; chatInput.focus(); } }
-        function listenToChatMessages() { const chatCollectionRef = collection(db, `Lobbys_list/${lobbyId}/chat`); const q = query(chatCollectionRef, orderBy('timestamp', 'asc')); unsubscribeChat = onSnapshot(q, (snapshot) => { snapshot.docChanges().forEach(change => { if (change.type === 'added') { renderMessage(change.doc.id, change.doc.data()); if (!isChatPanelVisible && change.doc.data().senderUid !== currentUser.uid) { toggleChatBtn.classList.add('new-message'); playSound('sound-new-message'); } } if (change.type === 'removed') { const msgElement = chatMessagesEl.querySelector(`[data-id="${change.doc.id}"]`); if (msgElement) msgElement.remove(); } }); }); }
-        function renderMessage(id, data) { const messageDiv = document.createElement('div'); messageDiv.classList.add('chat-message'); messageDiv.dataset.id = id; const isSelf = data.senderUid === currentUser.uid; if (isSelf) messageDiv.classList.add('self'); const deleteButton = (isSelf || isCurrentUserAdmin) ? `<button class="delete-msg-btn" onclick="window.handleDeleteMessage('${id}')" title="حذف پیام">×</button>` : ''; messageDiv.innerHTML = `<img src="${data.senderAvatarUrl || 'https://up.20script.ir/file/1d50-defult.png'}" class="chat-message-avatar" onerror="this.src='https://up.20script.ir/file/1d50-defult.png';"><div class="chat-message-content"><span class="chat-message-sender">${data.senderName}</span><div class="chat-message-bubble">${deleteButton}${data.text}</div></div>`; chatMessagesEl.appendChild(messageDiv); chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight; }
-        async function handleSendMessage(e) { e.preventDefault(); if (!isCurrentUserInLobby) { showNotificationModal("امکان ارسال پیام نیست", "شما دیگر در این لابی حضور ندارید."); return; } const messageText = chatInput.value.trim(); if (messageText === '') return; chatInput.disabled = true; const tempMessage = chatInput.value; chatInput.value = ''; try { const chatCollectionRef = collection(db, `Lobbys_list/${lobbyId}/chat`); await addDoc(chatCollectionRef, { text: messageText, senderName: currentUserData.displayName || "بازیکن", senderUid: currentUser.uid, senderAvatarUrl: currentUserData.avatarUrl || "https://up.20script.ir/file/1d50-defult.png", timestamp: serverTimestamp() }); } catch (error) { console.error("Error sending message:", error); chatInput.value = tempMessage; showNotificationModal("خطا", "ارسال پیام با مشکل مواجه شد."); } finally { chatInput.disabled = false; chatInput.focus(); } }
-        window.handleDeleteMessage = async function(messageId) { const msgRef = doc(db, `Lobbys_list/${lobbyId}/chat`, messageId); try { await deleteDoc(msgRef); } catch (error) { console.error("Error deleting message:", error); showNotificationModal("خطا", "حذف پیام با مشکل مواجه شد."); } }
-        async function handleClearAllMessages() { showConfirmModal('پاک کردن چت', 'آیا از پاک کردن تمام پیام‌های این لابی مطمئن هستید؟ این عمل غیرقابل بازگشت است.', async () => { const chatCollectionRef = collection(db, `Lobbys_list/${lobbyId}/chat`); const querySnapshot = await getDocs(query(chatCollectionRef)); if(querySnapshot.empty) return; const batch = writeBatch(db); querySnapshot.forEach(doc => batch.delete(doc.ref)); await batch.commit(); chatMessagesEl.innerHTML = ''; }); }
-        function showConfirmModal(title, message, onConfirm) { const modal = document.getElementById('confirm-modal'); document.getElementById('confirm-modal-title').textContent = title; document.getElementById('confirm-modal-message').innerHTML = message; const yesBtn = document.getElementById('confirm-modal-yes-btn'); const newYesBtn = yesBtn.cloneNode(true); yesBtn.parentNode.replaceChild(newYesBtn, yesBtn); newYesBtn.onclick = () => { modal.classList.remove('visible'); if (onConfirm) onConfirm(); }; document.getElementById('confirm-modal-no-btn').onclick = () => modal.classList.remove('visible'); modal.onclick = (e) => { if (e.target === modal) modal.classList.remove('visible'); }; modal.classList.add('visible'); }
-        function showNotificationModal(title, message, onOk) { const modal = document.getElementById('notification-modal'); document.getElementById('notification-modal-title').textContent = title; document.getElementById('notification-modal-message').textContent = message; const okBtn = document.getElementById('notification-modal-ok-btn'); const newOkBtn = okBtn.cloneNode(true); okBtn.parentNode.replaceChild(newOkBtn, okBtn); const closeModal = () => { modal.classList.remove('visible'); if (onOk) onOk(); }; newOkBtn.onclick = closeModal; modal.onclick = (e) => { if (e.target === modal) closeModal(); }; modal.classList.add('visible'); }
+        // --- مدیریت چت ---
 
+        async function handleSendMessage(e) {
+            e.preventDefault();
+            const text = chatInput.value.trim();
+            if (text === '') return;
+
+            const isPrivateChat = currentGameState.phase === 'private_chat';
+            
+            const newMessage = {
+                senderUid: currentUser.uid,
+                senderName: currentUser.displayName,
+                senderAvatar: currentUser.avatarUrl,
+                text: text,
+                isPrivate: isPrivateChat,
+                timestamp: serverTimestamp()
+            };
+            
+            // افزودن پیام به آرایه چت در دیتابیس با arrayUnion
+            await updateDoc(gameRef, { chat: arrayUnion(newMessage) });
+
+            chatInput.value = '';
+        }
+
+        function addMessageToChatUI(msgData) {
+            const { senderName, senderAvatar, text, senderUid, isPrivate, announcement } = msgData;
+            
+            if (announcement) {
+                const msgEl = document.createElement('div');
+                msgEl.className = 'chat-message announcement';
+                msgEl.textContent = text;
+                chatMessagesEl.appendChild(msgEl);
+                chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+                return;
+            }
+
+            const isSelf = senderUid === currentUser.uid;
+            
+            // فیلتر کردن پیام‌های خصوصی
+            if (isPrivate) {
+                const myPair = currentGameState.pairs?.find(p => p.includes(currentUser.uid));
+                if (!myPair || !myPair.includes(senderUid)) {
+                    return; // اگر پیام خصوصی برای من نیست، نمایش نده
+                }
+            }
+
+            const msgEl = document.createElement('div');
+            msgEl.className = `chat-message ${isSelf ? 'self' : ''} ${isPrivate ? 'private' : ''}`;
+            msgEl.innerHTML = `
+                <img src="${senderAvatar || 'https://up.20script.ir/file/1d50-defult.png'}" class="chat-message-avatar">
+                <div class="chat-message-content">
+                    <span class="chat-message-sender">${senderName}</span>
+                    <div class="chat-message-bubble">${text}</div>
+                </div>`;
+            chatMessagesEl.appendChild(msgEl);
+            chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+        }
+
+        async function addAnnouncementMessage(text) {
+             await updateDoc(gameRef, {
+                announcements: arrayUnion(`[${new Date().toLocaleTimeString('fa-IR', { hour: '2-digit', minute:'2-digit'})}] ${text}`)
+             });
+        }
+        
+        function setupEventListeners() {
+            chatForm.addEventListener('submit', handleSendMessage);
+            cooperateBtn.addEventListener('click', () => handlePlayerChoice('cooperate'));
+            betrayBtn.addEventListener('click', () => handlePlayerChoice('betray'));
+        }
+
+        // --- شروع برنامه ---
+        setupEventListeners();
         main();
+
     </script>
 </body>
 </html>
