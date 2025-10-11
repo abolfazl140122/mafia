@@ -67,7 +67,6 @@
         .chat-message.is-self .chat-message-sender { color: var(--status-approved); }
         .chat-message.is-self .chat-message-time { text-align: right; }
         
-        /* New Styles for Chat Features */
         .chat-date-separator { align-self: center; background-color: rgba(0,0,0,0.4); color: var(--text-secondary); font-size: 0.8rem; padding: 4px 12px; border-radius: 15px; margin: 10px 0; }
         .chat-system-message { align-self: center; color: var(--primary-gold); font-style: italic; font-size: 0.9rem; opacity: 0.8; }
         #typing-indicator { flex-shrink: 0; height: 20px; padding: 0 15px; font-size: 0.9rem; color: var(--text-secondary); font-style: italic; transition: opacity 0.3s; opacity: 0; }
@@ -423,16 +422,17 @@
             playSound('audio-click');
             const clanDocRef = doc(db, 'clans', clanId);
             try {
-                // Add system message for joining
+                // REORDERED: First, update the document to become a member
+                await updateDoc(clanDocRef, {
+                    members: arrayUnion(currentUser.uid),
+                    memberCount: increment(1)
+                });
+
+                // SECOND: Now that user is a member, add the system message
                 await addDoc(collection(db, 'clans', clanId, 'chat'), {
                     type: 'system',
                     text: `کاربر "${currentUserData.displayName || 'ناشناس'}" به کلن پیوست.`,
                     createdAt: serverTimestamp()
-                });
-
-                await updateDoc(clanDocRef, {
-                    members: arrayUnion(currentUser.uid),
-                    memberCount: increment(1)
                 });
                 
                 playSound('audio-success');
