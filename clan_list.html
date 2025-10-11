@@ -66,7 +66,14 @@
         .chat-message.is-self .chat-message-content { background: #2a3a30; border-radius: 12px 12px 0 12px; }
         .chat-message.is-self .chat-message-sender { color: var(--status-approved); }
         .chat-message.is-self .chat-message-time { text-align: right; }
-        #clan-chat-form { display: flex; padding: 10px; border-top: 1px solid var(--border-color); gap: 10px; background-color: rgba(0,0,0,0.2); }
+        
+        /* New Styles for Chat Features */
+        .chat-date-separator { align-self: center; background-color: rgba(0,0,0,0.4); color: var(--text-secondary); font-size: 0.8rem; padding: 4px 12px; border-radius: 15px; margin: 10px 0; }
+        .chat-system-message { align-self: center; color: var(--primary-gold); font-style: italic; font-size: 0.9rem; opacity: 0.8; }
+        #typing-indicator { flex-shrink: 0; height: 20px; padding: 0 15px; font-size: 0.9rem; color: var(--text-secondary); font-style: italic; transition: opacity 0.3s; opacity: 0; }
+        #typing-indicator.visible { opacity: 1; }
+        
+        #clan-chat-form { display: flex; padding: 10px; border-top: 1px solid var(--border-color); gap: 10px; background-color: rgba(0,0,0,0.2); flex-shrink: 0; }
         #clan-chat-input { flex-grow: 1; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: var(--text-light); padding: 10px; border-radius: 8px; font-size: 1rem; }
         #clan-chat-send-btn { background: var(--primary-gold); border: none; color: var(--bg-dark); font-weight: 900; padding: 0 20px; border-radius: 8px; cursor: pointer; transition: background-color 0.2s; }
         #clan-chat-send-btn:disabled { background: #555; cursor: not-allowed; }
@@ -154,7 +161,7 @@
         // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, query, where, getDocs, doc, getDoc, updateDoc, arrayUnion, increment, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, query, where, getDocs, doc, getDoc, updateDoc, arrayUnion, increment, orderBy, setDoc, deleteDoc, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         // --- Firebase Configuration ---
         const firebaseConfig = { apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg", authDomain: "mafia-9fcbf.firebaseapp.com", projectId: "mafia-9fcbf", storageBucket: "mafia-9fcbf.appspot.com", messagingSenderId: "471627157488", appId: "1:471627157488:web:92f008548a5596619a5735" };
@@ -178,7 +185,8 @@
 
         // --- Global State ---
         let currentUser = null, currentUserData = null, isSubmitting = false, userClanData = null;
-        let unsubscribeClans = null, unsubscribeMyRequests = null, unsubscribeUserStatus = null, unsubscribeMyClan = null, unsubscribeMyClanChat = null;
+        let unsubscribeClans = null, unsubscribeMyRequests = null, unsubscribeUserStatus = null, unsubscribeMyClan = null, unsubscribeMyClanChat = null, unsubscribeTyping = null;
+        let typingTimeout = null;
 
         // --- Helper Functions ---
         const playSound = (id) => { try { document.getElementById(id)?.play(); } catch(e) { console.warn("Sound play failed", e); } };
@@ -189,6 +197,16 @@
             document.getElementById('custom-alert-message').textContent = msg;
             showModal(document.getElementById('custom-alert-modal'));
         };
+        const getRelativeDateLabel = (date) => {
+            const today = new Date();
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+
+            if (date.toDateString() === today.toDateString()) return 'امروز';
+            if (date.toDateString() === yesterday.toDateString()) return 'دیروز';
+            return new Intl.DateTimeFormat('fa-IR', { dateStyle: 'medium' }).format(date);
+        };
+
 
         // --- UI Rendering Functions ---
         const createClanCard = (clanData, index) => {
@@ -220,6 +238,7 @@
         const renderMyClanPanel = (clanData) => {
             userClanData = clanData;
             if (unsubscribeMyClanChat) unsubscribeMyClanChat();
+            if (unsubscribeTyping) unsubscribeTyping();
             
             const myClanTabButton = document.querySelector('.tab-button[data-tab-id="my-clan-panel"]');
             myClanTabButton.textContent = `کلن: ${clanData.name}`;
@@ -235,6 +254,7 @@
                     </div>
                     <div class="clan-chat-container">
                         <div id="clan-chat-messages"><p class="info-message">در حال بارگذاری چت...</p></div>
+                        <p id="typing-indicator"></p>
                         <form id="clan-chat-form">
                             <input type="text" id="clan-chat-input" placeholder="پیام خود را بنویسید..." autocomplete="off" required>
                             <button type="submit" id="clan-chat-send-btn">ارسال</button>
@@ -246,41 +266,69 @@
                 e.preventDefault();
                 handleSendClanMessage(clanData.id);
             });
+            document.getElementById('clan-chat-input').addEventListener('input', () => handleTyping(clanData.id));
             listenToClanChat(clanData.id);
+            listenForTyping(clanData.id);
         };
 
         const listenToClanChat = (clanId) => {
             const chatMessagesContainer = document.getElementById('clan-chat-messages');
             const chatQuery = query(collection(db, 'clans', clanId, 'chat'), orderBy('createdAt', 'asc'));
             
+            let lastMessageDate = null;
+
             unsubscribeMyClanChat = onSnapshot(chatQuery, (snapshot) => {
-                const hadMessages = chatMessagesContainer.childElementCount > 1; // More than the initial loading msg
-                chatMessagesContainer.innerHTML = '';
+                const hadMessages = chatMessagesContainer.childElementCount > 1; 
+
                 if (snapshot.empty) {
                     chatMessagesContainer.innerHTML = '<p class="info-message">هنوز پیامی در این کلن وجود ندارد. اولین نفر باشید!</p>';
                     return;
                 }
+                
                 snapshot.docChanges().forEach(change => {
                     if (change.type === "added" && hadMessages) {
-                       playSound('audio-message');
+                        const newMsgData = change.doc.data();
+                        if (newMsgData.senderId !== currentUser.uid) {
+                           playSound('audio-message');
+                        }
                     }
                 });
 
+                chatMessagesContainer.innerHTML = '';
                 snapshot.forEach(doc => {
                     const msgData = doc.data();
-                    const msgElement = document.createElement('div');
-                    const isSelf = msgData.senderId === currentUser.uid;
-                    msgElement.className = `chat-message ${isSelf ? 'is-self' : ''}`;
-                    const time = msgData.createdAt ? new Date(msgData.createdAt.toDate()).toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' }) : '';
+                    
+                    if (msgData.createdAt) {
+                        const msgDate = msgData.createdAt.toDate();
+                        if (!lastMessageDate || msgDate.toDateString() !== lastMessageDate.toDateString()) {
+                            const dateSeparator = document.createElement('div');
+                            dateSeparator.className = 'chat-date-separator';
+                            dateSeparator.textContent = getRelativeDateLabel(msgDate);
+                            chatMessagesContainer.appendChild(dateSeparator);
+                        }
+                        lastMessageDate = msgDate;
+                    }
 
-                    msgElement.innerHTML = `
-                        <img src="${msgData.senderAvatar || 'https://up.20script.ir/file/1d50-defult.png'}" class="chat-message-avatar" onerror="this.src='https://up.20script.ir/file/1d50-defult.png';">
-                        <div class="chat-message-content">
-                            <p class="chat-message-sender">${isSelf ? 'شما' : msgData.senderName}</p>
-                            <p class="chat-message-text">${msgData.text}</p>
-                            <p class="chat-message-time">${time}</p>
-                        </div>`;
-                    chatMessagesContainer.appendChild(msgElement);
+                    if(msgData.type === 'system') {
+                        const systemMsgElement = document.createElement('p');
+                        systemMsgElement.className = 'chat-system-message';
+                        systemMsgElement.textContent = msgData.text;
+                        chatMessagesContainer.appendChild(systemMsgElement);
+                    } else {
+                        const msgElement = document.createElement('div');
+                        const isSelf = msgData.senderId === currentUser.uid;
+                        msgElement.className = `chat-message ${isSelf ? 'is-self' : ''}`;
+                        const time = msgData.createdAt ? new Date(msgData.createdAt.toDate()).toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' }) : '';
+
+                        msgElement.innerHTML = `
+                            <img src="${msgData.senderAvatar || 'https://up.20script.ir/file/1d50-defult.png'}" class="chat-message-avatar" onerror="this.src='https://up.20script.ir/file/1d50-defult.png';">
+                            <div class="chat-message-content">
+                                <p class="chat-message-sender">${isSelf ? 'شما' : msgData.senderName}</p>
+                                <p class="chat-message-text">${msgData.text}</p>
+                                <p class="chat-message-time">${time}</p>
+                            </div>`;
+                        chatMessagesContainer.appendChild(msgElement);
+                    }
                 });
                 chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
             }, (error) => {
@@ -309,10 +357,13 @@
                     senderAvatar: currentUserData.avatarUrl || null,
                     createdAt: serverTimestamp()
                 });
+                // After sending, remove typing indicator
+                const typingRef = doc(db, 'clans', clanId, 'typing', currentUser.uid);
+                await deleteDoc(typingRef);
             } catch (error) {
                 console.error("Error sending clan message:", error);
                 showCustomAlert('خطا', 'ارسال پیام با مشکل مواجه شد. لطفا دوباره تلاش کنید.');
-                chatInput.value = text; // Restore text on failure
+                chatInput.value = text;
             } finally {
                 isSubmitting = false;
                 chatInput.disabled = false;
@@ -320,6 +371,48 @@
                 chatInput.focus();
             }
         };
+
+        const handleTyping = async (clanId) => {
+            if (!currentUser) return;
+            const typingRef = doc(db, 'clans', clanId, 'typing', currentUser.uid);
+
+            if (typingTimeout) clearTimeout(typingTimeout);
+            
+            const chatInput = document.getElementById('clan-chat-input');
+            if(chatInput.value.trim().length > 0) {
+                 setDoc(typingRef, {
+                    name: currentUserData.displayName || 'ناشناس',
+                    timestamp: serverTimestamp()
+                });
+            } else {
+                 deleteDoc(typingRef);
+                 return;
+            }
+
+            typingTimeout = setTimeout(() => {
+                deleteDoc(typingRef);
+            }, 3000); // User is considered "not typing" after 3 seconds of inactivity
+        };
+
+        const listenForTyping = (clanId) => {
+            const typingIndicator = document.getElementById('typing-indicator');
+            const typingQuery = query(collection(db, 'clans', clanId, 'typing'), where('timestamp', '<=', Timestamp.now()));
+            
+            unsubscribeTyping = onSnapshot(typingQuery, (snapshot) => {
+                const typers = snapshot.docs
+                    .map(doc => ({ id: doc.id, ...doc.data() }))
+                    .filter(typer => typer.id !== currentUser.uid); // Exclude self
+                
+                if (typers.length > 0) {
+                    const names = typers.map(t => t.name).join(', ');
+                    typingIndicator.textContent = `${names} در حال تایپ است...`;
+                    typingIndicator.classList.add('visible');
+                } else {
+                    typingIndicator.classList.remove('visible');
+                }
+            });
+        };
+
 
         const handleJoinClan = async (clanId) => {
             if (!currentUser) return;
@@ -330,10 +423,18 @@
             playSound('audio-click');
             const clanDocRef = doc(db, 'clans', clanId);
             try {
+                // Add system message for joining
+                await addDoc(collection(db, 'clans', clanId, 'chat'), {
+                    type: 'system',
+                    text: `کاربر "${currentUserData.displayName || 'ناشناس'}" به کلن پیوست.`,
+                    createdAt: serverTimestamp()
+                });
+
                 await updateDoc(clanDocRef, {
                     members: arrayUnion(currentUser.uid),
                     memberCount: increment(1)
                 });
+                
                 playSound('audio-success');
                 showCustomAlert('موفقیت', 'شما با موفقیت به کلن پیوستید!');
             } catch (error) {
@@ -348,14 +449,13 @@
             
             const isBanned = currentUserData.isBanned === true && currentUserData.banExpiresAt && currentUserData.banExpiresAt.toDate() > new Date();
             if (isBanned) {
-                // Cleanup all listeners to prevent background operations
                 if (unsubscribeClans) unsubscribeClans();
                 if (unsubscribeMyRequests) unsubscribeMyRequests();
                 if (unsubscribeUserStatus) unsubscribeUserStatus();
                 if (unsubscribeMyClan) unsubscribeMyClan();
                 if (unsubscribeMyClanChat) unsubscribeMyClanChat();
+                if (unsubscribeTyping) unsubscribeTyping();
                 
-                // Redirect user
                 alert('حساب کاربری شما مسدود شده است. شما به صفحه اصلی منتقل می‌شوید.');
                 window.location.href = 'https://abolfazl140122.github.io/mafia/';
             }
@@ -399,11 +499,13 @@
                     createClanFab.style.display = 'none';
                     userClanData = null;
                     if (unsubscribeMyClanChat) unsubscribeMyClanChat();
+                    if (unsubscribeTyping) unsubscribeTyping();
                     renderMyClanPlaceholder();
                 } else {
                     createClanFab.style.display = 'block';
                     userClanData = null;
                     if (unsubscribeMyClanChat) unsubscribeMyClanChat();
+                    if (unsubscribeTyping) unsubscribeTyping();
                     renderMyClanPlaceholder();
                 }
             });
@@ -419,12 +521,11 @@
                         currentUserData = userDocSnap.data();
                         setupLiveListeners(user);
                     } else {
-                        // Handle case where user exists in Auth but not Firestore
                         signOut(auth);
                     }
                 });
             } else {
-                window.location.href = './login.html'; // Redirect if not logged in
+                window.location.href = './login.html';
             }
         });
 
