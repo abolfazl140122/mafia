@@ -787,7 +787,7 @@
                 if (docSnap.exists()) { 
                     const latestSelfData = docSnap.data(); 
                     if (latestSelfData.isBanned && latestSelfData.banExpiresAt && latestSelfData.banExpiresAt.toDate() > new Date()) { 
-                        // Fix 1: Redirect to the specified URL when banned
+                        // <<< CHANGE APPLIED HERE >>>
                         cleanUpAndLeave("حساب کاربری شما مسدود شد!", 'https://abolfazl140122.github.io/mafia/'); 
                         return; 
                     } 
@@ -843,40 +843,191 @@
             }); 
         }
         
-        // Fix 2: Refined logic for profile information filtering
+        async function showPlayerActionModal(player) {
+            targetUserForAction = player;
+            const modal = document.getElementById('player-action-modal');
+            document.getElementById('player-action-title').textContent = player.displayName;
+            const buttonsContainer = document.getElementById('player-action-buttons');
+            buttonsContainer.innerHTML = '';
+            
+            if (player.isBot) {
+                if (isHost) {
+                    const kickBotBtn = document.createElement('button');
+                    kickBotBtn.className = 'modal-button danger';
+                    kickBotBtn.textContent = 'اخراج ربات';
+                    kickBotBtn.onclick = () => {
+                        modal.classList.remove('visible');
+                        showKickConfirm(player.displayName, player.uid);
+                    };
+                    buttonsContainer.appendChild(kickBotBtn);
+                }
+            } else {
+                const profileBtn = document.createElement('button');
+                profileBtn.className = 'modal-button primary';
+                profileBtn.textContent = 'مشاهده پروفایل';
+                profileBtn.onclick = () => {
+                    modal.classList.remove('visible');
+                    showPlayerProfile(player.uid);
+                };
+                buttonsContainer.appendChild(profileBtn);
+
+                // Add "Change Avatar" button for self with the same theme
+                if (player.uid === currentUser.uid) {
+                    const changeAvatarBtn = document.createElement('button');
+                    changeAvatarBtn.className = 'modal-button primary'; 
+                    changeAvatarBtn.textContent = 'تغییر آواتار';
+                    changeAvatarBtn.onclick = () => {
+                        modal.classList.remove('visible');
+                        showAvatarSelectionModal();
+                    };
+                    buttonsContainer.appendChild(changeAvatarBtn);
+                }
+
+                if (player.uid !== currentUser.uid) {
+                    if (isHost || isCurrentUserAdmin) {
+                        const transferBtn = document.createElement('button');
+                        transferBtn.className = 'modal-button secondary';
+                        transferBtn.textContent = 'انتقال مالکیت';
+                        transferBtn.onclick = () => {
+                            modal.classList.remove('visible');
+                            showTransferOwnershipConfirm(player);
+                        };
+                        buttonsContainer.appendChild(transferBtn);
+
+                        const kickBtn = document.createElement('button');
+                        kickBtn.className = 'modal-button secondary';
+                        kickBtn.textContent = 'اخراج از لابی';
+                        kickBtn.onclick = () => {
+                            modal.classList.remove('visible');
+                            showKickConfirm(player.displayName, player.uid);
+                        };
+                        buttonsContainer.appendChild(kickBtn);
+                    }
+                    
+                    if (isCurrentUserAdmin) {
+                        const banBtn = document.createElement('button');
+                        banBtn.className = 'modal-button danger';
+                        banBtn.textContent = 'مسدود کردن کاربر';
+                        banBtn.onclick = () => {
+                            modal.classList.remove('visible');
+                            showBanModal();
+                        };
+                        buttonsContainer.appendChild(banBtn);
+                    }
+                }
+            }
+
+            modal.onclick = (e) => { if (e.target === modal) modal.classList.remove('visible'); };
+            modal.classList.add('visible');
+        }
+        
+        // --- NEW & IMPROVED: Avatar Selection Logic ---
+        async function showAvatarSelectionModal() {
+            const modal = document.getElementById('avatar-selection-modal-overlay');
+            const grid = document.getElementById('avatar-selection-grid');
+            
+            grid.innerHTML = ''; 
+            for (let i = 0; i < 8; i++) {
+                const skeleton = document.createElement('div');
+                skeleton.className = 'avatar-skeleton-card';
+                skeleton.style.animationDelay = `${i * 0.05}s`;
+                grid.appendChild(skeleton);
+            }
+            
+            modal.classList.add('visible');
+
+            try {
+                if (allShopAvatars.length === 0) {
+                    const avatarsSnapshot = await getDocs(collection(db, 'avatars'));
+                    avatarsSnapshot.forEach(doc => allShopAvatars.push(doc.data()));
+                }
+
+                const ownedAvatarIds = currentUserData.ownedAvatars || [];
+                const ownedAvatars = allShopAvatars.filter(avatar => ownedAvatarIds.includes(avatar.id));
+
+                setTimeout(() => {
+                    grid.innerHTML = ''; 
+                    if (ownedAvatars.length === 0) {
+                        grid.innerHTML = `<div id="no-avatars-message">شما هنوز آواتار خریداری شده‌ای ندارید. برای خرید به فروشگاه مراجعه کنید.</div>`;
+                    } else {
+                        ownedAvatars.forEach((avatar, index) => {
+                            const card = document.createElement('div');
+                            card.className = 'avatar-select-card';
+                            if (avatar.imageUrl === currentUserData.avatarUrl) {
+                                card.classList.add('equipped');
+                            }
+                            card.innerHTML = `<img src="${avatar.imageUrl}" alt="${avatar.name}" class="avatar-select-img">`;
+                            card.onclick = () => handleAvatarSelect(avatar);
+
+                            card.style.animation = 'avatar-card-appear 0.5s cubic-bezier(0.25, 0.8, 0.25, 1) forwards';
+                            card.style.animationDelay = `${index * 0.05}s`;
+                            
+                            grid.appendChild(card);
+                        });
+                    }
+                }, 700); 
+
+            } catch (error) {
+                console.error("Error loading avatars:", error);
+                grid.innerHTML = `<div id="no-avatars-message" style="color: #e74c3c;">خطا در بارگذاری آواتارها.</div>`;
+            }
+        }
+
+        async function handleAvatarSelect(avatar) {
+            if (avatar.imageUrl === currentUserData.avatarUrl) return; 
+
+            const modal = document.getElementById('avatar-selection-modal-overlay');
+            modal.classList.remove('visible');
+            loadingOverlay.style.display = 'flex';
+            loadingOverlay.querySelector('#loading-text').textContent = 'در حال تغییر آواتار...';
+            
+            const userDocRef = doc(db, 'users', currentUser.uid);
+            const lobbyDocRef = doc(db, 'Lobbys_list', lobbyId);
+
+            try {
+                await updateDoc(userDocRef, { avatarUrl: avatar.imageUrl });
+                
+                await runTransaction(db, async (transaction) => {
+                    const lobbyDoc = await transaction.get(lobbyDocRef);
+                    if (!lobbyDoc.exists()) throw new Error("لابی یافت نشد!");
+
+                    let players = lobbyDoc.data().players;
+                    const playerIndex = players.findIndex(p => p.uid === currentUser.uid);
+                    if (playerIndex > -1) {
+                        players[playerIndex].avatarUrl = avatar.imageUrl;
+                        transaction.update(lobbyDocRef, { players: players });
+                    }
+                });
+
+                currentUserData.avatarUrl = avatar.imageUrl; 
+                showNotificationModal("موفقیت", "آواتار شما با موفقیت تغییر کرد.");
+
+            } catch (error) {
+                console.error("Error changing avatar:", error);
+                showNotificationModal("خطا", "تغییر آواتار با مشکل مواجه شد.");
+            } finally {
+                loadingOverlay.style.display = 'none';
+                loadingOverlay.querySelector('#loading-text').textContent = 'در حال ورود به لابی...';
+            }
+        }
+        // --- End of Avatar Selection Logic ---
+
         async function showPlayerProfile(uid) { 
             const userDocRef = doc(db, 'users', uid); 
             const docSnap = await getDoc(userDocRef); 
-            if (!docSnap.exists()) { 
-                showNotificationModal("خطا", "اطلاعات این کاربر یافت نشد."); 
-                return; 
-            } 
+            if (!docSnap.exists()) { showNotificationModal("خطا", "اطلاعات این کاربر یافت نشد."); return; } 
             const userData = docSnap.data(); 
-            const isViewingOwnProfile = uid === currentUser.uid;
-
             document.getElementById('profile-modal-avatar').src = userData.avatarUrl || 'https://up.20script.ir/file/1d50-defult.png'; 
             document.getElementById('profile-modal-name').textContent = userData.displayName || "کاربر ناشناس"; 
-            
             const profileStatLevel = document.getElementById('profile-stat-level'); 
-            const diamondsContainer = document.getElementById('profile-stat-diamonds-container'); 
-            const emailContainer = document.getElementById('profile-stat-email-container'); 
-
-            // Logic for Level display
-            if (isViewingOwnProfile || isCurrentUserAdmin) {
-                // If viewing own profile or if current user is admin, show actual admin status
-                if (userData.isAdmin === true) { 
-                    profileStatLevel.textContent = "ادمین"; 
-                    profileStatLevel.classList.add('stat-value-admin'); 
-                } else { 
-                    profileStatLevel.textContent = "کاربر"; 
-                    profileStatLevel.classList.remove('stat-value-admin'); 
-                }
-            } else {
-                // If a normal user is viewing another user, always show "کاربر"
+            if (userData.isAdmin === true) { 
+                profileStatLevel.textContent = "ادمین"; 
+                profileStatLevel.classList.add('stat-value-admin'); 
+            } else { 
                 profileStatLevel.textContent = "کاربر"; 
-                profileStatLevel.classList.remove('stat-value-admin'); // Ensure no admin styling
+                profileStatLevel.classList.remove('stat-value-admin'); 
             }
-
+            // Fix: Correctly access profileStatAge element
             document.getElementById('profile-stat-age').textContent = userData.old || "نامشخص"; 
             if (userData.createdAt && typeof userData.createdAt.toDate === 'function') { 
                 const date = userData.createdAt.toDate(); 
@@ -884,20 +1035,21 @@
             } else { 
                 document.getElementById('profile-stat-date').textContent = "نامشخص"; 
             } 
-            
-            // Logic for Sensitive Data (Diamonds, Email) display
-            if (isViewingOwnProfile || isCurrentUserAdmin) { 
-                // If viewing own profile OR current user is an admin, show sensitive data
+            const diamondsContainer = document.getElementById('profile-stat-diamonds-container'); 
+            const emailContainer = document.getElementById('profile-stat-email-container'); 
+
+            // <<< CHANGE APPLIED HERE >>>
+            // Show sensitive info if viewer is an admin OR is viewing their own profile
+            if (isCurrentUserAdmin || currentUser.uid === uid) { 
                 diamondsContainer.style.display = 'flex'; 
                 emailContainer.style.display = 'flex'; 
                 document.getElementById('profile-stat-diamonds').textContent = userData.game || 0; 
                 document.getElementById('profile-stat-email').textContent = userData.email || "ثبت نشده"; 
             } else { 
-                // If a normal user is viewing another user, hide sensitive data
                 diamondsContainer.style.display = 'none'; 
                 emailContainer.style.display = 'none'; 
             } 
-
+            
             const modal = document.getElementById('view-profile-modal-overlay'); 
             document.getElementById('profile-modal-close-btn').onclick = () => modal.classList.remove('visible'); 
             modal.onclick = (e) => { if (e.target === modal) modal.classList.remove('visible'); }; 
