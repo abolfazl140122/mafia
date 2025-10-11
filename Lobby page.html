@@ -497,6 +497,7 @@
         let currentUserIsAdmin = false;
         let allLobbiesData = new Map();
         let isCreatingLobby = false;
+        let unsubscribeUserDoc = null; // [NEW FEATURE] To hold the user status listener
 
         let isMusicPlaying = false;
         const MUSIC_URL = "https://raw.githubusercontent.com/abolfazl140122/mafia/main/mysterious-dark-background-310162%20(1).mp3";
@@ -747,13 +748,43 @@
                 await handleBackgroundMusic();
                 const userDocRef = doc(db, 'users', user.uid);
                 
-                onSnapshot(userDocRef, (docSnap) => {
+                // [NEW FEATURE] Detach any existing listener before attaching a new one.
+                if (unsubscribeUserDoc) unsubscribeUserDoc();
+
+                unsubscribeUserDoc = onSnapshot(userDocRef, (docSnap) => {
                     if (docSnap.exists()) {
-                        const newAdminStatus = docSnap.data()?.isAdmin === true;
+                        const userData = docSnap.data();
+
+                        // [NEW FEATURE] Real-time ban status check.
+                        if (userData.isBanned && userData.banExpiresAt && userData.banExpiresAt.toDate() > new Date()) {
+                            // If user is banned, stop everything and prepare for redirect.
+                            if (unsubscribeUserDoc) unsubscribeUserDoc(); // Stop listening
+                            document.body.style.pointerEvents = 'none'; // Disable interaction
+
+                            showCustomAlert(
+                                'دسترسی مسدود شد',
+                                'حساب شما توسط مدیر مسدود شده است. شما به صفحه اصلی هدایت می‌شوید.',
+                                [{
+                                    text: 'باشه',
+                                    class: 'primary',
+                                    action: () => {
+                                        window.location.href = 'https://abolfazl140122.github.io/mafia/';
+                                    }
+                                }]
+                            );
+                            return; // Stop further execution
+                        }
+
+                        // Existing admin status check logic
+                        const newAdminStatus = userData?.isAdmin === true;
                         if (newAdminStatus !== currentUserIsAdmin) {
                             currentUserIsAdmin = newAdminStatus;
                             rerenderAllLobbyCards(); 
                         }
+                    } else {
+                        // If the user document is deleted or doesn't exist, log them out.
+                        console.error("User document not found. Logging out.");
+                        window.location.href = './login.html';
                     }
                 });
 
@@ -861,6 +892,13 @@
         searchInput.addEventListener('input', debounce(filterLobbies, 250));
         privateLobbyToggle.addEventListener('change', () => { lobbyPasswordInput.style.display = privateLobbyToggle.checked ? 'block' : 'none'; });
         [createLobbyModal, customAlertModal].forEach(modal => { modal.addEventListener('click', (e) => { if (e.target === modal) hideModal(modal); }); });
+        
+        // [NEW FEATURE] Add a cleanup listener for when the user navigates away or closes the tab.
+        window.addEventListener('beforeunload', () => {
+            if (unsubscribeUserDoc) {
+                unsubscribeUserDoc();
+            }
+        });
     </script>
 </body>
 </html>
