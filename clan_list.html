@@ -354,7 +354,8 @@
                     senderId: currentUser.uid,
                     senderName: currentUserData.displayName || 'ناشناس',
                     senderAvatar: currentUserData.avatarUrl || null,
-                    createdAt: serverTimestamp()
+                    createdAt: serverTimestamp(),
+                    type: 'user' // Explicitly set message type
                 });
                 // After sending, remove typing indicator
                 const typingRef = doc(db, 'clans', clanId, 'typing', currentUser.uid);
@@ -395,12 +396,16 @@
 
         const listenForTyping = (clanId) => {
             const typingIndicator = document.getElementById('typing-indicator');
-            const typingQuery = query(collection(db, 'clans', clanId, 'typing'), where('timestamp', '<=', Timestamp.now()));
+            const typingQuery = query(collection(db, 'clans', clanId, 'typing'));
             
             unsubscribeTyping = onSnapshot(typingQuery, (snapshot) => {
+                const fiveSecondsAgo = Date.now() - 5000;
                 const typers = snapshot.docs
                     .map(doc => ({ id: doc.id, ...doc.data() }))
-                    .filter(typer => typer.id !== currentUser.uid); // Exclude self
+                    .filter(typer => {
+                        const timestamp = typer.timestamp?.toDate().getTime();
+                        return typer.id !== currentUser.uid && timestamp > fiveSecondsAgo;
+                    });
                 
                 if (typers.length > 0) {
                     const names = typers.map(t => t.name).join(', ');
@@ -412,7 +417,6 @@
             });
         };
 
-
         const handleJoinClan = async (clanId) => {
             if (!currentUser) return;
             if (userClanData) {
@@ -422,13 +426,13 @@
             playSound('audio-click');
             const clanDocRef = doc(db, 'clans', clanId);
             try {
-                // REORDERED: First, update the document to become a member
+                // **FIX APPLIED HERE**: First, join the clan.
                 await updateDoc(clanDocRef, {
                     members: arrayUnion(currentUser.uid),
                     memberCount: increment(1)
                 });
-
-                // SECOND: Now that user is a member, add the system message
+                
+                // **THEN**, add the system message.
                 await addDoc(collection(db, 'clans', clanId, 'chat'), {
                     type: 'system',
                     text: `کاربر "${currentUserData.displayName || 'ناشناس'}" به کلن پیوست.`,
