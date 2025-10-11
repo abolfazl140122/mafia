@@ -1267,7 +1267,7 @@
         }
 
         function setupEventListeners() { 
-            actionBtn.addEventListener('click', () => isHost ? startGame() : toggleReadyStatus()); 
+            actionBtn.addEventListener('click', () => isHost ? startNegotiatorGame() : toggleReadyStatus()); 
             leaveLobbyBtn.addEventListener('click', showLeaveConfirm); 
             window.addEventListener('beforeunload', handleLeaveLobbyOnExit); 
             toggleChatBtn.addEventListener('click', toggleChatPanel); 
@@ -1329,40 +1329,50 @@
             }); 
         }
         
-        function assignRoles(lobbyPlayers) {
-            const roles = [
-                { roleName: 'پدرخوانده', team: 'mafia', ability: { actionText: 'شلیک', canTarget: true, requiresTarget: true } }, 
-                { roleName: 'مافیا ساده', team: 'mafia', ability: { actionText: 'شلیک', canTarget: true, requiresTarget: true } }, 
-                { roleName: 'مافیا ساده', team: 'mafia', ability: { actionText: 'شلیک', canTarget: true, requiresTarget: true } }, 
-                { roleName: 'دکتر', team: 'citizen', ability: { actionText: 'نجات دادن', canTarget: true, requiresTarget: true } }, 
-                { roleName: 'کارآگاه', team: 'citizen', ability: { actionText: 'استعلام', canTarget: true, requiresTarget: true } }, 
-                { roleName: 'شهروند ساده', team: 'citizen', ability: null }, 
-                { roleName: 'شهروند ساده', team: 'citizen', ability: null }, 
-                { roleName: 'شهروند ساده', team: 'citizen', ability: null }, 
-                { roleName: 'شهروند ساده', team: 'citizen', ability: null }, 
-                { roleName: 'شهروند ساده', team: 'citizen', ability: null }, 
-                { roleName: 'شهروند ساده', team: 'citizen', ability: null }, 
-                { roleName: 'شهروند ساده', team: 'citizen', ability: null },
-            ];
-            const shuffledPlayers = [...lobbyPlayers].sort(() => Math.random() - 0.5);
-            return shuffledPlayers.map((player, index) => ({ uid: player.uid, displayName: player.displayName, avatarUrl: player.avatarUrl, isAlive: true, ...roles[index] }));
-        }
-
-        async function startGame() {
+        /**
+         * Creates and starts a new "Negotiator / Prisoner's Dilemma" game.
+         * This function replaces the old role-based game logic.
+         */
+        async function startNegotiatorGame() {
             actionBtn.disabled = true; 
             actionBtn.textContent = 'در حال ساخت بازی...';
             try {
                 const lobbyDocRef = doc(db, "Lobbys_list", lobbyId); 
                 const lobbyDocSnap = await getDoc(lobbyDocRef);
                 if (!lobbyDocSnap.exists()) { throw new Error("لابی دیگر وجود ندارد!"); }
+
                 const lobbyData = lobbyDocSnap.data();
-                const gamePlayers = assignRoles(lobbyData.players.filter(p => !p.isSpectator));
-                const gameData = { creatorId: lobbyData.creatorId, players: gamePlayers, day: 1, phase: 'day_discussion', timerEndsAt: new Date(Date.now() + 60000), announcements: ['بازی شروع شد! همه در روز اول فرصت صحبت دارند.'], createdAt: serverTimestamp() };
+                
+                // Map lobby players to the new game player structure.
+                const gamePlayers = lobbyData.players
+                    .filter(p => !p.isSpectator)
+                    .map(player => ({
+                        uid: player.uid,
+                        displayName: player.displayName,
+                        avatar: player.avatarUrl,
+                        score: 0,
+                        currentChoice: null,
+                        partnerId: null
+                    }));
+
+                // Define the initial game state document.
+                const gameData = {
+                    lobbyId: lobbyId,
+                    players: gamePlayers,
+                    round: 1,
+                    maxRounds: 5,
+                    status: 'pairing', // Initial status before the first round starts.
+                    createdAt: serverTimestamp()
+                };
+
                 const gameCollectionRef = collection(db, 'games'); 
                 const newGameDocRef = await addDoc(gameCollectionRef, gameData);
+                
+                // Update the lobby to link to the new game, triggering redirection for all players.
                 await updateDoc(lobbyDocRef, { gameStarted: true, gameId: newGameDocRef.id });
+
             } catch (error) { 
-                console.error("Error starting game:", error); 
+                console.error("Error starting negotiator game:", error); 
                 showNotificationModal("خطا", `مشکلی در شروع بازی پیش آمد: ${error.message}`); 
                 actionBtn.disabled = false; 
                 actionBtn.textContent = 'شروع بازی'; 
