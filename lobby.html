@@ -692,7 +692,8 @@
                 const wasInLobby = isCurrentUserInLobby;
                 isCurrentUserInLobby = players.some(p => p.uid === currentUser.uid);
                 if (wasInLobby && !isCurrentUserInLobby) {
-                    cleanUpAndLeave("شما توسط سازنده لابی اخراج شدید.", './Lobby page.html');
+                    // *** CHANGE APPLIED HERE: Redirect to main site when kicked ***
+                    cleanUpAndLeave("شما توسط سازنده لابی اخراج شدید.", 'https://abolfazl140122.github.io/mafia/');
                     return;
                 }
                 const visiblePlayerCount = players.filter(p => !p.isSpectator).length;
@@ -766,7 +767,6 @@
                 if (docSnap.exists()) { 
                     const latestSelfData = docSnap.data(); 
                     if (latestSelfData.isBanned && latestSelfData.banExpiresAt && latestSelfData.banExpiresAt.toDate() > new Date()) { 
-                        // <<< CHANGE APPLIED HERE >>>
                         cleanUpAndLeave("حساب کاربری شما مسدود شد!", 'https://abolfazl140122.github.io/mafia/'); 
                         return; 
                     } 
@@ -1084,19 +1084,68 @@
             } 
         }
 
-        function cleanUpAndLeave(notificationMessage, redirectUrl) { 
-            if (unsubscribeLobby) unsubscribeLobby(); 
-            if (unsubscribeChat) unsubscribeChat(); 
-            if (unsubscribeSelf) unsubscribeSelf(); 
-            window.removeEventListener('beforeunload', handleLeaveLobbyOnExit); 
+        /**
+         * === PROFESSIONAL CLEANUP FUNCTION (REWRITTEN) ===
+         * Cleans up all active listeners, disables the UI, shows a final notification,
+         * and safely redirects the user. This function is the single point of exit from the lobby.
+         * @param {string} notificationMessage The message to show the user in a modal.
+         * @param {string} redirectUrl The URL to redirect to. Defaults to the main site.
+         */
+        function cleanUpAndLeave(notificationMessage, redirectUrl) {
+            // 1. Prevent multiple executions if already in cleanup process
+            if (window.isCleaningUp) return;
+            window.isCleaningUp = true;
+            console.log(`Cleanup initiated. Reason: ${notificationMessage}`);
+
+            // 2. Unsubscribe from all real-time listeners to stop receiving data and prevent errors
+            if (unsubscribeLobby) {
+                unsubscribeLobby();
+                unsubscribeLobby = null;
+            }
+            if (unsubscribeChat) {
+                unsubscribeChat();
+                unsubscribeChat = null;
+            }
+            if (unsubscribeSelf) {
+                unsubscribeSelf();
+                unsubscribeSelf = null;
+            }
             playerBanListeners.forEach(unsubscribe => unsubscribe());
             playerBanListeners.clear();
 
-            actionBtn.disabled = true; 
-            leaveLobbyBtn.disabled = true; 
-            chatInput.disabled = true; 
-            chatInput.placeholder = notificationMessage; 
-            showNotificationModal("توجه", notificationMessage, () => { window.location.href = redirectUrl; }); 
+            // 3. Remove global event listeners
+            window.removeEventListener('beforeunload', handleLeaveLobbyOnExit);
+
+            // 4. Disable all interactive UI elements immediately to prevent further actions
+            try {
+                actionBtn.disabled = true;
+                leaveLobbyBtn.disabled = true;
+                addBotBtn.disabled = true;
+                chatInput.disabled = true;
+                chatInput.placeholder = "ارتباط با سرور قطع شده است.";
+                document.querySelectorAll('.player-slot').forEach(slot => slot.onclick = null);
+            } catch (e) {
+                console.warn("Could not disable all UI elements during cleanup.", e);
+            }
+
+            // 5. Determine the redirect target and prevent redirect loops
+            const targetUrl = redirectUrl || 'https://abolfazl140122.github.io/mafia/';
+            const currentUrlSimple = window.location.href.replace(/\/$/, ""); 
+            const targetUrlSimple = targetUrl.replace(/\/$/, "");
+
+            if (currentUrlSimple === targetUrlSimple) {
+                console.warn("Redirect loop prevented. Already at target URL:", targetUrl);
+                showNotificationModal("توجه", notificationMessage, () => {}); // Show message but don't redirect
+                return;
+            }
+
+            // 6. Show the final notification and then redirect
+            console.log("Redirecting to:", targetUrl);
+            showNotificationModal("توجه", notificationMessage, () => {
+                setTimeout(() => {
+                    window.location.href = targetUrl;
+                }, 200); // Small delay to ensure the user sees the modal
+            });
         }
 
         async function handleLeaveLobbyOnExit() { 
