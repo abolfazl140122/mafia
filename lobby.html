@@ -355,24 +355,6 @@
             color: var(--text-secondary);
             font-size: 1rem;
         }
-        /* Removed .form-input as it's replaced by circular buttons */
-        /* #add-bot-modal-content .form-input {
-            width: 100%;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            background-color: var(--bg-dark);
-            color: var(--text-light);
-            font-family: 'Vazirmatn', sans-serif;
-            font-size: 1.1rem;
-            text-align: center;
-            transition: all 0.3s ease;
-        } */
-        /* #add-bot-modal-content .form-input:focus {
-            outline: none;
-            border-color: var(--primary-gold);
-            box-shadow: 0 0 10px rgba(255, 201, 71, 0.3);
-        } */
         #add-bot-modal-content .modal-buttons {
             flex-direction: row; /* Override default column for this modal */
         }
@@ -428,8 +410,6 @@
             transform: none;
             box-shadow: none;
         }
-
-
     </style>
 </head>
 <body>
@@ -542,7 +522,6 @@
         
         // NEW Add Bot Modal Elements
         const addBotModal = document.getElementById('add-bot-modal');
-        // Removed: const numBotsInput = document.getElementById('num-bots-input'); 
         const addBotConfirmBtn = document.getElementById('add-bot-confirm-btn');
         const addBotCancelBtn = document.getElementById('add-bot-cancel-btn');
 
@@ -1027,7 +1006,6 @@
                 profileStatLevel.textContent = "کاربر"; 
                 profileStatLevel.classList.remove('stat-value-admin'); 
             }
-            // Fix: Correctly access profileStatAge element
             document.getElementById('profile-stat-age').textContent = userData.old || "نامشخص"; 
             if (userData.createdAt && typeof userData.createdAt.toDate === 'function') { 
                 const date = userData.createdAt.toDate(); 
@@ -1038,8 +1016,6 @@
             const diamondsContainer = document.getElementById('profile-stat-diamonds-container'); 
             const emailContainer = document.getElementById('profile-stat-email-container'); 
 
-            // <<< CHANGE APPLIED HERE >>>
-            // Show sensitive info if viewer is an admin OR is viewing their own profile
             if (isCurrentUserAdmin || currentUser.uid === uid) { 
                 diamondsContainer.style.display = 'flex'; 
                 emailContainer.style.display = 'flex'; 
@@ -1113,7 +1089,6 @@
             if (unsubscribeChat) unsubscribeChat(); 
             if (unsubscribeSelf) unsubscribeSelf(); 
             window.removeEventListener('beforeunload', handleLeaveLobbyOnExit); 
-            // Unsubscribe all player ban listeners
             playerBanListeners.forEach(unsubscribe => unsubscribe());
             playerBanListeners.clear();
 
@@ -1147,15 +1122,10 @@
             } 
         }
 
-        // Helper function to hide any modal
         function hideModal(modalElement) {
             modalElement.classList.remove('visible');
         }
         
-        /**
-         * Adds specified number of bots to the lobby.
-         * @param {number} numberOfBots The quantity of bots to add.
-         */
         async function addBots(numberOfBots) {
             const lobbyDocRef = doc(db, "Lobbys_list", lobbyId);
             try {
@@ -1185,10 +1155,6 @@
             }
         }
 
-        /**
-         * [Feature: add_bot_modal]
-         * Shows the modal for adding bots, calculating available capacity.
-         */
         function showAddBotModal() {
             if (!currentLobbyData) {
                 showNotificationModal("خطا", "اطلاعات لابی در دسترس نیست.");
@@ -1203,9 +1169,9 @@
             }
 
             const botCountGrid = document.getElementById('bot-count-selection-grid');
-            botCountGrid.innerHTML = ''; // Clear previous buttons
+            botCountGrid.innerHTML = ''; 
 
-            selectedBotCount = 1; // Reset default selection
+            selectedBotCount = 1; 
 
             for (let i = 1; i <= MAX_PLAYERS; i++) {
                 const button = document.createElement('div');
@@ -1215,40 +1181,37 @@
 
                 if (i > remainingCapacity) {
                     button.disabled = true;
-                    button.classList.add('disabled'); // Add disabled class for styling
+                    button.classList.add('disabled'); 
                 } else if (i === selectedBotCount) {
-                    button.classList.add('selected'); // Select 1 by default, if available
+                    button.classList.add('selected'); 
                 }
                 
                 button.addEventListener('click', () => {
                     if (!button.disabled) {
-                        // Deselect previous
                         const prevSelected = botCountGrid.querySelector('.bot-count-button.selected');
                         if (prevSelected) prevSelected.classList.remove('selected');
                         
-                        // Select current
                         button.classList.add('selected');
                         selectedBotCount = i;
                     }
                 });
                 botCountGrid.appendChild(button);
             }
-            // Ensure at least one button is selected if capacity > 0 and default 1 is not suitable
             if (remainingCapacity > 0) {
                 const defaultSelectedBtn = botCountGrid.querySelector(`.bot-count-button[data-count="${selectedBotCount}"]`);
                 if (defaultSelectedBtn && !defaultSelectedBtn.disabled) {
                     defaultSelectedBtn.classList.add('selected');
-                } else { // If default 1 is disabled, select the first available
+                } else { 
                     const firstAvailable = botCountGrid.querySelector('.bot-count-button:not(.disabled)');
                     if (firstAvailable) {
                         firstAvailable.classList.add('selected');
                         selectedBotCount = parseInt(firstAvailable.dataset.count, 10);
                     } else {
-                        selectedBotCount = 0; // No bots can be added
+                        selectedBotCount = 0; 
                     }
                 }
             } else {
-                selectedBotCount = 0; // No bots can be added
+                selectedBotCount = 0; 
             }
 
             addBotModal.classList.add('visible');
@@ -1265,27 +1228,24 @@
             document.getElementById('ban-user-form').addEventListener('submit', handleBanFormSubmit); 
             document.getElementById('admin-join-btn').addEventListener('click', handleAdminJoinGame);
             
-            // NEW: Add Bot Button & Modal Listeners [Feature: add_bot_modal]
             addBotBtn.addEventListener('click', showAddBotModal);
-            // Update addBotConfirmBtn text and style
             addBotConfirmBtn.textContent = 'ساخت ربات‌ها';
             addBotConfirmBtn.classList.remove('primary');
             addBotConfirmBtn.classList.add('gold-gradient-button');
 
-            addBotConfirmBtn.addEventListener('click', async (e) => { // Added async here
+            addBotConfirmBtn.addEventListener('click', async (e) => { 
                 e.preventDefault();
                 if (selectedBotCount === 0) {
                     showNotificationModal("خطا", "هیچ رباتی برای اضافه کردن انتخاب نشده است.");
                     return;
                 }
-                await addBots(selectedBotCount); // Await the addBots call
+                await addBots(selectedBotCount); 
             });
             addBotCancelBtn.addEventListener('click', () => hideModal(addBotModal));
             addBotModal.addEventListener('click', (e) => {
                 if (e.target === addBotModal) hideModal(addBotModal);
             });
 
-            // NEW: Event listeners for Avatar Selection Modal
             const avatarModal = document.getElementById('avatar-selection-modal-overlay');
             document.getElementById('avatar-modal-close-btn').onclick = () => avatarModal.classList.remove('visible');
             avatarModal.onclick = (e) => { if (e.target === avatarModal) avatarModal.classList.remove('visible'); };
