@@ -174,7 +174,6 @@
         .modal-button.primary { color: white; background: linear-gradient(145deg, var(--dark-red), var(--darker-red)); border-color: var(--primary-gold); }
         .modal-button.secondary { color: var(--text-light); background: linear-gradient(145deg, #504436, #332a20); border-color: var(--border-color); }
         .modal-button.danger { background: linear-gradient(145deg, #c0392b, #a93226); border-color: #e67e22; color: white; }
-        /* NEW: Gold gradient for confirm button in add bot modal */
         .modal-button.gold-gradient-button {
             background: linear-gradient(145deg, var(--primary-gold), #e0a73b);
             border: 2px solid #ffd700;
@@ -206,7 +205,6 @@
         .stat-value.stat-value-admin { font-weight: 900; color: var(--primary-gold); text-shadow: 0 0 8px rgba(255, 201, 71, 0.6), 0 1px 2px rgba(0,0,0,0.8); animation: admin-glow 2s ease-in-out infinite alternate; }
         @keyframes admin-glow { from { text-shadow: 0 0 6px rgba(255, 201, 71, 0.5), 0 1px 2px rgba(0,0,0,0.8); } to { text-shadow: 0 0 12px rgba(255, 201, 71, 0.8), 0 1px 3px rgba(0,0,0,0.9); } }
         
-        /* استایل‌های مسدود کردن کاربر */
         #lobby-ban-user-modal-content .form-group { display: flex; flex-direction: column; gap: 5px; text-align: right; margin-bottom: 15px; }
         #lobby-ban-user-modal-content .form-label { font-weight: 700; color: var(--text-secondary); font-size: 0.9rem; }
         #lobby-ban-user-modal-content .form-input, #lobby-ban-user-modal-content .form-select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); background-color: var(--bg-dark); color: var(--text-light); font-family: 'Vazirmatn', sans-serif; font-size: 1rem; transition: all 0.3s ease; }
@@ -216,7 +214,6 @@
         #lobby-ban-user-modal-content .form-group-horizontal .form-select { flex-grow: 1; }
         #lobby-ban-user-modal-content .confirm-buttons-container { display: flex; gap: 15px; margin-top: 25px; }
 
-        /* === NEW & IMPROVED: استایل‌های پنل انتخاب آواتار === */
         #avatar-selection-modal-content {
             background: linear-gradient(160deg, #2c2118, #1a140e 80%);
             border: 2px solid var(--border-color);
@@ -261,7 +258,7 @@
             overflow: hidden;
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-            opacity: 0; /* Initial state for animation */
+            opacity: 0;
         }
         .avatar-select-card:hover {
             transform: translateY(-5px) scale(1.05);
@@ -294,7 +291,6 @@
             text-shadow: none;
         }
 
-        /* NEW: Animation for avatar cards appearing */
         @keyframes avatar-card-appear {
             from {
                 opacity: 0;
@@ -306,7 +302,6 @@
             }
         }
 
-        /* NEW: Beautiful Skeleton Loader for Avatars */
         .avatar-skeleton-card {
             aspect-ratio: 1 / 1;
             border-radius: 12px;
@@ -322,7 +317,6 @@
             }
         }
 
-        /* NEW: Improved styling for no-avatars message */
         #no-avatars-message {
             font-size: 1.1rem;
             color: var(--text-secondary);
@@ -342,7 +336,6 @@
             filter: grayscale(80%);
         }
 
-        /* NEW: Add Bot Modal */
         #add-bot-modal-content .form-group {
             display: flex;
             flex-direction: column;
@@ -356,13 +349,12 @@
             font-size: 1rem;
         }
         #add-bot-modal-content .modal-buttons {
-            flex-direction: row; /* Override default column for this modal */
+            flex-direction: row;
         }
 
-        /* NEW: Styles for Bot Count Selection Grid */
         #bot-count-selection-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(60px, 1fr)); /* Responsive grid */
+            grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
             gap: 10px;
             padding: 15px;
             background-color: rgba(0,0,0,0.2);
@@ -375,7 +367,7 @@
             width: 60px;
             height: 60px;
             border-radius: 50%;
-            background-color: #3a2e22; /* Darker secondary */
+            background-color: #3a2e22;
             color: var(--text-light);
             font-size: 1.2rem;
             font-weight: 700;
@@ -402,7 +394,7 @@
             transform: scale(1.08);
         }
         
-        .bot-count-button.disabled { /* Using .disabled for clarity, matching JS */
+        .bot-count-button.disabled {
             opacity: 0.5;
             cursor: not-allowed;
             background-color: #2a2a2a;
@@ -453,7 +445,6 @@
     <div id="view-profile-modal-overlay" class="modal-overlay"> <div id="view-profile-modal-content" class="modal-content"> <div class="profile-header"> <span id="profile-modal-close-btn" class="modal-close-btn">&times;</span> <img id="profile-modal-avatar" src="" alt="آواتار پروفایل"> <div class="profile-name-banner"> <h2 id="profile-modal-name"></h2> </div> </div> <div class="profile-body"> <div class="profile-stat-item"> <span class="stat-label"><span>👑</span><span>سطح:</span></span> <span id="profile-stat-level" class="stat-value"></span> </div> <div class="profile-stat-item"> <span class="stat-label"><span>📜</span><span>تاریخ ثبت نام:</span></span> <span id="profile-stat-date" class="stat-value"></span> </div> <div class="profile-stat-item"> <span class="stat-label"><span>🎂</span><span>سن:</span></span> <span id="profile-stat-age" class="stat-value"></span> </div> <div class="profile-stat-item" id="profile-stat-diamonds-container"> <span class="stat-label"><span>💎</span><span>تعداد الماس:</span></span> <span id="profile-stat-diamonds" class="stat-value"></span> </div> <div class="profile-stat-item" id="profile-stat-email-container"> <span class="stat-label"><span>📧</span><span>ایمیل:</span></span> <span id="profile-stat-email" class="stat-value"></span> </div> </div> </div> </div>
     <div id="lobby-ban-user-modal-overlay" class="modal-overlay"> <div id="lobby-ban-user-modal-content" class="modal-content"> <h2 class="modal-title">مسدود کردن کاربر</h2> <form id="ban-user-form"> <div class="form-group"> <label for="ban-reason" class="form-label">دلیل مسدودیت:</label> <input type="text" id="ban-reason" class="form-input" required placeholder="مثال: استفاده از الفاظ نامناسب"> </div> <div class="form-group form-group-horizontal"> <label class="form-label">مدت زمان:</label> <input type="number" id="ban-duration" class="form-input" required value="1"> <select id="ban-unit" class="form-select"> <option value="hours">ساعت</option> <option value="days">روز</option> <option value="weeks">هفته</option> </select> </div> <div class="confirm-buttons-container"> <button type="button" id="ban-cancel-btn" class="modal-button secondary" style="width: 50%;">انصراف</button> <button type="submit" class="modal-button danger" style="width: 50%;">اعمال مسدودیت</button> </div> </form> </div> </div>
     
-    <!-- NEW & IMPROVED: پنل انتخاب آواتار -->
     <div id="avatar-selection-modal-overlay" class="modal-overlay">
         <div id="avatar-selection-modal-content" class="modal-content">
             <header class="avatar-modal-header">
@@ -466,7 +457,6 @@
         </div>
     </div>
 
-    <!-- NEW: Add Bot Modal -->
     <div id="add-bot-modal" class="modal-overlay">
         <div id="add-bot-modal-content" class="modal-content">
             <h2 class="modal-title">افزودن ربات</h2>
@@ -520,7 +510,6 @@
         const chatInput = document.getElementById('chat-input');
         const clearChatBtn = document.getElementById('clear-chat-btn');
         
-        // NEW Add Bot Modal Elements
         const addBotModal = document.getElementById('add-bot-modal');
         const addBotConfirmBtn = document.getElementById('add-bot-confirm-btn');
         const addBotCancelBtn = document.getElementById('add-bot-cancel-btn');
@@ -539,22 +528,17 @@
         let isCurrentUserInLobby = true;
         let targetUserForAction = null;
         let currentLobbyData = null;
-        let allShopAvatars = []; // Cache for shop avatars
-        const playerBanListeners = new Map(); // Map to store unsubscribe functions for player ban listeners
-        let selectedBotCount = 1; // Global variable to store the selected number of bots
+        let allShopAvatars = [];
+        const playerBanListeners = new Map();
+        let selectedBotCount = 1;
 
 
-        /**
-         * Renders the entire lobby state based on Firestore data.
-         * [Feature: host_buttons_default - ensured]
-         */
         function renderLobby(data) {
             lobbyNameEl.textContent = data.lobbyName;
             const allPlayers = data.players || [];
             isHost = currentUser.uid === data.creatorId;
             const visiblePlayers = allPlayers.filter(p => !p.isSpectator);
             
-            // Host controls display state
             addBotBtn.style.display = isHost ? 'block' : 'none'; 
             
             leftPlayersEl.innerHTML = '';
@@ -611,7 +595,7 @@
                 actionBtn.style.display = 'none';
             }
             updateAdminUI(allPlayers);
-            updatePlayerBanListeners(allPlayers); // [Feature: admin_auto_kick_banned_user]
+            updatePlayerBanListeners(allPlayers);
         }
         
         async function main() {
@@ -674,7 +658,6 @@
                         if (unsubscribeChat) unsubscribeChat();
                         if (unsubscribeSelf) unsubscribeSelf();
                         window.removeEventListener('beforeunload', handleLeaveLobbyOnExit);
-                        // Unsubscribe all player ban listeners before redirect
                         playerBanListeners.forEach(unsubscribe => unsubscribe());
                         playerBanListeners.clear();
                         window.location.href = `./gamescreen.html?id=${data.gameId}`;
@@ -692,7 +675,6 @@
                 const wasInLobby = isCurrentUserInLobby;
                 isCurrentUserInLobby = players.some(p => p.uid === currentUser.uid);
                 if (wasInLobby && !isCurrentUserInLobby) {
-                    // *** CHANGE APPLIED HERE: Redirect to main site when kicked ***
                     cleanUpAndLeave("شما توسط سازنده لابی اخراج شدید.", 'https://abolfazl140122.github.io/mafia/');
                     return;
                 }
@@ -714,14 +696,7 @@
             });
         }
 
-        /**
-         * [Feature: admin_auto_kick_banned_user]
-         * Manages real-time listeners for other players' ban statuses.
-         * If a player is banned by an admin, they are automatically kicked from the lobby.
-         * @param {Array<Object>} allPlayers The current list of players in the lobby.
-         */
         function updatePlayerBanListeners(allPlayers) {
-            // Unsubscribe from players no longer in the lobby
             const currentUidsInLobby = new Set(allPlayers.map(p => p.uid));
             playerBanListeners.forEach((unsubscribe, uid) => {
                 if (!currentUidsInLobby.has(uid)) {
@@ -730,9 +705,7 @@
                 }
             });
 
-            // Subscribe to new players
             allPlayers.forEach(player => {
-                // Only listen for other human players (not self, not bots)
                 if (player.uid !== currentUser.uid && !player.isBot && !playerBanListeners.has(player.uid)) {
                     const playerDocRef = doc(db, 'users', player.uid);
                     const unsubscribe = onSnapshot(playerDocRef, (userDocSnap) => {
@@ -740,13 +713,11 @@
                             const bannedUserData = userDocSnap.data();
                             const isBanned = bannedUserData.isBanned === true && bannedUserData.banExpiresAt && bannedUserData.banExpiresAt.toDate() > new Date();
                             
-                            // If player is banned AND current user is host/admin, kick them
                             if (isBanned && (isHost || isCurrentUserAdmin)) {
                                 console.log(`Player ${player.displayName} (UID: ${player.uid}) is banned. Kicking from lobby.`);
                                 kickPlayer(player.uid);
                             }
                         } else {
-                            // If user document somehow disappears, also kick for safety (if current user is host/admin)
                             if (isHost || isCurrentUserAdmin) {
                                 console.warn(`User document for player ${player.displayName} (UID: ${player.uid}) not found. Kicking from lobby.`);
                                 kickPlayer(player.uid);
@@ -850,7 +821,6 @@
                 };
                 buttonsContainer.appendChild(profileBtn);
 
-                // Add "Change Avatar" button for self with the same theme
                 if (player.uid === currentUser.uid) {
                     const changeAvatarBtn = document.createElement('button');
                     changeAvatarBtn.className = 'modal-button primary'; 
@@ -900,7 +870,6 @@
             modal.classList.add('visible');
         }
         
-        // --- NEW & IMPROVED: Avatar Selection Logic ---
         async function showAvatarSelectionModal() {
             const modal = document.getElementById('avatar-selection-modal-overlay');
             const grid = document.getElementById('avatar-selection-grid');
@@ -989,7 +958,6 @@
                 loadingOverlay.querySelector('#loading-text').textContent = 'در حال ورود به لابی...';
             }
         }
-        // --- End of Avatar Selection Logic ---
 
         async function showPlayerProfile(uid) { 
             const userDocRef = doc(db, 'users', uid); 
@@ -1084,20 +1052,11 @@
             } 
         }
 
-        /**
-         * === PROFESSIONAL CLEANUP FUNCTION (REWRITTEN) ===
-         * Cleans up all active listeners, disables the UI, shows a final notification,
-         * and safely redirects the user. This function is the single point of exit from the lobby.
-         * @param {string} notificationMessage The message to show the user in a modal.
-         * @param {string} redirectUrl The URL to redirect to. Defaults to the main site.
-         */
         function cleanUpAndLeave(notificationMessage, redirectUrl) {
-            // 1. Prevent multiple executions if already in cleanup process
             if (window.isCleaningUp) return;
             window.isCleaningUp = true;
             console.log(`Cleanup initiated. Reason: ${notificationMessage}`);
 
-            // 2. Unsubscribe from all real-time listeners to stop receiving data and prevent errors
             if (unsubscribeLobby) {
                 unsubscribeLobby();
                 unsubscribeLobby = null;
@@ -1113,10 +1072,8 @@
             playerBanListeners.forEach(unsubscribe => unsubscribe());
             playerBanListeners.clear();
 
-            // 3. Remove global event listeners
             window.removeEventListener('beforeunload', handleLeaveLobbyOnExit);
 
-            // 4. Disable all interactive UI elements immediately to prevent further actions
             try {
                 actionBtn.disabled = true;
                 leaveLobbyBtn.disabled = true;
@@ -1128,23 +1085,21 @@
                 console.warn("Could not disable all UI elements during cleanup.", e);
             }
 
-            // 5. Determine the redirect target and prevent redirect loops
             const targetUrl = redirectUrl || 'https://abolfazl140122.github.io/mafia/';
             const currentUrlSimple = window.location.href.replace(/\/$/, ""); 
             const targetUrlSimple = targetUrl.replace(/\/$/, "");
 
             if (currentUrlSimple === targetUrlSimple) {
                 console.warn("Redirect loop prevented. Already at target URL:", targetUrl);
-                showNotificationModal("توجه", notificationMessage, () => {}); // Show message but don't redirect
+                showNotificationModal("توجه", notificationMessage, () => {});
                 return;
             }
 
-            // 6. Show the final notification and then redirect
             console.log("Redirecting to:", targetUrl);
             showNotificationModal("توجه", notificationMessage, () => {
                 setTimeout(() => {
                     window.location.href = targetUrl;
-                }, 200); // Small delay to ensure the user sees the modal
+                }, 200);
             });
         }
 
@@ -1343,7 +1298,6 @@
 
                 const lobbyData = lobbyDocSnap.data();
                 
-                // Map lobby players to the new game player structure.
                 const gamePlayers = lobbyData.players
                     .filter(p => !p.isSpectator)
                     .map(player => ({
@@ -1355,20 +1309,18 @@
                         partnerId: null
                     }));
 
-                // Define the initial game state document.
                 const gameData = {
                     lobbyId: lobbyId,
                     players: gamePlayers,
                     round: 1,
                     maxRounds: 5,
-                    status: 'pairing', // Initial status before the first round starts.
+                    status: 'pairing',
                     createdAt: serverTimestamp()
                 };
 
                 const gameCollectionRef = collection(db, 'games'); 
                 const newGameDocRef = await addDoc(gameCollectionRef, gameData);
                 
-                // Update the lobby to link to the new game, triggering redirection for all players.
                 await updateDoc(lobbyDocRef, { gameStarted: true, gameId: newGameDocRef.id });
 
             } catch (error) { 
