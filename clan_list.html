@@ -42,9 +42,9 @@
         .tab-panel { width: 50%; height: 100%; display: flex; flex-direction: column; padding: 0 5px; }
 
         #clan-list-panel { overflow-y: auto; display: flex; flex-direction: column; gap: 15px; padding-bottom: 80px; }
-        #clan-list-panel::-webkit-scrollbar, #my-clan-panel::-webkit-scrollbar { width: 6px; }
-        #clan-list-panel::-webkit-scrollbar-track, #my-clan-panel::-webkit-scrollbar-track { background: transparent; }
-        #clan-list-panel::-webkit-scrollbar-thumb, #my-clan-panel::-webkit-scrollbar-thumb { background-color: var(--primary-gold); border-radius: 10px; }
+        #clan-list-panel::-webkit-scrollbar, #my-clan-panel::-webkit-scrollbar, #clan-chat-messages::-webkit-scrollbar { width: 6px; }
+        #clan-list-panel::-webkit-scrollbar-track, #my-clan-panel::-webkit-scrollbar-track, #clan-chat-messages::-webkit-scrollbar-track { background: transparent; }
+        #clan-list-panel::-webkit-scrollbar-thumb, #my-clan-panel::-webkit-scrollbar-thumb, #clan-chat-messages::-webkit-scrollbar-thumb { background-color: var(--primary-gold); border-radius: 10px; }
         
         #my-clan-panel { overflow-y: auto; }
         .my-clan-placeholder { margin: auto; text-align: center; color: var(--text-secondary); opacity: 0.7; }
@@ -56,16 +56,20 @@
         .my-clan-info-bar { display: flex; justify-content: space-around; margin-top: 10px; color: var(--text-secondary); }
         .clan-chat-container { flex-grow: 1; display: flex; flex-direction: column; background: rgba(0,0,0,0.3); border-radius: 12px; border: 1px solid var(--border-color); overflow: hidden; }
         #clan-chat-messages { flex-grow: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px; }
-        .chat-message { display: flex; gap: 10px; max-width: 80%; }
-        .chat-message-avatar { width: 35px; height: 35px; border-radius: 50%; flex-shrink: 0; object-fit: cover; }
-        .chat-message-content { background: #332a20; padding: 8px 12px; border-radius: 12px; }
+        .chat-message { display: flex; gap: 10px; max-width: 80%; align-items: flex-end; }
+        .chat-message-avatar { width: 35px; height: 35px; border-radius: 50%; flex-shrink: 0; object-fit: cover; border: 1px solid var(--border-color); }
+        .chat-message-content { background: #332a20; padding: 8px 12px; border-radius: 12px 12px 12px 0; }
         .chat-message-sender { font-size: 0.8rem; font-weight: 700; color: var(--primary-gold); margin-bottom: 4px; }
+        .chat-message-text { word-break: break-word; }
+        .chat-message-time { font-size: 0.7rem; color: var(--text-secondary); opacity: 0.7; margin-top: 5px; text-align: left; }
         .chat-message.is-self { align-self: flex-end; flex-direction: row-reverse; }
-        .chat-message.is-self .chat-message-content { background: #2a3a30; }
+        .chat-message.is-self .chat-message-content { background: #2a3a30; border-radius: 12px 12px 0 12px; }
         .chat-message.is-self .chat-message-sender { color: var(--status-approved); }
-        #clan-chat-form { display: flex; padding: 10px; border-top: 1px solid var(--border-color); gap: 10px; }
+        .chat-message.is-self .chat-message-time { text-align: right; }
+        #clan-chat-form { display: flex; padding: 10px; border-top: 1px solid var(--border-color); gap: 10px; background-color: rgba(0,0,0,0.2); }
         #clan-chat-input { flex-grow: 1; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: var(--text-light); padding: 10px; border-radius: 8px; font-size: 1rem; }
-        #clan-chat-send-btn { background: var(--primary-gold); border: none; color: var(--bg-dark); font-weight: 900; padding: 0 20px; border-radius: 8px; cursor: pointer; }
+        #clan-chat-send-btn { background: var(--primary-gold); border: none; color: var(--bg-dark); font-weight: 900; padding: 0 20px; border-radius: 8px; cursor: pointer; transition: background-color 0.2s; }
+        #clan-chat-send-btn:disabled { background: #555; cursor: not-allowed; }
 
         .info-message { text-align: center; font-size: 1.1rem; color: var(--text-secondary); margin-top: 50px; opacity: 0.8; }
         .clan-card { background: linear-gradient(160deg, #2a2118, var(--bg-dark)); border: 1px solid var(--border-color); border-radius: 16px; padding: 15px; display: flex; align-items: center; gap: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.4); opacity: 0; transform: translateY(20px); animation: slideInUp 0.5s forwards; transition: transform 0.3s ease, box-shadow 0.3s ease; }
@@ -101,9 +105,6 @@
         .request-status.pending { background-color: var(--status-pending); color: black; }
         .request-status.approved { background-color: var(--status-approved); color: white; }
 
-        #ban-overlay { z-index: 3000; background-color: rgba(0,0,0,0.95); backdrop-filter: blur(5px); }
-        #ban-panel { border-color: var(--suspension-red); box-shadow: 0 0 25px rgba(231, 76, 60, 0.5); }
-        #ban-title { color: var(--suspension-red); }
     </style>
 </head>
 <body>
@@ -143,11 +144,11 @@
     <div id="create-clan-modal" class="modal-overlay"> <div class="modal-content"> <h2 class="modal-title">ساخت کلن جدید</h2> <p style="text-align: center; margin-bottom: 20px; color: var(--text-secondary);">نام کلن خود را وارد کنید. پس از تایید توسط مدیریت، در لیست عمومی نمایش داده خواهد شد.</p> <input type="text" id="clan-name-input" class="modal-input" placeholder="نام کلن (مثال: گرگ‌های شب)" maxlength="25"> <div class="modal-buttons"> <button id="create-clan-cancel-btn" class="modal-button secondary">انصراف</button> <button id="create-clan-confirm-btn" class="modal-button primary">ارسال درخواست</button> </div> </div> </div>
     <div id="my-requests-modal" class="modal-overlay"> <div class="modal-content"> <h2 class="modal-title">وضعیت درخواست‌های من</h2> <div id="my-requests-list"></div> <button id="my-requests-close-btn" class="modal-button secondary" style="margin-top:20px;">بستن</button> </div> </div>
     <div id="custom-alert-modal" class="modal-overlay"> <div class="modal-content" style="max-width:350px;"> <h2 id="custom-alert-title" class="modal-title">توجه!</h2> <p id="custom-alert-message" style="margin-bottom:25px;"></p> <button id="custom-alert-ok-btn" class="modal-button primary">متوجه شدم</button> </div> </div>
-    <div id="ban-overlay" class="modal-overlay"> <div id="ban-panel" class="modal-content"> <h2 id="ban-title" class="modal-title">حساب کاربری مسدود است</h2> <p id="ban-message" style="margin-bottom:25px; line-height: 1.7;"></p> <button id="ban-logout-btn" class="modal-button secondary">خروج از حساب</button> </div> </div>
     
     <!-- Audio Elements -->
     <audio id="audio-click" src="https://assets.mixkit.co/sfx/preview/mixkit-unlock-game-notification-253.mp3" preload="auto"></audio>
     <audio id="audio-success" src="https://assets.mixkit.co/sfx/preview/mixkit-quick-positive-video-game-notification-interface-265.mp3" preload="auto"></audio>
+    <audio id="audio-message" src="https://assets.mixkit.co/sfx/preview/mixkit-message-pop-alert-2354.mp3" preload="auto"></audio>
 
     <script type="module">
         // Import Firebase modules
@@ -180,7 +181,7 @@
         let unsubscribeClans = null, unsubscribeMyRequests = null, unsubscribeUserStatus = null, unsubscribeMyClan = null, unsubscribeMyClanChat = null;
 
         // --- Helper Functions ---
-        const playSound = (id) => { try { document.getElementById(id).play(); } catch(e) { console.warn("Sound play failed", e); } };
+        const playSound = (id) => { try { document.getElementById(id)?.play(); } catch(e) { console.warn("Sound play failed", e); } };
         const showModal = (el) => el.classList.add('visible');
         const hideModal = (el) => el.classList.remove('visible');
         const showCustomAlert = (title, msg) => {
@@ -235,7 +236,7 @@
                     <div class="clan-chat-container">
                         <div id="clan-chat-messages"><p class="info-message">در حال بارگذاری چت...</p></div>
                         <form id="clan-chat-form">
-                            <input type="text" id="clan-chat-input" placeholder="پیام خود را بنویسید..." autocomplete="off">
+                            <input type="text" id="clan-chat-input" placeholder="پیام خود را بنویسید..." autocomplete="off" required>
                             <button type="submit" id="clan-chat-send-btn">ارسال</button>
                         </form>
                     </div>
@@ -253,20 +254,31 @@
             const chatQuery = query(collection(db, 'clans', clanId, 'chat'), orderBy('createdAt', 'asc'));
             
             unsubscribeMyClanChat = onSnapshot(chatQuery, (snapshot) => {
+                const hadMessages = chatMessagesContainer.childElementCount > 1; // More than the initial loading msg
                 chatMessagesContainer.innerHTML = '';
                 if (snapshot.empty) {
-                    chatMessagesContainer.innerHTML = '<p class="info-message">هنوز پیامی در این کلن وجود ندارد.</p>';
+                    chatMessagesContainer.innerHTML = '<p class="info-message">هنوز پیامی در این کلن وجود ندارد. اولین نفر باشید!</p>';
                     return;
                 }
+                snapshot.docChanges().forEach(change => {
+                    if (change.type === "added" && hadMessages) {
+                       playSound('audio-message');
+                    }
+                });
+
                 snapshot.forEach(doc => {
                     const msgData = doc.data();
                     const msgElement = document.createElement('div');
-                    msgElement.className = `chat-message ${msgData.senderId === currentUser.uid ? 'is-self' : ''}`;
+                    const isSelf = msgData.senderId === currentUser.uid;
+                    msgElement.className = `chat-message ${isSelf ? 'is-self' : ''}`;
+                    const time = msgData.createdAt ? new Date(msgData.createdAt.toDate()).toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' }) : '';
+
                     msgElement.innerHTML = `
-                        <img src="${msgData.senderAvatar || 'https://up.20script.ir/file/1d50-defult.png'}" class="chat-message-avatar">
+                        <img src="${msgData.senderAvatar || 'https://up.20script.ir/file/1d50-defult.png'}" class="chat-message-avatar" onerror="this.src='https://up.20script.ir/file/1d50-defult.png';">
                         <div class="chat-message-content">
-                            <p class="chat-message-sender">${msgData.senderName}</p>
-                            <p>${msgData.text}</p>
+                            <p class="chat-message-sender">${isSelf ? 'شما' : msgData.senderName}</p>
+                            <p class="chat-message-text">${msgData.text}</p>
+                            <p class="chat-message-time">${time}</p>
                         </div>`;
                     chatMessagesContainer.appendChild(msgElement);
                 });
@@ -280,10 +292,15 @@
         // --- Core Logic Functions ---
         const handleSendClanMessage = async (clanId) => {
             const chatInput = document.getElementById('clan-chat-input');
+            const sendButton = document.getElementById('clan-chat-send-btn');
             const text = chatInput.value.trim();
-            if (!text || !currentUserData) return;
+            if (!text || !currentUserData || isSubmitting) return;
             
+            isSubmitting = true;
+            chatInput.disabled = true;
+            sendButton.disabled = true;
             chatInput.value = '';
+
             try {
                 await addDoc(collection(db, 'clans', clanId, 'chat'), {
                     text: text,
@@ -294,8 +311,13 @@
                 });
             } catch (error) {
                 console.error("Error sending clan message:", error);
-                showCustomAlert('خطا', 'ارسال پیام با مشکل مواجه شد.');
+                showCustomAlert('خطا', 'ارسال پیام با مشکل مواجه شد. لطفا دوباره تلاش کنید.');
                 chatInput.value = text; // Restore text on failure
+            } finally {
+                isSubmitting = false;
+                chatInput.disabled = false;
+                sendButton.disabled = false;
+                chatInput.focus();
             }
         };
 
@@ -322,30 +344,27 @@
         
         const handleUserStatusUpdate = (userDocSnap) => {
             if (!userDocSnap.exists()) return;
-            currentUserData = userDocSnap.data(); // Keep user data updated
+            currentUserData = userDocSnap.data();
             
             const isBanned = currentUserData.isBanned === true && currentUserData.banExpiresAt && currentUserData.banExpiresAt.toDate() > new Date();
             if (isBanned) {
                 // Cleanup all listeners to prevent background operations
                 if (unsubscribeClans) unsubscribeClans();
                 if (unsubscribeMyRequests) unsubscribeMyRequests();
+                if (unsubscribeUserStatus) unsubscribeUserStatus();
                 if (unsubscribeMyClan) unsubscribeMyClan();
+                if (unsubscribeMyClanChat) unsubscribeMyClanChat();
                 
-                document.getElementById('ban-message').textContent = `شما به دلیل "${currentUserData.banReason || 'نامشخص'}" تا تاریخ ${new Date(currentUserData.banExpiresAt.toDate()).toLocaleString('fa-IR')} مسدود شده‌اید.`;
-                showModal(document.getElementById('ban-overlay'));
-                
-                // Disable all interactive elements except logout
-                document.querySelectorAll('button, input').forEach(el => el.disabled = true);
-                document.getElementById('ban-logout-btn').disabled = false;
+                // Redirect user
+                alert('حساب کاربری شما مسدود شده است. شما به صفحه اصلی منتقل می‌شوید.');
+                window.location.href = 'https://abolfazl140122.github.io/mafia/';
             }
         };
 
         const setupLiveListeners = (user) => {
-            // User status listener (for ban check)
             const userDocRef = doc(db, 'users', user.uid);
             unsubscribeUserStatus = onSnapshot(userDocRef, handleUserStatusUpdate, (error) => console.error("Error listening to user status:", error));
 
-            // Public (approved) clans list listener
             const publicClansQuery = query(collection(db, 'clans'), where("isApproved", "==", true));
             unsubscribeClans = onSnapshot(publicClansQuery, (snapshot) => {
                 clanListEl.innerHTML = '';
@@ -357,7 +376,6 @@
                         clanListEl.appendChild(createClanCard(clanData, index));
                     });
                 }
-                // Hide loading overlay once data is loaded
                 if (loadingOverlay.style.opacity !== '0') {
                     loadingOverlay.style.opacity = '0';
                     setTimeout(() => loadingOverlay.style.display = 'none', 500);
@@ -368,23 +386,24 @@
                 clanListEl.innerHTML = '<p class="info-message" style="color: #e74c3c;">مشکلی در دریافت اطلاعات پیش آمد.</p>';
             });
 
-            // "My Clan" listener
-            const myClanQuery = query(collection(db, 'clans'), where("members", "array-contains", user.uid));
+            const myClanQuery = query(collection(db, 'clans'), where("members", "array-contains", user.uid), where("isApproved", "==", true));
             unsubscribeMyClan = onSnapshot(myClanQuery, async (snapshot) => {
                 const pendingRequestQuery = query(collection(db, "clans"), where("creatorId", "==", user.uid), where("isApproved", "==", false));
                 const pendingSnapshot = await getDocs(pendingRequestQuery);
 
-                if (!snapshot.empty && snapshot.docs[0].data().isApproved) {
+                if (!snapshot.empty) {
                     createClanFab.style.display = 'none';
                     const myClanDoc = snapshot.docs[0];
                     renderMyClanPanel({ id: myClanDoc.id, ...myClanDoc.data() });
                 } else if (!pendingSnapshot.empty) {
                     createClanFab.style.display = 'none';
                     userClanData = null;
+                    if (unsubscribeMyClanChat) unsubscribeMyClanChat();
                     renderMyClanPlaceholder();
                 } else {
                     createClanFab.style.display = 'block';
                     userClanData = null;
+                    if (unsubscribeMyClanChat) unsubscribeMyClanChat();
                     renderMyClanPlaceholder();
                 }
             });
@@ -394,7 +413,16 @@
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUser = user;
-                setupLiveListeners(user);
+                const userDocRef = doc(db, 'users', user.uid);
+                getDoc(userDocRef).then(userDocSnap => {
+                    if (userDocSnap.exists()) {
+                        currentUserData = userDocSnap.data();
+                        setupLiveListeners(user);
+                    } else {
+                        // Handle case where user exists in Auth but not Firestore
+                        signOut(auth);
+                    }
+                });
             } else {
                 window.location.href = './login.html'; // Redirect if not logged in
             }
@@ -502,10 +530,6 @@
         });
         
         document.getElementById('custom-alert-ok-btn').addEventListener('click', () => hideModal(document.getElementById('custom-alert-modal')));
-        document.getElementById('ban-logout-btn').addEventListener('click', () => { 
-            signOut(auth).catch(err => console.error("Sign out error", err)); 
-            window.location.href='./login.html'; 
-        });
         
         // Tab switching logic
         const contentSlider = document.querySelector('.content-slider');
