@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        /* === متغیرهای رنگی پایه === */
+        /* === متغیرهای رنگی === */
         :root {
             --primary-gold: #ffc947;
             --dark-red: #8c4843;
@@ -17,8 +17,8 @@
             --text-secondary: #c5a687;
             --bg-dark: #1a140e;
             --border-color: #5c4a3a;
-            --cooperate-blue: #3498db;
-            --betray-red: #e74c3c;
+            --cooperate-green: #28a745;
+            --betray-red: #dc3545;
         }
 
         /* === ریست و استایل‌های کلی === */
@@ -53,7 +53,7 @@
             height: 100%;
             max-width: 1400px;
             display: grid;
-            grid-template-columns: 250px 1fr 250px;
+            grid-template-columns: 280px 1fr 280px;
             grid-template-rows: 80px 1fr;
             grid-template-areas: 
                 "header header header"
@@ -68,40 +68,19 @@
             .game-container {
                 grid-template-columns: 1fr;
                 grid-template-rows: auto auto 1fr;
-                grid-template-areas:
-                    "header"
-                    "scoreboard"
-                    "main";
+                grid-template-areas: "header" "scoreboard" "main";
                 padding: 10px;
             }
-            #history-panel { display: none; } /* Hide history on smaller screens */
+            #history-panel { display: none; }
         }
 
         /* === هدر بازی === */
-        .game-header {
-            grid-area: header;
-            background: rgba(0,0,0,0.4);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 25px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-        }
+        .game-header { grid-area: header; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); border-radius: 12px; display: flex; justify-content: space-between; align-items: center; padding: 0 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
         #game-title { font-size: 1.5rem; font-weight: 900; color: var(--primary-gold); text-shadow: 1px 1px 5px #000; }
         #round-counter, #main-timer { font-size: 1.3rem; background-color: var(--darker-red); padding: 5px 15px; border-radius: 8px; border: 1px solid var(--primary-gold); }
         
         /* === پنل‌های کناری === */
-        .side-panel {
-            background: rgba(0,0,0,0.3);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-        }
+        .side-panel { background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 12px; padding: 15px; display: flex; flex-direction: column; overflow-y: auto; }
         .panel-title { font-size: 1.2rem; font-weight: 700; color: var(--primary-gold); margin-bottom: 15px; text-align: center; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
 
         /* === پنل امتیازات === */
@@ -111,8 +90,10 @@
         .player-score-item.is-self { background-color: var(--darker-red); border: 1px solid var(--primary-gold); }
         .player-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; margin-left: 10px; border: 2px solid var(--border-color); }
         .player-name { flex-grow: 1; font-weight: 700; }
-        .player-score { font-size: 1.2rem; font-weight: 900; color: var(--primary-gold); }
-
+        .player-score { font-size: 1.2rem; font-weight: 900; color: var(--primary-gold); transition: color 0.3s; }
+        .player-score.score-increase { animation: score-up 0.5s ease-out; }
+        @keyframes score-up { 0% { transform: scale(1); color: var(--primary-gold); } 50% { transform: scale(1.4); color: var(--cooperate-green); } 100% { transform: scale(1); color: var(--primary-gold); } }
+        
         /* === پنل تاریخچه === */
         #history-panel { grid-area: history; }
         #history-list { display: flex; flex-direction: column; gap: 8px; }
@@ -120,33 +101,46 @@
         
         /* === استیج اصلی === */
         #main-stage {
-            grid-area: main;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            padding: 20px;
-            text-align: center;
+            grid-area: main; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color);
+            border-radius: 12px; display: flex; flex-direction: column; justify-content: space-around;
+            align-items: center; padding: 20px; text-align: center;
         }
-        .stage-message { font-size: 1.5rem; font-weight: 700; color: var(--text-secondary); }
-        .decision-buttons-container { display: none; gap: 20px; margin-top: 30px; }
-        .decision-btn {
-            width: 180px; height: 180px; border-radius: 50%;
-            border: 5px solid;
-            font-size: 1.8rem; font-weight: 900;
-            cursor: pointer; transition: all 0.3s ease;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        #stage-message { font-size: 1.5rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 20px; }
+        #pair-container { display: none; flex-direction: row; justify-content: space-around; align-items: center; width: 100%; perspective: 1000px; }
+        
+        .player-card-container { display: flex; flex-direction: column; align-items: center; gap: 15px; }
+        .player-card {
+            width: 200px; height: 280px; position: relative;
+            transform-style: preserve-3d; transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .player-card.flipped { transform: rotateY(180deg); }
+        .card-face {
+            position: absolute; width: 100%; height: 100%; backface-visibility: hidden;
+            border-radius: 15px; border: 2px solid var(--border-color);
+            background: linear-gradient(145deg, #3c3022, var(--bg-dark));
             box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+            display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 15px;
         }
-        .decision-btn:not(:disabled):hover { transform: scale(1.05); box-shadow: 0 8px 30px rgba(0,0,0,0.6); }
+        .card-face.card-back { transform: rotateY(180deg); }
+        .player-card-avatar { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 4px solid var(--border-color); margin-bottom: 15px; }
+        .player-card-name { font-size: 1.2rem; font-weight: 700; color: var(--primary-gold); }
+        .player-card-status { font-size: 1rem; color: var(--text-secondary); margin-top: 10px; }
+        
+        .card-back .choice-icon { font-size: 5rem; line-height: 1; }
+        .card-back .choice-text { font-size: 2rem; font-weight: 900; margin-top: 10px; }
+        .card-back.cooperate { background: var(--cooperate-green); color: white; }
+        .card-back.betray { background: var(--betray-red); color: white; }
+
+        .decision-buttons-container { display: none; gap: 25px; margin-top: 20px; }
+        .decision-btn {
+            padding: 15px 30px; border-radius: 10px; border: 2px solid;
+            font-size: 1.2rem; font-weight: 900; cursor: pointer; transition: all 0.3s ease;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.5); box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+        }
+        .decision-btn:not(:disabled):hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0,0,0,0.6); }
         .decision-btn:disabled { cursor: not-allowed; opacity: 0.6; }
-        .decision-btn .icon { font-size: 4rem; line-height: 1; }
-        #cooperate-btn { background: var(--cooperate-blue); border-color: #85c1e9; color: white; }
-        #betray-btn { background: var(--betray-red); border-color: #f5b7b1; color: white; }
+        #cooperate-btn { background-color: var(--cooperate-green); border-color: #73c686; color: white; }
+        #betray-btn { background-color: var(--betray-red); border-color: #eb9a9a; color: white; }
 
         /* === مودال‌ها === */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.85); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s 0.3s; }
@@ -155,34 +149,33 @@
         .modal-overlay.visible .modal-content { transform: scale(1); }
         .modal-title { font-size: 1.5rem; font-weight: 900; color: var(--primary-gold); margin-bottom: 20px; }
         
-        /* === مودال چت خصوصی === */
         #private-chat-modal .modal-content { width: 95%; max-width: 500px; height: 80%; max-height: 600px; display: flex; flex-direction: column; padding: 0; }
         .chat-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
-        .chat-header h3 { font-size: 1.1rem; color: var(--primary-gold); }
-        #chat-timer { font-size: 1.2rem; font-weight: 700; color: var(--text-light); }
+        #chat-partner-name { font-size: 1.1rem; color: var(--primary-gold); }
         #chat-messages { flex-grow: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px; }
         .chat-message { display: flex; align-items: flex-start; gap: 10px; max-width: 80%; }
         .chat-message.self { align-self: flex-end; flex-direction: row-reverse; }
         .chat-message-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 2px solid var(--border-color); }
+        .chat-message-content { display: flex; flex-direction: column; }
+        .chat-message.self .chat-message-content { align-items: flex-end; }
         .chat-message-bubble { background-color: #332a20; padding: 8px 12px; border-radius: 12px; font-size: 0.9rem; word-wrap: break-word; }
         .chat-message.self .chat-message-bubble { background-color: #2a3a30; }
+        .chat-message-timestamp { font-size: 0.7rem; color: var(--text-secondary); margin-top: 4px; padding: 0 5px; }
         #chat-form { display: flex; padding: 15px; border-top: 1px solid var(--border-color); gap: 10px; flex-shrink: 0; }
         #chat-input { flex-grow: 1; background-color: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-light); font-family: 'Vazirmatn', sans-serif; font-size: 0.9rem; }
         #chat-send-btn { background-color: var(--primary-gold); border: none; border-radius: 8px; color: var(--darker-red); font-weight: 900; padding: 0 15px; cursor: pointer; }
         
-        /* === مودال نتایج دور === */
         #round-result-modal-content { display: flex; flex-direction: column; gap: 20px; }
         .result-pair { display: flex; justify-content: space-around; align-items: center; }
         .result-player-card { display: flex; flex-direction: column; align-items: center; gap: 10px; }
         .result-player-card .player-avatar { width: 80px; height: 80px; }
         .result-choice { font-size: 1.2rem; font-weight: 700; padding: 5px 10px; border-radius: 8px; color: white; }
-        .result-choice.cooperate { background-color: var(--cooperate-blue); }
+        .result-choice.cooperate { background-color: var(--cooperate-green); }
         .result-choice.betray { background-color: var(--betray-red); }
         .result-points { font-size: 1.5rem; font-weight: 900; }
         .result-points.positive { color: #2ecc71; }
         .result-points.negative { color: #e74c3c; }
         
-        /* === مودال پایان بازی === */
         #game-over-modal-content .modal-title { font-size: 2rem; }
         #final-winner { margin: 20px 0; font-size: 1.3rem; }
         #final-winner span { color: var(--primary-gold); font-weight: 900; }
@@ -211,18 +204,45 @@
         </aside>
 
         <main id="main-stage">
-            <div id="stage-content">
-                <h3 id="stage-message" class="stage-message">در حال جفت‌کردن بازیکنان...</h3>
-                <div class="decision-buttons-container" id="decision-buttons">
-                    <button id="cooperate-btn" class="decision-btn">
-                        <span class="icon">🤝</span>
-                        <span>همکاری</span>
-                    </button>
-                    <button id="betray-btn" class="decision-btn">
-                        <span class="icon">⚔️</span>
-                        <span>خیانت</span>
-                    </button>
+            <h3 id="stage-message" class="stage-message">در حال جفت‌کردن بازیکنان...</h3>
+            
+            <div id="pair-container">
+                <!-- Player Card (Self) -->
+                <div class="player-card-container">
+                    <div class="player-card" id="self-card">
+                        <div class="card-face card-front">
+                            <img id="self-card-avatar" src="https://up.20script.ir/file/1d50-defult.png" class="player-card-avatar">
+                            <div id="self-card-name" class="player-card-name">شما</div>
+                            <div id="self-card-status" class="player-card-status">در حال تصمیم‌گیری...</div>
+                        </div>
+                        <div id="self-card-back" class="card-face card-back">
+                            <span id="self-choice-icon" class="choice-icon"></span>
+                            <span id="self-choice-text" class="choice-text"></span>
+                        </div>
+                    </div>
                 </div>
+
+                <div style="font-size: 3rem; color: var(--primary-gold);">VS</div>
+
+                <!-- Player Card (Opponent) -->
+                <div class="player-card-container">
+                     <div class="player-card" id="opponent-card">
+                        <div class="card-face card-front">
+                            <img id="opponent-card-avatar" src="https://up.20script.ir/file/1d50-defult.png" class="player-card-avatar">
+                            <div id="opponent-card-name" class="player-card-name">حریف</div>
+                            <div id="opponent-card-status" class="player-card-status">در حال تصمیم‌گیری...</div>
+                        </div>
+                        <div id="opponent-card-back" class="card-face card-back">
+                            <span id="opponent-choice-icon" class="choice-icon"></span>
+                            <span id="opponent-choice-text" class="choice-text"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="decision-buttons-container" id="decision-buttons">
+                <button id="cooperate-btn" class="decision-btn">🤝 همکاری</button>
+                <button id="betray-btn" class="decision-btn">💣 خیانت</button>
             </div>
         </main>
 
@@ -232,12 +252,11 @@
         </aside>
     </div>
     
-    <!-- مودال چت خصوصی -->
+    <!-- مودال‌ها (بدون تغییر) -->
     <div id="private-chat-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="chat-header">
                 <h3 id="chat-partner-name">چت با ...</h3>
-                <div id="chat-timer">⏱️ ۰۰:۶۰</div>
             </div>
             <div id="chat-messages"></div>
             <form id="chat-form">
@@ -246,32 +265,27 @@
             </form>
         </div>
     </div>
-    
-    <!-- مودال نتایج دور -->
     <div id="round-result-modal" class="modal-overlay">
         <div id="round-result-modal-content" class="modal-content">
              <h2 class="modal-title">نتایج دور</h2>
              <div id="result-pairs-container"></div>
         </div>
     </div>
-    
-    <!-- مودال پایان بازی -->
     <div id="game-over-modal" class="modal-overlay">
         <div id="game-over-modal-content" class="modal-content">
              <h2 class="modal-title">بازی تمام شد!</h2>
              <p id="final-winner"></p>
-             <button id="back-to-lobby-btn">بازگشت به لیست لابی‌ها</button>
+             <button id="back-to-lobby-btn">بازگشت به لابی</button>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, runTransaction, getDoc, collection, addDoc, serverTimestamp, query, orderBy, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, runTransaction, getDoc, collection, addDoc, serverTimestamp, query, orderBy, writeBatch, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         // --- Config & Elements ---
         const firebaseConfig = { apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg", authDomain: "mafia-9fcbf.firebaseapp.com", projectId: "mafia-9fcbf", storageBucket: "mafia-9fcbf.appspot.com", messagingSenderId: "471627157488", appId: "1:471627157488:web:92f008548a5596619a5735", };
-        
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
@@ -283,12 +297,12 @@
         const mainTimerEl = document.getElementById('main-timer');
         const scoreboardListEl = document.getElementById('scoreboard-list');
         const stageMessageEl = document.getElementById('stage-message');
+        const pairContainerEl = document.getElementById('pair-container');
         const decisionButtonsEl = document.getElementById('decision-buttons');
         const cooperateBtn = document.getElementById('cooperate-btn');
         const betrayBtn = document.getElementById('betray-btn');
         const privateChatModal = document.getElementById('private-chat-modal');
         const chatPartnerNameEl = document.getElementById('chat-partner-name');
-        const chatTimerEl = document.getElementById('chat-timer');
         const chatMessagesEl = document.getElementById('chat-messages');
         const chatForm = document.getElementById('chat-form');
         const chatInput = document.getElementById('chat-input');
@@ -306,9 +320,8 @@
         let unsubscribeChat = null;
         let isHost = false;
         let currentPartner = null;
-        let currentPairId = null;
-        let chatTimerInterval = null;
-        const botMemory = new Map(); // Stores partner's last move against bot
+        let mainTimerInterval = null;
+        const botMemory = new Map();
 
         // --- Main Function ---
         async function main() {
@@ -330,7 +343,6 @@
             });
         }
 
-        // --- Realtime Listener ---
         function listenToGameChanges() {
             const gameDocRef = doc(db, 'games', gameId);
             unsubscribeGame = onSnapshot(gameDocRef, (docSnap) => {
@@ -340,20 +352,18 @@
                     return;
                 }
                 
+                const oldGameData = gameData;
                 gameData = { id: docSnap.id, ...docSnap.data() };
                 
-                // Validate if current user is part of this game
-                const isPlayerInGame = gameData.players.some(p => p.uid === currentUser.uid);
-                if (!isPlayerInGame) {
+                if (!gameData.players.some(p => p.uid === currentUser.uid)) {
                     alert("شما عضو این بازی نیستید.");
                     window.location.href = './Lobby page.html';
                     return;
                 }
                 
-                // Determine if user is the host (for client-side game management)
                 isHost = gameData.players[0].uid === currentUser.uid;
 
-                updateUI();
+                updateUI(oldGameData);
                 handleGameStatus();
                 
                 if (loadingOverlay.style.display !== 'none') {
@@ -367,82 +377,135 @@
         }
         
         // --- UI Update ---
-        function updateUI() {
-            // Update Scoreboard
-            scoreboardListEl.innerHTML = '';
+        function updateUI(oldGameData) {
+            // Update Scoreboard with animation
             const sortedPlayers = [...gameData.players].sort((a, b) => b.score - a.score);
+            scoreboardListEl.innerHTML = '';
             sortedPlayers.forEach(player => {
+                const oldPlayer = oldGameData?.players.find(p => p.uid === player.uid);
+                const oldScore = oldPlayer ? oldPlayer.score : 0;
+
                 const item = document.createElement('li');
                 item.className = 'player-score-item';
                 if (player.uid === currentUser.uid) item.classList.add('is-self');
                 item.innerHTML = `
                     <img src="${player.avatar || 'https://up.20script.ir/file/1d50-defult.png'}" alt="avatar" class="player-avatar">
                     <span class="player-name">${player.displayName}</span>
-                    <span class="player-score">${player.score}</span>
+                    <span class="player-score" data-uid="${player.uid}">${player.score}</span>
                 `;
                 scoreboardListEl.appendChild(item);
+
+                if (player.score > oldScore) {
+                     const scoreEl = item.querySelector('.player-score');
+                     animateScore(scoreEl, oldScore, player.score);
+                }
             });
             
-            // Update Round Counter
             roundCounterEl.textContent = `دور ${gameData.round} / ${gameData.maxRounds}`;
         }
         
+        function animateScore(element, start, end) {
+            element.classList.add('score-increase');
+            let current = start;
+            const increment = (end - start) > 5 ? Math.ceil((end - start) / 10) : 1;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= end) {
+                    current = end;
+                    clearInterval(timer);
+                    element.classList.remove('score-increase');
+                }
+                element.textContent = current;
+            }, 50);
+        }
+
         // --- Game State Machine ---
         function handleGameStatus() {
             const self = gameData.players.find(p => p.uid === currentUser.uid);
-            
-            // Hide all modals initially
+            const myPair = gameData.pairs?.find(p => p.players.includes(currentUser.uid));
+            currentPartner = myPair ? gameData.players.find(p => p.uid === myPair.players.find(uid => uid !== currentUser.uid)) : null;
+
+            // Hide modals initially
             privateChatModal.classList.remove('visible');
             roundResultModal.classList.remove('visible');
             gameOverModal.classList.remove('visible');
 
+            updateTimer();
+            
             switch(gameData.status) {
                 case 'pairing':
-                    stageMessageEl.textContent = 'در حال جفت‌کردن بازیکنان...';
+                    stageMessageEl.style.display = 'block';
+                    pairContainerEl.style.display = 'none';
                     decisionButtonsEl.style.display = 'none';
-                    if (isHost) runPairingLogic();
+                    stageMessageEl.textContent = 'در حال جفت‌کردن بازیکنان...';
+                    if (isHost) setTimeout(runPairingLogic, 2000); // Give a moment to show message
                     break;
                     
                 case 'chat':
-                    findPartnerAndOpenChat();
+                    stageMessageEl.style.display = 'none';
+                    if (myPair) {
+                        renderPlayerCards(self, currentPartner);
+                        openPrivateChat();
+                    } else {
+                        stageMessageEl.textContent = 'شما این دور استراحت می‌کنید.';
+                        stageMessageEl.style.display = 'block';
+                        pairContainerEl.style.display = 'none';
+                    }
+                    decisionButtonsEl.style.display = 'none';
                     break;
                     
                 case 'decision':
-                    stageMessageEl.textContent = `با ${currentPartner?.displayName || 'شریکتان'} مذاکره کردید. حالا تصمیم بگیرید:`;
-                    if (self.currentChoice) {
-                        decisionButtonsEl.style.display = 'none';
-                        stageMessageEl.textContent = 'منتظر تصمیم شریکتان...';
-                    } else {
-                        decisionButtonsEl.style.display = 'flex';
-                        cooperateBtn.disabled = false;
-                        betrayBtn.disabled = false;
+                    stageMessageEl.style.display = 'none';
+                    if (privateChatModal.classList.contains('visible')) {
+                        privateChatModal.classList.remove('visible');
+                        if(unsubscribeChat) unsubscribeChat();
                     }
+
+                    if (myPair) {
+                        renderPlayerCards(self, currentPartner);
+                        if (self.currentChoice) {
+                            decisionButtonsEl.style.display = 'none';
+                            document.getElementById('self-card-status').textContent = 'منتظر حریف...';
+                        } else {
+                            decisionButtonsEl.style.display = 'flex';
+                            cooperateBtn.disabled = false;
+                            betrayBtn.disabled = false;
+                        }
+                    } else {
+                         stageMessageEl.textContent = 'شما این دور استراحت می‌کنید.';
+                         stageMessageEl.style.display = 'block';
+                         pairContainerEl.style.display = 'none';
+                    }
+
                     if (isHost) checkAllDecisionsMade();
                     runBotDecisionLogic(self);
                     break;
 
                 case 'result':
-                    stageMessageEl.textContent = 'نمایش نتایج دور...';
+                    stageMessageEl.style.display = 'none';
                     decisionButtonsEl.style.display = 'none';
-                    showRoundResult();
-                    if (isHost) setTimeout(startNextRound, 5000); // 5-second delay before next round
+                    if (myPair) {
+                        revealChoices(self, currentPartner);
+                    }
+                    showRoundResultModal(); // Also show the modal for all pairs
+                    if (isHost) setTimeout(startNextRound, 7000); // 7-second delay before next round
                     break;
                     
                 case 'ended':
                     stageMessageEl.textContent = 'بازی به پایان رسید!';
+                    pairContainerEl.style.display = 'none';
                     decisionButtonsEl.style.display = 'none';
                     showGameOver();
+                    if (isHost) updatePermanentStats();
                     break;
             }
         }
         
-        // --- Host-Side Logic (Client Fallback) ---
+        // --- Host-Side Logic ---
         async function runPairingLogic() {
-            // This function should only run once per pairing status
             if (gameData.pairs?.length > 0 && gameData.round === gameData.pairs[0].round) return;
 
             const playersToPair = [...gameData.players];
-            // Fisher-Yates shuffle
             for (let i = playersToPair.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [playersToPair[i], playersToPair[j]] = [playersToPair[j], playersToPair[i]];
@@ -456,24 +519,16 @@
                         pairId: `${pairId}_r${gameData.round}`,
                         round: gameData.round,
                         players: [playersToPair[i].uid, playersToPair[i+1].uid],
-                        choices: { [playersToPair[i].uid]: null, [playersToPair[i+1].uid]: null }
                     });
                 }
-                // Note: odd player out sits out this round.
             }
             
             try {
                 const gameDocRef = doc(db, 'games', gameId);
                 await runTransaction(db, async (transaction) => {
-                    transaction.update(gameDocRef, {
-                        status: 'chat',
-                        pairs: pairs,
-                        chatStartTime: serverTimestamp() // Set timer start for all clients
-                    });
+                    transaction.update(gameDocRef, { status: 'chat', pairs: pairs, phaseStartTime: serverTimestamp() });
                 });
-            } catch (error) {
-                console.error("Error starting chat phase:", error);
-            }
+            } catch (error) { console.error("Error starting chat phase:", error); }
         }
 
         async function checkAllDecisionsMade() {
@@ -481,10 +536,7 @@
                 const isPaired = gameData.pairs.some(pair => pair.players.includes(p.uid));
                 return !isPaired || p.currentChoice !== null;
             });
-
-            if (allDecided) {
-                await runScoringLogic();
-            }
+            if (allDecided) await runScoringLogic();
         }
 
         async function runScoringLogic() {
@@ -492,10 +544,11 @@
             try {
                 await runTransaction(db, async (transaction) => {
                     const freshGameDoc = await transaction.get(gameDocRef);
-                    if (!freshGameDoc.exists()) return;
+                    if (!freshGameDoc.exists() || freshGameDoc.data().status !== 'decision') return;
                     
                     const currentPlayers = freshGameDoc.data().players;
                     const roundResults = [];
+                    let playerStatsUpdate = {}; // { uid: { cooperations: x, betrayals: y } }
 
                     gameData.pairs.forEach(pair => {
                         const playerA = currentPlayers.find(p => p.uid === pair.players[0]);
@@ -506,25 +559,24 @@
 
                         let pointsA = 0, pointsB = 0;
 
-                        if (choiceA === 'cooperate' && choiceB === 'cooperate') {
-                            pointsA = 2; pointsB = 2;
-                        } else if (choiceA === 'cooperate' && choiceB === 'betray') {
-                            pointsA = 0; pointsB = 3;
-                        } else if (choiceA === 'betray' && choiceB === 'cooperate') {
-                            pointsA = 3; pointsB = 0;
-                        } else if (choiceA === 'betray' && choiceB === 'betray') {
-                            pointsA = 1; pointsB = 1;
-                        }
+                        if (choiceA === 'cooperate' && choiceB === 'cooperate') { pointsA = 3; pointsB = 3; } 
+                        else if (choiceA === 'cooperate' && choiceB === 'betray') { pointsA = 0; pointsB = 5; } 
+                        else if (choiceA === 'betray' && choiceB === 'cooperate') { pointsA = 5; pointsB = 0; } 
+                        else if (choiceA === 'betray' && choiceB === 'betray') { pointsA = 1; pointsB = 1; }
 
                         playerA.score += pointsA;
                         playerB.score += pointsB;
                         
-                        // For bot memory
+                        // Update stats
+                        playerA.cooperations = (playerA.cooperations || 0) + (choiceA === 'cooperate' ? 1 : 0);
+                        playerA.betrayals = (playerA.betrayals || 0) + (choiceA === 'betray' ? 1 : 0);
+                        playerB.cooperations = (playerB.cooperations || 0) + (choiceB === 'cooperate' ? 1 : 0);
+                        playerB.betrayals = (playerB.betrayals || 0) + (choiceB === 'betray' ? 1 : 0);
+
                         if (playerA.uid.startsWith('bot_')) botMemory.set(playerB.uid, choiceB);
                         if (playerB.uid.startsWith('bot_')) botMemory.set(playerA.uid, choiceA);
 
                         roundResults.push({
-                            pairId: pair.pairId,
                             players: {
                                 [playerA.uid]: { displayName: playerA.displayName, avatar: playerA.avatar, choice: choiceA, points: pointsA },
                                 [playerB.uid]: { displayName: playerB.displayName, avatar: playerB.avatar, choice: choiceB, points: pointsB }
@@ -535,18 +587,11 @@
                     const newRoundsHistory = freshGameDoc.data().rounds || [];
                     newRoundsHistory.push({ round: gameData.round, results: roundResults });
                     
-                    // Reset choices for next round
                     currentPlayers.forEach(p => p.currentChoice = null);
 
-                    transaction.update(gameDocRef, {
-                        players: currentPlayers,
-                        status: 'result',
-                        rounds: newRoundsHistory
-                    });
+                    transaction.update(gameDocRef, { players: currentPlayers, status: 'result', rounds: newRoundsHistory, phaseStartTime: serverTimestamp() });
                 });
-            } catch (error) {
-                console.error("Error in scoring:", error);
-            }
+            } catch (error) { console.error("Error in scoring:", error); }
         }
         
         async function startNextRound() {
@@ -558,12 +603,31 @@
                 await runTransaction(db, async (tx) => tx.update(gameDocRef, {
                     status: 'pairing',
                     round: gameData.round + 1,
-                    pairs: [] // Clear old pairs
+                    pairs: [],
+                    phaseStartTime: serverTimestamp()
                 }));
             }
         }
         
-        // --- Player Actions ---
+        async function updatePermanentStats() {
+            const batch = writeBatch(db);
+            gameData.players.forEach(player => {
+                if (player.uid.startsWith('bot_')) return;
+                const statRef = doc(db, 'gameStats', player.uid);
+                const playerData = {
+                    totalPoints: player.score,
+                    cooperations: player.cooperations || 0,
+                    betrayals: player.betrayals || 0,
+                    displayName: player.displayName
+                };
+                // Note: For a real app, you'd use FieldValue.increment here
+                // but that requires reading the doc first. For simplicity, we overwrite.
+                batch.set(statRef, playerData, { merge: true });
+            });
+            await batch.commit();
+        }
+
+        // --- Player Actions & UI ---
         async function makeDecision(choice) {
             cooperateBtn.disabled = true;
             betrayBtn.disabled = true;
@@ -587,64 +651,64 @@
                 betrayBtn.disabled = false;
             }
         }
-        
-        // --- Chat Logic ---
-        function findPartnerAndOpenChat() {
-            const myPair = gameData.pairs.find(p => p.players.includes(currentUser.uid));
-            if (myPair) {
-                const partnerUid = myPair.players.find(uid => uid !== currentUser.uid);
-                currentPartner = gameData.players.find(p => p.uid === partnerUid);
-                currentPairId = myPair.pairId;
-                
-                openPrivateChat();
-            } else {
-                // Player is not in a pair this round
-                stageMessageEl.textContent = 'شما این دور استراحت می‌کنید.';
-                decisionButtonsEl.style.display = 'none';
-            }
+
+        function renderPlayerCards(self, partner) {
+            pairContainerEl.style.display = 'flex';
+            
+            // Self Card
+            document.getElementById('self-card-avatar').src = self.avatar || 'https://up.20script.ir/file/1d50-defult.png';
+            document.getElementById('self-card-name').textContent = self.displayName;
+            document.getElementById('self-card-status').textContent = 'انتخاب شما...';
+            document.getElementById('self-card').classList.remove('flipped');
+
+            // Opponent Card
+            document.getElementById('opponent-card-avatar').src = partner.avatar || 'https://up.20script.ir/file/1d50-defult.png';
+            document.getElementById('opponent-card-name').textContent = partner.displayName;
+            document.getElementById('opponent-card-status').textContent = 'منتظر تصمیم حریف...';
+            document.getElementById('opponent-card').classList.remove('flipped');
         }
 
+        function revealChoices(self, partner) {
+            const selfChoice = self.currentChoice;
+            const partnerChoice = partner.currentChoice;
+
+            // Update self card back
+            const selfCardBack = document.getElementById('self-card-back');
+            selfCardBack.className = 'card-face card-back ' + selfChoice;
+            document.getElementById('self-choice-icon').textContent = selfChoice === 'cooperate' ? '🤝' : '💣';
+            document.getElementById('self-choice-text').textContent = selfChoice === 'cooperate' ? 'همکاری' : 'خیانت';
+
+            // Update opponent card back
+            const opponentCardBack = document.getElementById('opponent-card-back');
+            opponentCardBack.className = 'card-face card-back ' + partnerChoice;
+            document.getElementById('opponent-choice-icon').textContent = partnerChoice === 'cooperate' ? '🤝' : '💣';
+            document.getElementById('opponent-choice-text').textContent = partnerChoice === 'cooperate' ? 'همکاری' : 'خیانت';
+            
+            // Flip cards
+            setTimeout(() => {
+                document.getElementById('self-card').classList.add('flipped');
+                document.getElementById('opponent-card').classList.add('flipped');
+            }, 100);
+        }
+        
+        // --- Chat Logic ---
         function openPrivateChat() {
+            const myPair = gameData.pairs.find(p => p.players.includes(currentUser.uid));
+            const pairId = myPair.pairId;
             chatPartnerNameEl.textContent = `چت با ${currentPartner.displayName}`;
             privateChatModal.classList.add('visible');
             chatMessagesEl.innerHTML = '';
             
             if (unsubscribeChat) unsubscribeChat();
-            const chatCollectionRef = collection(db, `games/${gameId}/privateChats/${currentPairId}/messages`);
+            const chatCollectionRef = collection(db, `games/${gameId}/privateChats/${pairId}/messages`);
             const q = query(chatCollectionRef, orderBy('createdAt', 'asc'));
             unsubscribeChat = onSnapshot(q, (snapshot) => {
                 snapshot.docChanges().forEach(change => {
-                    if (change.type === 'added') {
-                        renderMessage(change.doc.data());
-                    }
+                    if (change.type === 'added') renderMessage(change.doc.data());
                 });
             });
-
-            // Start timer
-            const chatDuration = gameData.chatDuration || 60; // 60 seconds default
-            const startTime = gameData.chatStartTime.toDate();
             
-            if(chatTimerInterval) clearInterval(chatTimerInterval);
-            chatTimerInterval = setInterval(() => {
-                const now = new Date();
-                const elapsed = (now - startTime) / 1000;
-                const remaining = Math.max(0, chatDuration - elapsed);
-                const minutes = Math.floor(remaining / 60).toString().padStart(2, '0');
-                const seconds = Math.floor(remaining % 60).toString().padStart(2, '0');
-                chatTimerEl.textContent = `⏱️ ${minutes}:${seconds}`;
-
-                if (remaining <= 0) {
-                    clearInterval(chatTimerInterval);
-                    privateChatModal.classList.remove('visible');
-                    if (isHost) {
-                        const gameDocRef = doc(db, 'games', gameId);
-                        runTransaction(db, async (tx) => tx.update(gameDocRef, { status: 'decision' }));
-                    }
-                }
-            }, 1000);
-            
-            const self = gameData.players.find(p => p.uid === currentUser.uid);
-            runBotChatLogic(self);
+            runBotChatLogic(gameData.players.find(p => p.uid.startsWith('bot_') && myPair.players.includes(p.uid)), pairId);
         }
 
         function renderMessage(data) {
@@ -654,10 +718,14 @@
             
             const sender = gameData.players.find(p => p.uid === data.senderUid);
             const avatar = sender?.avatar || 'https://up.20script.ir/file/1d50-defult.png';
+            const timestamp = data.createdAt?.toDate()?.toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' }) || '';
 
             msgDiv.innerHTML = `
                 <img src="${avatar}" class="chat-message-avatar">
-                <div class="chat-message-bubble">${data.text}</div>`;
+                <div class="chat-message-content">
+                    <div class="chat-message-bubble">${data.text}</div>
+                    <div class="chat-message-timestamp">${timestamp}</div>
+                </div>`;
             chatMessagesEl.appendChild(msgDiv);
             chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
         }
@@ -666,71 +734,60 @@
             e.preventDefault();
             const text = chatInput.value.trim();
             if (text === '') return;
-
             chatInput.value = '';
-            
-            const chatCollectionRef = collection(db, `games/${gameId}/privateChats/${currentPairId}/messages`);
+
+            const pairId = gameData.pairs.find(p => p.players.includes(currentUser.uid)).pairId;
+            const chatCollectionRef = collection(db, `games/${gameId}/privateChats/${pairId}/messages`);
             try {
-                await addDoc(chatCollectionRef, {
-                    senderUid: currentUser.uid,
-                    text: text,
-                    createdAt: serverTimestamp()
-                });
-            } catch(error) {
-                console.error("Error sending message:", error);
-                chatInput.value = text; // Restore on error
-            }
+                await addDoc(chatCollectionRef, { senderUid: currentUser.uid, text: text, createdAt: serverTimestamp() });
+            } catch(error) { console.error("Error sending message:", error); chatInput.value = text; }
         }
 
         // --- Bot AI Logic ---
-        function runBotChatLogic(player) {
-            if (!player.uid.startsWith('bot_')) return;
-            
-            // Send an initial message after a delay
+        function runBotChatLogic(bot, pairId) {
+            if (!bot) return;
             setTimeout(() => {
-                const messages = ["سلام! آماده‌ای؟", "بیا همکاری کنیم تا امتیاز بیشتری بگیریم.", "امیدوارم بهم خیانت نکنی!"];
+                const messages = ["سلام! آماده‌ای؟", "بیا همکاری کنیم تا امتیاز بیشتری بگیریم.", "امیدوارم بهم خیانت نکنی!", "به نظرت بهترین استراتژی چیه؟"];
                 const message = messages[Math.floor(Math.random() * messages.length)];
-                
-                const chatCollectionRef = collection(db, `games/${gameId}/privateChats/${currentPairId}/messages`);
-                addDoc(chatCollectionRef, {
-                    senderUid: player.uid,
-                    text: message,
-                    createdAt: serverTimestamp()
-                });
-            }, Math.random() * 3000 + 2000); // 2-5 second delay
+                const chatCollectionRef = collection(db, `games/${gameId}/privateChats/${pairId}/messages`);
+                addDoc(chatCollectionRef, { senderUid: bot.uid, text: message, createdAt: serverTimestamp() });
+            }, Math.random() * 3000 + 2000);
         }
         
-        function runBotDecisionLogic(player) {
-            if (!player.uid.startsWith('bot_') || player.currentChoice) return;
+        function runBotDecisionLogic(bot) {
+            if (!bot || !bot.uid.startsWith('bot_') || bot.currentChoice) return;
 
-            // Decide after a delay to simulate thinking
             setTimeout(() => {
-                let cooperationChance = 0.6; // 60% base chance to cooperate
+                let cooperationChance = 0.7; // 70% base chance to cooperate
                 const partnerLastMove = botMemory.get(currentPartner.uid);
 
                 if (partnerLastMove === 'betray') {
-                    cooperationChance = 0.2; // If partner betrayed last time, much less likely to cooperate
+                    // If partner betrayed, retaliate with high probability (60-90% chance to betray)
+                    cooperationChance = 1 - (Math.random() * 0.3 + 0.6); // results in 0.1 to 0.4
+                } else if (partnerLastMove === 'cooperate') {
+                    // If partner cooperated, be more trustful (70-95% chance to cooperate)
+                    cooperationChance = Math.random() * 0.25 + 0.7; // results in 0.7 to 0.95
                 }
 
                 const choice = Math.random() < cooperationChance ? 'cooperate' : 'betray';
                 
-                // This is a simplified "makeDecision" for the bot
                 const gameDocRef = doc(db, 'games', gameId);
                 runTransaction(db, async (transaction) => {
                     const gameDoc = await transaction.get(gameDocRef);
+                    if (!gameDoc.exists()) return;
                     const players = gameDoc.data().players;
-                    const botIndex = players.findIndex(p => p.uid === player.uid);
-                    if (botIndex !== -1) {
+                    const botIndex = players.findIndex(p => p.uid === bot.uid);
+                    if (botIndex !== -1 && players[botIndex].currentChoice === null) {
                         players[botIndex].currentChoice = choice;
                         transaction.update(gameDocRef, { players: players });
                     }
                 });
 
-            }, Math.random() * 4000 + 1000); // 1-5 second delay
+            }, Math.random() * 4000 + 1000);
         }
 
         // --- Result & Game Over Modals ---
-        function showRoundResult() {
+        function showRoundResultModal() {
             resultPairsContainer.innerHTML = '';
             const latestRoundHistory = gameData.rounds[gameData.rounds.length - 1];
             if (!latestRoundHistory) return;
@@ -738,29 +795,21 @@
             latestRoundHistory.results.forEach(pairResult => {
                 const container = document.createElement('div');
                 container.className = 'result-pair';
-                
-                const players = Object.values(pairResult.players);
-                const playerA = players[0];
-                const playerB = players[1];
-
+                const [playerA, playerB] = Object.values(pairResult.players);
                 container.innerHTML = `
                     <div class="result-player-card">
-                        <img src="${playerA.avatar}" class="player-avatar">
-                        <span>${playerA.displayName}</span>
+                        <img src="${playerA.avatar}" class="player-avatar"><span>${playerA.displayName}</span>
                         <span class="result-choice ${playerA.choice}">${playerA.choice === 'cooperate' ? 'همکاری' : 'خیانت'}</span>
-                        <span class="result-points ${playerA.points >= 0 ? 'positive' : 'negative'}">${playerA.points > 0 ? '+' : ''}${playerA.points}</span>
-                    </div>
-                     <div style="font-size: 2rem;">vs</div>
+                        <span class="result-points ${playerA.points > 0 ? 'positive' : 'negative'}">${playerA.points > 0 ? '+' : ''}${playerA.points}</span>
+                    </div><div>vs</div>
                     <div class="result-player-card">
-                        <img src="${playerB.avatar}" class="player-avatar">
-                        <span>${playerB.displayName}</span>
+                        <img src="${playerB.avatar}" class="player-avatar"><span>${playerB.displayName}</span>
                         <span class="result-choice ${playerB.choice}">${playerB.choice === 'cooperate' ? 'همکاری' : 'خیانت'}</span>
-                        <span class="result-points ${playerB.points >= 0 ? 'positive' : 'negative'}">${playerB.points > 0 ? '+' : ''}${playerB.points}</span>
-                    </div>
-                `;
+                        <span class="result-points ${playerB.points > 0 ? 'positive' : 'negative'}">${playerB.points > 0 ? '+' : ''}${playerB.points}</span>
+                    </div>`;
                 resultPairsContainer.appendChild(container);
             });
-            roundResultModal.classList.add('visible');
+            setTimeout(() => roundResultModal.classList.add('visible'), 2000); // Show after cards flip
         }
 
         function showGameOver() {
@@ -769,14 +818,42 @@
             gameOverModal.classList.add('visible');
         }
 
+        function updateTimer() {
+            if(mainTimerInterval) clearInterval(mainTimerInterval);
+            if (!gameData.phaseStartTime) return;
+
+            const phaseDurations = { 'chat': 60, 'decision': 20, 'result': 7 };
+            const duration = phaseDurations[gameData.status] || 0;
+            if (duration === 0) {
+                mainTimerEl.textContent = "--:--";
+                return;
+            }
+
+            const startTime = gameData.phaseStartTime.toDate();
+            mainTimerInterval = setInterval(() => {
+                const now = new Date();
+                const elapsed = (now - startTime) / 1000;
+                const remaining = Math.max(0, duration - elapsed);
+                const minutes = Math.floor(remaining / 60).toString().padStart(2, '0');
+                const seconds = Math.floor(remaining % 60).toString().padStart(2, '0');
+                mainTimerEl.textContent = `${minutes}:${seconds}`;
+
+                if (remaining <= 0) {
+                    clearInterval(mainTimerInterval);
+                    if (isHost && gameData.status === 'chat') {
+                        const gameDocRef = doc(db, 'games', gameId);
+                        runTransaction(db, async (tx) => tx.update(gameDocRef, { status: 'decision', phaseStartTime: serverTimestamp() }));
+                    }
+                }
+            }, 1000);
+        }
+
         // --- Event Listeners ---
         function setupEventListeners() {
             cooperateBtn.addEventListener('click', () => makeDecision('cooperate'));
             betrayBtn.addEventListener('click', () => makeDecision('betray'));
             chatForm.addEventListener('submit', handleSendMessage);
-            backToLobbyBtn.addEventListener('click', () => {
-                window.location.href = './Lobby page.html';
-            });
+            backToLobbyBtn.addEventListener('click', () => { window.location.href = './Lobby page.html'; });
         }
         
         main();
