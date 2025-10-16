@@ -3,25 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>شهر مافیا - کلن‌ها</title>
+    <title>کلن‌ها - مافیای نوین</title>
     
-    <!-- Google Fonts: Vazirmatn -->
+    <!-- Google Fonts: Vazirmatn (with specified weights 400, 700, 900) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
 
     <style>
         /* --- General & Reset Styles --- */
         :root {
-            --gold-primary: #FFD700;
-            --gold-gradient: linear-gradient(145deg, #FFD700, #DAA520);
+            --gold-primary: #ffc947;
+            --gold-glow: rgba(255, 201, 71, 0.7);
+            --brown-dark: #2b2017;
+            --brown-medium: #5c4a3a;
+            --brown-reddish: #8c4843;
+            --text-light: #f0e6d2;
+            --text-muted: #c5a687;
             --dark-bg: #1a1a1a;
-            --brown-dark: #2c1e12;
-            --brown-light: #4a3423;
-            --text-light: #f0f0f0;
-            --text-dark: #1e1e1e;
             --transparent-bg: rgba(10, 10, 10, 0.7);
-            --border-color: rgba(255, 215, 0, 0.4);
+            --border-color: #5c4a3a;
         }
 
         * {
@@ -32,12 +33,29 @@
             -moz-osx-font-smoothing: grayscale;
         }
 
+        /* --- Custom Themed Scrollbar --- */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--brown-dark);
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: var(--gold-primary);
+            border-radius: 4px;
+            border: 2px solid var(--brown-dark);
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: #ffdd7c;
+        }
+
         body {
             font-family: 'Vazirmatn', sans-serif;
             background-color: var(--dark-bg);
             color: var(--text-light);
-            background-image: url('https://images.unsplash.com/photo-1599591436217-88150469b617?q=80&w=2070&auto=format&fit=crop');
-            background-size: cover;
+            /* Using a subtle, dark textured background image would be ideal here */
+            background-image: url('https://www.transparenttextures.com/patterns/dark-denim-3.png');
+            background-size: auto;
             background-position: center;
             background-attachment: fixed;
             min-height: 100vh;
@@ -55,7 +73,7 @@
             content: '';
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(0, 0, 0, 0.75);
+            background-color: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(8px);
             z-index: -1;
         }
@@ -76,19 +94,19 @@
             align-items: center;
             padding: 15px 10px;
             background: rgba(0, 0, 0, 0.3);
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 2px solid var(--border-color);
             margin-bottom: 25px;
         }
 
         .header-title {
-            font-size: 1.5rem;
-            font-weight: 700;
+            font-size: 1.8rem;
+            font-weight: 900;
             color: var(--gold-primary);
-            text-shadow: 0 0 10px var(--gold-primary);
+            text-shadow: 0 0 10px var(--gold-glow);
         }
         
         .header-btn {
-            background: var(--transparent-bg);
+            background: transparent;
             border: 1px solid var(--border-color);
             color: var(--text-light);
             padding: 8px 16px;
@@ -97,12 +115,14 @@
             transition: all 0.3s ease;
             font-family: inherit;
             font-size: 0.9rem;
+            font-weight: 700;
         }
 
         .header-btn:hover {
             background: var(--gold-primary);
-            color: var(--text-dark);
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+            color: var(--brown-dark);
+            border-color: var(--gold-primary);
+            box-shadow: 0 0 15px var(--gold-glow);
         }
 
         /* --- Tabs Navigation --- */
@@ -110,31 +130,34 @@
             display: flex;
             justify-content: center;
             margin-bottom: 30px;
+            border-bottom: 2px solid var(--border-color);
         }
 
         .tab-btn {
             font-family: inherit;
             font-size: 1.1rem;
-            font-weight: 500;
+            font-weight: 700;
             padding: 12px 30px;
             cursor: pointer;
             background: none;
             border: none;
             border-bottom: 3px solid transparent;
-            color: rgba(255, 255, 255, 0.7);
+            color: rgba(240, 230, 210, 0.7);
             transition: all 0.3s ease;
             margin: 0 10px;
+            transform: translateY(2px);
         }
 
         .tab-btn.active {
             color: var(--gold-primary);
             border-bottom-color: var(--gold-primary);
+            text-shadow: 0 0 8px var(--gold-glow);
         }
         
         /* --- Tab Content --- */
         .tab-content { display: none; animation: fadeIn 0.5s ease-in-out; }
         .tab-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* --- Clans List Section --- */
         #clans-list-tab .clans-grid {
@@ -144,38 +167,50 @@
         }
         
         .clan-card {
-            background: rgba(44, 30, 18, 0.75);
+            background: rgba(43, 32, 23, 0.75); /* --brown-dark with transparency */
             border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 20px;
             text-align: center;
             box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
-            transition: transform 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         
-        .clan-card:hover { transform: translateY(-5px); }
+        .clan-card:hover { 
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 0 20px var(--gold-glow), inset 0 0 15px rgba(0,0,0,0.5);
+        }
 
         .clan-card h3 {
-            font-size: 1.4rem;
-            font-weight: 700;
-            background: var(--gold-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: var(--gold-primary);
+            text-shadow: 0 0 5px var(--gold-glow);
             margin-bottom: 15px;
         }
         
-        .clan-card p { font-size: 0.95rem; margin-bottom: 8px; }
-        .clan-card .leader { color: #ccc; }
-        .clan-card .members { color: var(--gold-primary); font-weight: 500; margin-bottom: 20px; }
+        .clan-card p { font-size: 0.95rem; margin-bottom: 8px; font-weight: 400; }
+        .clan-card .leader { color: var(--text-muted); }
+        .clan-card .members { color: var(--gold-primary); font-weight: 700; margin-bottom: 20px; }
 
         .join-btn {
-            background: var(--gold-gradient); border: none; color: var(--text-dark);
+            background: transparent;
+            border: 1px solid var(--gold-primary);
+            color: var(--gold-primary);
             font-family: inherit; font-weight: 700; padding: 10px 25px;
             border-radius: 8px; cursor: pointer; transition: all 0.3s ease;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
-        .join-btn:hover { transform: scale(1.05); }
-        .join-btn:disabled { background: #555; color: #999; cursor: not-allowed; }
+        .join-btn:hover {
+            background: var(--gold-primary);
+            color: var(--brown-dark);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px var(--gold-glow);
+        }
+        .join-btn:disabled { 
+            background: #555; color: #999; border-color: #555;
+            cursor: not-allowed; transform: none; box-shadow: none;
+        }
 
         /* --- My Clan Section --- */
         #my-clan-tab .content-wrapper {
@@ -190,15 +225,19 @@
         .not-in-clan h2 { font-size: 1.5rem; margin-bottom: 25px; }
 
         .create-clan-btn {
-            background: var(--gold-gradient); border: none; color: var(--text-dark);
+            background: var(--gold-primary); border: none; color: var(--brown-dark);
             font-family: inherit; font-weight: 700; padding: 12px 35px; font-size: 1.1rem;
-            border-radius: 10px; cursor: pointer; transition: transform 0.3s ease;
+            border-radius: 10px; cursor: pointer; transition: all 0.3s ease;
         }
-        .create-clan-btn:hover { transform: scale(1.05); }
+        .create-clan-btn:hover {
+             transform: scale(1.05); 
+             box-shadow: 0 0 15px var(--gold-glow);
+        }
         
         .clan-details h2 {
-            font-size: 2rem; text-align: center; margin-bottom: 20px;
-            background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            font-size: 2.2rem; text-align: center; margin-bottom: 20px;
+            font-weight: 900; color: var(--gold-primary);
+            text-shadow: 0 0 10px var(--gold-glow);
         }
 
         .clan-stats {
@@ -208,7 +247,7 @@
             border-bottom: 1px solid var(--border-color);
         }
         .stat-item span { display: block; font-size: 1.3rem; font-weight: 700; color: var(--gold-primary); }
-        .stat-item p { font-size: 0.9rem; color: #ccc; }
+        .stat-item p { font-size: 0.9rem; color: var(--text-muted); }
         
         /* --- Clan Chat --- */
         .clan-chat { margin-top: 40px; }
@@ -221,42 +260,30 @@
             border: 1px solid var(--border-color); border-radius: 8px;
             padding: 15px; margin-bottom: 20px;
             background: rgba(0,0,0,0.3);
-            display: flex;
-            flex-direction: column-reverse;
+            display: flex; flex-direction: column-reverse;
         }
-        .chat-messages {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .chat-message {
-            padding: 8px 12px;
-            border-radius: 10px;
-            max-width: 75%;
-        }
-        .chat-message.sent {
-            background-color: var(--brown-light);
-            align-self: flex-start; /* RTL: start is left */
-        }
-        .chat-message.received {
-            background-color: #333;
-            align-self: flex-end; /* RTL: end is right */
-        }
+        .chat-messages { display: flex; flex-direction: column; gap: 12px; }
+        .chat-message { padding: 8px 12px; border-radius: 10px; max-width: 75%; }
+        .chat-message.sent { background-color: var(--brown-reddish); align-self: flex-start; /* RTL: start is left */ }
+        .chat-message.received { background-color: #333; align-self: flex-end; /* RTL: end is right */ }
         .chat-message .sender { font-weight: 700; color: var(--gold-primary); font-size: 0.9rem; }
         .chat-message .text { margin: 5px 0; }
-        .chat-message .timestamp { font-size: 0.75rem; color: #aaa; text-align: left; }
+        .chat-message .timestamp { font-size: 0.75rem; color: var(--text-muted); text-align: left; }
         
         .chat-form { display: flex; gap: 10px; }
         .chat-form input {
             flex-grow: 1; padding: 10px; border-radius: 8px;
             background: rgba(0,0,0,0.4); border: 1px solid var(--border-color);
-            color: var(--text-light); font-family: inherit;
+            color: var(--text-light); font-family: inherit; font-size: 1rem;
         }
+        .chat-form input:focus { border-color: var(--gold-primary); outline: none; }
         .chat-form button {
             padding: 10px 20px; border-radius: 8px;
-            background: var(--gold-gradient); border: none; color: var(--text-dark);
+            background: var(--gold-primary); border: none; color: var(--brown-dark);
             font-family: inherit; font-weight: 700; cursor: pointer;
+            transition: box-shadow 0.3s ease;
         }
+        .chat-form button:hover { box-shadow: 0 0 10px var(--gold-glow); }
 
         /* --- Modal for Requests --- */
         .modal {
@@ -270,21 +297,21 @@
             margin: 15% auto; padding: 25px; border-radius: 12px;
             width: 80%; max-width: 500px; position: relative;
         }
-        .close-btn {
-            color: #aaa; float: left; font-size: 28px; font-weight: bold;
-            cursor: pointer;
-        }
+        .close-btn { color: var(--text-muted); float: left; font-size: 28px; font-weight: bold; cursor: pointer; }
+        .close-btn:hover { color: var(--text-light); }
         .modal-content h2 { margin-bottom: 20px; color: var(--gold-primary); }
         #requests-list p {
             padding: 10px;
             border-bottom: 1px solid var(--border-color);
         }
-         #requests-list p:last-child { border-bottom: none; }
+        #requests-list p:last-child { border-bottom: none; }
 
         /* Responsive */
         @media (max-width: 768px) {
             .header-title { font-size: 1.2rem; }
             #clans-list-tab .clans-grid { grid-template-columns: 1fr; }
+            .tabs-nav { justify-content: space-around; }
+            .tab-btn { padding: 12px 15px; margin: 0; font-size: 1rem; }
         }
     </style>
 </head>
@@ -294,7 +321,7 @@
         <!-- Header -->
         <header class="page-header">
             <button id="my-requests-btn" class="header-btn">درخواست‌های من</button>
-            <h1 class="header-title">شهر مافیا - کلن‌ها</h1>
+            <h1 class="header-title">کلن‌ها</h1>
             <button class="header-btn">بازگشت</button>
         </header>
 
@@ -374,6 +401,7 @@
         import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js';
 
         const firebaseConfig = {
+          // --- PASTE YOUR FIREBASE CONFIGURATION OBJECT HERE ---
           apiKey: 'AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg',
           authDomain: 'mafia-9fcbf.firebaseapp.com',
           databaseURL: 'https://mafia-9fcbf-default-rtdb.firebaseio.com',
@@ -428,8 +456,7 @@
         // --- Data Fetching & Display ---
 
         async function checkUserClanStatus() {
-            // In a real app, you'd have a 'users' collection with a 'clanId' field.
-            // For this demo, we'll query the 'clans' collection to see if the user is a member.
+            // This function assumes a user can only be in one clan at a time.
             const clansRef = collection(db, 'clans');
             const q = query(clansRef, where('members', 'array-contains', currentUser.uid));
             const querySnapshot = await getDocs(q);
@@ -446,25 +473,48 @@
             }
         }
 
+        async function getLeaderName(creatorId) {
+            if (!creatorId) return 'ناشناس';
+            try {
+                const userDocRef = doc(db, 'users', creatorId);
+                const userDoc = await getDoc(userDocRef);
+                return userDoc.exists() ? userDoc.data().displayName || 'ناشناس' : 'ناشناس';
+            } catch (error) {
+                console.error("Error fetching leader name for ID:", creatorId, error);
+                return 'ناشناس';
+            }
+        }
+
         async function loadAllClans() {
-            clansGrid.innerHTML = 'در حال بارگذاری کلن‌ها...';
+            clansGrid.innerHTML = '<p style="text-align: center;">در حال بارگذاری کلن‌ها...</p>';
             try {
                 const querySnapshot = await getDocs(collection(db, 'clans'));
-                clansGrid.innerHTML = ''; // Clear loading message
+                
                 if (querySnapshot.empty) {
-                    clansGrid.innerHTML = '<p>هیچ کلنی یافت نشد.</p>';
+                    clansGrid.innerHTML = '<p style="text-align: center;">هیچ کلنی یافت نشد.</p>';
                     return;
                 }
-                querySnapshot.forEach(doc => {
+                
+                // Create an array of promises to fetch all leader names
+                const clanDataPromises = querySnapshot.docs.map(async (doc) => {
                     const clan = doc.data();
                     const clanId = doc.id;
-                    const isFull = clan.memberCount >= clan.capacity;
-                    
+                    const leaderName = await getLeaderName(clan.creatorId);
+                    return { clan, clanId, leaderName };
+                });
+
+                // Wait for all leader names to be fetched
+                const clansWithLeaders = await Promise.all(clanDataPromises);
+
+                clansGrid.innerHTML = ''; // Clear loading message
+                
+                clansWithLeaders.forEach(({ clan, clanId, leaderName }) => {
+                    const isFull = (clan.memberCount || 0) >= (clan.capacity || 20);
                     const card = document.createElement('div');
                     card.className = 'clan-card';
                     card.innerHTML = `
                         <h3>${clan.name || 'بدون نام'}</h3>
-                        <p class="leader">رهبر: ${clan.leaderName || 'ناشناس'}</p>
+                        <p class="leader">رهبر: ${leaderName}</p>
                         <p class="members">اعضا: ${clan.memberCount || 0}/${clan.capacity || 20}</p>
                         <button class="join-btn" data-clan-id="${clanId}" ${isFull ? 'disabled' : ''}>
                             ${isFull ? 'پر است' : 'پیوستن'}
@@ -472,10 +522,11 @@
                     `;
                     clansGrid.appendChild(card);
                 });
+
                 setupJoinButtonListeners();
             } catch (error) {
                 console.error("Error loading clans: ", error);
-                clansGrid.innerHTML = '<p>خطا در بارگذاری کلن‌ها.</p>';
+                clansGrid.innerHTML = '<p style="text-align: center;">خطا در بارگذاری کلن‌ها.</p>';
             }
         }
 
@@ -521,7 +572,7 @@
             const isSent = msg.senderUid === currentUser.uid;
             messageDiv.className = `chat-message ${isSent ? 'sent' : 'received'}`;
             
-            const date = msg.timestamp?.toDate ? msg.timestamp.toDate().toLocaleTimeString('fa-IR') : '';
+            const date = msg.timestamp?.toDate ? msg.timestamp.toDate().toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' }) : '';
 
             messageDiv.innerHTML = `
                 ${!isSent ? `<p class="sender">${msg.senderName || 'کاربر'}</p>` : ''}
@@ -539,10 +590,12 @@
             if (messageText === '') return;
 
             try {
+                // This assumes Firebase security rules are in place (e.g., isClanMember)
+                // to prevent non-members from writing to the chat.
                 const chatRef = collection(db, 'clans', userClanId, 'chat');
                 await addDoc(chatRef, {
                     senderUid: currentUser.uid,
-                    senderName: currentUser.displayName || 'کاربر ناشناس', // Assumes user has a display name
+                    senderName: currentUser.displayName || 'کاربر ناشناس',
                     text: messageText,
                     timestamp: serverTimestamp()
                 });
@@ -639,15 +692,8 @@
                 }
             }
             
-            closeBtn.onclick = function() {
-                modal.style.display = "none";
-            }
-            
-            window.onclick = function(event) {
-                if (event.target == modal) {
-                    modal.style.display = "none";
-                }
-            }
+            closeBtn.onclick = function() { modal.style.display = "none"; }
+            window.onclick = function(event) { if (event.target == modal) { modal.style.display = "none"; } }
         }
         
     </script>
