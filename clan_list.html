@@ -17,7 +17,7 @@
             --gold-glow: rgba(255, 201, 71, 0.7);
             --brown-dark: #2b2017;
             --brown-medium: #5c4a3a;
-            --brown-reddish: #8c4843;
+            --brown-reddish: #8c4843; /* Kept for potential other uses */
             --dark-red-hover: #5a2c2a;
             --text-light: #f0e6d2;
             --text-muted: #c5a687;
@@ -34,7 +34,7 @@
             -moz-osx-font-smoothing: grayscale;
         }
 
-        /* --- Custom Themed Scrollbar --- */
+        /* --- Custom Themed Scrollbar (Feature 7) --- */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -54,8 +54,7 @@
             font-family: 'Vazirmatn', sans-serif;
             background-color: var(--dark-bg);
             color: var(--text-light);
-            /* Thematic background from the game */
-            background-image: url('https://i.imgur.com/a/Hw8I5Iu.jpeg');
+            background-image: linear-gradient(to top, rgba(10, 8, 5, 0.9), rgba(0,0,0,0.8)), url('https://i.imgur.com/a/Hw8I5Iu.jpeg');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -103,7 +102,7 @@
             font-size: 1.8rem;
             font-weight: 900;
             color: var(--gold-primary);
-            text-shadow: 0 0 10px var(--gold-glow);
+            text-shadow: 0 0 15px var(--gold-glow); /* Enhanced Glow (Feature 7) */
         }
         
         .header-btn {
@@ -160,20 +159,26 @@
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- Clans List Section & Loading Spinner --- */
+        /* --- Centralized Loading Spinner (Feature 2) --- */
         #clans-list-tab .clans-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 20px;
+            min-height: 40vh; /* Ensure container has height */
+            position: relative;
         }
-        
+
         .loading-container {
+            position: absolute; /* Changed for viewport centering */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            min-height: 40vh;
             transition: opacity 0.5s ease-out;
+            z-index: 10;
         }
 
         .loading-container.fade-out {
@@ -191,9 +196,9 @@
 
         .loading-container p {
             font-size: 1.5rem;
-            font-weight: 700;
+            font-weight: 900; /* Bolder font */
             color: var(--gold-primary);
-            text-shadow: 0 0 10px var(--gold-glow);
+            text-shadow: 0 0 10px var(--gold-glow); /* Gold glow */
             margin-top: 20px;
         }
 
@@ -203,7 +208,7 @@
         }
 
         .clan-card {
-            background: rgba(43, 32, 23, 0.75); /* --brown-dark with transparency */
+            background: rgba(43, 32, 23, 0.75);
             border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 20px;
@@ -285,7 +290,7 @@
         .stat-item span { display: block; font-size: 1.3rem; font-weight: 700; color: var(--gold-primary); }
         .stat-item p { font-size: 0.9rem; color: var(--text-muted); }
         
-        /* --- Clan Chat --- */
+        /* --- Clan Chat (Features 1 & 7) --- */
         .clan-chat { margin-top: 40px; }
         .clan-chat h3 {
             text-align: center; font-size: 1.4rem; margin-bottom: 20px;
@@ -296,13 +301,21 @@
             border: 1px solid var(--border-color); border-radius: 8px;
             padding: 15px; margin-bottom: 20px;
             background: rgba(0,0,0,0.3);
-            display: flex; flex-direction: column; /* Changed from column-reverse */
+            display: flex; flex-direction: column;
+            scroll-behavior: smooth; /* Smooth scroll behavior */
+            box-shadow: 0 0 10px -2px var(--gold-glow); /* Neon glow effect */
         }
         .chat-messages { display: flex; flex-direction: column; gap: 12px; margin-top: auto; }
         .chat-message { padding: 8px 12px; border-radius: 10px; max-width: 75%; }
         /* RTL: start is right, end is left */
-        .chat-message.sent { background-color: var(--brown-reddish); align-self: flex-end; }
-        .chat-message.received { background-color: #333; align-self: flex-start; }
+        .chat-message.sent { 
+            background-color: var(--brown-medium); /* Brown-gold background (Feature 1) */
+            align-self: flex-end; 
+        }
+        .chat-message.received { 
+            background-color: #333; /* Dark grey background (Feature 1) */
+            align-self: flex-start; 
+        }
         .chat-message .sender { font-weight: 700; color: var(--gold-primary); font-size: 0.9rem; }
         .chat-message .text { margin: 5px 0; }
         .chat-message .timestamp { font-size: 0.75rem; color: var(--text-muted); text-align: left; }
@@ -321,28 +334,36 @@
             transition: box-shadow 0.3s ease;
         }
         .chat-form button:hover { box-shadow: 0 0 10px var(--gold-glow); }
+        .chat-form button:disabled { background-color: #555; color: #999; cursor: not-allowed; }
 
-        /* --- Modal for Requests --- */
+        /* --- Modals (Requests & Management) --- */
         .modal {
             display: none; position: fixed; z-index: 1000;
             left: 0; top: 0; width: 100%; height: 100%;
             overflow: auto; background-color: rgba(0,0,0,0.8);
             backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease;
         }
         .modal-content {
             background: var(--brown-dark); border: 1px solid var(--gold-primary);
-            margin: 15% auto; padding: 25px; border-radius: 12px;
-            width: 80%; max-width: 500px; position: relative;
+            margin: 10% auto; padding: 25px; border-radius: 12px;
+            width: 90%; max-width: 600px; position: relative;
         }
         .close-btn { color: var(--text-muted); float: left; font-size: 28px; font-weight: bold; cursor: pointer; }
         .close-btn:hover { color: var(--text-light); }
         .modal-content h2 { margin-bottom: 20px; color: var(--gold-primary); }
-        #requests-list p {
-            padding: 10px;
-            border-bottom: 1px solid var(--border-color);
+        .requests-list-item, .members-list-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px; border-bottom: 1px solid var(--border-color);
         }
-        #requests-list p:last-child { border-bottom: none; }
-
+        .requests-list-item:last-child, .members-list-item:last-child { border-bottom: none; }
+        .action-btn { 
+            padding: 5px 10px; border-radius: 5px; cursor: pointer;
+            font-family: inherit; font-weight: 700; border: none; margin: 0 4px;
+        }
+        .accept-btn { background-color: #4CAF50; color: white; }
+        .reject-btn, .kick-btn { background-color: var(--brown-reddish); color: white; }
+        
         /* Responsive */
         @media (max-width: 768px) {
             .header-title { font-size: 1.2rem; }
@@ -396,6 +417,9 @@
                             <div class="stat-item"><p>اعضا</p><span id="clan-members-count">--/--</span></div>
                         </div>
                         
+                        <!-- Clan Management Button (Feature 3) -->
+                        <div id="clan-management-section" style="text-align: center; margin-bottom: 20px;"></div>
+
                         <!-- Clan Chat Section -->
                         <div class="clan-chat">
                             <h3>چت کلن</h3>
@@ -406,7 +430,7 @@
                             </div>
                             <form id="chat-form" class="chat-form">
                                 <input type="text" id="chat-message-input" placeholder="پیام خود را بنویسید..." required>
-                                <button type="submit">ارسال</button>
+                                <button type="submit" id="send-chat-btn">ارسال</button>
                             </form>
                         </div>
                     </div>
@@ -419,26 +443,41 @@
         <p>برای مشاهده کلن‌ها، لطفا ابتدا وارد حساب کاربری خود شوید.</p>
     </div>
     
-    <!-- Modal for Join Requests -->
+    <!-- Modal for User's Join Requests -->
     <div id="requests-modal" class="modal">
         <div class="modal-content">
-            <span id="close-modal-btn" class="close-btn">&times;</span>
+            <span class="close-btn">&times;</span>
             <h2>درخواست‌های عضویت من</h2>
-            <div id="requests-list">
-                <!-- Requests will be dynamically inserted here -->
+            <div id="requests-list"></div>
+        </div>
+    </div>
+    
+    <!-- Modal for Clan Management (Feature 3) -->
+    <div id="management-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>مدیریت کلن</h2>
+            <div id="management-requests-list">
+                <h4>درخواست‌های عضویت</h4>
+                <!-- Join requests for the clan will be loaded here -->
+            </div>
+            <div id="management-members-list" style="margin-top: 20px;">
+                <h4>لیست اعضا</h4>
+                <!-- Clan members for kicking/promoting will be loaded here -->
+            </div>
+             <div id="management-settings" style="margin-top: 20px;">
+                <h4>تنظیمات کلن</h4>
+                <!-- Clan settings like rename, chat lock, delete -->
             </div>
         </div>
     </div>
 
-
     <script type="module">
-        // Import the functions you need from the SDKs you need
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js';
-        import { getFirestore, collection, addDoc, getDocs, onSnapshot, query, orderBy, serverTimestamp, doc, getDoc, where } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js';
+        import { getFirestore, collection, addDoc, getDocs, onSnapshot, query, orderBy, serverTimestamp, doc, getDoc, where, updateDoc, arrayUnion, arrayRemove, deleteDoc } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js';
         import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js';
 
         const firebaseConfig = {
-          // --- PASTE YOUR FIREBASE CONFIGURATION OBJECT HERE ---
           apiKey: 'AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg',
           authDomain: 'mafia-9fcbf.firebaseapp.com',
           databaseURL: 'https://mafia-9fcbf-default-rtdb.firebaseio.com',
@@ -449,7 +488,6 @@
           measurementId: 'G-0PDHDWC6NV'
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
@@ -464,10 +502,12 @@
         const chatMessagesContainer = document.getElementById('chat-messages-container');
         const chatMessageInput = document.getElementById('chat-message-input');
         const chatBox = document.getElementById('chat-box');
+        const sendChatBtn = document.getElementById('send-chat-btn');
 
         let currentUser = null;
         let userClanId = null;
-        let unsubscribeFromChat = null; // To store the chat listener cleanup function
+        let userClanData = null;
+        let unsubscribeFromChat = null;
 
         // --- Authentication ---
         onAuthStateChanged(auth, user => {
@@ -495,19 +535,20 @@
         // --- Data Fetching & Display ---
 
         async function checkUserClanStatus() {
-            // This function assumes a user can only be in one clan at a time.
+            // Using `memberUIDs` for efficient querying (Feature 4 structure support)
             const clansRef = collection(db, 'clans');
-            const q = query(clansRef, where('members', 'array-contains', currentUser.uid));
+            const q = query(clansRef, where('memberUIDs', 'array-contains', currentUser.uid));
             const querySnapshot = await getDocs(q);
 
             if (!querySnapshot.empty) {
                 const clanDoc = querySnapshot.docs[0];
                 userClanId = clanDoc.id;
-                const clanData = clanDoc.data();
-                displayInClanView(clanData);
+                userClanData = clanDoc.data();
+                displayInClanView(userClanData);
                 listenToClanChat(userClanId);
             } else {
                 userClanId = null;
+                userClanData = null;
                 displayNotInClanView();
             }
         }
@@ -523,7 +564,8 @@
                 return 'ناشناس';
             }
         }
-
+        
+        // --- Loaders (Feature 2) ---
         function showClansLoader() {
             clansGrid.innerHTML = `
                 <div class="loading-container" id="clans-loader">
@@ -537,7 +579,7 @@
             const loader = document.getElementById('clans-loader');
             if (loader) {
                 loader.classList.add('fade-out');
-                setTimeout(() => loader.remove(), 500); // Remove after fade-out transition
+                setTimeout(() => loader.remove(), 500);
             }
         }
 
@@ -546,9 +588,9 @@
             try {
                 const querySnapshot = await getDocs(collection(db, 'clans'));
                 
-                // Wait a bit for the loader to be visible, then proceed
                 setTimeout(async () => {
                     hideClansLoader();
+                    clansGrid.innerHTML = '';
 
                     if (querySnapshot.empty) {
                         clansGrid.innerHTML = '<p style="text-align: center;">هیچ کلنی یافت نشد.</p>';
@@ -563,8 +605,6 @@
                     });
 
                     const clansWithLeaders = await Promise.all(clanDataPromises);
-                    
-                    clansGrid.innerHTML = ''; // Clear just in case
                     
                     clansWithLeaders.forEach(({ clan, clanId, leaderName }) => {
                         const isFull = (clan.memberCount || 0) >= (clan.capacity || 20);
@@ -582,7 +622,7 @@
                     });
 
                     setupJoinButtonListeners();
-                }, 500); // Artificial delay to ensure loader is seen
+                }, 500); 
 
             } catch (error) {
                 console.error("Error loading clans: ", error);
@@ -599,44 +639,61 @@
             document.getElementById('clan-level').textContent = clanData.level || 1;
             document.getElementById('clan-score').textContent = (clanData.score || 0).toLocaleString();
             document.getElementById('clan-members-count').textContent = `${clanData.memberCount || 0}/${clanData.capacity || 20}`;
+            
+            // Chat Lock Logic (Feature 6)
+            if (clanData.chatLocked && clanData.creatorId !== currentUser.uid) {
+                chatMessageInput.disabled = true;
+                chatMessageInput.placeholder = "چت توسط رهبر کلن بسته شده است.";
+                sendChatBtn.disabled = true;
+            } else {
+                chatMessageInput.disabled = false;
+                chatMessageInput.placeholder = "پیام خود را بنویسید...";
+                sendChatBtn.disabled = false;
+            }
+
+            // Management Panel Logic (Feature 3)
+            const managementSection = document.getElementById('clan-management-section');
+            if (clanData.creatorId === currentUser.uid) {
+                managementSection.innerHTML = `<button id="management-btn" class="header-btn">مدیریت کلن</button>`;
+                document.getElementById('management-btn').addEventListener('click', openManagementModal);
+            } else {
+                managementSection.innerHTML = '';
+            }
         }
 
         function displayNotInClanView() {
             inClanView.style.display = 'none';
             notInClanView.style.display = 'block';
             if (unsubscribeFromChat) {
-                unsubscribeFromChat(); // Stop listening to old chat if user leaves a clan
+                unsubscribeFromChat(); 
                 unsubscribeFromChat = null;
             }
         }
         
         function scrollToChatBottom() {
-             chatBox.scrollTo({
-                top: chatBox.scrollHeight,
-                behavior: 'smooth'
-            });
+             chatBox.scrollTop = chatBox.scrollHeight;
         }
 
-        // --- Clan Chat Logic ---
+        // --- Clan Chat Logic (Feature 1) ---
         function listenToClanChat(clanId) {
-            if (unsubscribeFromChat) unsubscribeFromChat(); // Unsubscribe from any previous listener
+            if (unsubscribeFromChat) unsubscribeFromChat();
 
             const chatRef = collection(db, 'clans', clanId, 'chat');
-            const q = query(chatRef, orderBy('timestamp', 'asc')); // Order by ascending to get oldest first
+            const q = query(chatRef, orderBy('timestamp', 'asc'));
 
             unsubscribeFromChat = onSnapshot(q, (querySnapshot) => {
-                chatMessagesContainer.innerHTML = ''; // Clear previous messages
+                chatMessagesContainer.innerHTML = ''; 
                 querySnapshot.forEach(doc => {
-                    renderChatMessage(doc.data(), false); // Render without scrolling for each message
+                    renderChatMessage(doc.data());
                 });
-                scrollToChatBottom(); // Scroll once after all messages are rendered
+                scrollToChatBottom();
             }, (error) => {
                 console.error("Error listening to chat: ", error);
                 chatMessagesContainer.innerHTML = '<li>خطا در بارگذاری چت.</li>';
             });
         }
 
-        function renderChatMessage(msg, shouldScroll) {
+        function renderChatMessage(msg) {
             const messageDiv = document.createElement('div');
             const isSent = msg.senderUid === currentUser.uid;
             messageDiv.className = `chat-message ${isSent ? 'sent' : 'received'}`;
@@ -649,29 +706,24 @@
                 <p class="timestamp">${date}</p>
             `;
             chatMessagesContainer.appendChild(messageDiv);
-            if (shouldScroll) {
-                scrollToChatBottom();
-            }
         }
 
         chatForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!userClanId || !currentUser) return;
+            
+            // Feature 6: Check if chat is locked before sending
+            if (userClanData.chatLocked && userClanData.creatorId !== currentUser.uid) {
+                alert('چت در حال حاضر قفل است.');
+                return;
+            }
 
             const messageText = chatMessageInput.value.trim();
             if (messageText === '') return;
-
+            
+            chatMessageInput.value = ''; // Clear input immediately
+            
             try {
-                const tempMessage = {
-                    senderUid: currentUser.uid,
-                    senderName: currentUser.displayName || 'کاربر ناشناس',
-                    text: messageText,
-                    timestamp: { toDate: () => new Date() } // Create a temporary timestamp
-                };
-                
-                chatMessageInput.value = ''; // Clear input field immediately
-                renderChatMessage(tempMessage, true); // Optimistic UI update
-
                 const chatRef = collection(db, 'clans', userClanId, 'chat');
                 await addDoc(chatRef, {
                     senderUid: currentUser.uid,
@@ -679,11 +731,10 @@
                     text: messageText,
                     timestamp: serverTimestamp()
                 });
-
+                scrollToChatBottom();
             } catch (error) {
                 console.error("Error sending message: ", error);
                 alert('خطا در ارسال پیام.');
-                // Here you might want to remove the optimistic message
             }
         });
 
@@ -701,10 +752,10 @@
             });
         }
         
+        // Feature 5: Back Button Logic
         function setupBackButtonListener() {
             const backBtn = document.getElementById('back-btn');
             backBtn.addEventListener('click', () => {
-                // Check if the user came from a page on the same domain that includes 'main.html'
                 if (document.referrer && document.referrer.includes('main.html')) {
                     window.location.href = 'main.html';
                 } else {
@@ -733,6 +784,7 @@
                         const requestsRef = collection(db, 'join_requests');
                         await addDoc(requestsRef, {
                             userId: currentUser.uid,
+                            userName: currentUser.displayName || 'کاربر ناشناس',
                             clanId: clanId,
                             status: 'pending',
                             requestedAt: serverTimestamp()
@@ -749,46 +801,127 @@
         }
         
         function setupModalListeners() {
-            const modal = document.getElementById('requests-modal');
-            const openBtn = document.getElementById('my-requests-btn');
-            const closeBtn = document.getElementById('close-modal-btn');
-            
-            openBtn.onclick = async function() {
-                const requestsList = document.getElementById('requests-list');
-                requestsList.innerHTML = '<p>در حال بارگذاری...</p>';
-                modal.style.display = "block";
-                
-                try {
-                    const requestsRef = collection(db, "join_requests");
-                    const q = query(requestsRef, where("userId", "==", currentUser.uid));
-                    const querySnapshot = await getDocs(q);
-                    
-                    if (querySnapshot.empty) {
-                        requestsList.innerHTML = '<p>شما هیچ درخواست فعالی ندارید.</p>';
-                        return;
-                    }
-                    
-                    requestsList.innerHTML = '';
-                    for (const reqDoc of querySnapshot.docs) {
-                        const request = reqDoc.data();
-                        const clanDocRef = doc(db, 'clans', request.clanId);
-                        const clanDoc = await getDoc(clanDocRef);
-                        const clanName = clanDoc.exists() ? clanDoc.data().name : 'کلن حذف شده';
-                        
-                        const p = document.createElement('p');
-                        p.textContent = `درخواست برای کلن «${clanName}» - وضعیت: ${request.status}`;
-                        requestsList.appendChild(p);
-                    }
-                } catch(error) {
-                    console.error("Error fetching requests: ", error);
-                    requestsList.innerHTML = '<p>خطا در دریافت درخواست‌ها.</p>';
+            document.querySelectorAll('.modal').forEach(modal => {
+                const closeBtn = modal.querySelector('.close-btn');
+                closeBtn.onclick = () => { modal.style.display = "none"; };
+            });
+            window.onclick = (event) => {
+                if (event.target.classList.contains('modal')) {
+                    event.target.style.display = "none";
                 }
-            }
+            };
             
-            closeBtn.onclick = function() { modal.style.display = "none"; }
-            window.onclick = function(event) { if (event.target == modal) { modal.style.display = "none"; } }
+            document.getElementById('my-requests-btn').onclick = openMyRequestsModal;
         }
         
+        async function openMyRequestsModal() {
+            const modal = document.getElementById('requests-modal');
+            const requestsList = document.getElementById('requests-list');
+            requestsList.innerHTML = '<p>در حال بارگذاری...</p>';
+            modal.style.display = "block";
+            
+            try {
+                const requestsRef = collection(db, "join_requests");
+                const q = query(requestsRef, where("userId", "==", currentUser.uid));
+                const querySnapshot = await getDocs(q);
+                
+                if (querySnapshot.empty) {
+                    requestsList.innerHTML = '<p>شما هیچ درخواست فعالی ندارید.</p>';
+                    return;
+                }
+                
+                requestsList.innerHTML = '';
+                for (const reqDoc of querySnapshot.docs) {
+                    const request = reqDoc.data();
+                    const clanDocRef = doc(db, 'clans', request.clanId);
+                    const clanDoc = await getDoc(clanDocRef);
+                    const clanName = clanDoc.exists() ? clanDoc.data().name : 'کلن حذف شده';
+                    
+                    const p = document.createElement('p');
+                    p.className = 'requests-list-item';
+                    p.textContent = `درخواست برای کلن «${clanName}» - وضعیت: ${request.status}`;
+                    requestsList.appendChild(p);
+                }
+            } catch(error) {
+                console.error("Error fetching requests: ", error);
+                requestsList.innerHTML = '<p>خطا در دریافت درخواست‌ها.</p>';
+            }
+        }
+        
+        // --- Clan Management Functions (Feature 3, 4, 6) ---
+        async function openManagementModal() {
+            const modal = document.getElementById('management-modal');
+            modal.style.display = 'block';
+            loadJoinRequestsForClan();
+            // Future implementations for members list and settings would go here
+        }
+
+        async function loadJoinRequestsForClan() {
+            const requestsListDiv = document.getElementById('management-requests-list');
+            requestsListDiv.innerHTML = '<h4>درخواست‌های عضویت</h4><p>در حال بارگذاری...</p>';
+
+            const requestsRef = collection(db, "join_requests");
+            const q = query(requestsRef, where("clanId", "==", userClanId), where("status", "==", "pending"));
+            const querySnapshot = await getDocs(q);
+
+            if (querySnapshot.empty) {
+                requestsListDiv.innerHTML = '<h4>درخواست‌های عضویت</h4><p>هیچ درخواست جدیدی وجود ندارد.</p>';
+                return;
+            }
+
+            requestsListDiv.innerHTML = '<h4>درخواست‌های عضویت</h4>';
+            querySnapshot.forEach(reqDoc => {
+                const request = reqDoc.data();
+                const reqId = reqDoc.id;
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'requests-list-item';
+                itemDiv.innerHTML = `
+                    <span>${request.userName}</span>
+                    <div>
+                        <button class="action-btn accept-btn" data-req-id="${reqId}" data-user-id="${request.userId}">پذیرش</button>
+                        <button class="action-btn reject-btn" data-req-id="${reqId}">رد</button>
+                    </div>
+                `;
+                requestsListDiv.appendChild(itemDiv);
+            });
+
+            // Add event listeners for accept/reject buttons
+            requestsListDiv.querySelectorAll('.accept-btn').forEach(btn => {
+                btn.onclick = () => handleJoinRequest(btn.dataset.reqId, btn.dataset.userId, true);
+            });
+            requestsListDiv.querySelectorAll('.reject-btn').forEach(btn => {
+                btn.onclick = () => handleJoinRequest(btn.dataset.reqId, null, false);
+            });
+        }
+        
+        async function handleJoinRequest(reqId, userId, accepted) {
+            const reqRef = doc(db, 'join_requests', reqId);
+            if (accepted) {
+                // Add user to clan and delete request
+                const clanRef = doc(db, 'clans', userClanId);
+                const clanDoc = await getDoc(clanRef);
+                const clanData = clanDoc.data();
+                
+                if((clanData.memberCount || 0) >= (clanData.capacity || 20)) {
+                    alert("ظرفیت کلن پر است.");
+                    return;
+                }
+
+                await updateDoc(clanRef, {
+                    memberUIDs: arrayUnion(userId),
+                    // In a real scenario with role objects, this would be arrayUnion({uid: userId, role: 'member'})
+                    memberCount: (clanData.memberCount || 0) + 1
+                });
+                await deleteDoc(reqRef);
+                alert("کاربر با موفقیت به کلن اضافه شد.");
+            } else {
+                // Just delete the request
+                await deleteDoc(reqRef);
+                alert("درخواست رد شد.");
+            }
+            loadJoinRequestsForClan(); // Refresh list
+        }
+
     </script>
 </body>
 </html>
