@@ -298,6 +298,7 @@
             setupModalListeners();
             setupBackButtonListener();
             setupManagementListeners();
+            setupCreateClanButtonListener(); // Listener for the create clan button
         }
 
         // --- Real-time Clan Data Listener ---
@@ -461,7 +462,7 @@
             }
         });
 
-        // --- Management Logic ---
+        // --- Management & Creation Logic ---
         function setupManagementListeners() {
             document.getElementById('manage-requests-btn').addEventListener('click', showClanJoinRequests);
             document.getElementById('manage-members-btn').addEventListener('click', showKickMembersModal);
@@ -470,6 +471,56 @@
             document.getElementById('delete-clan-btn').addEventListener('click', handleDeleteClan);
         }
 
+        function setupCreateClanButtonListener() {
+            const createClanBtn = document.querySelector('.create-clan-btn');
+            if (createClanBtn) {
+                createClanBtn.addEventListener('click', handleCreateClan);
+            }
+        }
+
+        function handleCreateClan() {
+            if (userClanId) {
+                alert('شما در حال حاضر عضو یک کلن هستید و نمی‌توانید کلن جدیدی بسازید.');
+                return;
+            }
+
+            showCustomPromptModal({
+                title: 'ساخت کلن جدید',
+                message: 'یک نام منحصر به فرد برای کلن خود انتخاب کنید.',
+                inputPlaceholder: 'نام کلن...',
+                confirmText: 'ساختن',
+                onConfirm: async (clanName) => {
+                    if (!clanName || clanName.length < 3) {
+                        alert('نام کلن باید حداقل ۳ کاراکتر باشد.');
+                        return;
+                    }
+                    
+                    try {
+                        const newClanData = {
+                            name: clanName,
+                            creatorId: currentUser.uid,
+                            creatorName: currentUser.displayName || 'کاربر ناشناس',
+                            members: [currentUser.uid],
+                            memberCount: 1,
+                            capacity: 20,
+                            level: 1,
+                            score: 0,
+                            chatLocked: false,
+                            createdAt: serverTimestamp()
+                        };
+
+                        await addDoc(collection(db, 'clans'), newClanData);
+                        alert(`کلن «${clanName}» با موفقیت ساخته شد!`);
+                        // The onSnapshot listener (listenForUserClan) will automatically update the UI
+                        
+                    } catch (error) {
+                        console.error("Error creating clan:", error);
+                        alert('خطایی در ساخت کلن رخ داد. لطفا دوباره تلاش کنید.');
+                    }
+                }
+            });
+        }
+        
         async function toggleChatLock() {
             const newStatus = !userClanData.chatLocked;
             try {
