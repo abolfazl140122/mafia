@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>شهر مافیا - لیست کلن‌ها</title>
+    <title>شهر مافیا - کلن‌ها</title>
     
     <!-- Google Fonts: Vazirmatn -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,7 +20,7 @@
             --brown-light: #4a3423;
             --text-light: #f0f0f0;
             --text-dark: #1e1e1e;
-            --transparent-bg: rgba(10, 10, 10, 0.6);
+            --transparent-bg: rgba(10, 10, 10, 0.7);
             --border-color: rgba(255, 215, 0, 0.4);
         }
 
@@ -36,7 +36,7 @@
             font-family: 'Vazirmatn', sans-serif;
             background-color: var(--dark-bg);
             color: var(--text-light);
-            background-image: url('https://images.unsplash.com/photo-1599591436217-88150469b617?q=80&w=2070&auto=format&fit=crop'); /* Placeholder background */
+            background-image: url('https://images.unsplash.com/photo-1599591436217-88150469b617?q=80&w=2070&auto=format&fit=crop');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -51,17 +51,22 @@
             z-index: 2;
         }
 
-        /* Backdrop for content readability */
         .main-container::before {
             content: '';
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.7);
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0, 0, 0, 0.75);
             backdrop-filter: blur(8px);
             z-index: -1;
+        }
+        
+        #auth-prompt {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.2rem;
+            background: var(--transparent-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
         }
 
         /* --- Header --- */
@@ -90,7 +95,7 @@
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-family: 'Vazirmatn', sans-serif;
+            font-family: inherit;
             font-size: 0.9rem;
         }
 
@@ -108,7 +113,7 @@
         }
 
         .tab-btn {
-            font-family: 'Vazirmatn', sans-serif;
+            font-family: inherit;
             font-size: 1.1rem;
             font-weight: 500;
             padding: 12px 30px;
@@ -126,24 +131,10 @@
             border-bottom-color: var(--gold-primary);
         }
         
-        .tab-btn:hover {
-            color: white;
-        }
-
         /* --- Tab Content --- */
-        .tab-content {
-            display: none; /* Hidden by default */
-            animation: fadeIn 0.5s ease-in-out;
-        }
-
-        .tab-content.active {
-            display: block; /* Shown when active */
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .tab-content { display: none; animation: fadeIn 0.5s ease-in-out; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         /* --- Clans List Section --- */
         #clans-list-tab .clans-grid {
@@ -157,18 +148,12 @@
             border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
             text-align: center;
             box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: transform 0.3s ease;
         }
         
-        .clan-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 20px rgba(0,0,0,0.4), inset 0 0 20px rgba(0,0,0,0.5);
-        }
+        .clan-card:hover { transform: translateY(-5px); }
 
         .clan-card h3 {
             font-size: 1.4rem;
@@ -178,39 +163,19 @@
             -webkit-text-fill-color: transparent;
             margin-bottom: 15px;
         }
-
-        .clan-card p {
-            font-size: 0.95rem;
-            margin-bottom: 8px;
-        }
         
-        .clan-card .leader {
-            color: #ccc;
-        }
-        
-        .clan-card .members {
-            color: var(--gold-primary);
-            font-weight: 500;
-            margin-bottom: 20px;
-        }
+        .clan-card p { font-size: 0.95rem; margin-bottom: 8px; }
+        .clan-card .leader { color: #ccc; }
+        .clan-card .members { color: var(--gold-primary); font-weight: 500; margin-bottom: 20px; }
 
         .join-btn {
-            background: var(--gold-gradient);
-            border: none;
-            color: var(--text-dark);
-            font-family: 'Vazirmatn', sans-serif;
-            font-weight: 700;
-            padding: 10px 25px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            background: var(--gold-gradient); border: none; color: var(--text-dark);
+            font-family: inherit; font-weight: 700; padding: 10px 25px;
+            border-radius: 8px; cursor: pointer; transition: all 0.3s ease;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
-
-        .join-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 15px rgba(255, 215, 0, 0.4);
-        }
+        .join-btn:hover { transform: scale(1.05); }
+        .join-btn:disabled { background: #555; color: #999; cursor: not-allowed; }
 
         /* --- My Clan Section --- */
         #my-clan-tab .content-wrapper {
@@ -221,152 +186,115 @@
             box-shadow: inset 0 0 20px rgba(0,0,0,0.6);
         }
         
-        /* State: Not in a clan */
-        .not-in-clan {
-            text-align: center;
-            padding: 40px 20px;
-        }
-
-        .not-in-clan h2 {
-            font-size: 1.5rem;
-            margin-bottom: 25px;
-        }
+        .not-in-clan { text-align: center; padding: 40px 20px; }
+        .not-in-clan h2 { font-size: 1.5rem; margin-bottom: 25px; }
 
         .create-clan-btn {
-            background: var(--gold-gradient);
-            border: none;
-            color: var(--text-dark);
-            font-family: 'Vazirmatn', sans-serif;
-            font-weight: 700;
-            padding: 12px 35px;
-            font-size: 1.1rem;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            background: var(--gold-gradient); border: none; color: var(--text-dark);
+            font-family: inherit; font-weight: 700; padding: 12px 35px; font-size: 1.1rem;
+            border-radius: 10px; cursor: pointer; transition: transform 0.3s ease;
         }
-
-        .create-clan-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 15px rgba(255, 215, 0, 0.4);
-        }
+        .create-clan-btn:hover { transform: scale(1.05); }
         
-        /* State: Is in a clan */
         .clan-details h2 {
-            font-size: 2rem;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 20px;
-            background: var(--gold-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-size: 2rem; text-align: center; margin-bottom: 20px;
+            background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
 
         .clan-stats {
-            display: flex;
-            justify-content: space-around;
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 20px 0;
+            display: flex; justify-content: space-around; text-align: center;
+            margin-bottom: 30px; padding: 20px 0;
             border-top: 1px solid var(--border-color);
             border-bottom: 1px solid var(--border-color);
         }
-
-        .stat-item span {
-            display: block;
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--gold-primary);
-        }
-        .stat-item p {
-            font-size: 0.9rem;
-            color: #ccc;
-        }
+        .stat-item span { display: block; font-size: 1.3rem; font-weight: 700; color: var(--gold-primary); }
+        .stat-item p { font-size: 0.9rem; color: #ccc; }
         
-        .members-list h3 {
-            text-align: center;
-            font-size: 1.4rem;
-            margin-bottom: 20px;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px;
+        /* --- Clan Chat --- */
+        .clan-chat { margin-top: 40px; }
+        .clan-chat h3 {
+            text-align: center; font-size: 1.4rem; margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color); padding-bottom: 10px;
         }
-        
-        .member-item {
+        .chat-box {
+            height: 300px; overflow-y: auto;
+            border: 1px solid var(--border-color); border-radius: 8px;
+            padding: 15px; margin-bottom: 20px;
+            background: rgba(0,0,0,0.3);
             display: flex;
-            align-items: center;
-            padding: 10px;
-            border-radius: 8px;
-            transition: background-color 0.2s;
+            flex-direction: column-reverse;
         }
-        
-        .member-item:not(:last-child) {
-            margin-bottom: 10px;
+        .chat-messages {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
-
-        .member-item:hover {
-            background-color: rgba(255, 215, 0, 0.1);
+        .chat-message {
+            padding: 8px 12px;
+            border-radius: 10px;
+            max-width: 75%;
         }
-        
-        .member-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
+        .chat-message.sent {
             background-color: var(--brown-light);
-            margin-left: 15px; /* RTL: margin-left for spacing */
-            border: 2px solid var(--gold-primary);
+            align-self: flex-start; /* RTL: start is left */
         }
-
-        .member-info .name {
-            font-weight: 500;
-            font-size: 1.1rem;
+        .chat-message.received {
+            background-color: #333;
+            align-self: flex-end; /* RTL: end is right */
         }
+        .chat-message .sender { font-weight: 700; color: var(--gold-primary); font-size: 0.9rem; }
+        .chat-message .text { margin: 5px 0; }
+        .chat-message .timestamp { font-size: 0.75rem; color: #aaa; text-align: left; }
         
-        .member-info .role {
-            font-size: 0.9rem;
-            color: #bbb;
+        .chat-form { display: flex; gap: 10px; }
+        .chat-form input {
+            flex-grow: 1; padding: 10px; border-radius: 8px;
+            background: rgba(0,0,0,0.4); border: 1px solid var(--border-color);
+            color: var(--text-light); font-family: inherit;
+        }
+        .chat-form button {
+            padding: 10px 20px; border-radius: 8px;
+            background: var(--gold-gradient); border: none; color: var(--text-dark);
+            font-family: inherit; font-weight: 700; cursor: pointer;
         }
 
-        /* Responsive Design */
+        /* --- Modal for Requests --- */
+        .modal {
+            display: none; position: fixed; z-index: 1000;
+            left: 0; top: 0; width: 100%; height: 100%;
+            overflow: auto; background-color: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background: var(--brown-dark); border: 1px solid var(--gold-primary);
+            margin: 15% auto; padding: 25px; border-radius: 12px;
+            width: 80%; max-width: 500px; position: relative;
+        }
+        .close-btn {
+            color: #aaa; float: left; font-size: 28px; font-weight: bold;
+            cursor: pointer;
+        }
+        .modal-content h2 { margin-bottom: 20px; color: var(--gold-primary); }
+        #requests-list p {
+            padding: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+         #requests-list p:last-child { border-bottom: none; }
+
+        /* Responsive */
         @media (max-width: 768px) {
-            .header-title {
-                font-size: 1.2rem;
-            }
-            .header-btn {
-                padding: 6px 12px;
-                font-size: 0.8rem;
-            }
-            .tab-btn {
-                font-size: 1rem;
-                padding: 10px 15px;
-            }
-            #clans-list-tab .clans-grid {
-                grid-template-columns: 1fr;
-            }
+            .header-title { font-size: 1.2rem; }
+            #clans-list-tab .clans-grid { grid-template-columns: 1fr; }
         }
-
-        @media (max-width: 480px) {
-             .page-header {
-                flex-direction: column;
-                gap: 15px;
-            }
-            .header-title {
-                order: -1; /* Make title appear first */
-            }
-            .clan-stats {
-                flex-direction: column;
-                gap: 20px;
-            }
-        }
-        
     </style>
 </head>
 <body>
 
-    <div class="main-container">
+    <div id="app-container" class="main-container" style="display: none;">
         <!-- Header -->
         <header class="page-header">
-            <button class="header-btn">درخواست‌های من</button>
-            <h1 class="header-title">شهر مافیا - لیست کلن‌ها</h1>
+            <button id="my-requests-btn" class="header-btn">درخواست‌های من</button>
+            <h1 class="header-title">شهر مافیا - کلن‌ها</h1>
             <button class="header-btn">بازگشت</button>
         </header>
 
@@ -380,149 +308,348 @@
         <main>
             <!-- Tab 1: All Clans List -->
             <section id="clans-list-tab" class="tab-content active">
-                <div class="clans-grid">
-                    <!-- Mock Clan Card 1 -->
-                    <div class="clan-card">
-                        <h3>خاندان پدرخوانده</h3>
-                        <p class="leader">رهبر: گادفادر</p>
-                        <p class="members">اعضا: 18/20</p>
-                        <button class="join-btn">پیوستن</button>
-                    </div>
-                    <!-- Mock Clan Card 2 -->
-                    <div class="clan-card">
-                        <h3>سایلنسرها</h3>
-                        <p class="leader">رهبر: لئون</p>
-                        <p class="members">اعضا: 12/20</p>
-                        <button class="join-btn">مشاهده</button>
-                    </div>
-                    <!-- Mock Clan Card 3 -->
-                    <div class="clan-card">
-                        <h3>فرقه سایه‌ها</h3>
-                        <p class="leader">رهبر: ناشناس</p>
-                        <p class="members">اعضا: 20/20</p>
-                        <button class="join-btn" disabled>پر است</button>
-                    </div>
-                    <!-- Mock Clan Card 4 -->
-                    <div class="clan-card">
-                        <h3>گروهبان‌های شهر</h3>
-                        <p class="leader">رهبر: کارآگاه</p>
-                        <p class="members">اعضا: 9/20</p>
-                        <button class="join-btn">پیوستن</button>
-                    </div>
-                     <!-- Mock Clan Card 5 -->
-                     <div class="clan-card">
-                        <h3>پزشکان مافیا</h3>
-                        <p class="leader">رهبر: دکتر لکتر</p>
-                        <p class="members">اعضا: 15/20</p>
-                        <button class="join-btn">پیوستن</button>
-                    </div>
-                     <!-- Mock Clan Card 6 -->
-                     <div class="clan-card">
-                        <h3>شهروندان متحد</h3>
-                        <p class="leader">رهبر: شهردار</p>
-                        <p class="members">اعضا: 19/20</p>
-                        <button class="join-btn">پیوستن</button>
-                    </div>
+                <div id="clans-grid-container" class="clans-grid">
+                    <!-- Clan cards will be dynamically inserted here -->
                 </div>
             </section>
 
             <!-- Tab 2: My Clan -->
             <section id="my-clan-tab" class="tab-content">
                 <div class="content-wrapper">
-                    
-                    <!-- This part is shown if the user IS NOT in a clan -->
-                    <div class="not-in-clan">
+                    <!-- View: Not in a clan -->
+                    <div id="not-in-clan-view" class="not-in-clan" style="display: none;">
                         <h2>شما هنوز عضو هیچ کلنی نیستید!</h2>
                         <p style="margin-bottom: 25px; color: #ccc;">می‌توانید به یک کلن موجود بپیوندید یا کلن خودتان را بسازید.</p>
                         <button class="create-clan-btn">ساخت کلن جدید</button>
                     </div>
                     
-                    <!-- This part is shown if the user IS in a clan -->
-                    <div class="clan-details" style="display: none;">
-                        <h2>خاندان پدرخوانده</h2>
+                    <!-- View: Is in a clan -->
+                    <div id="in-clan-view" class="clan-details" style="display: none;">
+                        <h2 id="clan-name">نام کلن</h2>
                         <div class="clan-stats">
-                            <div class="stat-item">
-                                <p>سطح کلن</p>
-                                <span>7</span>
-                            </div>
-                            <div class="stat-item">
-                                <p>امتیاز کلن</p>
-                                <span>12,500</span>
-                            </div>
-                            <div class="stat-item">
-                                <p>اعضا</p>
-                                <span>18/20</span>
-                            </div>
+                            <div class="stat-item"><p>سطح کلن</p><span id="clan-level">--</span></div>
+                            <div class="stat-item"><p>امتیاز کلن</p><span id="clan-score">--</span></div>
+                            <div class="stat-item"><p>اعضا</p><span id="clan-members-count">--/--</span></div>
                         </div>
-                        <div class="members-list">
-                            <h3>لیست اعضا</h3>
-                            <!-- Mock Member 1 -->
-                            <div class="member-item">
-                                <div class="member-avatar"></div>
-                                <div class="member-info">
-                                    <p class="name">گادفادر</p>
-                                    <p class="role">رهبر</p>
+                        
+                        <!-- Clan Chat Section -->
+                        <div class="clan-chat">
+                            <h3>چت کلن</h3>
+                            <div class="chat-box">
+                                <div id="chat-messages-container" class="chat-messages">
+                                    <!-- Messages will be dynamically inserted here -->
                                 </div>
                             </div>
-                             <!-- Mock Member 2 -->
-                             <div class="member-item">
-                                <div class="member-avatar"></div>
-                                <div class="member-info">
-                                    <p class="name">ماتادور</p>
-                                    <p class="role">کاپیتان</p>
-                                </div>
-                            </div>
-                             <!-- Mock Member 3 -->
-                             <div class="member-item">
-                                <div class="member-avatar"></div>
-                                <div class="member-info">
-                                    <p class="name">شهروند ساده</p>
-                                    <p class="role">عضو</p>
-                                </div>
-                            </div>
+                            <form id="chat-form" class="chat-form">
+                                <input type="text" id="chat-message-input" placeholder="پیام خود را بنویسید..." required>
+                                <button type="submit">ارسال</button>
+                            </form>
                         </div>
                     </div>
-
                 </div>
             </section>
         </main>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // --- Mock Data Simulation ---
-            // Set to `true` to see the "My Clan" view, `false` to see the "Not in a clan" view.
-            const isUserInClan = false; 
+    <div id="auth-prompt" class="main-container">
+        <p>برای مشاهده کلن‌ها، لطفا ابتدا وارد حساب کاربری خود شوید.</p>
+    </div>
+    
+    <!-- Modal for Join Requests -->
+    <div id="requests-modal" class="modal">
+        <div class="modal-content">
+            <span id="close-modal-btn" class="close-btn">&times;</span>
+            <h2>درخواست‌های عضویت من</h2>
+            <div id="requests-list">
+                <!-- Requests will be dynamically inserted here -->
+            </div>
+        </div>
+    </div>
 
-            // Tab switching logic
-            const tabButtons = document.querySelectorAll('.tab-btn');
-            const tabContents = document.querySelectorAll('.tab-content');
 
-            tabButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    // Remove active class from all buttons and content
-                    tabButtons.forEach(btn => btn.classList.remove('active'));
-                    tabContents.forEach(content => content.classList.remove('active'));
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js';
+        import { getFirestore, collection, addDoc, getDocs, onSnapshot, query, orderBy, serverTimestamp, doc, getDoc, where } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js';
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js';
 
-                    // Add active class to the clicked button and its corresponding content
-                    button.classList.add('active');
-                    const tabId = button.getAttribute('data-tab');
-                    document.getElementById(tabId).classList.add('active');
-                });
-            });
+        const firebaseConfig = {
+          apiKey: 'AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg',
+          authDomain: 'mafia-9fcbf.firebaseapp.com',
+          databaseURL: 'https://mafia-9fcbf-default-rtdb.firebaseio.com',
+          projectId: 'mafia-9fcbf',
+          storageBucket: 'mafia-9fcbf.firebasestorage.app',
+          messagingSenderId: '471627157488',
+          appId: '1:471627157488:web:92f008548a5596619a5735',
+          measurementId: 'G-0PDHDWC6NV'
+        };
 
-            // "My Clan" tab content logic
-            const notInClanView = document.querySelector('#my-clan-tab .not-in-clan');
-            const inClanView = document.querySelector('#my-clan-tab .clan-details');
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
 
-            if (isUserInClan) {
-                notInClanView.style.display = 'none';
-                inClanView.style.display = 'block';
+        // --- DOM Elements ---
+        const appContainer = document.getElementById('app-container');
+        const authPrompt = document.getElementById('auth-prompt');
+        const clansGrid = document.getElementById('clans-grid-container');
+        const notInClanView = document.getElementById('not-in-clan-view');
+        const inClanView = document.getElementById('in-clan-view');
+        const chatForm = document.getElementById('chat-form');
+        const chatMessagesContainer = document.getElementById('chat-messages-container');
+        const chatMessageInput = document.getElementById('chat-message-input');
+
+        let currentUser = null;
+        let userClanId = null;
+        let unsubscribeFromChat = null; // To store the chat listener cleanup function
+
+        // --- Authentication ---
+        onAuthStateChanged(auth, user => {
+            if (user) {
+                currentUser = user;
+                authPrompt.style.display = 'none';
+                appContainer.style.display = 'block';
+                initializeAppLogic();
             } else {
-                notInClanView.style.display = 'block';
-                inClanView.style.display = 'none';
+                currentUser = null;
+                appContainer.style.display = 'none';
+                authPrompt.style.display = 'block';
+                if (unsubscribeFromChat) unsubscribeFromChat();
             }
         });
+        
+        async function initializeAppLogic() {
+            await checkUserClanStatus();
+            await loadAllClans();
+            setupTabListeners();
+            setupModalListeners();
+        }
+
+        // --- Data Fetching & Display ---
+
+        async function checkUserClanStatus() {
+            // In a real app, you'd have a 'users' collection with a 'clanId' field.
+            // For this demo, we'll query the 'clans' collection to see if the user is a member.
+            const clansRef = collection(db, 'clans');
+            const q = query(clansRef, where('members', 'array-contains', currentUser.uid));
+            const querySnapshot = await getDocs(q);
+
+            if (!querySnapshot.empty) {
+                const clanDoc = querySnapshot.docs[0];
+                userClanId = clanDoc.id;
+                const clanData = clanDoc.data();
+                displayInClanView(clanData);
+                listenToClanChat(userClanId);
+            } else {
+                userClanId = null;
+                displayNotInClanView();
+            }
+        }
+
+        async function loadAllClans() {
+            clansGrid.innerHTML = 'در حال بارگذاری کلن‌ها...';
+            try {
+                const querySnapshot = await getDocs(collection(db, 'clans'));
+                clansGrid.innerHTML = ''; // Clear loading message
+                if (querySnapshot.empty) {
+                    clansGrid.innerHTML = '<p>هیچ کلنی یافت نشد.</p>';
+                    return;
+                }
+                querySnapshot.forEach(doc => {
+                    const clan = doc.data();
+                    const clanId = doc.id;
+                    const isFull = clan.memberCount >= clan.capacity;
+                    
+                    const card = document.createElement('div');
+                    card.className = 'clan-card';
+                    card.innerHTML = `
+                        <h3>${clan.name || 'بدون نام'}</h3>
+                        <p class="leader">رهبر: ${clan.leaderName || 'ناشناس'}</p>
+                        <p class="members">اعضا: ${clan.memberCount || 0}/${clan.capacity || 20}</p>
+                        <button class="join-btn" data-clan-id="${clanId}" ${isFull ? 'disabled' : ''}>
+                            ${isFull ? 'پر است' : 'پیوستن'}
+                        </button>
+                    `;
+                    clansGrid.appendChild(card);
+                });
+                setupJoinButtonListeners();
+            } catch (error) {
+                console.error("Error loading clans: ", error);
+                clansGrid.innerHTML = '<p>خطا در بارگذاری کلن‌ها.</p>';
+            }
+        }
+
+        function displayInClanView(clanData) {
+            notInClanView.style.display = 'none';
+            inClanView.style.display = 'block';
+
+            document.getElementById('clan-name').textContent = clanData.name;
+            document.getElementById('clan-level').textContent = clanData.level || 1;
+            document.getElementById('clan-score').textContent = (clanData.score || 0).toLocaleString();
+            document.getElementById('clan-members-count').textContent = `${clanData.memberCount || 0}/${clanData.capacity || 20}`;
+        }
+
+        function displayNotInClanView() {
+            inClanView.style.display = 'none';
+            notInClanView.style.display = 'block';
+            if (unsubscribeFromChat) {
+                unsubscribeFromChat(); // Stop listening to old chat if user leaves a clan
+                unsubscribeFromChat = null;
+            }
+        }
+
+        // --- Clan Chat Logic ---
+        function listenToClanChat(clanId) {
+            if (unsubscribeFromChat) unsubscribeFromChat(); // Unsubscribe from any previous listener
+
+            const chatRef = collection(db, 'clans', clanId, 'chat');
+            const q = query(chatRef, orderBy('timestamp', 'desc'));
+
+            unsubscribeFromChat = onSnapshot(q, (querySnapshot) => {
+                chatMessagesContainer.innerHTML = ''; // Clear previous messages
+                querySnapshot.forEach(doc => {
+                    renderChatMessage(doc.data());
+                });
+            }, (error) => {
+                console.error("Error listening to chat: ", error);
+                chatMessagesContainer.innerHTML = '<li>خطا در بارگذاری چت.</li>';
+            });
+        }
+
+        function renderChatMessage(msg) {
+            const messageDiv = document.createElement('div');
+            const isSent = msg.senderUid === currentUser.uid;
+            messageDiv.className = `chat-message ${isSent ? 'sent' : 'received'}`;
+            
+            const date = msg.timestamp?.toDate ? msg.timestamp.toDate().toLocaleTimeString('fa-IR') : '';
+
+            messageDiv.innerHTML = `
+                ${!isSent ? `<p class="sender">${msg.senderName || 'کاربر'}</p>` : ''}
+                <p class="text">${msg.text}</p>
+                <p class="timestamp">${date}</p>
+            `;
+            chatMessagesContainer.appendChild(messageDiv);
+        }
+
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!userClanId || !currentUser) return;
+
+            const messageText = chatMessageInput.value.trim();
+            if (messageText === '') return;
+
+            try {
+                const chatRef = collection(db, 'clans', userClanId, 'chat');
+                await addDoc(chatRef, {
+                    senderUid: currentUser.uid,
+                    senderName: currentUser.displayName || 'کاربر ناشناس', // Assumes user has a display name
+                    text: messageText,
+                    timestamp: serverTimestamp()
+                });
+                chatMessageInput.value = ''; // Clear input field
+            } catch (error) {
+                console.error("Error sending message: ", error);
+                alert('خطا در ارسال پیام.');
+            }
+        });
+
+        // --- Event Listeners ---
+        function setupTabListeners() {
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    button.classList.add('active');
+                    document.getElementById(button.dataset.tab).classList.add('active');
+                });
+            });
+        }
+
+        function setupJoinButtonListeners() {
+            clansGrid.addEventListener('click', async (e) => {
+                if (e.target.matches('.join-btn') && !e.target.disabled) {
+                    const clanId = e.target.dataset.clanId;
+                    if (!currentUser) {
+                        alert('برای پیوستن به کلن باید وارد شوید.');
+                        return;
+                    }
+                    if (userClanId) {
+                        alert('شما در حال حاضر عضو یک کلن هستید.');
+                        return;
+                    }
+                    
+                    e.target.disabled = true;
+                    e.target.textContent = 'درخواست ارسال شد';
+
+                    try {
+                        const requestsRef = collection(db, 'join_requests');
+                        await addDoc(requestsRef, {
+                            userId: currentUser.uid,
+                            clanId: clanId,
+                            status: 'pending',
+                            requestedAt: serverTimestamp()
+                        });
+                        alert('درخواست شما برای پیوستن به کلن ارسال شد.');
+                    } catch (error) {
+                        console.error("Error sending join request: ", error);
+                        alert('خطا در ارسال درخواست.');
+                        e.target.disabled = false;
+                        e.target.textContent = 'پیوستن';
+                    }
+                }
+            });
+        }
+        
+        function setupModalListeners() {
+            const modal = document.getElementById('requests-modal');
+            const openBtn = document.getElementById('my-requests-btn');
+            const closeBtn = document.getElementById('close-modal-btn');
+            
+            openBtn.onclick = async function() {
+                const requestsList = document.getElementById('requests-list');
+                requestsList.innerHTML = '<p>در حال بارگذاری...</p>';
+                modal.style.display = "block";
+                
+                try {
+                    const requestsRef = collection(db, "join_requests");
+                    const q = query(requestsRef, where("userId", "==", currentUser.uid));
+                    const querySnapshot = await getDocs(q);
+                    
+                    if (querySnapshot.empty) {
+                        requestsList.innerHTML = '<p>شما هیچ درخواست فعالی ندارید.</p>';
+                        return;
+                    }
+                    
+                    requestsList.innerHTML = '';
+                    for (const reqDoc of querySnapshot.docs) {
+                        const request = reqDoc.data();
+                        const clanDocRef = doc(db, 'clans', request.clanId);
+                        const clanDoc = await getDoc(clanDocRef);
+                        const clanName = clanDoc.exists() ? clanDoc.data().name : 'کلن حذف شده';
+                        
+                        const p = document.createElement('p');
+                        p.textContent = `درخواست برای کلن «${clanName}» - وضعیت: ${request.status}`;
+                        requestsList.appendChild(p);
+                    }
+                } catch(error) {
+                    console.error("Error fetching requests: ", error);
+                    requestsList.innerHTML = '<p>خطا در دریافت درخواست‌ها.</p>';
+                }
+            }
+            
+            closeBtn.onclick = function() {
+                modal.style.display = "none";
+            }
+            
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            }
+        }
+        
     </script>
 </body>
 </html>
