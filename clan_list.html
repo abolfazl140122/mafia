@@ -93,7 +93,6 @@
         .join-btn:hover { background: var(--gold-primary); color: var(--brown-dark); transform: scale(1.05); box-shadow: 0 0 15px var(--gold-glow); }
         .join-btn:disabled { background: #555; color: #999; border-color: #555; cursor: not-allowed; transform: none; box-shadow: none; }
         
-        /* NEW STYLE for pending button */
         .join-btn.pending {
             background: var(--status-pending);
             color: var(--brown-dark);
@@ -283,7 +282,6 @@
         let unsubscribeFromClan = null;
         let unsubscribeFromChat = null;
 
-        // --- NEW Global State for Join Requests ---
         let userHasPendingRequest = false;
         let pendingRequestClanId = null;
 
@@ -306,15 +304,16 @@
         
         async function initializeAppLogic() {
             listenForUserClan();
-            await checkForAnyPendingRequest(); // Check for pending requests before loading clans
+            await checkForAnyPendingRequest();
             await loadAllClans();
             setupTabListeners();
             setupModalListeners();
             setupBackButtonListener();
             setupManagementListeners();
+            setupNotInClanListeners(); // **NEW**: Setup listener for create clan button
         }
         
-        // --- NEW: Check if user has ANY pending request on load ---
+        // --- Check if user has ANY pending request on load ---
         async function checkForAnyPendingRequest() {
             if (!currentUser) return;
             const q = query(collection(db, 'join_requests'), where("userId", "==", currentUser.uid), where("status", "==", "pending"));
@@ -341,7 +340,7 @@
                     userClanData = clanDoc.data();
                     displayInClanView(userClanData);
                     listenToClanChat(userClanId);
-                    updateChatLockUI(); // Update chat UI based on lock status
+                    updateChatLockUI();
                 } else {
                     userClanId = null;
                     userClanData = null;
@@ -413,7 +412,6 @@
                     const isFull = (clan.memberCount || 0) >= (clan.capacity || 20);
                     
                     let buttonHTML = '';
-                    // MODIFIED LOGIC for button state
                     if (userHasPendingRequest) {
                         if (clanId === pendingRequestClanId) {
                             buttonHTML = `<button class="join-btn pending" disabled>در حال بررسی</button>`;
@@ -501,7 +499,7 @@
             } catch (error) {
                 console.error("Error sending message: ", error);
                 alert('خطا در ارسال پیام.');
-                chatMessageInput.value = tempInputValue; // Restore message on failure
+                chatMessageInput.value = tempInputValue;
             }
         });
 
@@ -743,7 +741,6 @@
             document.getElementById('back-btn').addEventListener('click', () => window.history.back());
         }
         
-        // --- HEAVILY MODIFIED ---
         function setupJoinButtonListeners(container) {
             container.addEventListener('click', async (e) => {
                 const joinButton = e.target;
@@ -757,18 +754,15 @@
                     return;
                 }
                 
-                // Show confirmation modal
                 showCustomPromptModal({
                     title: 'تایید درخواست عضویت',
                     message: `شما در حال ارسال درخواست به کلن «${clanName}» هستید. تا زمانی که این درخواست توسط رهبر کلن بررسی نشود (تایید یا رد شود)، شما قادر به ارسال درخواست به کلن‌های دیگر نخواهید بود. آیا ادامه می‌دهید؟`,
                     confirmText: 'بله، ارسال کن',
                     onConfirm: async () => {
-                        // --- Logic to execute after user confirms ---
                         joinButton.disabled = true;
                         joinButton.textContent = 'درحال ارسال...';
 
                         try {
-                            // Send request to Firestore
                             await addDoc(collection(db, 'join_requests'), {
                                 userId: currentUser.uid, 
                                 clanId: clanId, 
@@ -776,11 +770,9 @@
                                 requestedAt: serverTimestamp()
                             });
 
-                            // Update global state
                             userHasPendingRequest = true;
                             pendingRequestClanId = clanId;
 
-                            // Instantly update all buttons on the page without refresh
                             document.querySelectorAll('.join-btn').forEach(btn => {
                                 if (btn.dataset.clanId === clanId) {
                                     btn.textContent = 'در حال بررسی';
@@ -794,7 +786,6 @@
                         } catch (error) {
                             console.error("Error sending join request: ", error);
                             alert('خطا در ارسال درخواست. لطفا دوباره تلاش کنید.');
-                            // Re-enable only the clicked button on failure
                             joinButton.disabled = false; 
                             joinButton.textContent = 'پیوستن';
                         }
@@ -802,6 +793,58 @@
                 });
             });
         }
+
+        // **START: NEW CODE BLOCK for Creating a Clan**
+        function setupNotInClanListeners() {
+            const createClanBtn = document.querySelector('.create-clan-btn');
+            if (createClanBtn) {
+                createClanBtn.addEventListener('click', handleCreateClan);
+            }
+        }
+
+        function handleCreateClan() {
+            if (userClanId) {
+                alert("شما در حال حاضر عضو یک کلن هستید و نمی‌توانید کلن جدیدی بسازید.");
+                return;
+            }
+
+            showCustomPromptModal({
+                title: 'ساخت کلن جدید',
+                message: 'یک نام برای کلن خود انتخاب کنید. (بین ۳ تا ۲۰ حرف)',
+                inputPlaceholder: 'نام کلن...',
+                confirmText: 'ساخت کلن',
+                onConfirm: async (clanName) => {
+                    if (!clanName || clanName.length < 3 || clanName.length > 20) {
+                        alert("نام کلن باید بین ۳ تا ۲۰ حرف باشد.");
+                        return;
+                    }
+
+                    try {
+                        // Create the new clan document in Firestore
+                        await addDoc(collection(db, 'clans'), {
+                            name: clanName,
+                            creatorId: currentUser.uid,
+                            members: [currentUser.uid],
+                            memberCount: 1,
+                            capacity: 20, // Default capacity
+                            level: 1,     // Default level
+                            score: 0,     // Default score
+                            chatLocked: false,
+                            createdAt: serverTimestamp()
+                        });
+                        
+                        alert(`کلن «${clanName}» با موفقیت ساخته شد!`);
+                        // The onSnapshot listener (listenForUserClan) will automatically
+                        // detect the new clan and update the UI.
+
+                    } catch (error) {
+                        console.error("Error creating clan: ", error);
+                        alert("خطایی در ساخت کلن رخ داد. لطفا دوباره تلاش کنید.");
+                    }
+                }
+            });
+        }
+        // **END: NEW CODE BLOCK**
         
         function setupModalListeners() {
             document.getElementById('my-requests-btn').onclick = showMyJoinRequests;
