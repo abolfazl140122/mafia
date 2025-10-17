@@ -92,6 +92,15 @@
         .join-btn { background: transparent; border: 1px solid var(--gold-primary); color: var(--gold-primary); font-family: inherit; font-weight: 700; padding: 10px 25px; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .join-btn:hover { background: var(--gold-primary); color: var(--brown-dark); transform: scale(1.05); box-shadow: 0 0 15px var(--gold-glow); }
         .join-btn:disabled { background: #555; color: #999; border-color: #555; cursor: not-allowed; transform: none; box-shadow: none; }
+        
+        /* NEW STYLE for pending button */
+        .join-btn.pending {
+            background: var(--status-pending);
+            color: var(--brown-dark);
+            border-color: var(--status-pending);
+            cursor: not-allowed;
+            box-shadow: 0 0 10px rgba(243, 156, 18, 0.6);
+        }
 
         /* --- My Clan Section --- */
         #my-clan-tab .content-wrapper { background: var(--transparent-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 30px; box-shadow: inset 0 0 20px rgba(0,0,0,0.6); }
@@ -148,7 +157,7 @@
         .reject-btn { background-color: var(--status-rejected); color: white; }
         /* Modal Prompt Styles */
         .modal-prompt-body { padding: 20px 10px; text-align: center; }
-        .modal-prompt-body p { margin-bottom: 20px; font-size: 1.1rem; }
+        .modal-prompt-body p { margin-bottom: 20px; font-size: 1.1rem; line-height: 1.6; }
         .modal-prompt-body input { width: 100%; padding: 12px; border-radius: 8px; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: var(--text-light); font-family: inherit; font-size: 1rem; margin-bottom: 20px; }
         .modal-prompt-body input:focus { border-color: var(--gold-primary); outline: none; box-shadow: 0 0 8px var(--gold-glow); }
         .modal-prompt-actions { display: flex; justify-content: center; gap: 15px; }
@@ -274,6 +283,10 @@
         let unsubscribeFromClan = null;
         let unsubscribeFromChat = null;
 
+        // --- NEW Global State for Join Requests ---
+        let userHasPendingRequest = false;
+        let pendingRequestClanId = null;
+
         // --- Authentication ---
         onAuthStateChanged(auth, user => {
             initialLoader.style.display = 'none';
@@ -293,11 +306,27 @@
         
         async function initializeAppLogic() {
             listenForUserClan();
+            await checkForAnyPendingRequest(); // Check for pending requests before loading clans
             await loadAllClans();
             setupTabListeners();
             setupModalListeners();
             setupBackButtonListener();
             setupManagementListeners();
+        }
+        
+        // --- NEW: Check if user has ANY pending request on load ---
+        async function checkForAnyPendingRequest() {
+            if (!currentUser) return;
+            const q = query(collection(db, 'join_requests'), where("userId", "==", currentUser.uid), where("status", "==", "pending"));
+            const querySnapshot = await getDocs(q);
+            
+            if (!querySnapshot.empty) {
+                userHasPendingRequest = true;
+                pendingRequestClanId = querySnapshot.docs[0].data().clanId;
+            } else {
+                userHasPendingRequest = false;
+                pendingRequestClanId = null;
+            }
         }
 
         // --- Real-time Clan Data Listener ---
@@ -379,18 +408,33 @@
                     return { clan, clanId: doc.id, leaderName };
                 }));
                 
+                let gridHTML = '';
                 clansWithLeaders.forEach(({ clan, clanId, leaderName }) => {
                     const isFull = (clan.memberCount || 0) >= (clan.capacity || 20);
-                    clansGrid.innerHTML += `
+                    
+                    let buttonHTML = '';
+                    // MODIFIED LOGIC for button state
+                    if (userHasPendingRequest) {
+                        if (clanId === pendingRequestClanId) {
+                            buttonHTML = `<button class="join-btn pending" disabled>در حال بررسی</button>`;
+                        } else {
+                            buttonHTML = `<button class="join-btn" disabled>پیوستن</button>`;
+                        }
+                    } else if (isFull) {
+                        buttonHTML = `<button class="join-btn" disabled>پر است</button>`;
+                    } else {
+                        buttonHTML = `<button class="join-btn" data-clan-id="${clanId}" data-clan-name="${clan.name || 'بدون نام'}">پیوستن</button>`;
+                    }
+
+                    gridHTML += `
                         <div class="clan-card">
                             <h3>${clan.name || 'بدون نام'}</h3>
                             <p class="leader">رهبر: ${leaderName}</p>
                             <p class="members">اعضا: ${clan.memberCount || 0}/${clan.capacity || 20}</p>
-                            <button class="join-btn" data-clan-id="${clanId}" ${isFull ? 'disabled' : ''}>
-                                ${isFull ? 'پر است' : 'پیوستن'}
-                            </button>
+                            ${buttonHTML}
                         </div>`;
                 });
+                clansGrid.innerHTML = gridHTML;
 
                 setupJoinButtonListeners(clansGrid);
             } catch (error) {
@@ -698,39 +742,64 @@
         function setupBackButtonListener() {
             document.getElementById('back-btn').addEventListener('click', () => window.history.back());
         }
-
+        
+        // --- HEAVILY MODIFIED ---
         function setupJoinButtonListeners(container) {
             container.addEventListener('click', async (e) => {
-                if (!e.target.matches('.join-btn') || e.target.disabled) return;
+                const joinButton = e.target;
+                if (!joinButton.matches('.join-btn') || joinButton.disabled) return;
                 
-                const clanId = e.target.dataset.clanId;
+                const clanId = joinButton.dataset.clanId;
+                const clanName = joinButton.dataset.clanName;
+
                 if (userClanId) {
                     alert('شما در حال حاضر عضو یک کلن هستید.');
                     return;
                 }
                 
-                // Check for existing pending request
-                const q = query(collection(db, 'join_requests'), where("userId", "==", currentUser.uid), where("clanId", "==", clanId), where("status", "==", "pending"));
-                const existingRequest = await getDocs(q);
-                if (!existingRequest.empty) {
-                    alert('شما قبلا برای این کلن درخواست داده‌اید و در حال بررسی است.');
-                    e.target.textContent = 'درخواست داده شد';
-                    e.target.disabled = true;
-                    return;
-                }
+                // Show confirmation modal
+                showCustomPromptModal({
+                    title: 'تایید درخواست عضویت',
+                    message: `شما در حال ارسال درخواست به کلن «${clanName}» هستید. تا زمانی که این درخواست توسط رهبر کلن بررسی نشود (تایید یا رد شود)، شما قادر به ارسال درخواست به کلن‌های دیگر نخواهید بود. آیا ادامه می‌دهید؟`,
+                    confirmText: 'بله، ارسال کن',
+                    onConfirm: async () => {
+                        // --- Logic to execute after user confirms ---
+                        joinButton.disabled = true;
+                        joinButton.textContent = 'درحال ارسال...';
 
-                e.target.disabled = true;
-                e.target.textContent = 'درحال ارسال...';
-                try {
-                    await addDoc(collection(db, 'join_requests'), {
-                        userId: currentUser.uid, clanId: clanId, status: 'pending', requestedAt: serverTimestamp()
-                    });
-                    e.target.textContent = 'درخواست ارسال شد';
-                    alert('درخواست شما برای پیوستن به کلن ارسال شد.');
-                } catch (error) {
-                    console.error("Error sending join request: ", error);
-                    e.target.disabled = false; e.target.textContent = 'پیوستن';
-                }
+                        try {
+                            // Send request to Firestore
+                            await addDoc(collection(db, 'join_requests'), {
+                                userId: currentUser.uid, 
+                                clanId: clanId, 
+                                status: 'pending', 
+                                requestedAt: serverTimestamp()
+                            });
+
+                            // Update global state
+                            userHasPendingRequest = true;
+                            pendingRequestClanId = clanId;
+
+                            // Instantly update all buttons on the page without refresh
+                            document.querySelectorAll('.join-btn').forEach(btn => {
+                                if (btn.dataset.clanId === clanId) {
+                                    btn.textContent = 'در حال بررسی';
+                                    btn.classList.add('pending');
+                                }
+                                btn.disabled = true;
+                            });
+
+                            alert('درخواست شما برای پیوستن به کلن ارسال شد.');
+
+                        } catch (error) {
+                            console.error("Error sending join request: ", error);
+                            alert('خطا در ارسال درخواست. لطفا دوباره تلاش کنید.');
+                            // Re-enable only the clicked button on failure
+                            joinButton.disabled = false; 
+                            joinButton.textContent = 'پیوستن';
+                        }
+                    }
+                });
             });
         }
         
