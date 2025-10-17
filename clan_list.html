@@ -209,6 +209,7 @@
                                 <button class="management-btn" id="manage-members-btn">اخراج عضو</button>
                                 <button class="management-btn" id="rename-clan-btn">تغییر نام کلن</button>
                                 <button class="management-btn" id="toggle-chat-btn">قفل/بازکردن چت</button>
+                                <button class="management-btn" id="change-music-btn">تغییر موسیقی کلن</button>
                                 <button class="management-btn danger" id="delete-clan-btn">حذف کلن</button>
                             </div>
                         </div>
@@ -238,6 +239,25 @@
             <div id="modal-body"></div>
         </div>
     </div>
+    
+    <!-- مودال جدید برای تنظیم موسیقی کلن -->
+    <div id="music-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" data-modal-id="music-modal">&times;</span>
+            <h2 id="music-modal-title">موسیقی پس‌زمینه کلن</h2>
+            <div id="music-modal-body" class="modal-prompt-body">
+                 <p>آدرس اینترنتی (URL) فایل موسیقی (mp3) را وارد کنید. برای بهترین نتیجه از لینک مستقیم استفاده کنید.</p>
+                 <input type="url" id="music-url-input" placeholder="https://example.com/music.mp3">
+                 <div class="modal-prompt-actions">
+                     <button class="management-btn danger" id="remove-music-btn">حذف موسیقی</button>
+                     <button class="accept-btn" id="save-music-btn">ذخیره</button>
+                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- تگ صوتی برای پخش موسیقی کلن -->
+    <audio id="clan-background-music" loop></audio>
 
 
     <script type="module">
@@ -275,6 +295,11 @@
         const mainModal = document.getElementById('main-modal');
         const modalTitle = document.getElementById('modal-title');
         const modalBody = document.getElementById('modal-body');
+        
+        // --- Music Modal Elements ---
+        const musicModal = document.getElementById('music-modal');
+        const musicUrlInput = document.getElementById('music-url-input');
+        const clanBackgroundMusic = document.getElementById('clan-background-music');
 
         let currentUser = null;
         let userClanId = null;
@@ -310,10 +335,9 @@
             setupModalListeners();
             setupBackButtonListener();
             setupManagementListeners();
-            setupNotInClanListeners(); // **NEW**: Setup listener for create clan button
+            setupNotInClanListeners();
         }
         
-        // --- Check if user has ANY pending request on load ---
         async function checkForAnyPendingRequest() {
             if (!currentUser) return;
             const q = query(collection(db, 'join_requests'), where("userId", "==", currentUser.uid), where("status", "==", "pending"));
@@ -341,11 +365,15 @@
                     displayInClanView(userClanData);
                     listenToClanChat(userClanId);
                     updateChatLockUI();
+                    // پخش موسیقی مخصوص کلن
+                    playClanMusic(userClanData.clanMusicUrl);
                 } else {
                     userClanId = null;
                     userClanData = null;
                     displayNotInClanView();
                     if (unsubscribeFromChat) unsubscribeFromChat();
+                    // توقف موسیقی هنگام خروج از کلن
+                    playClanMusic(null);
                 }
             }, (error) => {
                 console.error("Error listening to user clan status:", error);
@@ -382,7 +410,7 @@
             if (!creatorId) return 'ناشناس';
             try {
                 const userDoc = await getDoc(doc(db, 'users', creatorId));
-                return userDoc.exists() ? userDoc.data().displayName || 'ناشناс' : 'ناشناс';
+                return userDoc.exists() ? userDoc.data().displayName || 'ناشناس' : 'ناشناس';
             } catch (error) {
                 console.error("Error fetching leader name:", error);
                 return 'ناشناس';
@@ -440,6 +468,26 @@
                 clansListContainer.innerHTML = '<p style="text-align: center;">خطا در بارگذاری کلن‌ها.</p>';
             }
         }
+
+        // --- Music Logic ---
+        function playClanMusic(url) {
+            if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
+                // اگر آدرس فعلی با آدرس جدید متفاوت است، آن را تغییر بده و پخش کن
+                if (clanBackgroundMusic.src !== url) {
+                    clanBackgroundMusic.src = url;
+                    clanBackgroundMusic.volume = 0.5; // تنظیم ولوم پیش‌فرض
+                    const playPromise = clanBackgroundMusic.play();
+                    if (playPromise !== undefined) {
+                        playPromise.catch(error => console.warn("پخش خودکار موسیقی ممکن است توسط مرورگر مسدود شده باشد:", error));
+                    }
+                }
+            } else {
+                // اگر آدرسی وجود ندارد، موسیقی را متوقف کن
+                clanBackgroundMusic.pause();
+                clanBackgroundMusic.src = '';
+            }
+        }
+
 
         // --- Chat Logic ---
         function listenToClanChat(clanId) {
@@ -510,7 +558,42 @@
             document.getElementById('rename-clan-btn').addEventListener('click', handleRenameClan);
             document.getElementById('toggle-chat-btn').addEventListener('click', toggleChatLock);
             document.getElementById('delete-clan-btn').addEventListener('click', handleDeleteClan);
+            document.getElementById('change-music-btn').addEventListener('click', showMusicModal);
         }
+        
+        function showMusicModal() {
+            musicUrlInput.value = userClanData?.clanMusicUrl || '';
+            musicModal.style.display = 'block';
+        }
+
+        async function handleSaveClanMusic() {
+            const newUrl = musicUrlInput.value.trim();
+            if (newUrl && !newUrl.startsWith('https://') && !newUrl.startsWith('http://')) {
+                alert('لطفا یک آدرس اینترنتی معتبر وارد کنید.');
+                return;
+            }
+            try {
+                await updateDoc(doc(db, 'clans', userClanId), { clanMusicUrl: newUrl });
+                alert('موسیقی کلن با موفقیت به‌روز شد.');
+                musicModal.style.display = 'none';
+            } catch (error) {
+                console.error("Error saving music URL:", error);
+                alert('خطا در ذخیره موسیقی.');
+            }
+        }
+        
+        async function handleRemoveClanMusic() {
+            musicUrlInput.value = ''; 
+            try {
+                await updateDoc(doc(db, 'clans', userClanId), { clanMusicUrl: '' });
+                alert('موسیقی کلن با موفقیت حذف شد.');
+                musicModal.style.display = 'none';
+            } catch (error) {
+                console.error("Error removing music URL:", error);
+                alert('خطا در حذف موسیقی.');
+            }
+        }
+
 
         async function toggleChatLock() {
             const newStatus = !userClanData.chatLocked;
@@ -523,7 +606,6 @@
             }
         }
         
-        // --- Modal & Management UI Functions ---
         function showCustomPromptModal({ title, message, inputPlaceholder, confirmText, onConfirm }) {
             modalTitle.textContent = title;
             modalBody.innerHTML = `
@@ -794,7 +876,6 @@
             });
         }
 
-        // **START: NEW CODE BLOCK for Creating a Clan**
         function setupNotInClanListeners() {
             const createClanBtn = document.querySelector('.create-clan-btn');
             if (createClanBtn) {
@@ -820,22 +901,19 @@
                     }
 
                     try {
-                        // Create the new clan document in Firestore
                         await addDoc(collection(db, 'clans'), {
                             name: clanName,
                             creatorId: currentUser.uid,
                             members: [currentUser.uid],
                             memberCount: 1,
-                            capacity: 20, // Default capacity
-                            level: 1,     // Default level
-                            score: 0,     // Default score
+                            capacity: 20,
+                            level: 1,
+                            score: 0,
                             chatLocked: false,
                             createdAt: serverTimestamp()
                         });
                         
                         alert(`کلن «${clanName}» با موفقیت ساخته شد!`);
-                        // The onSnapshot listener (listenForUserClan) will automatically
-                        // detect the new clan and update the UI.
 
                     } catch (error) {
                         console.error("Error creating clan: ", error);
@@ -844,17 +922,27 @@
                 }
             });
         }
-        // **END: NEW CODE BLOCK**
         
         function setupModalListeners() {
             document.getElementById('my-requests-btn').onclick = showMyJoinRequests;
             
             document.querySelectorAll('.close-btn').forEach(btn => {
-                btn.onclick = () => { mainModal.style.display = "none"; };
+                btn.onclick = () => { 
+                    const modalId = btn.dataset.modalId;
+                    if (modalId) {
+                        document.getElementById(modalId).style.display = "none";
+                    }
+                };
             });
-            window.onclick = (event) => { if (event.target == mainModal) { mainModal.style.display = "none"; } };
+            window.onclick = (event) => { 
+                if (event.target == mainModal || event.target == musicModal) { 
+                    event.target.style.display = "none";
+                } 
+            };
             
             modalBody.addEventListener('click', handleModalAction);
+            document.getElementById('save-music-btn').addEventListener('click', handleSaveClanMusic);
+            document.getElementById('remove-music-btn').addEventListener('click', handleRemoveClanMusic);
         }
         
         async function showMyJoinRequests() {
