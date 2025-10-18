@@ -18,6 +18,7 @@
             --rarity-common: #795548;
             --rarity-rare: #1E88E5;
             --rarity-legendary: #BA68C8;
+            --success-green: #4CAF50;
         }
 
         * {
@@ -107,8 +108,8 @@
             align-items: center;
             gap: 15px;
         }
-
-        /* NEW: Daily Gift Button */
+        
+        /* --- Daily Gift Button --- */
         .daily-gift-btn {
             background: linear-gradient(145deg, #1d6320, #2f9e34);
             color: white;
@@ -120,18 +121,27 @@
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 2px 8px rgba(46, 125, 50, 0.4);
+            position: relative;
         }
         .daily-gift-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(76, 175, 80, 0.5);
         }
-        .daily-gift-btn:disabled {
-            background: #555;
-            color: #999;
-            border-color: #777;
-            cursor: not-allowed;
-            box-shadow: none;
-            transform: none;
+        /* Glowing effect for available gift */
+        .daily-gift-btn.available::after {
+            content: '';
+            position: absolute;
+            top: -4px; left: -4px; right: -4px; bottom: -4px;
+            border-radius: 24px;
+            background: linear-gradient(145deg, var(--primary-gold), var(--success-green));
+            z-index: -1;
+            filter: blur(8px);
+            animation: glow 2s infinite ease-in-out;
+        }
+        @keyframes glow {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
         }
 
         .gem-balance {
@@ -147,7 +157,7 @@
             filter: drop-shadow(0 0 4px rgba(173, 216, 230, 0.9)); 
         }
 
-        /* NEW: Featured Section */
+        /* --- Featured Section --- */
         .featured-section {
             margin-bottom: 20px;
             flex-shrink: 0;
@@ -174,7 +184,6 @@
              flex-shrink: 0;
              width: 120px; /* Fixed width for featured items */
         }
-
 
         /* --- Controls Bar --- */
         .controls-bar {
@@ -255,7 +264,6 @@
             padding: 10px;
             margin: -10px;
         }
-        /* IMPROVED: Empty State */
         .empty-state {
             grid-column: 1 / -1;
             text-align: center;
@@ -272,13 +280,11 @@
             font-weight: bold;
         }
 
-
         /* --- Avatar Card --- */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        /* NEW: Legendary Glow */
         @keyframes legendary-glow {
             0% { box-shadow: 0 0 8px var(--rarity-legendary), 0 0 12px var(--rarity-legendary) inset; }
             50% { box-shadow: 0 0 14px var(--rarity-legendary), 0 0 20px var(--rarity-legendary) inset; }
@@ -326,7 +332,6 @@
             border-radius: 5px;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
         }
-        /* NEW: Sale Tag */
         .sale-tag {
             position: absolute;
             top: 5px;
@@ -370,7 +375,6 @@
             text-align: center;
             margin-top: auto; /* Pushes to bottom */
         }
-        /* NEW: Sale Price styling */
         .sale-price {
             display: flex;
             align-items: center;
@@ -404,8 +408,8 @@
             transform: scale(1.05) translateY(-2px);
         }
         
-        /* --- Loading Spinner & Modal (Unchanged) --- */
-        .loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; }
+        /* --- Loading Spinner & Modal --- */
+        .loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; }
         .loader { border: 8px solid #f3f3f330; border-top: 8px solid var(--primary-gold); border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; }
         .loader-text { margin-top: 20px; font-size: 1.1rem; font-weight: bold; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -415,7 +419,6 @@
         .modal-overlay.visible .modal-content { transform: scale(1); }
         .modal-avatar { width: 120px; height: 120px; border-radius: 15px; border: 3px solid var(--border-color-hover); margin: 0 auto 15px auto; display: block; }
         .modal-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 10px; color: var(--primary-gold);}
-        /* IMPROVED: Modal Text */
         .modal-text { font-size: 1rem; margin-bottom: 15px; line-height: 1.6; }
         .modal-details { font-size: 0.9rem; color: #ccc; margin-bottom: 25px; }
         .modal-buttons { display: flex; gap: 10px; }
@@ -424,6 +427,89 @@
         .confirm-button:hover { background: linear-gradient(145deg, #a1534d, #6b3431); }
         .cancel-button { color: #f0e6d2; background: transparent; border: 1px solid var(--border-color-hover); }
         .cancel-button:hover { background: rgba(255,255,255,0.1); }
+        
+        /* --- NEW: Daily Reward Modal Styles --- */
+        #daily-reward-modal .modal-content { max-width: 500px; }
+        .reward-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .day-card {
+            background: linear-gradient(145deg, #2a211a, #1a1510);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 15px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .day-name {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+        .day-reward {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        .day-reward .gem-icon { width: 20px; height: 20px; filter: none; }
+
+        /* Day Card States */
+        .day-card.today {
+            border-color: var(--primary-gold);
+            box-shadow: 0 0 15px rgba(255, 201, 71, 0.5);
+        }
+        .day-card.claimable {
+            cursor: pointer;
+        }
+        .day-card.claimable:hover {
+            transform: translateY(-5px);
+            border-color: #fff;
+        }
+        .day-card.claimed {
+            opacity: 0.6;
+            background: #111;
+        }
+        .day-card.claimed::after {
+            content: '✔';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            color: var(--success-green);
+            text-shadow: 0 0 10px rgba(76, 175, 80, 0.8);
+        }
+        .day-card.claimed .day-reward,
+        .day-card.claimed .day-name {
+            filter: blur(2px);
+        }
+        @keyframes reward-burst {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+        .reward-claim-animation {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--primary-gold);
+            text-shadow: 0 0 10px var(--primary-gold);
+            animation: reward-burst 0.7s ease-out forwards;
+            pointer-events: none;
+        }
 
         /* --- Toast Notifications (Unchanged) --- */
         .toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 2000; display: flex; flex-direction: column; gap: 10px; align-items: center; }
@@ -446,8 +532,7 @@
         <div class="user-info-bar">
              <div class="user-info-left">
                 <span id="user-display-name">...</span>
-                <!-- NEW: Daily Gift Button -->
-                <button id="daily-gift-btn" class="daily-gift-btn" disabled>هدیه روزانه</button>
+                <button id="daily-gift-btn" class="daily-gift-btn">هدیه روزانه</button>
             </div>
             <div class="gem-balance">
                 <span id="user-gems">0</span>
@@ -455,13 +540,11 @@
             </div>
         </div>
 
-        <!-- NEW: Featured Section -->
         <section class="featured-section">
             <h2 class="featured-title">✨ ویژه</h2>
             <div id="featured-grid" class="featured-grid"></div>
         </section>
 
-        <!-- IMPROVED: Controls Bar with Rarity Filter -->
         <div class="controls-bar">
             <input type="text" id="search-input" placeholder="جستجوی نام آواتار...">
              <div class="control-group">
@@ -483,18 +566,18 @@
         <main id="avatar-grid" class="avatar-grid"></main>
     </div>
 
-    <!-- Modals, Loaders, Toasts -->
+    <!-- Loader -->
     <div id="loader-overlay" class="loader-overlay">
         <div class="loader"></div>
         <p class="loader-text">در حال بارگذاری فروشگاه...</p>
     </div>
 
+    <!-- Action Modal -->
     <div id="action-modal" class="modal-overlay">
         <div class="modal-content">
             <img id="modal-avatar-img" src="" alt="آواتار" class="modal-avatar">
             <h2 id="modal-title" class="modal-title"></h2>
             <p id="modal-text" class="modal-text"></p>
-            <!-- NEW: Modal details -->
             <p id="modal-details" class="modal-details"></p>
             <div class="modal-buttons">
                 <button id="modal-cancel-btn" class="modal-button cancel-button">انصراف</button>
@@ -503,14 +586,29 @@
         </div>
     </div>
     
+    <!-- NEW: Daily Reward Modal -->
+    <div id="daily-reward-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 class="modal-title">🎁 جایزه روزانه هفتگی 🎁</h2>
+            <p class="modal-text">هر روز برای دریافت الماس رایگان سر بزنید! جوایز در آخر هفته بیشتر می‌شود.</p>
+            <div id="reward-grid" class="reward-grid">
+                <!-- Day cards will be generated by JS -->
+            </div>
+            <div class="modal-buttons">
+                <button id="reward-modal-close-btn" class="modal-button cancel-button">بستن</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Container -->
     <div id="toast-container" class="toast-container"></div>
     
-    <!-- Audio Elements (Unchanged) -->
+    <!-- Audio Elements -->
     <audio id="audio-click" src="https://cdn.pixabay.com/audio/2021/08/04/audio_bb63f68b4b.mp3" preload="auto"></audio>
     <audio id="audio-success" src="https://cdn.pixabay.com/audio/2022/03/15/audio_756314f296.mp3" preload="auto"></audio>
     <audio id="audio-equip" src="https://cdn.pixabay.com/audio/2022/03/10/audio_e621b67f58.mp3" preload="auto"></audio>
     <audio id="audio-error" src="https://cdn.pixabay.com/audio/2022/03/13/audio_0c28d2a8a8.mp3" preload="auto"></audio>
-    <audio id="audio-gift" src="https://cdn.pixabay.com/audio/2022/01/18/audio_45b410716a.mp3" preload="auto"></audio>
+    <audio id="audio-gift" src="httpshttps://cdn.pixabay.com/audio/2022/01/18/audio_45b410716a.mp3" preload="auto"></audio>
 
 
     <script type="module">
@@ -553,22 +651,29 @@
         const featuredGrid = document.getElementById('featured-grid');
         const avatarGrid = document.getElementById('avatar-grid');
         const searchInput = document.getElementById('search-input');
-        // Modals, Buttons, etc.
-        const modal = document.getElementById('action-modal');
+        // Modals
+        const actionModal = document.getElementById('action-modal');
         const modalImg = document.getElementById('modal-avatar-img');
         const modalTitle = document.getElementById('modal-title');
         const modalText = document.getElementById('modal-text');
         const modalDetails = document.getElementById('modal-details');
         const modalConfirmBtn = document.getElementById('modal-confirm-btn');
         const modalCancelBtn = document.getElementById('modal-cancel-btn');
+        const dailyRewardModal = document.getElementById('daily-reward-modal');
+        const rewardGridEl = document.getElementById('reward-grid');
+        const rewardModalCloseBtn = document.getElementById('reward-modal-close-btn');
+
+        // --- Constants ---
+        const DAY_NAMES = ["شنبه", "یکشنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنج‌شنبه", "جمعه"];
+        const WEEKLY_REWARDS = [15, 20, 25, 30, 40, 50, 75]; // Sat -> Fri
 
         // --- State Management ---
         const state = {
             currentUser: null,
             allAvatars: [],
             filters: {
-                category: 'all', // all, purchasable, owned, legendary, rare
-                sort: 'price-asc', // price-asc, price-desc, alpha-asc
+                category: 'all',
+                sort: 'price-asc',
                 search: ''
             }
         };
@@ -606,7 +711,7 @@
                     gems: userData.game || 0,
                     ownedAvatars: userData.ownedAvatars || [],
                     avatarUrl: userData.avatarUrl || "",
-                    lastDailyReward: userData.lastDailyReward || null
+                    dailyRewardStatus: userData.dailyRewardStatus || { weekStart: null, claimedDays: [] }
                 };
                 
                 state.allAvatars = [];
@@ -620,8 +725,9 @@
                     }
                 });
                 
+                await checkAndResetWeeklyReward();
                 renderShop();
-                checkDailyRewardStatus();
+                updateDailyGiftButtonState();
 
             } catch (error) {
                 console.error("خطا در بارگذاری اطلاعات فروشگاه:", error);
@@ -635,14 +741,11 @@
         function renderShop() {
             if (!state.currentUser) return;
             
-            // Update UI
             userDisplayNameEl.textContent = state.currentUser.displayName;
             userGemsEl.textContent = state.currentUser.gems.toLocaleString('fa');
             
-            // --- Filtering, Sorting, Searching ---
             let itemsToRender = [...state.allAvatars];
 
-            // Category Filter
             if (state.filters.category !== 'all') {
                 itemsToRender = itemsToRender.filter(avatar => {
                     const isOwned = state.currentUser.ownedAvatars.includes(avatar.id);
@@ -656,14 +759,12 @@
                 });
             }
 
-            // Search Filter
             if (state.filters.search) {
                 itemsToRender = itemsToRender.filter(avatar => 
                     avatar.name.toLowerCase().includes(state.filters.search.toLowerCase())
                 );
             }
             
-            // Sorting
             switch(state.filters.sort) {
                 case 'price-asc':
                     itemsToRender.sort((a, b) => (a.salePrice || a.price) - (b.salePrice || b.price));
@@ -676,7 +777,6 @@
                     break;
             }
 
-            // --- Render Grids ---
             renderFeaturedGrid();
             renderMainGrid(itemsToRender);
         }
@@ -784,15 +884,15 @@
                     modalTitle.textContent = "الماس کافی نیست";
                     modalText.innerHTML = `شما برای خرید این آواتار به <strong style="color: var(--primary-gold);">${currentPrice.toLocaleString('fa')}</strong> الماس نیاز دارید.`;
                     modalConfirmBtn.textContent = "باشه";
-                    modalConfirmBtn.onclick = hideModal;
+                    modalConfirmBtn.onclick = () => hideModal('action-modal');
                     modalCancelBtn.style.display = 'none';
                 }
             }
-            showModal();
+            showModal('action-modal');
         }
         
         async function purchaseAvatar(avatar) {
-            hideModal();
+            hideModal('action-modal');
             showLoader('در حال انجام تراکنش...');
             const userDocRef = doc(db, 'users', state.currentUser.uid);
             const price = avatar.salePrice || avatar.price;
@@ -826,7 +926,7 @@
         }
         
         async function equipAvatar(avatar) {
-             hideModal();
+             hideModal('action-modal');
              showLoader('در حال تجهیز آواتار...');
              const userDocRef = doc(db, 'users', state.currentUser.uid);
              try {
@@ -843,43 +943,110 @@
                  hideLoader();
              }
         }
-
-        async function handleDailyReward() {
+        
+        // --- NEW: Daily Reward Logic ---
+        function openDailyRewardModal() {
             playSound('audio-click');
-            showLoader('بررسی هدیه روزانه...');
+            rewardGridEl.innerHTML = ''; // Clear previous state
+            const todayIndex = getPersianDayIndex(); // 0 for Sat, 1 for Sun...
+
+            for (let i = 0; i < 7; i++) {
+                const dayCard = document.createElement('div');
+                dayCard.classList.add('day-card');
+
+                const isClaimed = state.currentUser.dailyRewardStatus.claimedDays.includes(i);
+                const isToday = (i === todayIndex);
+                const isClaimable = isToday && !isClaimed;
+
+                if(isToday) dayCard.classList.add('today');
+                if(isClaimed) dayCard.classList.add('claimed');
+                if(isClaimable) dayCard.classList.add('claimable');
+
+                dayCard.innerHTML = `
+                    <span class="day-name">${DAY_NAMES[i]}</span>
+                    <div class="day-reward">
+                        <span>${WEEKLY_REWARDS[i].toLocaleString('fa')}</span>
+                        <img src="https://up.20script.ir/file/03e7-4photoshop-diamond-pack1-removebg-preview.png" alt="Diamond" class="gem-icon">
+                    </div>
+                `;
+
+                if (isClaimable) {
+                    dayCard.addEventListener('click', () => handleClaimReward(i, dayCard), { once: true });
+                }
+                rewardGridEl.appendChild(dayCard);
+            }
+            showModal('daily-reward-modal');
+        }
+
+        async function handleClaimReward(dayIndex, dayCardElement) {
+            playSound('audio-click');
+            dayCardElement.classList.remove('claimable'); // Prevent double click
+
+            const rewardAmount = WEEKLY_REWARDS[dayIndex];
             const userDocRef = doc(db, 'users', state.currentUser.uid);
-            const rewardAmount = Math.floor(Math.random() * (50 - 15 + 1)) + 15; // Random between 15 and 50
 
             try {
+                // Optimistically show animation
+                const animationEl = document.createElement('div');
+                animationEl.className = 'reward-claim-animation';
+                animationEl.textContent = `+${rewardAmount.toLocaleString('fa')}`;
+                dayCardElement.appendChild(animationEl);
+                playSound('audio-gift');
+
                 await runTransaction(db, async (transaction) => {
                     const userDoc = await transaction.get(userDocRef);
                     if (!userDoc.exists()) throw "کاربر یافت نشد!";
-
-                    const now = new Date();
-                    const lastClaim = userDoc.data().lastDailyReward?.toDate();
-                    if (lastClaim && (now.getTime() - lastClaim.getTime()) < 24 * 60 * 60 * 1000) {
-                        throw "شما قبلاً هدیه امروز را دریافت کرده‌اید.";
-                    }
                     
-                    const currentGems = userDoc.data().game || 0;
+                    const data = userDoc.data();
+                    const currentGems = data.game || 0;
+                    const claimedDays = data.dailyRewardStatus?.claimedDays || [];
+
+                    if (claimedDays.includes(dayIndex)) throw "جایزه این روز قبلا دریافت شده!";
+
                     transaction.update(userDocRef, {
                         game: currentGems + rewardAmount,
-                        lastDailyReward: serverTimestamp()
+                        'dailyRewardStatus.claimedDays': arrayUnion(dayIndex)
                     });
                 });
-                
+
+                // Update local state on success
                 state.currentUser.gems += rewardAmount;
-                state.currentUser.lastDailyReward = { toDate: () => new Date() }; // Simulate timestamp locally
-                checkDailyRewardStatus();
-                userGemsEl.textContent = state.currentUser.gems.toLocaleString('fa');
-                playSound('audio-gift');
-                showToast(`شما ${rewardAmount.toLocaleString('fa')} الماس هدیه گرفتید!`, 'success');
+                state.currentUser.dailyRewardStatus.claimedDays.push(dayIndex);
+
+                // Update UI after a short delay for animation
+                setTimeout(() => {
+                    userGemsEl.textContent = state.currentUser.gems.toLocaleString('fa');
+                    dayCardElement.classList.add('claimed');
+                    animationEl.remove();
+                    updateDailyGiftButtonState();
+                    showToast(`شما ${rewardAmount.toLocaleString('fa')} الماس هدیه گرفتید!`, 'success');
+                }, 700);
 
             } catch (error) {
-                 playSound('audio-error');
-                 showToast(error.toString(), 'error');
-            } finally {
-                hideLoader();
+                playSound('audio-error');
+                showToast(error.toString(), 'error');
+                dayCardElement.classList.add('claimable'); // Re-enable on error
+                dayCardElement.querySelector('.reward-claim-animation')?.remove();
+            }
+        }
+
+        async function checkAndResetWeeklyReward() {
+            const lastWeekStart = state.currentUser.dailyRewardStatus.weekStart?.toDate();
+            const currentWeekStart = getStartOfWeek();
+
+            if (!lastWeekStart || lastWeekStart.getTime() < currentWeekStart.getTime()) {
+                const newStatus = {
+                    weekStart: currentWeekStart,
+                    claimedDays: []
+                };
+                try {
+                    const userDocRef = doc(db, 'users', state.currentUser.uid);
+                    await updateDoc(userDocRef, { dailyRewardStatus: newStatus });
+                    state.currentUser.dailyRewardStatus = newStatus;
+                    console.log("هفته جدید جوایز روزانه شروع شد.");
+                } catch (error) {
+                    console.error("خطا در ریست کردن جوایز هفتگی:", error);
+                }
             }
         }
         
@@ -910,32 +1077,57 @@
                 renderShop();
             });
 
-            dailyGiftBtn.addEventListener('click', handleDailyReward);
-            modalCancelBtn.addEventListener('click', hideModal);
-            modal.addEventListener('click', (e) => e.target === modal && hideModal());
+            dailyGiftBtn.addEventListener('click', openDailyRewardModal);
+            modalCancelBtn.addEventListener('click', () => hideModal('action-modal'));
+            actionModal.addEventListener('click', (e) => e.target === actionModal && hideModal('action-modal'));
+            rewardModalCloseBtn.addEventListener('click', () => hideModal('daily-reward-modal'));
+            dailyRewardModal.addEventListener('click', (e) => e.target === dailyRewardModal && hideModal('daily-reward-modal'));
         }
 
         // --- Helper Functions ---
-        function checkDailyRewardStatus() {
-            const lastClaim = state.currentUser.lastDailyReward?.toDate();
-            if (!lastClaim || (new Date().getTime() - lastClaim.getTime()) >= 24 * 60 * 60 * 1000) {
-                dailyGiftBtn.disabled = false;
-                dailyGiftBtn.textContent = 'دریافت هدیه!';
-            } else {
-                dailyGiftBtn.disabled = true;
+        function updateDailyGiftButtonState() {
+            const todayIndex = getPersianDayIndex();
+            const isClaimedToday = state.currentUser.dailyRewardStatus.claimedDays.includes(todayIndex);
+
+            if (isClaimedToday) {
+                dailyGiftBtn.classList.remove('available');
                 dailyGiftBtn.textContent = 'هدیه دریافت شد';
+            } else {
+                dailyGiftBtn.classList.add('available');
+                dailyGiftBtn.textContent = 'دریافت هدیه!';
             }
+        }
+        
+        function getPersianDayIndex() {
+            const day = new Date().getDay(); // Sunday is 0, Saturday is 6
+            return (day + 1) % 7; // Converts to Saturday = 0, Sunday = 1, ... Friday = 6
+        }
+
+        function getStartOfWeek() {
+            const now = new Date();
+            const dayIndex = getPersianDayIndex(); // Our 0-6 index for Saturday-Friday
+            const start = new Date(now);
+            start.setDate(now.getDate() - dayIndex);
+            start.setHours(0, 0, 0, 0); // Set to the beginning of the day
+            return start;
         }
 
         function getRarityText(rarity) {
             return { 'rare': 'کمیاب', 'legendary': 'افسانه‌ای', 'common': 'معمولی' }[rarity] || 'معمولی';
         }
-        function showModal() {
-            modal.classList.add('visible');
-            modalCancelBtn.style.display = 'flex'; 
+        function showModal(modalId) {
+            const modalEl = document.getElementById(modalId);
+            if(modalEl) {
+                modalEl.classList.add('visible');
+                // Special handling for action-modal buttons
+                if (modalId === 'action-modal') {
+                     modalEl.querySelector('.cancel-button').style.display = 'flex';
+                }
+            }
         }
-        function hideModal() {
-            modal.classList.remove('visible');
+        function hideModal(modalId) {
+            const modalEl = document.getElementById(modalId);
+            if(modalEl) modalEl.classList.remove('visible');
         }
         function showLoader(text = 'در حال بارگذاری...') {
             loader.querySelector('.loader-text').textContent = text;
@@ -944,8 +1136,25 @@
         function hideLoader() {
             loader.style.display = 'none';
         }
-        function showToast(message, type = 'info') { /* Unchanged */ }
-        function playSound(soundId) { /* Unchanged */ }
+        function showToast(message, type = 'info') {
+            const toastContainer = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            toastContainer.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'toast-out 0.3s ease-out forwards';
+                toast.addEventListener('animationend', () => toast.remove());
+            }, 3000);
+        }
+        function playSound(soundId) {
+            const audioElement = document.getElementById(soundId);
+            if (audioElement) {
+                audioElement.currentTime = 0;
+                audioElement.play().catch(e => console.log("خطا در پخش صدا:", e));
+            }
+        }
         
         // --- Start the App ---
         main();
