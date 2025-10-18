@@ -109,24 +109,22 @@
         .clan-chat h3 { text-align: center; font-size: 1.4rem; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
         .chat-box { height: 350px; overflow-y: auto; scroll-behavior: smooth; border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; margin-bottom: 20px; background: rgba(0,0,0,0.3); display: flex; flex-direction: column; gap: 15px; }
         
-        .chat-message-wrapper { display: flex; max-width: 80%; width: fit-content; }
-        .chat-message-wrapper.sent { align-self: flex-end; flex-direction: row-reverse; }
-        .chat-message-wrapper.received { align-self: flex-start; }
-
-        .chat-avatar { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--border-color); object-fit: cover; flex-shrink: 0; }
-        .sent .chat-avatar { margin-right: 10px; }
-        .received .chat-avatar { margin-left: 10px; }
-
-        .chat-message { padding: 8px 12px; border-radius: 10px; position: relative; width: 100%; }
-        .chat-message-wrapper.sent .chat-message { background-color: var(--brown-reddish); }
-        .chat-message-wrapper.received .chat-message { background-color: var(--chat-received-bg); }
-
-        .chat-message .sender { font-weight: 700; color: var(--gold-primary); font-size: 0.9rem; margin-bottom: 5px; }
-        .chat-message .text { margin: 5px 0; word-wrap: break-word; }
-        .chat-message .timestamp { font-size: 0.75rem; color: var(--text-muted); text-align: left; margin-top: 4px; }
+        .chat-message { display: flex; align-items: flex-end; gap: 10px; max-width: 85%; }
+        .chat-message.sent { align-self: flex-end; flex-direction: row-reverse; }
+        .chat-message.received { align-self: flex-start; }
+        
+        .chat-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 2px solid var(--border-color); }
+        
+        .message-content { padding: 8px 12px; border-radius: 10px; width: fit-content; position: relative; }
+        .chat-message.sent .message-content { background-color: var(--brown-reddish); }
+        .chat-message.received .message-content { background-color: var(--chat-received-bg); }
+        
+        .message-content .sender { font-weight: 700; color: var(--gold-primary); font-size: 0.9rem; margin-bottom: 5px; }
+        .message-content .text { margin: 5px 0; word-wrap: break-word; }
+        .message-content .timestamp { font-size: 0.75rem; color: var(--text-muted); text-align: left; margin-top: 4px; }
         
         .delete-msg-btn { position: absolute; top: 5px; left: 5px; background: none; border: none; cursor: pointer; opacity: 0; transition: opacity 0.2s; padding: 2px; }
-        .chat-message:hover .delete-msg-btn { opacity: 0.7; }
+        .message-content:hover .delete-msg-btn { opacity: 0.6; }
         .delete-msg-btn:hover { opacity: 1; }
         .delete-msg-btn svg { width: 16px; height: 16px; fill: var(--text-light); }
         
@@ -315,7 +313,7 @@
 
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js';
-        import { getFirestore, collection, addDoc, getDocs, onSnapshot, query, orderBy, serverTimestamp, doc, getDoc, where, updateDoc, deleteDoc, writeBatch, arrayUnion, increment, arrayRemove, runTransaction } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js';
+        import { getFirestore, collection, addDoc, getDocs, onSnapshot, query, orderBy, serverTimestamp, doc, getDoc, where, updateDoc, deleteDoc, writeBatch, arrayUnion, increment, arrayRemove } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js';
         import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js';
 
         const firebaseConfig = {
@@ -353,65 +351,59 @@
         const musicUrlInput = document.getElementById('music-url-input');
         const clanBackgroundMusic = document.getElementById('clan-background-music');
 
+        // --- App State ---
         let currentUser = null;
+        let currentUserProfile = {};
         let userClanId = null;
         let userClanData = null;
+        let clanMemberProfiles = {}; // Cache for member profiles (avatar, name)
         let unsubscribeFromClan = null;
         let unsubscribeFromChat = null;
+        let unsubscribeFromClansList = null;
         let userHasPendingRequest = false;
         let pendingRequestClanId = null;
-        
-        const userCache = {}; // Cache for user data (avatar, name)
-        const DEFAULT_AVATAR_URL = 'https://i.imgur.com/sC22k2A.png'; // A generic default avatar
-        const TRASH_ICON_SVG = `<svg viewBox="0 0 24 24"><path d="M9,3V4H4V6H5V19A2,2 0 0,0 7,21H17A2,2 0 0,0 19,19V6H20V4H15V3H9M7,6H17V19H7V6M9,8V17H11V8H9M13,8V17H15V8H13Z" /></svg>`;
 
-        onAuthStateChanged(auth, user => {
+        const TRASH_ICON_SVG = `<svg viewBox="0 0 24 24"><path d="M9,3V4H4V6H5V19A2,2 0 0,0 7,21H17A2,2 0 0,0 19,19V6H20V4H15V3H9M7,6H17V19H7V6M9,8V17H11V8H9M13,8V17H15V8H13Z" /></svg>`;
+        const DEFAULT_AVATAR_URL = `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2M1YTY4NyI+PHBhdGggZD0iTTEyLCAyQTEwLDEwIDAgMCwwIDIsMTJBMTAsMTAgMCAwLDAgMTIsMjJBMTAsMTAgMCAwLDAgMjIsMTJBMTAsMTAgMCAwLDAgMTIsMlpNMTIsNkE3LDcgMCAwLDEgMTksMTNBMywzIDAgMCwxIDE2LDE2QTEsMSAwIDAsMCAxNSwxNUExLDEgMCAwLDAgMTYsMTRBNSw1IDAgMCwwIDcsMTNBNSw1IDAgMCwwIDEyLDhBMywzIDAgMCwxIDE1LDExQTEsMSAwIDAsMCAxNiwxM0ExLDEgMCAwLDAgMTUsMTJBMiwyIDAgMCwwIDEzLDEwQzEzLDguODkgMTIsNiAxMiw2WiIgLz48L3N2Zz4=`;
+        
+        // --- Authentication Listener ---
+        onAuthStateChanged(auth, async user => {
             initialLoader.style.display = 'none';
             if (user) {
                 currentUser = user;
+                await fetchCurrentUserProfile(); // Fetch profile early
                 authPrompt.style.display = 'none';
                 appContainer.style.display = 'block';
                 initializeAppLogic();
             } else {
                 currentUser = null;
+                currentUserProfile = {};
                 appContainer.style.display = 'none';
                 authPrompt.style.display = 'block';
+                // Clean up all real-time listeners on logout
                 if (unsubscribeFromClan) unsubscribeFromClan();
                 if (unsubscribeFromChat) unsubscribeFromChat();
+                if (unsubscribeFromClansList) unsubscribeFromClansList();
             }
         });
         
+        async function fetchCurrentUserProfile() {
+            if (!currentUser) return;
+            const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+            if (userDoc.exists()) {
+                currentUserProfile = userDoc.data();
+            }
+        }
+
         async function initializeAppLogic() {
             listenForUserClan();
             await checkForAnyPendingRequest();
-            await loadAllClans();
+            listenForAllClans(); // Changed to a real-time listener
             setupTabListeners();
             setupModalListeners();
             setupBackButtonListener();
             setupActionListeners();
             setupNotInClanListeners();
-        }
-
-        async function getUserData(uid) {
-            if (userCache[uid]) {
-                return userCache[uid];
-            }
-            try {
-                const userDoc = await getDoc(doc(db, 'users', uid));
-                if (userDoc.exists()) {
-                    const data = userDoc.data();
-                    const userData = {
-                        displayName: data.displayName || 'کاربر ناشناس',
-                        avatarUrl: data.avatarUrl || DEFAULT_AVATAR_URL,
-                    };
-                    userCache[uid] = userData;
-                    return userData;
-                }
-            } catch (error) {
-                console.error("Error fetching user data:", error);
-            }
-            // Return default data if user not found or error
-            return { displayName: 'کاربر ناشناس', avatarUrl: DEFAULT_AVATAR_URL };
         }
         
         async function checkForAnyPendingRequest() {
@@ -427,11 +419,12 @@
             if (unsubscribeFromClan) unsubscribeFromClan();
             const q = query(collection(db, 'clans'), where('members', 'array-contains', currentUser.uid));
 
-            unsubscribeFromClan = onSnapshot(q, (querySnapshot) => {
+            unsubscribeFromClan = onSnapshot(q, async (querySnapshot) => {
                 if (!querySnapshot.empty) {
                     const clanDoc = querySnapshot.docs[0];
                     userClanId = clanDoc.id;
                     userClanData = clanDoc.data();
+                    await fetchAndCacheMemberProfiles(userClanData.members); // Fetch member profiles
                     displayInClanView(userClanData);
                     listenToClanChat(userClanId);
                     updateChatLockUI();
@@ -439,6 +432,7 @@
                 } else {
                     userClanId = null;
                     userClanData = null;
+                    clanMemberProfiles = {}; // Clear profile cache
                     displayNotInClanView();
                     if (unsubscribeFromChat) unsubscribeFromChat();
                     playClanMusic(null);
@@ -449,6 +443,24 @@
             });
         }
         
+        // --- Caching Function for Avatars/Names ---
+        async function fetchAndCacheMemberProfiles(memberUids) {
+            if (!memberUids || memberUids.length === 0) return;
+            const profilesToFetch = memberUids.filter(uid => !clanMemberProfiles[uid]); // Only fetch new members
+            if (profilesToFetch.length === 0) return;
+
+            try {
+                const userDocs = await Promise.all(profilesToFetch.map(uid => getDoc(doc(db, 'users', uid))));
+                userDocs.forEach(userDoc => {
+                    if (userDoc.exists()) {
+                        clanMemberProfiles[userDoc.id] = userDoc.data();
+                    }
+                });
+            } catch (error) {
+                console.error("Error caching member profiles:", error);
+            }
+        }
+
         function displayInClanView(clanData) {
             notInClanView.style.display = 'none';
             inClanView.style.display = 'block';
@@ -472,19 +484,31 @@
         }
         
         async function getLeaderName(creatorId) {
-            const leaderData = await getUserData(creatorId);
-            return leaderData.displayName;
-        }
-
-        async function loadAllClans() {
-            showClansLoader();
+            if (clanMemberProfiles[creatorId] && clanMemberProfiles[creatorId].displayName) {
+                return clanMemberProfiles[creatorId].displayName;
+            }
+            if (!creatorId) return 'ناشناس';
             try {
-                const querySnapshot = await getDocs(collection(db, 'clans'));
+                const userDoc = await getDoc(doc(db, 'users', creatorId));
+                return userDoc.exists() ? userDoc.data().displayName || 'ناشناس' : 'ناشناس';
+            } catch (error) {
+                console.error("Error fetching leader name:", error);
+                return 'ناشناس';
+            }
+        }
+        
+        // --- REAL-TIME CLAN LIST LISTENER ---
+        function listenForAllClans() {
+            showClansLoader();
+            if (unsubscribeFromClansList) unsubscribeFromClansList(); // Unsubscribe from previous listener
+
+            const q = query(collection(db, 'clans'), orderBy('memberCount', 'desc'));
+            unsubscribeFromClansList = onSnapshot(q, async (querySnapshot) => {
                 clansListContainer.innerHTML = '<div class="clans-grid" id="clans-grid-container"></div>';
                 const clansGrid = document.getElementById('clans-grid-container');
 
                 if (querySnapshot.empty) {
-                    clansGrid.innerHTML = '<p style="text-align: center; grid-column: 1 / -1;">هیچ کلنی یافت نشد.</p>';
+                    clansGrid.innerHTML = '<p style="text-align: center; grid-column: 1 / -1;">هیچ کلنی یافت نشد. اولین کلن را شما بسازید!</p>';
                     return;
                 }
 
@@ -517,11 +541,12 @@
                 clansGrid.innerHTML = gridHTML;
 
                 setupJoinButtonListeners(clansGrid);
-            } catch (error) {
-                console.error("Error loading clans: ", error);
+            }, (error) => {
+                console.error("Error listening to clans list: ", error);
                 clansListContainer.innerHTML = '<p style="text-align: center;">خطا در بارگذاری کلن‌ها.</p>';
-            }
+            });
         }
+
 
         function playClanMusic(url) {
             const isValidUrl = url && (url.startsWith('http://') || url.startsWith('https://'));
@@ -531,8 +556,7 @@
                 clanBackgroundMusic.volume = 0.5;
                 const playPromise = clanBackgroundMusic.play();
                 if (playPromise !== undefined) {
-                    playPromise.catch(error => {
-                        console.warn("Music autoplay was prevented. User must interact with the page first.", error);
+                    playPromise.catch(() => {
                         document.body.addEventListener('click', () => clanBackgroundMusic.play(), { once: true });
                     });
                 }
@@ -546,24 +570,26 @@
             if (unsubscribeFromChat) unsubscribeFromChat();
             const q = query(collection(db, 'clans', clanId, 'chat'), orderBy('timestamp', 'asc'));
 
-            unsubscribeFromChat = onSnapshot(q, async (querySnapshot) => {
-                let htmlContent = '';
-                for (const doc of querySnapshot.docs) {
-                    htmlContent += await renderChatMessage(doc.id, doc.data());
-                }
-                chatBox.innerHTML = htmlContent;
+            unsubscribeFromChat = onSnapshot(q, (querySnapshot) => {
+                chatBox.innerHTML = '';
+                querySnapshot.forEach(doc => renderChatMessage(doc.id, doc.data()));
                 chatBox.scrollTop = chatBox.scrollHeight;
             }, (error) => console.error("Error listening to chat: ", error));
         }
         
-        async function renderChatMessage(msgId, msg) {
-            if (msg.deletedFor && msg.deletedFor.includes(currentUser.uid)) return '';
+        // --- Renders Chat Message with Avatar ---
+        function renderChatMessage(msgId, msg) {
+            if (msg.deletedFor && msg.deletedFor.includes(currentUser.uid)) return;
 
-            const senderData = await getUserData(msg.senderUid);
             const isSent = msg.senderUid === currentUser.uid;
             const isLeader = userClanData.creatorId === currentUser.uid;
             const date = msg.timestamp?.toDate ? msg.timestamp.toDate().toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' }) : '...';
             
+            // Get sender's profile from cache
+            const senderProfile = clanMemberProfiles[msg.senderUid] || {};
+            const senderName = senderProfile.displayName || 'کاربر ناشناس';
+            const senderAvatar = senderProfile.avatarUrl || DEFAULT_AVATAR_URL;
+
             let deleteButton = '';
             if (isLeader) {
                 deleteButton = `<button class="delete-msg-btn" data-msg-id="${msgId}" data-action="leader-delete">${TRASH_ICON_SVG}</button>`;
@@ -571,16 +597,17 @@
                 deleteButton = `<button class="delete-msg-btn" data-msg-id="${msgId}" data-action="user-delete">${TRASH_ICON_SVG}</button>`;
             }
             
-            return `
-                <div class="chat-message-wrapper ${isSent ? 'sent' : 'received'}">
-                    <img src="${senderData.avatarUrl}" alt="Avatar" class="chat-avatar">
-                    <div class="chat-message">
+            const messageHTML = `
+                <div class="chat-message ${isSent ? 'sent' : 'received'}">
+                    <img src="${senderAvatar}" alt="avatar" class="chat-avatar">
+                    <div class="message-content">
                         ${deleteButton}
-                        ${!isSent ? `<p class="sender">${senderData.displayName}</p>` : ''}
+                        ${!isSent ? `<p class="sender">${senderName}</p>` : ''}
                         <p class="text">${msg.text}</p>
                         <p class="timestamp">${date}</p>
                     </div>
                 </div>`;
+            chatBox.innerHTML += messageHTML;
         }
 
 
@@ -596,9 +623,7 @@
         }
 
         // --- Event Listeners Setup ---
-
         function setupActionListeners() {
-            // Leader actions
             document.getElementById('manage-requests-btn').addEventListener('click', showClanJoinRequests);
             document.getElementById('manage-members-btn').addEventListener('click', showKickMembersModal);
             document.getElementById('manage-kicked-btn').addEventListener('click', showKickedListModal);
@@ -606,10 +631,7 @@
             document.getElementById('toggle-chat-btn').addEventListener('click', toggleChatLock);
             document.getElementById('delete-clan-btn').addEventListener('click', handleDeleteClan);
             document.getElementById('change-music-btn').addEventListener('click', showMusicModal);
-            // Member actions
             document.getElementById('leave-clan-btn').addEventListener('click', handleLeaveClan);
-
-            // Chat form
             chatForm.addEventListener('submit', handleSendMessage);
             chatBox.addEventListener('click', handleChatActions);
         }
@@ -635,7 +657,6 @@
 
         function setupModalListeners() {
             document.getElementById('my-requests-btn').onclick = showMyJoinRequests;
-            
             document.querySelectorAll('.close-btn').forEach(btn => {
                 btn.onclick = () => { 
                     const modalId = btn.dataset.modalId;
@@ -645,7 +666,6 @@
             window.onclick = (event) => { 
                 if (event.target == mainModal || event.target == musicModal) event.target.style.display = "none";
             };
-            
             modalBody.addEventListener('click', handleModalAction);
             document.getElementById('save-music-btn').addEventListener('click', handleSaveClanMusic);
             document.getElementById('remove-music-btn').addEventListener('click', handleRemoveClanMusic);
@@ -671,7 +691,6 @@
                     onConfirm: async () => {
                         joinButton.disabled = true;
                         joinButton.textContent = 'درحال ارسال...';
-
                         try {
                             await addDoc(collection(db, 'join_requests'), {
                                 userId: currentUser.uid, 
@@ -679,19 +698,10 @@
                                 status: 'pending', 
                                 requestedAt: serverTimestamp()
                             });
-
                             userHasPendingRequest = true;
                             pendingRequestClanId = clanId;
-
-                            document.querySelectorAll('.join-btn:not(:disabled)').forEach(btn => {
-                                btn.disabled = true;
-                                if (btn.dataset.clanId === clanId) {
-                                    btn.textContent = 'در حال بررسی';
-                                    btn.classList.add('pending');
-                                }
-                            });
+                            // The real-time listener will automatically update the button states across the UI.
                             alert('درخواست شما برای پیوستن به کلن ارسال شد.');
-
                         } catch (error) {
                             console.error("Error sending join request: ", error);
                             alert('خطا در ارسال درخواست. لطفا دوباره تلاش کنید.');
@@ -704,7 +714,6 @@
         }
         
         // --- Action Handlers ---
-
         async function handleSendMessage(e) {
             e.preventDefault();
             if (!userClanId || !currentUser || chatMessageInput.disabled) return;
@@ -717,6 +726,7 @@
             try {
                 await addDoc(collection(db, 'clans', userClanId, 'chat'), {
                     senderUid: currentUser.uid,
+                    // Note: senderName and avatar are fetched during render, not stored in the message doc
                     text: tempInputValue,
                     timestamp: serverTimestamp()
                 });
@@ -737,23 +747,19 @@
             if (action === 'leader-delete') {
                 if (confirm('آیا از حذف این پیام برای تمام اعضا اطمینان دارید؟')) {
                     try {
-                        const msgRef = doc(db, 'clans', userClanId, 'chat', msgId);
-                        await deleteDoc(msgRef);
+                        await deleteDoc(doc(db, 'clans', userClanId, 'chat', msgId));
                     } catch (error) {
                         console.error("Error deleting message for everyone:", error);
-                        alert('خطا در حذف پیام.');
                     }
                 }
             } else if (action === 'user-delete') {
                 if (confirm('آیا می‌خواهید این پیام را برای خودتان حذف کنید؟ (دیگران همچنان آن را می‌بینند)')) {
                      try {
-                        const msgRef = doc(db, 'clans', userClanId, 'chat', msgId);
-                        await updateDoc(msgRef, {
+                        await updateDoc(doc(db, 'clans', userClanId, 'chat', msgId), {
                             deletedFor: arrayUnion(currentUser.uid)
                         });
                     } catch (error) {
                         console.error("Error deleting message for self:", error);
-                        alert('خطا در حذف پیام.');
                     }
                 }
             }
@@ -767,17 +773,13 @@
         async function handleSaveClanMusic() {
             const newUrl = musicUrlInput.value.trim();
             if (newUrl && !newUrl.startsWith('https://') && !newUrl.startsWith('http://')) {
-                alert('لطفا یک آدرس اینترنتی معتبر وارد کنید.');
-                return;
+                alert('لطفا یک آدرس اینترنتی معتبر وارد کنید.'); return;
             }
             try {
                 await updateDoc(doc(db, 'clans', userClanId), { clanMusicUrl: newUrl });
                 alert('موسیقی کلن با موفقیت به‌روز شد.');
                 musicModal.style.display = 'none';
-            } catch (error) {
-                console.error("Error saving music URL:", error);
-                alert('خطا در ذخیره موسیقی.');
-            }
+            } catch (error) { console.error("Error saving music URL:", error); }
         }
         
         async function handleRemoveClanMusic() {
@@ -786,10 +788,7 @@
                 await updateDoc(doc(db, 'clans', userClanId), { clanMusicUrl: '' });
                 alert('موسیقی کلن با موفقیت حذف شد.');
                 musicModal.style.display = 'none';
-            } catch (error) {
-                console.error("Error removing music URL:", error);
-                alert('خطا در حذف موسیقی.');
-            }
+            } catch (error) { console.error("Error removing music URL:", error); }
         }
 
         async function toggleChatLock() {
@@ -797,10 +796,7 @@
             try {
                 await updateDoc(doc(db, 'clans', userClanId), { chatLocked: newStatus });
                 alert(`چت کلن با موفقیت ${newStatus ? 'قفل' : 'باز'} شد.`);
-            } catch (error) {
-                console.error("Error toggling chat lock:", error);
-                alert('خطا در تغییر وضعیت چت.');
-            }
+            } catch (error) { console.error("Error toggling chat lock:", error); }
         }
         
         function handleRenameClan() {
@@ -811,16 +807,12 @@
                 confirmText: 'تایید',
                 onConfirm: async (newName) => {
                     if (newName.length < 3 || newName.length > 20) {
-                        alert("نام کلن باید بین ۳ تا ۲۰ حرف باشد.");
-                        return;
+                        alert("نام کلن باید بین ۳ تا ۲۰ حرف باشد."); return;
                     }
                     try {
                         await updateDoc(doc(db, 'clans', userClanId), { name: newName });
                         alert('نام کلن با موفقیت تغییر کرد.');
-                    } catch (error) {
-                        console.error("Error renaming clan:", error);
-                        alert('خطا در تغییر نام کلن.');
-                    }
+                    } catch (error) { console.error("Error renaming clan:", error); }
                 }
             });
         }
@@ -835,10 +827,7 @@
                      try {
                         await deleteDoc(doc(db, 'clans', userClanId));
                         alert('کلن با موفقیت حذف شد.');
-                    } catch (error) {
-                        console.error("Error deleting clan:", error);
-                        alert('خطا در حذف کلن.');
-                    }
+                    } catch (error) { console.error("Error deleting clan:", error); }
                 }
             });
         }
@@ -856,16 +845,12 @@
                             memberCount: increment(-1)
                         });
                         alert(`شما با موفقیت از کلن خارج شدید.`);
-                    } catch (error) {
-                        console.error("Error leaving clan:", error);
-                        alert("خطا در خروج از کلن.");
-                    }
+                    } catch (error) { console.error("Error leaving clan:", error); }
                 }
             });
         }
         
         // --- Modal Content Generators ---
-
         function showCustomPromptModal({ title, message, inputPlaceholder, confirmText, onConfirm, isDanger = false }) {
             modalTitle.textContent = title;
             modalBody.innerHTML = `
@@ -877,23 +862,15 @@
                          <button class="modal-button ${isDanger ? 'modal-danger-btn' : 'modal-confirm-btn'}" id="modal-confirm-btn">${confirmText}</button>
                     </div>
                 </div>`;
-            
             mainModal.style.display = 'block';
-            
             const confirmBtn = document.getElementById('modal-confirm-btn');
             const cancelBtn = document.getElementById('modal-cancel-btn');
             const input = document.getElementById('modal-prompt-input');
-
             const closeModal = () => mainModal.style.display = 'none';
-
             confirmBtn.onclick = () => {
                 const value = input ? input.value.trim() : true;
-                if (value || !input) {
-                    onConfirm(value);
-                    closeModal();
-                } else {
-                    alert('لطفا مقداری را وارد کنید.');
-                }
+                if (value || !input) { onConfirm(value); closeModal(); } 
+                else { alert('لطفا مقداری را وارد کنید.'); }
             };
             cancelBtn.onclick = closeModal;
         }
@@ -902,98 +879,64 @@
             modalTitle.textContent = 'درخواست‌های عضویت';
             modalBody.innerHTML = '<p style="text-align:center;">در حال بارگذاری...</p>';
             mainModal.style.display = "block";
-
             try {
                 const q = query(collection(db, "join_requests"), where("clanId", "==", userClanId), where("status", "==", "pending"));
                 const querySnapshot = await getDocs(q);
-
                 if (querySnapshot.empty) {
-                    modalBody.innerHTML = '<p style="text-align:center;">هیچ درخواست جدیدی وجود ندارد.</p>';
-                    return;
+                    modalBody.innerHTML = '<p style="text-align:center;">هیچ درخواست جدیدی وجود ندارد.</p>'; return;
                 }
-                
                 let html = '';
                 for (const reqDoc of querySnapshot.docs) {
                     const request = reqDoc.data();
-                    const userData = await getUserData(request.userId);
-                    
-                    html += `
-                        <div class="list-item">
-                            <span>${userData.displayName}</span>
-                            <div class="item-actions">
-                                <button class="modal-button accept-btn" data-action="accept-request" data-req-id="${reqDoc.id}" data-user-id="${request.userId}">پذیرش</button>
-                                <button class="modal-button reject-btn" data-action="reject-request" data-req-id="${reqDoc.id}">رد</button>
-                            </div>
-                        </div>`;
+                    const user = await getDoc(doc(db, 'users', request.userId));
+                    const userName = user.exists() ? user.data().displayName : 'کاربر حذف شده';
+                    html += `<div class="list-item"><span>${userName}</span><div class="item-actions"><button class="modal-button accept-btn" data-action="accept-request" data-req-id="${reqDoc.id}" data-user-id="${request.userId}">پذیرش</button><button class="modal-button reject-btn" data-action="reject-request" data-req-id="${reqDoc.id}">رد</button></div></div>`;
                 }
                 modalBody.innerHTML = html;
-            } catch(error) {
-                console.error("Error fetching clan requests: ", error);
-                modalBody.innerHTML = '<p style="text-align:center;">خطا در دریافت درخواست‌ها.</p>';
-            }
+            } catch(error) { console.error("Error fetching clan requests: ", error); }
         }
         
         async function showKickMembersModal() {
             modalTitle.textContent = 'اخراج عضو';
             modalBody.innerHTML = '<p style="text-align:center;">در حال بارگذاری لیست اعضا...</p>';
             mainModal.style.display = "block";
-
             try {
                 const memberUIDs = userClanData.members.filter(uid => uid !== currentUser.uid);
-
                 if (memberUIDs.length === 0) {
-                     modalBody.innerHTML = '<p style="text-align:center;">عضو دیگری برای اخراج وجود ندارد.</p>';
-                     return;
+                     modalBody.innerHTML = '<p style="text-align:center;">عضو دیگری برای اخراج وجود ندارد.</p>'; return;
                 }
-                
+                const memberDocs = await Promise.all(memberUIDs.map(uid => getDoc(doc(db, 'users', uid))));
                 let html = '';
-                for (const memberId of memberUIDs) {
-                    const memberData = await getUserData(memberId);
-                    html += `
-                        <div class="list-item">
-                            <span>${memberData.displayName}</span>
-                            <div class="item-actions">
-                                <button class="modal-button reject-btn" data-action="kick-member" data-user-id="${memberId}" data-user-name="${memberData.displayName}">اخراج</button>
-                            </div>
-                        </div>`;
-                }
+                memberDocs.forEach(memberDoc => {
+                    if (memberDoc.exists()) {
+                        const memberData = memberDoc.data();
+                        html += `<div class="list-item"><span>${memberData.displayName || 'کاربر بی‌نام'}</span><div class="item-actions"><button class="modal-button reject-btn" data-action="kick-member" data-user-id="${memberDoc.id}" data-user-name="${memberData.displayName}">اخراج</button></div></div>`;
+                    }
+                });
                 modalBody.innerHTML = html;
-            } catch(error) {
-                console.error("Error fetching members for kicking:", error);
-                modalBody.innerHTML = '<p style="text-align:center;">خطا در دریافت لیست اعضا.</p>';
-            }
+            } catch(error) { console.error("Error fetching members for kicking:", error); }
         }
 
         async function showKickedListModal() {
             modalTitle.textContent = 'مدیریت اخراج‌شدگان';
             modalBody.innerHTML = '<p style="text-align:center;">در حال بارگذاری لیست...</p>';
             mainModal.style.display = "block";
-            
             try {
                 const kickedUIDs = userClanData.kickedMembers || [];
                 if (kickedUIDs.length === 0) {
-                     modalBody.innerHTML = '<p style="text-align:center;">هیچ عضو اخراج شده‌ای وجود ندارد.</p>';
-                     return;
+                     modalBody.innerHTML = '<p style="text-align:center;">هیچ عضو اخراج شده‌ای وجود ندارد.</p>'; return;
                 }
+                const memberDocs = await Promise.all(kickedUIDs.map(uid => getDoc(doc(db, 'users', uid))));
                 let html = '';
-                for (const memberId of kickedUIDs) {
-                    const memberData = await getUserData(memberId);
-                    html += `
-                        <div class="list-item">
-                            <span>${memberData.displayName}</span>
-                            <div class="item-actions">
-                                <button class="modal-button accept-btn" data-action="un-kick" data-user-id="${memberId}">عفو</button>
-                            </div>
-                        </div>`;
-                }
+                memberDocs.forEach(memberDoc => {
+                    if (memberDoc.exists()) {
+                        html += `<div class="list-item"><span>${memberDoc.data().displayName || 'کاربر بی‌نام'}</span><div class="item-actions"><button class="modal-button accept-btn" data-action="un-kick" data-user-id="${memberDoc.id}">عفو</button></div></div>`;
+                    }
+                });
                 modalBody.innerHTML = html;
-            } catch(error) {
-                console.error("Error fetching kicked members:", error);
-                modalBody.innerHTML = '<p style="text-align:center;">خطا در دریافت لیست.</p>';
-            }
+            } catch(error) { console.error("Error fetching kicked members:", error); }
         }
         
-        // --- Modal Action Handler ---
         async function handleModalAction(e) {
             const target = e.target.closest('.modal-button');
             if (!target) return;
@@ -1002,168 +945,88 @@
 
             if (action === 'accept-request') {
                 target.disabled = true;
-                const reqId = target.dataset.reqId;
-                const userId = target.dataset.userId;
-
                 const batch = writeBatch(db);
-                const clanRef = doc(db, 'clans', userClanId);
-                const requestRef = doc(db, 'join_requests', reqId);
-
-                batch.update(clanRef, { members: arrayUnion(userId), memberCount: increment(1) });
-                batch.update(requestRef, { status: true });
-
+                batch.update(doc(db, 'clans', userClanId), { members: arrayUnion(target.dataset.userId), memberCount: increment(1) });
+                batch.update(doc(db, 'join_requests', target.dataset.reqId), { status: true });
                 try {
                     await batch.commit();
                     target.closest('.list-item').remove();
-                    if (modalBody.children.length === 0) modalBody.innerHTML = '<p style="text-align:center;">هیچ درخواست دیگری وجود ندارد.</p>';
-                } catch (error) {
-                    console.error("Error accepting request: ", error);
-                    alert("خطا در پذیرش درخواست.");
-                    target.disabled = false;
-                }
+                } catch (error) { console.error("Error accepting request: ", error); target.disabled = false; }
             }
 
             if (action === 'reject-request') {
                 target.disabled = true;
-                const reqId = target.dataset.reqId;
                 try {
-                    await updateDoc(doc(db, 'join_requests', reqId), { status: false });
+                    await updateDoc(doc(db, 'join_requests', target.dataset.reqId), { status: false });
                     target.closest('.list-item').remove();
-                    if (modalBody.children.length === 0) modalBody.innerHTML = '<p style="text-align:center;">هیچ درخواست دیگری وجود ندارد.</p>';
-                } catch (error) {
-                    console.error("Error rejecting request: ", error);
-                    alert("خطا در رد کردن درخواست.");
-                    target.disabled = false;
-                }
+                } catch (error) { console.error("Error rejecting request: ", error); target.disabled = false; }
             }
 
             if (action === 'kick-member') {
-                const userId = target.dataset.userId;
-                const userName = target.dataset.userName;
                 showCustomPromptModal({
                     title: 'اخراج عضو',
-                    message: `آیا از اخراج کاربر «${userName}» اطمینان دارید؟ این کاربر دیگر قادر به درخواست عضویت نخواهد بود مگر اینکه او را عفو کنید.`,
-                    confirmText: 'اخراج',
-                    isDanger: true,
+                    message: `آیا از اخراج کاربر «${target.dataset.userName}» اطمینان دارید؟`, confirmText: 'اخراج', isDanger: true,
                     onConfirm: async () => {
                          try {
-                            await updateDoc(doc(db, 'clans', userClanId), {
-                                members: arrayRemove(userId),
-                                kickedMembers: arrayUnion(userId),
-                                memberCount: increment(-1)
-                            });
-                            alert(`کاربر ${userName} با موفقیت اخراج شد.`);
+                            await updateDoc(doc(db, 'clans', userClanId), { members: arrayRemove(target.dataset.userId), kickedMembers: arrayUnion(target.dataset.userId), memberCount: increment(-1) });
                             mainModal.style.display = 'none';
-                            await loadAllClans(); // Refresh clan list to show kicked status
-                        } catch (error) {
-                            console.error("Error kicking member:", error);
-                            alert("خطا در اخراج عضو.");
-                        }
+                        } catch (error) { console.error("Error kicking member:", error); }
                     }
                 });
             }
 
             if (action === 'un-kick') {
-                const userId = target.dataset.userId;
                 try {
-                    await updateDoc(doc(db, 'clans', userClanId), {
-                        kickedMembers: arrayRemove(userId)
-                    });
+                    await updateDoc(doc(db, 'clans', userClanId), { kickedMembers: arrayRemove(target.dataset.userId) });
                     target.closest('.list-item').remove();
-                    if (modalBody.children.length === 0) modalBody.innerHTML = '<p style="text-align:center;">هیچ عضو اخراج شده دیگری وجود ندارد.</p>';
-                    await loadAllClans(); // Refresh clan list
-                } catch (error) {
-                    console.error("Error un-kicking member:", error);
-                    alert("خطا در عفو عضو.");
-                }
+                } catch (error) { console.error("Error un-kicking member:", error); }
             }
         }
 
-        // --- Create Clan ---
         function handleCreateClan() {
-            if (userClanId) {
-                alert("شما در حال حاضر عضو یک کلن هستید.");
-                return;
-            }
-
+            if (userClanId) { alert("شما در حال حاضر عضو یک کلن هستید."); return; }
             showCustomPromptModal({
-                title: 'ساخت کلن جدید',
-                message: 'یک نام برای کلن خود انتخاب کنید. (بین ۳ تا ۲۰ حرف)',
-                inputPlaceholder: 'نام کلن...',
-                confirmText: 'ساخت کلن',
+                title: 'ساخت کلن جدید', message: 'یک نام برای کلن خود انتخاب کنید. (بین ۳ تا ۲۰ حرف)',
+                inputPlaceholder: 'نام کلن...', confirmText: 'ساخت کلن',
                 onConfirm: async (clanName) => {
                     if (!clanName || clanName.length < 3 || clanName.length > 20) {
-                        alert("نام کلن باید بین ۳ تا ۲۰ حرف باشد.");
-                        return;
+                        alert("نام کلن باید بین ۳ تا ۲۰ حرف باشد."); return;
                     }
                     try {
                         await addDoc(collection(db, 'clans'), {
-                            name: clanName,
-                            creatorId: currentUser.uid,
-                            members: [currentUser.uid],
-                            kickedMembers: [],
-                            memberCount: 1,
-                            capacity: 20,
-                            level: 1,
-                            score: 0,
-                            chatLocked: false,
-                            createdAt: serverTimestamp(),
-                            clanMusicUrl: ''
+                            name: clanName, creatorId: currentUser.uid, members: [currentUser.uid],
+                            kickedMembers: [], memberCount: 1, capacity: 20, level: 1, score: 0,
+                            chatLocked: false, createdAt: serverTimestamp(), clanMusicUrl: ''
                         });
                         alert(`کلن «${clanName}» با موفقیت ساخته شد!`);
-                        await loadAllClans();
-                    } catch (error) {
-                        console.error("Error creating clan: ", error);
-                        alert("خطایی در ساخت کلن رخ داد.");
-                    }
+                    } catch (error) { console.error("Error creating clan: ", error); }
                 }
             });
         }
         
-        // --- My Requests Modal ---
         async function showMyJoinRequests() {
             modalTitle.textContent = 'درخواست‌های عضویت من';
             modalBody.innerHTML = '<p style="text-align:center;">در حال بارگذاری...</p>';
             mainModal.style.display = "block";
-            
             try {
                 const q = query(collection(db, "join_requests"), where("userId", "==", currentUser.uid), orderBy("requestedAt", "desc"));
                 const querySnapshot = await getDocs(q);
-                
                 if (querySnapshot.empty) {
-                    modalBody.innerHTML = '<p style="text-align:center;">شما هیچ درخواستی ندارید.</p>';
-                    return;
+                    modalBody.innerHTML = '<p style="text-align:center;">شما هیچ درخواستی ندارید.</p>'; return;
                 }
-                
                 let html = '';
                 for (const reqDoc of querySnapshot.docs) {
                     const request = reqDoc.data();
                     const clanDoc = await getDoc(doc(db, 'clans', request.clanId));
                     const clanName = clanDoc.exists() ? clanDoc.data().name : 'کلن حذف شده';
-
                     let statusText, statusColor;
-                    if (request.status === 'pending') {
-                        statusText = 'درحال بررسی';
-                        statusColor = 'var(--status-pending)';
-                    } else if (request.status === true) {
-                        statusText = 'تایید شده';
-                        statusColor = 'var(--status-accepted)';
-                    } else {
-                        statusText = 'رد شده';
-                        statusColor = 'var(--status-rejected)';
-                    }
-                    
-                    html += `
-                        <div class="list-item">
-                            <span>درخواست برای کلن «${clanName}»</span>
-                            <span style="color: ${statusColor}; font-weight: 700;">${statusText}</span>
-                        </div>`;
+                    if (request.status === 'pending') { statusText = 'درحال بررسی'; statusColor = 'var(--status-pending)';}
+                    else if (request.status === true) { statusText = 'تایید شده'; statusColor = 'var(--status-accepted)';}
+                    else { statusText = 'رد شده'; statusColor = 'var(--status-rejected)'; }
+                    html += `<div class="list-item"><span>درخواست برای کلن «${clanName}»</span><span style="color: ${statusColor}; font-weight: 700;">${statusText}</span></div>`;
                 }
                 modalBody.innerHTML = html;
-            } catch(error) {
-                console.error("Error fetching my requests: ", error);
-                modalBody.innerHTML = '<p style="text-align:center;">خطا در دریافت درخواست‌های شما.</p>';
-            }
+            } catch(error) { console.error("Error fetching my requests: ", error); }
         }
     </script>
 </body>
