@@ -159,6 +159,7 @@
             border: 1px solid rgba(79, 217, 79, 0.5);
         }
 
+        /* --- START: Modal Styles --- */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -208,6 +209,11 @@
             margin-bottom: 15px;
         }
 
+        .modal-body strong {
+            color: #fff;
+            font-weight: 700;
+        }
+        
         #confirm-user-info {
             display: flex;
             flex-direction: column;
@@ -247,11 +253,17 @@
             background: linear-gradient(145deg, #27ae60, #229954);
             color: white;
         }
+        .modal-button.confirm:hover {
+            background: linear-gradient(145deg, #2ecc71, #27ae60);
+        }
         .modal-button.cancel {
             background: linear-gradient(145deg, #616161, #3a3a3a);
             color: #e0dacc;
         }
-        
+        .modal-button.cancel:hover {
+            background: linear-gradient(145deg, #757575, #4f4f4f);
+        }
+
         .close-button {
             background: none;
             border: 2px solid #ff9e9e;
@@ -265,7 +277,13 @@
             margin-top: 20px;
             transition: all 0.3s;
         }
+        .close-button:hover {
+            background: rgba(217, 83, 79, 0.2);
+            color: #fff;
+        }
+        /* --- END: Modal Styles --- */
 
+        /* --- START: Suspension Modal Styles --- */
         .modal-content.suspension {
             border-color: var(--suspension-border);
             box-shadow: 0 0 25px var(--suspension-glow), 0 15px 45px rgba(0, 0, 0, 0.7);
@@ -282,11 +300,14 @@
             border-radius: 50%;
             object-fit: cover;
             border: 3px solid var(--suspension-red);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            margin-bottom: 15px;
         }
         #suspension-name {
             font-size: 1.5rem;
             font-weight: 700;
             color: #e0dacc;
+            text-shadow: 1px 1px 3px #000;
         }
         #suspension-title {
             font-size: 2rem;
@@ -300,6 +321,8 @@
             padding: 12px;
             background-color: rgba(0,0,0,0.3);
             border-radius: 8px;
+            font-style: italic;
+            border: 1px solid rgba(255,255,255,0.1);
         }
         .countdown-timer {
             display: flex;
@@ -314,6 +337,10 @@
             border-radius: 12px;
             border: 1px solid #5c4a3a;
             min-width: 70px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
         #suspension-countdown-timer .time-block {
             border-color: var(--suspension-border);
@@ -323,13 +350,18 @@
             font-size: 2.5rem;
             font-weight: 900;
             color: white;
+            line-height: 1;
         }
          #suspension-countdown-timer .time-value { color: #f8d7da; }
         .time-label {
             font-size: 0.8rem;
+            font-weight: 400;
             color: #e0dacc;
             margin-top: 8px;
         }
+        #suspension-countdown-timer .time-label { color: #f5c6cb; }
+        /* --- END: Suspension Modal Styles --- */
+
     </style>
 </head>
 <body>
@@ -340,11 +372,11 @@
         <form id="login-form">
             <div class="input-group">
                 <label for="email">ایمیل</label>
-                <input type="email" id="email" class="auth-input" required>
+                <input type="email" id="email" class="auth-input" required autocomplete="email">
             </div>
             <div class="input-group">
                 <label for="password">رمز عبور</label>
-                <input type="password" id="password" class="auth-input" required>
+                <input type="password" id="password" class="auth-input" required autocomplete="current-password">
             </div>
             <button type="submit" id="login-button" class="auth-button">ورود</button>
         </form>
@@ -388,7 +420,7 @@
         <div class="modal-content" style="text-align: right;">
             <h2 class="modal-title">راهنمای پیدا کردن ایمیل بازیابی</h2>
             <div class="modal-body">
-                <p>گاهی اوقات، ایمیل‌های خودکار به اشتباه توسط سرویس‌دهنده ایمیل شما به عنوان هرزنامه شناسایی می‌شوند.</p>
+                <p>گاهی اوقات, ایمیل‌های خودکار به اشتباه توسط سرویس‌دهنده ایمیل شما به عنوان هرزنامه شناسایی می‌شوند.</p>
                 <p><strong>پوشه اسپم (Spam) یا هرزنامه (Junk) چیست؟</strong> این پوشه‌ای در ایمیل شماست که ایمیل‌های مشکوک به آنجا منتقل می‌شوند.</p>
                 <p><strong>این فرآیند کاملاً امن است.</strong> لطفاً صندوق ورودی و سپس پوشه اسپم ایمیل خود را با دقت بررسی کنید.</p>
             </div>
@@ -416,250 +448,256 @@
         </div>
     </div>
 
-
     <script>
-        // --- START: Configuration ---
-        // آدرس سرور پروکسی خود را اینجا وارد کنید
-        // اگر از nginx استفاده می‌کنید، این مسیر باید به location /api/ اشاره کند
-        const PROXY_URL = 'http://195.248.241.65/api'; 
-        // --- END: Configuration ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- START: Configuration ---
+            const PROXY_URL = 'https://novinmafia.duckdns.org/api';
+            // --- END: Configuration ---
 
+            // --- START: Element Selection ---
+            const loginForm = document.getElementById('login-form');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const loginButton = document.getElementById('login-button');
+            const messageBox = document.getElementById('message-box');
+            const messageText = document.getElementById('message-text');
+            const forgotPasswordLink = document.getElementById('forgot-password-link');
+            
+            const spamGuideContainer = document.getElementById('spam-guide-link-container');
+            const openSpamGuideLink = document.getElementById('open-spam-guide');
+            const spamGuideModal = document.getElementById('spam-guide-modal');
+            const closeSpamGuideButton = document.getElementById('close-spam-guide');
 
-        // --- START: Element Selection ---
-        const loginForm = document.getElementById('login-form');
-        const emailInput = document.getElementById('email');
-        const passwordInput = document.getElementById('password');
-        const loginButton = document.getElementById('login-button');
-        const messageBox = document.getElementById('message-box');
-        const messageText = document.getElementById('message-text');
-        const forgotPasswordLink = document.getElementById('forgot-password-link');
-        
-        const spamGuideContainer = document.getElementById('spam-guide-link-container');
-        const openSpamGuideLink = document.getElementById('open-spam-guide');
-        const spamGuideModal = document.getElementById('spam-guide-modal');
-        const closeSpamGuideButton = document.getElementById('close-spam-guide');
+            const accountConfirmModal = document.getElementById('account-confirm-modal');
+            const confirmAvatar = document.getElementById('confirm-avatar');
+            const confirmName = document.getElementById('confirm-name');
+            const confirmYesBtn = document.getElementById('confirm-yes-btn');
+            const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
 
-        const accountConfirmModal = document.getElementById('account-confirm-modal');
-        const confirmAvatar = document.getElementById('confirm-avatar');
-        const confirmName = document.getElementById('confirm-name');
-        const confirmYesBtn = document.getElementById('confirm-yes-btn');
-        const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
+            const suspensionModal = document.getElementById('suspension-notice-modal');
+            const closeSuspensionButton = document.getElementById('close-suspension-notice');
+            // --- END: Element Selection ---
 
-        const suspensionModal = document.getElementById('suspension-notice-modal');
-        const closeSuspensionButton = document.getElementById('close-suspension-notice');
-        // --- END: Element Selection ---
+            // --- START: State Variables ---
+            let suspensionCountdownInterval = null;
+            // --- END: State Variables ---
 
-        // --- START: State Variables ---
-        let suspensionCountdownInterval = null;
-        // --- END: State Variables ---
-        
-        /**
-         * تابع مرکزی برای ارسال درخواست به سرور پروکسی
-         * @param {string} endpoint - مسیر API (e.g., '/login')
-         * @param {object} body - بدنه درخواست
-         * @returns {Promise<any>} - پاسخ JSON از سرور
-         */
-        async function apiRequest(endpoint, body) {
-            try {
-                const response = await fetch(`${PROXY_URL}${endpoint}`, {
-                    method: 'POST',
+            /**
+             * تابع مرکزی برای ارسال درخواست به سرور واسط
+             * @param {string} endpoint - مسیر API (e.g., '/login')
+             * @param {string} method - متد HTTP (GET, POST, etc.)
+             * @param {object} [body=null] - بدنه درخواست برای متدهای POST/PUT
+             * @returns {Promise<any>} - پاسخ JSON از سرور
+             */
+            async function apiRequest(endpoint, method, body = null) {
+                const options = {
+                    method: method,
                     headers: {
                         'Content-Type': 'application/json',
+                        // 'x-api-key': 'YOUR_CLIENT_SIDE_API_KEY' // Note: This is insecure for public clients
                     },
-                    body: JSON.stringify(body),
-                });
-
-                if (!response.ok) {
-                    // تلاش برای خواندن پیام خطا از سرور
-                    const errorData = await response.json().catch(() => ({ message: `خطای سرور: ${response.status}` }));
-                    throw new Error(errorData.message || 'یک خطای ناشناخته رخ داد.');
+                };
+                if (body) {
+                    options.body = JSON.stringify(body);
                 }
 
-                return await response.json();
-            } catch (error) {
-                // مدیریت خطاهای شبکه یا JSON parsing
-                console.error(`API Request Error to ${endpoint}:`, error);
-                throw new Error(error.message || 'خطا در برقراری ارتباط با سرور.');
-            }
-        }
+                try {
+                    const response = await fetch(`${PROXY_URL}${endpoint}`, options);
+                    const responseData = await response.json();
 
-
-        // --- START: Event Listeners ---
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = emailInput.value.trim();
-            const password = passwordInput.value.trim();
-
-            if (!email || !password) {
-                showMessage("لطفاً ایمیل و رمز عبور را وارد کنید.", 'error'); 
-                return;
-            }
-
-            setLoading(true);
-            try {
-                const data = await apiRequest('/login', { email, password });
-                if (data.success) {
-                    // در صورت موفقیت، می‌توان توکن را در localStorage ذخیره کرد و کاربر را هدایت کرد
-                    // localStorage.setItem('authToken', data.token);
-                    showMessage('ورود موفقیت‌آمیز بود! در حال انتقال...', 'success');
-                    window.location.href = './index.html'; // یا هر صفحه دیگری
-                }
-            } catch (error) {
-                showMessage(error.message, 'error');
-            } finally {
-                setLoading(false);
-            }
-        });
-
-        forgotPasswordLink.addEventListener('click', async (e) => {
-            e.preventDefault();
-            const email = emailInput.value.trim();
-
-            if (!email) {
-                showMessage("برای بازیابی رمز، ابتدا ایمیل خود را در کادر بالا وارد کنید.", 'error');
-                emailInput.focus();
-                return;
-            }
-
-            setLoading(true);
-            try {
-                const data = await apiRequest('/forgot-password', { email });
-                
-                // سرور در پاسخ اولیه، اطلاعات کاربر را برای تایید برمی‌گرداند
-                if (data.success && data.action === 'confirm_user') {
-                    const userData = data.data;
-                    confirmAvatar.src = userData.avatarUrl || 'https://i.imgur.com/T2bT1tG.png';
-                    confirmName.textContent = userData.displayName || 'کاربر ناشناس';
-                    accountConfirmModal.classList.add('visible');
-                    
-                    // یک event listener جدید برای دکمه تایید تنظیم می‌کنیم
-                    confirmYesBtn.onclick = () => handleSendResetEmail(email);
-
-                } else if (data.success && data.action === 'email_sent') {
-                     // این حالت زمانی است که سرور مستقیما ایمیل را ارسال می‌کند (در صورت عدم نیاز به تایید)
-                    showMessage("لینک بازیابی رمز عبور به ایمیل شما ارسال شد. لطفاً صندوق ورودی (Inbox) و پوشه اسپم (Spam) را بررسی کنید.", 'success');
-                    spamGuideContainer.style.display = 'block';
-                }
-                
-            } catch (error) {
-                 // مدیریت خطاهای خاصی که از سرور می‌آیند
-                if (error.message.includes("SUSPENDED")) {
-                    try {
-                        const errorData = JSON.parse(error.message.replace("SUSPENDED:", ""));
-                        showSuspensionNotice(errorData);
-                    } catch(e) {
-                         showMessage("حساب کاربری شما مسدود است.", 'error');
+                    if (!response.ok) {
+                        throw new Error(responseData.message || `خطای سرور: ${response.status}`);
                     }
-                } else {
-                    showMessage(error.message, 'error');
+                    return responseData;
+                } catch (error) {
+                    console.error(`API Request Error to ${endpoint}:`, error);
+                    // Handle generic network errors (fetch failed)
+                    if (error.message.toLowerCase().includes('failed to fetch')) {
+                         throw new Error('خطا در برقراری ارتباط با سرور. لطفاً اتصال اینترنت خود را بررسی کنید.');
+                    }
+                    throw error; // Re-throw the error to be caught by the caller
                 }
-            } finally {
-                setLoading(false);
             }
-        });
-        
-        async function handleSendResetEmail(email) {
-            accountConfirmModal.classList.remove('visible');
-            setLoading(true);
-            try {
-                // درخواست مجدد به همان endpoint اما با یک فلگ اضافه برای ارسال نهایی
-                const data = await apiRequest('/forgot-password', { email, confirm_send: true });
-                if (data.success) {
-                    showMessage("لینک بازیابی رمز عبور به ایمیل شما ارسال شد. لطفاً صندوق ورودی (Inbox) و پوشه اسپم (Spam) را بررسی کنید.", 'success');
-                    spamGuideContainer.style.display = 'block';
-                }
-            } catch (error) {
-                showMessage(error.message, 'error');
-            } finally {
-                setLoading(false);
-            }
-        }
+            
+            // --- START: Event Listeners ---
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = emailInput.value.trim();
+                const password = passwordInput.value.trim();
 
-        // Modal Event Listeners
-        openSpamGuideLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            spamGuideModal.classList.add('visible');
-        });
-
-        closeSpamGuideButton.addEventListener('click', () => spamGuideModal.classList.remove('visible'));
-        closeSuspensionButton.addEventListener('click', () => {
-            suspensionModal.classList.remove('visible');
-            if (suspensionCountdownInterval) {
-                clearInterval(suspensionCountdownInterval);
-                suspensionCountdownInterval = null;
-            }
-        });
-        confirmCancelBtn.addEventListener('click', () => accountConfirmModal.classList.remove('visible'));
-
-        [spamGuideModal, accountConfirmModal, suspensionModal].forEach(modal => {
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    modal.classList.remove('visible');
-                }
-            });
-        });
-        // --- END: Event Listeners ---
-
-
-        // --- START: Helper Functions ---
-        function showSuspensionNotice(suspensionData) {
-            const userData = suspensionData.userData;
-            document.getElementById('suspension-avatar').src = userData.avatarUrl || 'https://i.imgur.com/T2bT1tG.png';
-            document.getElementById('suspension-name').textContent = userData.displayName || 'کاربر';
-            document.getElementById('suspension-reason').textContent = `دلیل مسدودیت: ${userData.banReason || 'نامشخص'}`;
-            suspensionModal.classList.add('visible');
-            startSuspensionCountdown(new Date(suspensionData.banExpiresAt));
-        }
-
-        function startSuspensionCountdown(targetDate) {
-            if (suspensionCountdownInterval) clearInterval(suspensionCountdownInterval);
-
-            const countdownElements = {
-                days: document.getElementById('s-days'),
-                hours: document.getElementById('s-hours'),
-                minutes: document.getElementById('s-minutes'),
-                seconds: document.getElementById('s-seconds')
-            };
-
-            const updateTimer = () => {
-                const distance = targetDate.getTime() - new Date().getTime();
-
-                if (distance < 0) {
-                    clearInterval(suspensionCountdownInterval);
-                    suspensionCountdownInterval = null;
-                    Object.values(countdownElements).forEach(el => el.textContent = '00');
+                if (!email || !password) {
+                    showMessage("لطفاً ایمیل و رمز عبور را وارد کنید.", 'error'); 
                     return;
                 }
 
-                const f = (n) => String(Math.floor(n)).padStart(2, '0');
-                countdownElements.days.textContent = f(distance / (1000 * 60 * 60 * 24));
-                countdownElements.hours.textContent = f((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                countdownElements.minutes.textContent = f((distance % (1000 * 60 * 60)) / (1000 * 60));
-                countdownElements.seconds.textContent = f((distance % (1000 * 60)) / 1000);
-            };
+                setLoading(true);
+                try {
+                    const data = await apiRequest('/login', 'POST', { email, password });
+                    if (data.success && data.token) {
+                        localStorage.setItem('authToken', data.token); // ذخیره توکن برای نشست‌های بعدی
+                        showMessage('ورود موفقیت‌آمیز بود! در حال انتقال...', 'success');
+                        // تاخیر کوتاه برای نمایش پیام موفقیت
+                        setTimeout(() => {
+                           window.location.href = './index.html'; // یا داشبورد کاربر
+                        }, 1500);
+                    } else {
+                        // اگر سرور success:false برگرداند
+                        throw new Error(data.message || 'اطلاعات ورود نامعتبر است.');
+                    }
+                } catch (error) {
+                    showMessage(error.message, 'error');
+                } finally {
+                    setLoading(false);
+                }
+            });
 
-            updateTimer();
-            suspensionCountdownInterval = setInterval(updateTimer, 1000);
-        }
+            forgotPasswordLink.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const email = emailInput.value.trim();
 
-        function showMessage(message, type) {
-            messageText.textContent = message;
-            messageBox.className = `message-box ${type}-message`;
-            messageBox.style.display = 'block';
-        }
+                if (!email) {
+                    showMessage("برای بازیابی رمز, ابتدا ایمیل خود را در کادر بالا وارد کنید.", 'error');
+                    emailInput.focus();
+                    return;
+                }
 
-        function setLoading(isLoading) {
-            loginButton.disabled = isLoading;
-            loginButton.textContent = isLoading ? 'در حال بررسی...' : 'ورود';
-            forgotPasswordLink.style.pointerEvents = isLoading ? 'none' : 'auto';
-            forgotPasswordLink.style.opacity = isLoading ? '0.5' : '1';
+                setLoading(true);
+                try {
+                    const data = await apiRequest('/forgot-password', 'POST', { email });
+                    
+                    if (data.success && data.action === 'confirm_user' && data.data) {
+                        const userData = data.data;
+                        confirmAvatar.src = userData.avatarUrl || 'https://i.imgur.com/T2bT1tG.png';
+                        confirmName.textContent = userData.displayName || 'کاربر ناشناس';
+                        accountConfirmModal.classList.add('visible');
+                        
+                        // Handler for the confirmation button
+                        confirmYesBtn.onclick = () => handleSendResetEmail(email);
+                    } else {
+                         throw new Error(data.message || 'پاسخ نامعتبر از سرور دریافت شد.');
+                    }
+                    
+                } catch (error) {
+                    // بررسی خطاهای خاص مانند مسدودیت کاربر
+                    if (error.message.includes("SUSPENDED")) {
+                        try {
+                            const errorData = JSON.parse(error.message.replace("SUSPENDED:", ""));
+                            showSuspensionNotice(errorData);
+                        } catch(e) {
+                             showMessage("حساب کاربری شما مسدود است.", 'error');
+                        }
+                    } else {
+                        showMessage(error.message, 'error');
+                    }
+                } finally {
+                    setLoading(false);
+                }
+            });
             
-            if (!isLoading) return;
-            
-            messageBox.style.display = 'none';
-            spamGuideContainer.style.display = 'none';
-        }
-        // --- END: Helper Functions ---
+            async function handleSendResetEmail(email) {
+                accountConfirmModal.classList.remove('visible');
+                setLoading(true);
+                try {
+                    // درخواست نهایی برای ارسال ایمیل
+                    const data = await apiRequest('/forgot-password', 'POST', { email, confirm_send: true });
+                    if (data.success) {
+                        showMessage("لینک بازیابی رمز عبور به ایمیل شما ارسال شد. لطفاً صندوق ورودی (Inbox) و پوشه اسپم (Spam) را بررسی کنید.", 'success');
+                        spamGuideContainer.style.display = 'block';
+                    } else {
+                        throw new Error(data.message || "خطا در ارسال ایمیل بازیابی.");
+                    }
+                } catch (error) {
+                    showMessage(error.message, 'error');
+                } finally {
+                    setLoading(false);
+                }
+            }
+
+            // Modal Event Listeners
+            openSpamGuideLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                spamGuideModal.classList.add('visible');
+            });
+
+            closeSpamGuideButton.addEventListener('click', () => spamGuideModal.classList.remove('visible'));
+            closeSuspensionButton.addEventListener('click', () => {
+                suspensionModal.classList.remove('visible');
+                if (suspensionCountdownInterval) {
+                    clearInterval(suspensionCountdownInterval);
+                    suspensionCountdownInterval = null;
+                }
+            });
+            confirmCancelBtn.addEventListener('click', () => accountConfirmModal.classList.remove('visible'));
+
+            [spamGuideModal, accountConfirmModal, suspensionModal].forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.classList.remove('visible');
+                    }
+                });
+            });
+            // --- END: Event Listeners ---
+
+            // --- START: Helper Functions ---
+            function showSuspensionNotice(suspensionData) {
+                const userData = suspensionData.userData;
+                document.getElementById('suspension-avatar').src = userData.avatarUrl || 'https://i.imgur.com/T2bT1tG.png';
+                document.getElementById('suspension-name').textContent = userData.displayName || 'کاربر';
+                document.getElementById('suspension-reason').textContent = `دلیل مسدودیت: ${userData.banReason || 'نامشخص'}`;
+                suspensionModal.classList.add('visible');
+                startSuspensionCountdown(new Date(suspensionData.banExpiresAt));
+            }
+
+            function startSuspensionCountdown(targetDate) {
+                if (suspensionCountdownInterval) clearInterval(suspensionCountdownInterval);
+
+                const countdownElements = {
+                    days: document.getElementById('s-days'),
+                    hours: document.getElementById('s-hours'),
+                    minutes: document.getElementById('s-minutes'),
+                    seconds: document.getElementById('s-seconds')
+                };
+
+                const updateTimer = () => {
+                    const distance = targetDate.getTime() - new Date().getTime();
+
+                    if (distance < 0) {
+                        clearInterval(suspensionCountdownInterval);
+                        suspensionCountdownInterval = null;
+                        Object.values(countdownElements).forEach(el => el.textContent = '00');
+                        return;
+                    }
+
+                    const f = (n) => String(Math.floor(n)).padStart(2, '0');
+                    countdownElements.days.textContent = f(distance / (1000 * 60 * 60 * 24));
+                    countdownElements.hours.textContent = f((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    countdownElements.minutes.textContent = f((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    countdownElements.seconds.textContent = f((distance % (1000 * 60)) / 1000);
+                };
+
+                updateTimer();
+                suspensionCountdownInterval = setInterval(updateTimer, 1000);
+            }
+
+            function showMessage(message, type) {
+                messageText.textContent = message;
+                messageBox.className = `message-box ${type}-message`;
+                messageBox.style.display = 'block';
+            }
+
+            function setLoading(isLoading) {
+                loginButton.disabled = isLoading;
+                loginButton.textContent = isLoading ? 'در حال بررسی...' : 'ورود';
+                forgotPasswordLink.style.pointerEvents = isLoading ? 'none' : 'auto';
+                forgotPasswordLink.style.opacity = isLoading ? '0.5' : '1';
+                
+                if (isLoading) {
+                    messageBox.style.display = 'none';
+                    spamGuideContainer.style.display = 'none';
+                }
+            }
+            // --- END: Helper Functions ---
+        });
     </script>
 </body>
 </html>
