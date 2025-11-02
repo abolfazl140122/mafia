@@ -283,7 +283,7 @@
         }
         /* --- END: Modal Styles --- */
 
-        /* --- START: [NEW] Suspension Modal Styles --- */
+        /* --- START: Suspension Modal Styles --- */
         .modal-content.suspension {
             border-color: var(--suspension-border);
             box-shadow: 0 0 25px var(--suspension-glow), 0 15px 45px rgba(0, 0, 0, 0.7);
@@ -360,7 +360,7 @@
             margin-top: 8px;
         }
         #suspension-countdown-timer .time-label { color: #f5c6cb; }
-        /* --- END: [NEW] Suspension Modal Styles --- */
+        /* --- END: Suspension Modal Styles --- */
 
     </style>
 </head>
@@ -397,25 +397,6 @@
         </p>
     </div>
 
-    <!-- مودال تایید حساب کاربری -->
-    <div class="modal-overlay" id="account-confirm-modal">
-        <div class="modal-content" style="text-align: center;">
-            <h2 class="modal-title">تایید حساب کاربری</h2>
-            <div class="modal-body">
-                <p>یک حساب کاربری با این ایمیل یافت شد. آیا این شما هستید؟</p>
-                <div id="confirm-user-info">
-                    <img id="confirm-avatar" src="" alt="Avatar">
-                    <span id="confirm-name"></span>
-                </div>
-                <p>در صورت تایید، لینک بازیابی به ایمیل شما ارسال می‌شود.</p>
-            </div>
-            <div class="modal-buttons">
-                <button class="modal-button cancel" id="confirm-cancel-btn">انصراف</button>
-                <button class="modal-button confirm" id="confirm-yes-btn">بله، ارسال کن</button>
-            </div>
-        </div>
-    </div>
-    
     <!-- مودال راهنمای اسپم -->
     <div class="modal-overlay" id="spam-guide-modal">
         <div class="modal-content" style="text-align: right;">
@@ -429,7 +410,7 @@
         </div>
     </div>
 
-    <!-- [NEW] مودال کاربر مسدود شده -->
+    <!-- مودال کاربر مسدود شده -->
     <div class="modal-overlay" id="suspension-notice-modal">
         <div class="modal-content suspension" style="text-align: center;">
             <div id="suspension-user-info">
@@ -449,27 +430,7 @@
         </div>
     </div>
 
-
-    <script type="module">
-        // --- START: Firebase Configuration ---
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, collection, query, where, getDocs, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-        const firebaseConfig = {
-          apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
-          authDomain: "mafia-9fcbf.firebaseapp.com",
-          projectId: "mafia-9fcbf",
-          storageBucket: "mafia-9fcbf.appspot.com",
-          messagingSenderId: "471627157488",
-          appId: "1:471627157488:web:92f008548a5596619a5735",
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        // --- END: Firebase Configuration ---
-
+    <script>
         // --- START: Element Selection ---
         const loginForm = document.getElementById('login-form');
         const emailInput = document.getElementById('email');
@@ -483,13 +444,6 @@
         const spamGuideModal = document.getElementById('spam-guide-modal');
         const closeSpamGuideButton = document.getElementById('close-spam-guide');
 
-        const accountConfirmModal = document.getElementById('account-confirm-modal');
-        const confirmAvatar = document.getElementById('confirm-avatar');
-        const confirmName = document.getElementById('confirm-name');
-        const confirmYesBtn = document.getElementById('confirm-yes-btn');
-        const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
-
-        // [NEW] Suspension Modal Elements
         const suspensionModal = document.getElementById('suspension-notice-modal');
         const closeSuspensionButton = document.getElementById('close-suspension-notice');
         
@@ -499,9 +453,9 @@
 
         // --- START: State Variables ---
         let countdownInterval = null;
-        let suspensionCountdownInterval = null; // [NEW]
+        let suspensionCountdownInterval = null;
+        const PROXY_URL = ''; // آدرس پروکسی شما. اگر در همان دامنه است، خالی بگذارید
         // --- END: State Variables ---
-        
 
         // --- START: Event Listeners ---
         loginForm.addEventListener('submit', async (e) => {
@@ -516,27 +470,26 @@
 
             setLoading(true);
             try {
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                const user = userCredential.user;
+                const response = await fetch(`${PROXY_URL}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password }),
+                });
 
-                if (user) {
-                    const userDocRef = doc(db, 'users', user.uid);
-                    const userDocSnap = await getDoc(userDocRef);
-                    if (userDocSnap.exists() && !userDocSnap.data().createdAt) {
-                        const creationTime = new Date(user.metadata.creationTime);
-                        await updateDoc(userDocRef, {
-                            createdAt: creationTime
-                        });
-                    }
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'خطای ناشناخته');
                 }
 
-                window.location.href = './index.html';
+                // در صورت موفقیت، می‌توان اطلاعات کاربر را در localStorage ذخیره کرد
+                // localStorage.setItem('user', JSON.stringify(data.user));
+                window.location.href = './index.html'; // انتقال به صفحه اصلی
+
             } catch (error) {
-                let friendlyMessage = "ایمیل یا رمز عبور اشتباه است.";
-                if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-                    friendlyMessage = "ایمیل یا رمز عبور وارد شده صحیح نمی‌باشد.";
-                }
-                console.error("Login Error:", error.code, error.message);
+                const friendlyMessage = error.message === 'Failed to fetch' 
+                    ? 'خطا در ارتباط با سرور. لطفاً اتصال اینترنت خود را بررسی کنید.'
+                    : error.message || "ایمیل یا رمز عبور وارد شده صحیح نمی‌باشد.";
                 showMessage(friendlyMessage, 'error');
             } finally {
                 setLoading(false);
@@ -555,47 +508,33 @@
 
             setLoading(true);
             try {
-                const usersRef = collection(db, "users");
-                const q = query(usersRef, where("email", "==", email));
-                const querySnapshot = await getDocs(q);
+                const response = await fetch(`${PROXY_URL}/forgot-password`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email }),
+                });
 
-                if (querySnapshot.empty) {
-                    throw new Error("auth/user-not-found");
-                }
+                const data = await response.json();
                 
-                const userDoc = querySnapshot.docs[0];
-                const userData = userDoc.data();
-                
-                // --- [NEW] Ban Check ---
-                // بررسی می‌کند که آیا کاربر مسدود است و زمان مسدودیت هنوز تمام نشده است.
-                if (userData.isBanned === true && userData.banExpiresAt && userData.banExpiresAt.toDate() > new Date()) {
-                    showSuspensionNotice(userData);
-                    return; // اجرای تابع متوقف می‌شود
-                }
-                // --- [END NEW] Ban Check ---
-
-                const now = new Date();
-                const cooldownUntil = userData.passwordResetCooldownUntil?.toDate();
-                
-                if (cooldownUntil && cooldownUntil > now) {
-                    startCountdown(cooldownUntil);
-                    return; 
+                if (!response.ok) {
+                    // مدیریت خطاهای خاص از سرور
+                    if (data.isSuspended) {
+                        showSuspensionNotice(data.suspensionDetails);
+                    } else if (data.isCooldown) {
+                        startCountdown(new Date(data.cooldownUntil));
+                    } else {
+                         showMessage(data.message || 'خطای ناشناخته', 'error');
+                    }
+                    return;
                 }
 
-                confirmAvatar.src = userData.avatarUrl || 'https://i.imgur.com/T2bT1tG.png';
-                confirmName.textContent = userData.displayName || 'کاربر ناشناس';
-                accountConfirmModal.classList.add('visible');
-                
-                confirmYesBtn.onclick = () => handleSendResetEmail(email, userDoc.id, userData.passwordResetRequestCount || 0);
+                showMessage("لینک بازیابی رمز عبور به ایمیل شما ارسال شد. لطفاً صندوق ورودی (Inbox) و پوشه اسپم (Spam) را بررسی کنید.", 'success');
+                spamGuideContainer.style.display = 'block';
 
             } catch (error) {
-                let friendlyMessage = "خطایی در بررسی ایمیل رخ داد.";
-                if (error.message === 'auth/user-not-found') {
-                    friendlyMessage = "حسابی با این ایمیل در سیستم ثبت نشده است.";
-                } else if (error.code === 'auth/invalid-email') {
-                    friendlyMessage = "فرمت ایمیل وارد شده صحیح نمی‌باشد.";
-                }
-                console.error("Forgot Password Check Error:", error);
+                const friendlyMessage = error.message === 'Failed to fetch' 
+                    ? 'خطا در ارتباط با سرور.' 
+                    : "خطایی در بررسی ایمیل رخ داد.";
                 showMessage(friendlyMessage, 'error');
             } finally {
                 setLoading(false);
@@ -609,10 +548,9 @@
         });
 
         closeSpamGuideButton.addEventListener('click', () => spamGuideModal.classList.remove('visible'));
-        closeSuspensionButton.addEventListener('click', () => suspensionModal.classList.remove('visible')); // [NEW]
-        confirmCancelBtn.addEventListener('click', () => accountConfirmModal.classList.remove('visible'));
-
-        [spamGuideModal, accountConfirmModal, suspensionModal].forEach(modal => { // [NEW] suspensionModal added
+        closeSuspensionButton.addEventListener('click', () => suspensionModal.classList.remove('visible'));
+        
+        [spamGuideModal, suspensionModal].forEach(modal => {
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) {
                     modal.classList.remove('visible');
@@ -621,36 +559,8 @@
         });
         // --- END: Event Listeners ---
 
+
         // --- START: Helper Functions ---
-        
-        async function handleSendResetEmail(email, userId, currentRequestCount) {
-            accountConfirmModal.classList.remove('visible');
-            setLoading(true);
-
-            try {
-                const newRequestCount = currentRequestCount + 1;
-                const cooldownSeconds = 60 * Math.pow(2, currentRequestCount); 
-                const newCooldownDate = new Date(Date.now() + cooldownSeconds * 1000);
-                
-                const userDocRef = doc(db, 'users', userId);
-                await updateDoc(userDocRef, {
-                    passwordResetCooldownUntil: newCooldownDate,
-                    passwordResetRequestCount: newRequestCount
-                });
-
-                await sendPasswordResetEmail(auth, email);
-
-                showMessage("لینک بازیابی رمز عبور به ایمیل شما ارسال شد. لطفاً صندوق ورودی (Inbox) و پوشه اسپم (Spam) را بررسی کنید.", 'success');
-                spamGuideContainer.style.display = 'block';
-
-            } catch (error) {
-                console.error("Password Reset Send/Update Error:", error);
-                showMessage("خطایی در ارسال ایمیل بازیابی یا به‌روزرسانی اطلاعات رخ داد.", 'error');
-            } finally {
-                setLoading(false);
-            }
-        }
-        
         function startCountdown(cooldownEndDate) {
             if (countdownInterval) clearInterval(countdownInterval);
 
@@ -674,13 +584,12 @@
             countdownInterval = setInterval(updateTimer, 1000);
         }
 
-        // --- [START NEW] Suspension Functions ---
-        function showSuspensionNotice(userData) {
-            document.getElementById('suspension-avatar').src = userData.avatarUrl || 'https://i.imgur.com/T2bT1tG.png';
-            document.getElementById('suspension-name').textContent = userData.displayName || 'کاربر';
-            document.getElementById('suspension-reason').textContent = `دلیل مسدودیت: ${userData.banReason || 'نامشخص'}`;
+        function showSuspensionNotice(details) {
+            document.getElementById('suspension-avatar').src = details.avatarUrl || 'https://i.imgur.com/T2bT1tG.png';
+            document.getElementById('suspension-name').textContent = details.displayName || 'کاربر';
+            document.getElementById('suspension-reason').textContent = `دلیل مسدودیت: ${details.reason || 'نامشخص'}`;
             suspensionModal.classList.add('visible');
-            startSuspensionCountdown(userData.banExpiresAt.toDate());
+            startSuspensionCountdown(new Date(details.expiresAt));
         }
 
         function startSuspensionCountdown(targetDate) {
@@ -700,8 +609,6 @@
                     clearInterval(suspensionCountdownInterval);
                     suspensionCountdownInterval = null;
                     Object.values(countdownElements).forEach(el => el.textContent = '00');
-                    // Optionally close the modal after countdown
-                    // suspensionModal.classList.remove('visible');
                     return;
                 }
 
@@ -715,7 +622,6 @@
             updateTimer();
             suspensionCountdownInterval = setInterval(updateTimer, 1000);
         }
-        // --- [END NEW] Suspension Functions ---
 
         function showMessage(message, type, countdownString = '') {
             if (countdownInterval && !countdownString) {
