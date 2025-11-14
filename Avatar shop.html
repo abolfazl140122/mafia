@@ -35,7 +35,8 @@
 
         body {
             font-family: 'Vazirmatn', sans-serif;
-            background-image: url('https://up.20script.ir/file/6195-file-000000001500622f9419de6c322df297-1-.jpg');
+            /* background-image is now set by JavaScript */
+            background-color: var(--dark-bg); /* Fallback color */
             background-size: cover;
             background-position: center center;
             background-attachment: fixed;
@@ -43,6 +44,18 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+        }
+
+        /* --- Background Preloader --- */
+        #background-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #000;
+            z-index: 9999;
+            transition: opacity 1s ease-out;
         }
 
         .shop-container {
@@ -53,6 +66,8 @@
             padding: 20px;
             backdrop-filter: blur(5px) brightness(0.6);
             -webkit-backdrop-filter: blur(5px) brightness(0.6);
+            opacity: 0; /* Initially hidden */
+            transition: opacity 0.5s ease-in; /* Fade in effect */
         }
 
         /* --- Header --- */
@@ -573,6 +588,7 @@
     </style>
 </head>
 <body>
+    <div id="background-loader"></div>
 
     <div class="shop-container">
         <header class="shop-header">
@@ -668,6 +684,38 @@
 
 
     <script type="module">
+        // --- منطق پیش-بارگذاری پس‌زمینه ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const backgroundLoader = document.getElementById('background-loader');
+            const shopContainer = document.querySelector('.shop-container');
+            const imageUrl = 'https://up.20script.ir/file/6195-file-000000001500622f9419de6c322df297-1-.jpg';
+
+            const img = new Image();
+            img.src = imageUrl;
+
+            img.onload = () => {
+                document.body.style.backgroundImage = `url(${imageUrl})`;
+                backgroundLoader.style.opacity = '0';
+                
+                // Make shop container visible after background is set
+                shopContainer.style.opacity = '1';
+
+                setTimeout(() => {
+                    if (backgroundLoader) backgroundLoader.style.display = 'none';
+                }, 1000); // Match CSS transition
+            };
+
+            img.onerror = () => {
+                console.error('تصویر پس‌زمینه فروشگاه دانلود نشد.');
+                backgroundLoader.style.opacity = '0';
+                shopContainer.style.opacity = '1'; // Still show content on error
+                setTimeout(() => {
+                    if (backgroundLoader) backgroundLoader.style.display = 'none';
+                }, 1000);
+            };
+        });
+        // --- پایان منطق پیش-بارگذاری ---
+
         // --- Firebase Imports ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
