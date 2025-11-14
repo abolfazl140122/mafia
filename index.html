@@ -11,10 +11,7 @@
     
     <style>
         :root {
-            --wood-dark: #1a140f;
-            --wood-texture-url: url('https://www.transparenttextures.com/patterns/dark-wood.png');
-            --panel-bg-gradient: linear-gradient(145deg, #3c3022, #1e170f);
-            --panel-border: #5c4a3a;
+            --wood-dark: #0c0a09; /* Darker base for new background */
             --text-gold: #ffc947;
             --text-light: #e0dacc;
             --logo-glow-main: #ffdd00;
@@ -32,25 +29,48 @@
         @keyframes logo-glow { 0%, 100% { filter: drop-shadow(0 0 8px var(--logo-glow-main)) drop-shadow(0 0 16px rgba(255, 221, 0, 0.5)); } 50% { filter: drop-shadow(0 0 16px var(--logo-glow-main)) drop-shadow(0 0 32px rgba(255, 221, 0, 0.7)); } }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { height: 100%; overflow: hidden; }
-        body { font-family: 'Vazirmatn', sans-serif; background-color: var(--wood-dark); background-image: var(--wood-texture-url); color: var(--text-light); display: flex; align-items: center; justify-content: center; }
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: var(--wood-dark);
+            background-image: url('https://cdn.imgurl.ir/uploads/l799321_file_69171c89c9d984.31885040.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
         
-        .panel { width: 90%; max-width: 480px; background: var(--panel-bg-gradient); border-radius: 24px; border: 2px solid var(--panel-border); padding: 30px 40px; text-align: center; animation: panel-intro 1s cubic-bezier(0.25, 1, 0.5, 1); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5); }
+        .panel {
+            width: 90%;
+            max-width: 480px;
+            background: rgba(10, 5, 2, 0.7); /* Translucent dark brown */
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px); /* For Safari */
+            border-radius: 24px;
+            border: 1px solid rgba(255, 201, 71, 0.25); /* Subtle gold border */
+            padding: 30px 40px;
+            text-align: center;
+            animation: panel-intro 1s cubic-bezier(0.25, 1, 0.5, 1);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+        }
         
         #logo-container { margin: 0 auto 25px auto; width: 180px; height: 180px; }
         #logo { width: 100%; height: auto; animation: logo-glow 3s ease-in-out infinite; }
         #title { font-size: 3rem; font-weight: 900; color: var(--text-gold); margin-bottom: 30px; text-shadow: 0 0 5px rgba(255, 201, 71, 0.5), 2px 2px 4px rgba(0,0,0,0.5); }
-        #progress-bar-container { width: 100%; height: 20px; background-color: var(--progress-bar-bg); border-radius: 10px; overflow: hidden; padding: 3px; margin-bottom: 15px; border: 1px solid #5c4a3a; box-shadow: inset 0 2px 5px rgba(0,0,0,0.5); }
+        #progress-bar-container { width: 100%; height: 20px; background-color: var(--progress-bar-bg); border-radius: 10px; overflow: hidden; padding: 3px; margin-bottom: 15px; border: 1px solid rgba(255, 201, 71, 0.2); box-shadow: inset 0 2px 5px rgba(0,0,0,0.5); }
         #progress-bar-fill { width: 0%; height: 100%; border-radius: 7px; background: linear-gradient(90deg, var(--progress-bar-fill-start), var(--progress-bar-fill-end)); transition: width 0.4s cubic-bezier(0.65, 0, 0.35, 1); }
         #status-message { font-size: 1rem; font-weight: 700; min-height: 24px; }
         
         #maintenance-panel { box-shadow: 0 0 25px var(--panel-glow), 0 15px 45px rgba(0, 0, 0, 0.7); padding: 25px; }
-        #maintenance-banner-container { width: 100%; margin-bottom: 25px; border-radius: 16px; overflow: hidden; background-color: rgba(0,0,0,0.2); border: 1px solid var(--panel-border); }
+        #maintenance-banner-container { width: 100%; margin-bottom: 25px; border-radius: 16px; overflow: hidden; background-color: rgba(0,0,0,0.2); border: 1px solid rgba(255, 201, 71, 0.2); }
         #maintenance-banner { width: 100%; height: auto; display: block; }
         #maintenance-title { font-size: 2rem; font-weight: 900; color: var(--text-gold); margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; }
         #maintenance-message { font-size: 1rem; line-height: 1.8; margin-bottom: 30px; color: var(--text-light); padding: 0 15px; }
         
         .countdown-timer { display: flex; flex-direction: row-reverse; justify-content: center; gap: 15px; }
-        .time-block { background-color: var(--countdown-bg); padding: 15px; border-radius: 12px; border: 1px solid var(--panel-border); min-width: 80px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .time-block { background-color: var(--countdown-bg); padding: 15px; border-radius: 12px; border: 1px solid rgba(255, 201, 71, 0.15); min-width: 80px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .time-value { font-size: 3rem; font-weight: 900; color: white; line-height: 1; }
         .time-label { font-size: 0.8rem; font-weight: 400; color: var(--text-light); margin-top: 8px; }
 
