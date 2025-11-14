@@ -31,6 +31,19 @@
             padding: 20px;
         }
 
+        /* --- پنل بارگذاری پس‌زمینه --- */
+        #background-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #000; /* یک صفحه کاملا سیاه */
+            z-index: 9999; /* بالاتر از همه المان‌ها */
+            transition: opacity 1s ease-out;
+            pointer-events: none;
+        }
+
         #background-animation-container {
             position: fixed;
             top: 0;
@@ -38,7 +51,7 @@
             width: 100%;
             height: 100%;
             z-index: -1; 
-            background-image: url('https://cdn.imgurl.ir/uploads/j60503_IMG-20251112-WA0013.jpg');
+            /* background-image is now set by JavaScript after loading */
             background-size: cover;
             background-position: center center;
             background-repeat: no-repeat;
@@ -473,6 +486,7 @@
     </style>
 </head>
 <body>
+    <div id="background-loader"></div>
     
     <div id="background-animation-container"></div>
     <canvas id="particle-effect-canvas"></canvas>
@@ -541,6 +555,39 @@
 
 
     <script type="module">
+        // --- منطق پیش-بارگذاری پس‌زمینه ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const backgroundLoader = document.getElementById('background-loader');
+            const backgroundContainer = document.getElementById('background-animation-container');
+            const imageUrl = 'https://cdn.imgurl.ir/uploads/j60503_IMG-20251112-WA0013.jpg';
+
+            const img = new Image();
+            img.src = imageUrl;
+
+            img.onload = () => {
+                // تصویر با موفقیت دانلود شد، آن را به پس‌زمینه اعمال کن
+                backgroundContainer.style.backgroundImage = `url(${imageUrl})`;
+
+                // صفحه سیاه را محو کن
+                backgroundLoader.style.opacity = '0';
+
+                // بعد از اتمام انیمیشن محو شدن، المان را از صفحه حذف کن
+                setTimeout(() => {
+                    backgroundLoader.style.display = 'none';
+                }, 1000); // این زمان باید با transition در CSS هماهنگ باشد
+            };
+
+            img.onerror = () => {
+                // در صورت خطا در دانلود تصویر، صفحه سیاه را بردار تا برنامه قفل نشود
+                console.error('تصویر پس‌زمینه دانلود نشد.');
+                backgroundLoader.style.opacity = '0';
+                setTimeout(() => {
+                    backgroundLoader.style.display = 'none';
+                }, 1000);
+            };
+        });
+        // --- پایان منطق پیش-بارگذاری ---
+
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getFirestore, doc, getDoc, onSnapshot, collection, getDocs, updateDoc, query, orderBy, limit, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
