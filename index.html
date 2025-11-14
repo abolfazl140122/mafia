@@ -26,7 +26,6 @@
             --suspension-glow: rgba(231, 76, 60, 0.5);
         }
         @keyframes panel-intro { from { opacity: 0; transform: translateY(50px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
-        @keyframes logo-glow { 0%, 100% { filter: drop-shadow(0 0 8px var(--logo-glow-main)) drop-shadow(0 0 16px rgba(255, 221, 0, 0.5)); } 50% { filter: drop-shadow(0 0 16px var(--logo-glow-main)) drop-shadow(0 0 32px rgba(255, 221, 0, 0.7)); } }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { height: 100%; overflow: hidden; }
         body {
@@ -42,26 +41,63 @@
             justify-content: center;
         }
         
+        /* --- [NEW] Bottom Loader Styles --- */
+        #bottom-loader {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px 40px 30px 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            z-index: 100;
+            transition: opacity 0.5s ease;
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+            background: linear-gradient(to top, rgba(0,0,0,0.5), transparent);
+        }
+        #bottom-loader #progress-bar-container {
+            width: 100%;
+            max-width: 480px;
+            height: 8px;
+            background-color: var(--progress-bar-bg);
+            border-radius: 4px;
+            overflow: hidden;
+            padding: 2px;
+            border: 1px solid rgba(255, 201, 71, 0.2);
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+        }
+        #bottom-loader #progress-bar-fill {
+            width: 0%;
+            height: 100%;
+            border-radius: 2px;
+            background: linear-gradient(90deg, var(--progress-bar-fill-start), var(--progress-bar-fill-end));
+            transition: width 0.4s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+        #bottom-loader #status-message {
+            font-size: 0.85rem;
+            font-weight: 400;
+            color: var(--text-light);
+            opacity: 0.8;
+            min-height: auto;
+        }
+        
+        /* --- Panel Styles (for Maintenance & Suspension) --- */
         .panel {
             width: 90%;
             max-width: 480px;
-            background: rgba(10, 5, 2, 0.7); /* Translucent dark brown */
+            background: rgba(10, 5, 2, 0.7);
             backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px); /* For Safari */
+            -webkit-backdrop-filter: blur(10px);
             border-radius: 24px;
-            border: 1px solid rgba(255, 201, 71, 0.25); /* Subtle gold border */
+            border: 1px solid rgba(255, 201, 71, 0.25);
             padding: 30px 40px;
             text-align: center;
             animation: panel-intro 1s cubic-bezier(0.25, 1, 0.5, 1);
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
         }
-        
-        #logo-container { margin: 0 auto 25px auto; width: 180px; height: 180px; }
-        #logo { width: 100%; height: auto; animation: logo-glow 3s ease-in-out infinite; }
-        #title { font-size: 3rem; font-weight: 900; color: var(--text-gold); margin-bottom: 30px; text-shadow: 0 0 5px rgba(255, 201, 71, 0.5), 2px 2px 4px rgba(0,0,0,0.5); }
-        #progress-bar-container { width: 100%; height: 20px; background-color: var(--progress-bar-bg); border-radius: 10px; overflow: hidden; padding: 3px; margin-bottom: 15px; border: 1px solid rgba(255, 201, 71, 0.2); box-shadow: inset 0 2px 5px rgba(0,0,0,0.5); }
-        #progress-bar-fill { width: 0%; height: 100%; border-radius: 7px; background: linear-gradient(90deg, var(--progress-bar-fill-start), var(--progress-bar-fill-end)); transition: width 0.4s cubic-bezier(0.65, 0, 0.35, 1); }
-        #status-message { font-size: 1rem; font-weight: 700; min-height: 24px; }
         
         #maintenance-panel { box-shadow: 0 0 25px var(--panel-glow), 0 15px 45px rgba(0, 0, 0, 0.7); padding: 25px; }
         #maintenance-banner-container { width: 100%; margin-bottom: 25px; border-radius: 16px; overflow: hidden; background-color: rgba(0,0,0,0.2); border: 1px solid rgba(255, 201, 71, 0.2); }
@@ -97,13 +133,15 @@
 </head>
 <body>
 
-    <div id="loading-panel" class="panel">
-        <div id="logo-container"> <img id="logo" src="https://up.20script.ir/file/40b6-Copilot-20250812-110015-removebg-preview.png" alt="لوگوی شهر مافیا"> </div>
-        <h1 id="title">شهر مافیا</h1>
-        <div id="progress-bar-container"> <div id="progress-bar-fill"></div> </div>
+    <!-- [NEW] Bottom loader replaces the center panel -->
+    <div id="bottom-loader">
+        <div id="progress-bar-container">
+            <div id="progress-bar-fill"></div>
+        </div>
         <p id="status-message">در حال آماده سازی...</p>
     </div>
 
+    <!-- Maintenance panel remains centered, but hidden by default -->
     <div id="maintenance-panel" class="panel" style="display: none;">
         <div id="maintenance-banner-container"><img id="maintenance-banner" src="" alt="بنر بروزرسانی"></div>
         <h1 id="maintenance-title"></h1>
@@ -116,6 +154,7 @@
         </div>
     </div>
 
+    <!-- Suspension panel remains centered, but hidden by default -->
     <div id="suspension-panel" class="panel" style="display: none;">
         <div id="suspension-user-info">
             <img id="suspension-avatar" src="" alt="آواتار کاربر">
@@ -154,7 +193,7 @@
         const progressBarFill = document.getElementById('progress-bar-fill');
         const statusMessage = document.getElementById('status-message');
         const backgroundMusic = document.getElementById('background-music');
-        const loadingPanel = document.getElementById('loading-panel');
+        const bottomLoader = document.getElementById('bottom-loader'); // [MODIFIED]
         const suspensionPanel = document.getElementById('suspension-panel');
         const logoutBtn = document.getElementById('logout-btn');
         
@@ -203,12 +242,10 @@
             } catch (error) { console.error('فرایند مدیریت موسیقی با خطا مواجه شد:', error); statusMessage.textContent = 'خطا در دریافت موسیقی پس‌زمینه.'; }
         }
         
-        // --- [NEW] Function to handle smooth transition from suspension to game ---
+        // --- [MODIFIED] Function to handle smooth transition from suspension to game ---
         async function transitionToGame(displayName) {
             suspensionPanel.style.display = 'none';
-            loadingPanel.style.display = 'block';
-            loadingPanel.style.animation = 'none';
-            requestAnimationFrame(() => { loadingPanel.style.animation = 'panel-intro 1s cubic-bezier(0.25, 1, 0.5, 1)'; });
+            bottomLoader.style.display = 'flex'; // Show the bottom loader again
             
             updateProgress(100, `مسدودیت شما رفع شد. خوش آمدید، ${displayName}!`);
             await delay(2000);
@@ -216,8 +253,8 @@
         }
 
         // --- Suspension Panel Functions ---
-        function showSuspensionPanel(config, auth, db) { // [MODIFIED] Added db
-            loadingPanel.style.display = 'none';
+        function showSuspensionPanel(config, auth, db) {
+            bottomLoader.style.display = 'none'; // [MODIFIED] Hide loader
             suspensionPanel.style.display = 'block';
 
             const displayName = config.displayName || 'کاربر';
@@ -225,7 +262,7 @@
             document.getElementById('suspension-username').textContent = displayName;
             document.getElementById('suspension-reason').textContent = `دلیل: ${config.banReason || 'نامشخص'}`;
             
-            startSuspensionCountdown(config.banExpiresAt.toDate(), auth, db, displayName); // [MODIFIED] Pass db and displayName
+            startSuspensionCountdown(config.banExpiresAt.toDate(), auth, db, displayName);
             
             logoutBtn.onclick = () => {
                 signOut(auth).then(() => {
@@ -237,23 +274,20 @@
             };
         }
         
-        function startSuspensionCountdown(targetDate, auth, db, displayName) { // [MODIFIED] Signature updated
+        function startSuspensionCountdown(targetDate, auth, db, displayName) {
             const countdownElements = { days: document.getElementById('s-days'), hours: document.getElementById('s-hours'), minutes: document.getElementById('s-minutes'), seconds: document.getElementById('s-seconds') };
             const interval = setInterval(async () => {
                 const distance = targetDate.getTime() - new Date().getTime();
 
-                // [MODIFIED] This is the core logic change.
                 if (distance < 0) {
                     clearInterval(interval);
                     try {
                         const userDocRef = doc(db, 'users', auth.currentUser.uid);
-                        // Clean up all ban-related fields in Firestore.
                         await updateDoc(userDocRef, { isBanned: false, banReason: null, banExpiresAt: null });
                         console.log("مسدودیت کاربر به صورت خودکار رفع شد.");
                     } catch(e) {
                         console.error("خطا در رفع خودکار مسدودیت:", e);
                     }
-                    // Instead of reloading, call the smooth transition function.
                     await transitionToGame(displayName); 
                     return;
                 }
@@ -278,7 +312,6 @@
                             if (userDocSnap.exists()) {
                                 const userData = userDocSnap.data();
                                 if (userData.isBanned === true && userData.banExpiresAt && userData.banExpiresAt.toDate() > new Date()) {
-                                    // [MODIFIED] Reject with db instance for later use
                                     reject({ type: 'BANNED', config: userData, db: db }); 
                                     return;
                                 }
@@ -298,7 +331,6 @@
                 window.location.href = './main.html';
             } catch (rejection) {
                 if (rejection.type === 'BANNED') {
-                    // [MODIFIED] Pass db to the handler function
                     showSuspensionPanel(rejection.config, auth, rejection.db);
                 } else if (rejection.type === 'NO_USER') {
                     updateProgress(100, 'احراز هویت انجام نشد، در حال هدایت به صفحه ورود...');
@@ -315,7 +347,7 @@
 
         // --- Maintenance & Initializer ---
         function showMaintenancePanel(config, auth, db) {
-            loadingPanel.style.display = 'none';
+            bottomLoader.style.display = 'none'; // [MODIFIED] Hide loader
             const maintenancePanel = document.getElementById('maintenance-panel');
             maintenancePanel.style.display = 'block';
             const bannerContainer = document.getElementById('maintenance-banner-container');
@@ -335,10 +367,7 @@
                 if (distance < 0) {
                     clearInterval(interval);
                     document.getElementById('maintenance-panel').style.display = 'none';
-                    const loadingPanel = document.getElementById('loading-panel');
-                    loadingPanel.style.display = 'block';
-                    loadingPanel.style.animation = 'none';
-                    requestAnimationFrame(() => { loadingPanel.style.animation = 'panel-intro 1s cubic-bezier(0.25, 1, 0.5, 1)'; });
+                    bottomLoader.style.display = 'flex'; // [MODIFIED] Show loader
                     startNormalLoading(auth, db);
                     return;
                 }
