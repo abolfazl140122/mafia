@@ -24,14 +24,20 @@
             --suspension-red: #e74c3c;
             --suspension-border: #c0392b;
             --suspension-glow: rgba(231, 76, 60, 0.5);
+            /* [NEW] Viewport height variable for mobile browsers */
+            --vh: 1vh; 
         }
         @keyframes panel-intro { from { opacity: 0; transform: translateY(50px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { height: 100%; overflow: hidden; }
+        /* [MODIFIED] Added width: 100% for better consistency */
+        html, body { 
+            width: 100%;
+            height: 100%; 
+            overflow: hidden; 
+        }
         body {
             font-family: 'Vazirmatn', sans-serif;
             background-color: var(--wood-dark);
-            /* background-image is now set by JS to prevent loading delay */
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -41,19 +47,18 @@
             justify-content: center;
         }
         
-        /* --- [NEW] Preloader overlay to hide background image loading --- */
         #preloader-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
-            height: 100vh;
+            /* [MODIFIED] Using custom --vh property for mobile compatibility */
+            height: calc(var(--vh, 1vh) * 100);
             background-color: var(--wood-dark);
             z-index: 9999;
             transition: opacity 0.7s ease-in-out;
         }
 
-        /* --- Bottom Loader Styles --- */
         #bottom-loader {
             position: fixed;
             bottom: 0;
@@ -96,7 +101,6 @@
             min-height: auto;
         }
         
-        /* --- Panel Styles (for Maintenance & Suspension) --- */
         .panel {
             width: 90%;
             max-width: 480px;
@@ -122,7 +126,6 @@
         .time-value { font-size: 3rem; font-weight: 900; color: white; line-height: 1; }
         .time-label { font-size: 0.8rem; font-weight: 400; color: var(--text-light); margin-top: 8px; }
 
-        /* --- Suspension Panel Styles --- */
         #suspension-panel { border-color: var(--suspension-border); box-shadow: 0 0 25px var(--suspension-glow), 0 15px 45px rgba(0, 0, 0, 0.7); padding: 35px; }
         
         #suspension-user-info { display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; }
@@ -145,10 +148,8 @@
 </head>
 <body>
 
-    <!-- [NEW] This overlay covers the screen until the background image is ready -->
     <div id="preloader-overlay"></div>
 
-    <!-- Bottom loader, initially hidden -->
     <div id="bottom-loader" style="display: none;">
         <div id="progress-bar-container">
             <div id="progress-bar-fill"></div>
@@ -156,7 +157,6 @@
         <p id="status-message">در حال آماده سازی...</p>
     </div>
 
-    <!-- Maintenance panel remains centered, but hidden by default -->
     <div id="maintenance-panel" class="panel" style="display: none;">
         <div id="maintenance-banner-container"><img id="maintenance-banner" src="" alt="بنر بروزرسانی"></div>
         <h1 id="maintenance-title"></h1>
@@ -169,7 +169,6 @@
         </div>
     </div>
 
-    <!-- Suspension panel remains centered, but hidden by default -->
     <div id="suspension-panel" class="panel" style="display: none;">
         <div id="suspension-user-info">
             <img id="suspension-avatar" src="" alt="آواتار کاربر">
@@ -204,19 +203,46 @@
             measurementId: "G-0PDHDWC6NV"
         };
         
+        // --- [NEW] Viewport Height Fix for Mobile ---
+        const setVh = () => {
+            document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+        };
+        window.addEventListener('resize', setVh);
+        setVh(); // Initial call
+
         // --- DOM Elements ---
         const progressBarFill = document.getElementById('progress-bar-fill');
         const statusMessage = document.getElementById('status-message');
         const backgroundMusic = document.getElementById('background-music');
         const bottomLoader = document.getElementById('bottom-loader');
+        const maintenancePanel = document.getElementById('maintenance-panel');
         const suspensionPanel = document.getElementById('suspension-panel');
         const logoutBtn = document.getElementById('logout-btn');
-        
+        const allViews = [bottomLoader, maintenancePanel, suspensionPanel];
+
         // --- Constants ---
         const MUSIC_URL = "https://raw.githubusercontent.com/abolfazl140122/mafia/main/dark-music-249503.mp3";
         const MUSIC_CACHE_NAME = 'mafia-music-cache-v1';
         const MUSIC_VERSION_KEY = 'mafia-music-version';
         const DEFAULT_AVATAR = 'https://i.imgur.com/T2bT1tG.png';
+
+        // --- [NEW] View Manager ---
+        function showView(viewName) {
+            allViews.forEach(view => view.style.display = 'none');
+            switch (viewName) {
+                case 'loading':
+                    bottomLoader.style.display = 'flex';
+                    break;
+                case 'maintenance':
+                    maintenancePanel.style.display = 'block';
+                    break;
+                case 'suspended':
+                    suspensionPanel.style.display = 'block';
+                    break;
+                default:
+                    console.error(`Unknown view: ${viewName}`);
+            }
+        }
 
         // --- Helper Functions ---
         const updateProgress = (percentage, message) => {
@@ -258,19 +284,14 @@
         }
         
         async function transitionToGame(displayName) {
-            suspensionPanel.style.display = 'none';
-            bottomLoader.style.display = 'flex'; // Show the bottom loader again
-            
+            showView('loading');
             updateProgress(100, `مسدودیت شما رفع شد. خوش آمدید، ${displayName}!`);
             await delay(2000);
             window.location.href = './main.html';
         }
 
-        // --- Suspension Panel Functions ---
-        function showSuspensionPanel(config, auth, db) {
-            bottomLoader.style.display = 'none';
-            suspensionPanel.style.display = 'block';
-
+        // --- View Population & Countdown Logic ---
+        function populateSuspensionPanel(config, auth, db) {
             const displayName = config.displayName || 'کاربر';
             document.getElementById('suspension-avatar').src = config.avatarUrl || DEFAULT_AVATAR;
             document.getElementById('suspension-username').textContent = displayName;
@@ -313,7 +334,49 @@
             }, 1000);
         }
 
-        // --- Main Loading Logic ---
+        function populateMaintenancePanel(config) {
+            const bannerContainer = document.getElementById('maintenance-banner-container');
+            if (config.imageUrl) { document.getElementById('maintenance-banner').src = config.imageUrl; bannerContainer.style.display = 'block'; } else { bannerContainer.style.display = 'none'; }
+            const titleEl = document.getElementById('maintenance-title');
+            titleEl.textContent = config.title || "در حال بروزرسانی";
+            if (config.titleColor) { titleEl.style.color = config.titleColor; }
+            const messageEl = document.getElementById('maintenance-message');
+            messageEl.textContent = config.message || "به زودی باز خواهیم گشت.";
+            if (config.textColor) { messageEl.style.color = config.textColor; }
+        }
+
+        // [NEW] Handles the graceful transition after maintenance ends.
+        function handleMaintenanceFinish(auth, db) {
+            document.getElementById('maintenance-title').textContent = "بروزرسانی به پایان رسید";
+            document.getElementById('maintenance-message').textContent = "در حال هدایت شما به بازی...";
+            const countdownElements = { days: document.getElementById('days'), hours: document.getElementById('hours'), minutes: document.getElementById('minutes'), seconds: document.getElementById('seconds') };
+            Object.values(countdownElements).forEach(el => el.textContent = '00');
+            
+            setTimeout(() => {
+                showView('loading');
+                updateProgress(0, 'بارگذاری مجدد...');
+                startNormalLoading(auth, db);
+            }, 2500);
+        }
+
+        function startMaintenanceCountdown(targetDate, auth, db) {
+            const countdownElements = { days: document.getElementById('days'), hours: document.getElementById('hours'), minutes: document.getElementById('minutes'), seconds: document.getElementById('seconds') };
+            const interval = setInterval(() => {
+                const distance = targetDate.getTime() - new Date().getTime();
+                if (distance < 0) {
+                    clearInterval(interval);
+                    handleMaintenanceFinish(auth, db);
+                    return;
+                }
+                const f = (n) => String(Math.floor(n)).padStart(2, '0');
+                countdownElements.days.textContent = f(distance / (1000 * 60 * 60 * 24));
+                countdownElements.hours.textContent = f((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                countdownElements.minutes.textContent = f((distance % (1000 * 60 * 60)) / (1000 * 60));
+                countdownElements.seconds.textContent = f((distance % (1000 * 60)) / 1000);
+            }, 1000);
+        }
+
+        // --- Core Application Logic ---
         async function startNormalLoading(auth, db) {
             updateProgress(10, '...برقراری ارتباط با سرورهای شهر');
             const authPromise = new Promise((resolve, reject) => {
@@ -326,7 +389,7 @@
                             if (userDocSnap.exists()) {
                                 const userData = userDocSnap.data();
                                 if (userData.isBanned === true && userData.banExpiresAt && userData.banExpiresAt.toDate() > new Date()) {
-                                    reject({ type: 'BANNED', config: userData, db: db }); 
+                                    reject({ type: 'BANNED', config: userData, auth, db }); 
                                     return;
                                 }
                             }
@@ -345,7 +408,8 @@
                 window.location.href = './main.html';
             } catch (rejection) {
                 if (rejection.type === 'BANNED') {
-                    showSuspensionPanel(rejection.config, auth, rejection.db);
+                    populateSuspensionPanel(rejection.config, rejection.auth, rejection.db);
+                    showView('suspended');
                 } else if (rejection.type === 'NO_USER') {
                     updateProgress(100, 'احراز هویت انجام نشد، در حال هدایت به صفحه ورود...');
                     await delay(2000);
@@ -358,42 +422,7 @@
                 }
             }
         }
-
-        // --- Maintenance & Initializer ---
-        function showMaintenancePanel(config, auth, db) {
-            bottomLoader.style.display = 'none';
-            const maintenancePanel = document.getElementById('maintenance-panel');
-            maintenancePanel.style.display = 'block';
-            const bannerContainer = document.getElementById('maintenance-banner-container');
-            if (config.imageUrl) { document.getElementById('maintenance-banner').src = config.imageUrl; bannerContainer.style.display = 'block'; } else { bannerContainer.style.display = 'none'; }
-            const titleEl = document.getElementById('maintenance-title');
-            titleEl.textContent = config.title || "در حال بروزرسانی";
-            if (config.titleColor) { titleEl.style.color = config.titleColor; }
-            const messageEl = document.getElementById('maintenance-message');
-            messageEl.textContent = config.message || "به زودی باز خواهیم گشت.";
-            if (config.textColor) { messageEl.style.color = config.textColor; }
-            if (config.endTime && typeof config.endTime.toDate === 'function') { startCountdown(config.endTime.toDate(), auth, db); } else { document.querySelector('#maintenance-panel .countdown-timer').innerHTML = "<p>زمان پایان مشخص نشده است.</p>"; }
-        }
-        function startCountdown(targetDate, auth, db) {
-            const countdownElements = { days: document.getElementById('days'), hours: document.getElementById('hours'), minutes: document.getElementById('minutes'), seconds: document.getElementById('seconds') };
-            const interval = setInterval(() => {
-                const distance = targetDate.getTime() - new Date().getTime();
-                if (distance < 0) {
-                    clearInterval(interval);
-                    document.getElementById('maintenance-panel').style.display = 'none';
-                    bottomLoader.style.display = 'flex';
-                    startNormalLoading(auth, db);
-                    return;
-                }
-                const f = (n) => String(Math.floor(n)).padStart(2, '0');
-                countdownElements.days.textContent = f(distance / (1000 * 60 * 60 * 24));
-                countdownElements.hours.textContent = f((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                countdownElements.minutes.textContent = f((distance % (1000 * 60 * 60)) / (1000 * 60));
-                countdownElements.seconds.textContent = f((distance % (1000 * 60)) / 1000);
-            }, 1000);
-        }
         
-        // [MODIFIED] The original main function is renamed to run the core app logic
         async function runAppInitialization() {
             try {
                 const app = initializeApp(firebaseConfig);
@@ -403,49 +432,58 @@
                 const docSnap = await getDoc(maintenanceDocRef);
 
                 if (docSnap.exists() && docSnap.data().enabled === true) {
-                    showMaintenancePanel(docSnap.data(), auth, db);
+                    const config = docSnap.data();
+                    populateMaintenancePanel(config);
+                    showView('maintenance');
+                    
+                    if (config.endTime && typeof config.endTime.toDate === 'function') {
+                        const targetDate = config.endTime.toDate();
+                        if (targetDate.getTime() - new Date().getTime() < 0) {
+                            console.warn("Maintenance mode is enabled, but the end time is in the past.");
+                            handleMaintenanceFinish(auth, db);
+                        } else {
+                            startMaintenanceCountdown(targetDate, auth, db);
+                        }
+                    } else {
+                        document.querySelector('#maintenance-panel .countdown-timer').innerHTML = "<p>زمان پایان مشخص نشده است.</p>";
+                    }
                 } else {
+                    showView('loading');
                     startNormalLoading(auth, db);
                 }
             } catch (error) {
                 console.error("خطا در اتصال اولیه:", error);
+                showView('loading');
+                updateProgress(100);
                 statusMessage.textContent = 'خطا در اتصال! اینترنت خود را بررسی کنید.';
+                progressBarFill.style.background = 'linear-gradient(90deg, #c0392b, #e74c3c)';
             }
         }
         
-        // [NEW] This new main function now acts as the entry point.
-        // It preloads the background image before starting the main app logic.
         async function main() {
             const preloaderOverlay = document.getElementById('preloader-overlay');
             const body = document.body;
             const imageUrl = 'https://cdn.imgurl.ir/uploads/l799321_file_69171c89c9d984.31885040.jpg';
 
             const startApp = () => {
-                // Fade out the black overlay
                 preloaderOverlay.style.opacity = '0';
                 preloaderOverlay.addEventListener('transitionend', () => {
                     preloaderOverlay.style.display = 'none';
                 }, { once: true });
-
-                // Show the main loader and start the app initialization
-                bottomLoader.style.display = 'flex';
                 runAppInitialization();
             };
 
             const img = new Image();
             img.src = imageUrl;
 
-            // Check if the image is already in cache
             if (img.complete) {
                 body.style.backgroundImage = `url(${imageUrl})`;
                 startApp();
             } else {
-                // If not cached, wait for it to load
                 img.onload = () => {
                     body.style.backgroundImage = `url(${imageUrl})`;
                     startApp();
                 };
-                // If loading fails, start the app anyway with a dark background
                 img.onerror = () => {
                     console.warn('تصویر پس‌زمینه دانلود نشد. با پس‌زمینه تیره ادامه می‌دهیم.');
                     startApp();
@@ -453,7 +491,6 @@
             }
         }
 
-        // Start the entire process
         main();
     </script>
 </body>
