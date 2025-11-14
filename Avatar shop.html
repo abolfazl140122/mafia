@@ -35,18 +35,14 @@
 
         body {
             font-family: 'Vazirmatn', sans-serif;
-            /* background-image is now set by JavaScript */
-            background-color: var(--dark-bg); /* Fallback color */
-            background-size: cover;
-            background-position: center center;
-            background-attachment: fixed;
+            background-color: #0c0a09;
             color: var(--text-light);
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
-        /* --- Background Preloader --- */
+        /* --- Background Styles (Copied from main.html) --- */
         #background-loader {
             position: fixed;
             top: 0;
@@ -56,7 +52,48 @@
             background-color: #000;
             z-index: 9999;
             transition: opacity 1s ease-out;
+            pointer-events: none;
         }
+
+        #background-animation-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            animation: kenBurnsEffect 30s ease-in-out infinite alternate;
+        }
+
+        @keyframes kenBurnsEffect {
+            0% {
+                transform: scale(1.0) translate(0, 0);
+                transform-origin: 50% 50%;
+            }
+            100% {
+                transform: scale(1.15) translate(-2%, 2%);
+                transform-origin: 30% 80%;
+            }
+        }
+        
+        #particle-effect-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+        }
+        #particle-effect-canvas.visible {
+            opacity: 1;
+        }
+        /* --- End Background Styles --- */
 
         .shop-container {
             width: 100%;
@@ -64,10 +101,8 @@
             display: flex;
             flex-direction: column;
             padding: 20px;
-            backdrop-filter: blur(5px) brightness(0.6);
-            -webkit-backdrop-filter: blur(5px) brightness(0.6);
-            opacity: 0; /* Initially hidden */
-            transition: opacity 0.5s ease-in; /* Fade in effect */
+            position: relative;
+            z-index: 1;
         }
 
         /* --- Header --- */
@@ -589,6 +624,8 @@
 </head>
 <body>
     <div id="background-loader"></div>
+    <div id="background-animation-container"></div>
+    <canvas id="particle-effect-canvas"></canvas>
 
     <div class="shop-container">
         <header class="shop-header">
@@ -687,30 +724,25 @@
         // --- منطق پیش-بارگذاری پس‌زمینه ---
         document.addEventListener('DOMContentLoaded', () => {
             const backgroundLoader = document.getElementById('background-loader');
-            const shopContainer = document.querySelector('.shop-container');
-            const imageUrl = 'https://up.20script.ir/file/6195-file-000000001500622f9419de6c322df297-1-.jpg';
+            const backgroundContainer = document.getElementById('background-animation-container');
+            const imageUrl = 'https://cdn.imgurl.ir/uploads/j60503_IMG-20251112-WA0013.jpg';
 
             const img = new Image();
             img.src = imageUrl;
 
             img.onload = () => {
-                document.body.style.backgroundImage = `url(${imageUrl})`;
+                backgroundContainer.style.backgroundImage = `url(${imageUrl})`;
                 backgroundLoader.style.opacity = '0';
-                
-                // Make shop container visible after background is set
-                shopContainer.style.opacity = '1';
-
                 setTimeout(() => {
-                    if (backgroundLoader) backgroundLoader.style.display = 'none';
-                }, 1000); // Match CSS transition
+                    backgroundLoader.style.display = 'none';
+                }, 1000);
             };
 
             img.onerror = () => {
-                console.error('تصویر پس‌زمینه فروشگاه دانلود نشد.');
+                console.error('تصویر پس‌زمینه دانلود نشد.');
                 backgroundLoader.style.opacity = '0';
-                shopContainer.style.opacity = '1'; // Still show content on error
                 setTimeout(() => {
-                    if (backgroundLoader) backgroundLoader.style.display = 'none';
+                    backgroundLoader.style.display = 'none';
                 }, 1000);
             };
         });
@@ -755,6 +787,10 @@
         const featuredGrid = document.getElementById('featured-grid');
         const avatarGrid = document.getElementById('avatar-grid');
         const searchInput = document.getElementById('search-input');
+        // Background elements
+        const backgroundContainer = document.getElementById('background-animation-container');
+        const particleCanvas = document.getElementById('particle-effect-canvas');
+        const ctx = particleCanvas.getContext('2d');
         // Modals
         const actionModal = document.getElementById('action-modal');
         const modalImg = document.getElementById('modal-avatar-img');
@@ -770,6 +806,9 @@
         // --- Constants ---
         const DAY_NAMES = ["شنبه", "یکشنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنج‌شنبه", "جمعه"];
         const WEEKLY_REWARDS = [15, 20, 25, 30, 40, 50, 75]; // Sat -> Fri
+        const ANIMATION_INTENSITY_KEY = 'mafia-animation-intensity';
+        const VISUAL_EFFECT_KEY = 'mafia-visual-effect-enabled';
+        const DEFAULT_ANIMATION_INTENSITY = 50;
 
         // --- State Management ---
         const state = {
@@ -795,7 +834,6 @@
         }
 
         async function loadShopData(user) {
-            // Loader is already visible by default, but we can update its text
             showLoader('در حال بارگذاری اطلاعات...');
             try {
                 const userDocRef = doc(db, 'users', user.uid);
@@ -833,12 +871,12 @@
                 await checkAndResetWeeklyReward();
                 renderShop();
                 updateDailyGiftButtonState();
+                loadAndApplySettings(); // Apply background settings
 
             } catch (error) {
                 console.error("خطا در بارگذاری اطلاعات فروشگاه:", error);
                 showToast("خطا در ارتباط با سرور!", "error");
             } finally {
-                // This will now trigger the fade-out effect
                 hideLoader();
             }
         }
@@ -1188,6 +1226,13 @@
             actionModal.addEventListener('click', (e) => e.target === actionModal && hideModal('action-modal'));
             rewardModalCloseBtn.addEventListener('click', () => hideModal('daily-reward-modal'));
             dailyRewardModal.addEventListener('click', (e) => e.target === dailyRewardModal && hideModal('daily-reward-modal'));
+            
+            window.addEventListener('resize', () => {
+                if(animationFrameId) {
+                    resizeCanvas();
+                    initParticles();
+                }
+            });
         }
 
         // --- Helper Functions ---
@@ -1274,6 +1319,101 @@
             }
         }
         
+        // --- Background Animation & Particle Effect Helpers (from main.html) ---
+        function applyAnimationSettings(intensity) {
+            if (!backgroundContainer) return;
+            if (intensity == 0) {
+                backgroundContainer.style.animation = 'none';
+            } else {
+                const minDuration = 15;
+                const maxDuration = 40;
+                const duration = maxDuration - (intensity / 100) * (maxDuration - minDuration);
+                backgroundContainer.style.animation = `kenBurnsEffect ${duration}s ease-in-out infinite alternate`;
+            }
+        }
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * particleCanvas.width;
+                this.y = Math.random() * particleCanvas.height;
+                this.size = Math.random() * 2.5 + 1;
+                this.speedX = (Math.random() * 1 - 0.5) * 0.5;
+                this.speedY = (Math.random() * 1 - 0.5) * 0.5;
+                this.color = `rgba(255, 201, 71, ${Math.random() * 0.5 + 0.3})`;
+            }
+            update() {
+                if (this.x > particleCanvas.width || this.x < 0) this.speedX = -this.speedX;
+                if (this.y > particleCanvas.height || this.y < 0) this.speedY = -this.speedY;
+                this.x += this.speedX;
+                this.y += this.speedY;
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        let particlesArray = [];
+        let animationFrameId = null;
+
+        function initParticles() {
+            particlesArray = [];
+            const numberOfParticles = (particleCanvas.width * particleCanvas.height) / 12000;
+            for (let i = 0; i < numberOfParticles; i++) {
+                particlesArray.push(new Particle());
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
+            }
+            animationFrameId = requestAnimationFrame(animateParticles);
+        }
+
+        function resizeCanvas() {
+            particleCanvas.width = window.innerWidth;
+            particleCanvas.height = window.innerHeight;
+        }
+
+        function startParticleEffect() {
+            if (animationFrameId) return;
+            particleCanvas.classList.add('visible');
+            resizeCanvas();
+            initParticles();
+            animateParticles();
+        }
+
+        function stopParticleEffect() {
+            particleCanvas.classList.remove('visible');
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = null;
+            }
+            setTimeout(() => {
+                if (!animationFrameId) {
+                    ctx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+                }
+            }, 800);
+        }
+        
+        function loadAndApplySettings() {
+            const savedIntensity = localStorage.getItem(ANIMATION_INTENSITY_KEY);
+            const intensity = savedIntensity !== null ? parseInt(savedIntensity, 10) : DEFAULT_ANIMATION_INTENSITY;
+            applyAnimationSettings(intensity);
+
+            const isEffectEnabled = localStorage.getItem(VISUAL_EFFECT_KEY) === 'true';
+            if (isEffectEnabled) {
+                startParticleEffect();
+            } else {
+                stopParticleEffect();
+            }
+        }
+
         // --- Start the App ---
         main();
     </script>
