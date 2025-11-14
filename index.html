@@ -37,14 +37,24 @@
         body {
             font-family: 'Vazirmatn', sans-serif;
             background-color: var(--wood-dark);
-            /* [MODIFIED] Changed to 'contain' to ensure the whole image is visible without cropping */
-            background-size: contain;
+            background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             color: var(--text-light);
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+        
+        #preloader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: calc(var(--vh, 1vh) * 100);
+            background-color: var(--wood-dark);
+            z-index: 9999;
+            transition: opacity 0.7s ease-in-out;
         }
 
         #bottom-loader {
@@ -152,10 +162,10 @@
     </style>
 </head>
 <body>
-    
-    <!-- [REMOVED] Preloader overlay is removed to show loader instantly -->
 
-    <div id="bottom-loader" style="display: none;">
+    <div id="preloader-overlay"></div>
+
+    <div id="bottom-loader" style="display: flex;">
         <div id="progress-bar-container">
             <div id="progress-bar-fill"></div>
         </div>
@@ -437,31 +447,40 @@
                         document.querySelector('#maintenance-panel .countdown-timer').innerHTML = "<p>زمان پایان مشخص نشده است.</p>";
                     }
                 } else {
-                    // [MODIFIED] Artificial delay removed. Loader shows up immediately.
-                    showView('loading');
+                    // Loader is now visible from the start, delay removed.
+                    showView('loading'); // Ensure other views are hidden
                     updateTaskStatus('در حال آماده سازی...', null);
                     await startNewLoadingSequence(auth, db);
                 }
             } catch (error) {
                 console.error("خطا در اتصال اولیه:", error);
-                // [MODIFIED] Artificial delay removed on error too.
+                // Removed delay to show error immediately
                 showView('loading');
                 showLoadingError('خطا در اتصال! اینترنت خود را بررسی کنید.');
             }
         }
         
         async function main() {
-            // [MODIFIED] Preloader overlay is removed for instant loader visibility.
+            const preloaderOverlay = document.getElementById('preloader-overlay');
             const body = document.body;
-            // [MODIFIED] Background image URL updated.
             const imageUrl = 'https://cdn.imgurl.ir/uploads/q9812_file_6917756f1e1d68.57033147.jpg';
 
-            // Set background image immediately. It will show when loaded.
-            body.style.backgroundImage = `url(${imageUrl})`;
-            
-            // Start the app initialization process right away.
-            // The loader will be shown inside this function without delay.
-            runAppInitialization();
+            const startApp = () => {
+                preloaderOverlay.style.opacity = '0';
+                preloaderOverlay.addEventListener('transitionend', () => preloaderOverlay.style.display = 'none', { once: true });
+                runAppInitialization();
+            };
+
+            const img = new Image();
+            img.src = imageUrl;
+
+            if (img.complete) {
+                body.style.backgroundImage = `url(${imageUrl})`;
+                startApp();
+            } else {
+                img.onload = () => { body.style.backgroundImage = `url(${imageUrl})`; startApp(); };
+                img.onerror = () => { console.warn('تصویر پس‌زمینه دانلود نشد.'); startApp(); };
+            }
         }
 
         main();
