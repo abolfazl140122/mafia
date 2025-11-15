@@ -169,7 +169,6 @@
         <div id="progress-bar-container">
             <div id="progress-bar-fill"></div>
         </div>
-        <!-- [MODIFIED] Replaced <p> with a container for message and percentage -->
         <div id="status-container">
             <span id="status-message">در حال آماده سازی...</span>
             <span id="status-percentage"></span>
@@ -208,20 +207,35 @@
     <audio id="background-music" loop></audio>
     
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        // --- [NEW] API Service for proxy communication ---
+        const api = {
+            BASE_URL: "mafianovin.php",
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
-            authDomain: "mafia-9fcbf.firebaseapp.com",
-            projectId: "mafia-9fcbf",
-            storageBucket: "mafia-9fcbf.appspot.com",
-            messagingSenderId: "471627157488",
-            appId: "1:471627157488:web:92f008548a5596619a5735",
-            measurementId: "G-0PDHDWC6NV"
+            async getConfig() {
+                const response = await fetch(`${this.BASE_URL}?action=config`);
+                if (!response.ok) throw new Error('Failed to fetch config');
+                return response.json();
+            },
+
+            async proxyRequest(target, method = 'GET', data = null) {
+                const options = {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        target: target,
+                        method: method,
+                        data: data
+                    })
+                };
+                const response = await fetch(`${this.BASE_URL}?action=proxy`, options);
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ message: 'Request failed with status ' + response.status }));
+                    throw new Error(errorData.message || 'Proxy request failed');
+                }
+                return response.json();
+            }
         };
-        
+
         const setVh = () => {
             document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
         };
@@ -255,7 +269,6 @@
             }
         }
         
-        // --- [MODIFIED] New Progress Update Functions ---
         const updateOverallProgress = (percentage) => {
             progressBarFill.style.width = `${percentage}%`;
         };
@@ -280,10 +293,9 @@
         // --- Helper Functions ---
         const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
         
-        function playMusicFromBlob(blob) { /* ... (Function unchanged) ... */ try { const objectUrl = URL.createObjectURL(blob); backgroundMusic.src = objectUrl; backgroundMusic.volume = 0.4; backgroundMusic.play().catch(e => console.warn("پخش خودکار موسیقی توسط مرورگر مسدود شد.", e)); } catch (error) { console.error("خطا در ایجاد URL برای پخش موسیقی:", error); } }
-        function downloadAndCacheMusic(progressCallback) { /* ... (Function unchanged) ... */ return new Promise((resolve, reject) => { const xhr = new XMLHttpRequest(); xhr.open('GET', MUSIC_URL, true); xhr.responseType = 'blob'; xhr.onprogress = (event) => { if (event.lengthComputable) { const percentComplete = Math.round((event.loaded / event.total) * 100); progressCallback(percentComplete); } }; xhr.onload = async () => { if (xhr.status === 200) { const musicBlob = xhr.response; try { const cache = await caches.open(MUSIC_CACHE_NAME); await cache.put(MUSIC_URL, new Response(musicBlob)); localStorage.setItem(MUSIC_VERSION_KEY, MUSIC_URL); resolve(musicBlob); } catch (cacheError) { reject(cacheError); } } else { reject(new Error(`خطای شبکه در دانلود موسیقی: ${xhr.statusText}`)); } }; xhr.onerror = () => { reject(new Error('خطای شبکه در هنگام دانلود موسیقی.')); }; xhr.send(); }); }
+        function playMusicFromBlob(blob) { try { const objectUrl = URL.createObjectURL(blob); backgroundMusic.src = objectUrl; backgroundMusic.volume = 0.4; backgroundMusic.play().catch(e => console.warn("پخش خودکار موسیقی توسط مرورگر مسدود شد.", e)); } catch (error) { console.error("خطا در ایجاد URL برای پخش موسیقی:", error); } }
+        function downloadAndCacheMusic(progressCallback) { return new Promise((resolve, reject) => { const xhr = new XMLHttpRequest(); xhr.open('GET', MUSIC_URL, true); xhr.responseType = 'blob'; xhr.onprogress = (event) => { if (event.lengthComputable) { const percentComplete = Math.round((event.loaded / event.total) * 100); progressCallback(percentComplete); } }; xhr.onload = async () => { if (xhr.status === 200) { const musicBlob = xhr.response; try { const cache = await caches.open(MUSIC_CACHE_NAME); await cache.put(MUSIC_URL, new Response(musicBlob)); localStorage.setItem(MUSIC_VERSION_KEY, MUSIC_URL); resolve(musicBlob); } catch (cacheError) { reject(cacheError); } } else { reject(new Error(`خطای شبکه در دانلود موسیقی: ${xhr.statusText}`)); } }; xhr.onerror = () => { reject(new Error('خطای شبکه در هنگام دانلود موسیقی.')); }; xhr.send(); }); }
         
-        // [MODIFIED] Music handler now accepts a progress callback for the task runner
         async function handleBackgroundMusic(onProgress) {
             const cachedVersion = localStorage.getItem(MUSIC_VERSION_KEY);
             try {
@@ -302,31 +314,95 @@
                 playMusicFromBlob(musicBlob);
             } catch (error) {
                 console.error('فرایند مدیریت موسیقی با خطا مواجه شد:', error);
-                // Don't throw an error, just log it. Music is not critical.
             }
         }
 
-        async function transitionToGame(displayName) { /* ... (Function unchanged) ... */ showView('loading'); updateOverallProgress(100); updateTaskStatus(`خوش آمدید، ${displayName}!`, null); await delay(2000); window.location.href = './main.html'; }
+        async function transitionToGame(displayName) { showView('loading'); updateOverallProgress(100); updateTaskStatus(`خوش آمدید، ${displayName}!`, null); await delay(2000); window.location.href = './main.html'; }
         
-        // --- View Population & Countdown Logic (All functions unchanged) ---
-        function populateSuspensionPanel(config, auth, db) { const displayName = config.displayName || 'کاربر'; document.getElementById('suspension-avatar').src = config.avatarUrl || DEFAULT_AVATAR; document.getElementById('suspension-username').textContent = displayName; document.getElementById('suspension-reason').textContent = `دلیل: ${config.banReason || 'نامشخص'}`; startSuspensionCountdown(config.banExpiresAt.toDate(), auth, db, displayName); logoutBtn.onclick = () => { signOut(auth).then(() => { window.location.href = './login.html'; }).catch(err => { console.error('Logout error:', err); alert('خطا در خروج از حساب.'); }); }; }
-        function startSuspensionCountdown(targetDate, auth, db, displayName) { const countdownElements = { days: document.getElementById('s-days'), hours: document.getElementById('s-hours'), minutes: document.getElementById('s-minutes'), seconds: document.getElementById('s-seconds') }; const interval = setInterval(async () => { const distance = targetDate.getTime() - new Date().getTime(); if (distance < 0) { clearInterval(interval); try { const userDocRef = doc(db, 'users', auth.currentUser.uid); await updateDoc(userDocRef, { isBanned: false, banReason: null, banExpiresAt: null }); console.log("مسدودیت کاربر به صورت خودکار رفع شد."); } catch(e) { console.error("خطا در رفع خودکار مسدودیت:", e); } await transitionToGame(displayName); return; } const f = (n) => String(Math.floor(n)).padStart(2, '0'); countdownElements.days.textContent = f(distance / (1000 * 60 * 60 * 24)); countdownElements.hours.textContent = f((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)); countdownElements.minutes.textContent = f((distance % (1000 * 60 * 60)) / (1000 * 60)); countdownElements.seconds.textContent = f((distance % (1000 * 60)) / 1000); }, 1000); }
+        // --- [REFACTORED] View Population & Countdown Logic (Firebase independent) ---
+        function populateSuspensionPanel(config) { 
+            const displayName = config.displayName || 'کاربر'; 
+            document.getElementById('suspension-avatar').src = config.avatarUrl || DEFAULT_AVATAR; 
+            document.getElementById('suspension-username').textContent = displayName; 
+            document.getElementById('suspension-reason').textContent = `دلیل: ${config.banReason || 'نامشخص'}`; 
+            // Convert timestamp string/number from proxy to Date object
+            const banExpiresDate = new Date(config.banExpiresAt);
+            startSuspensionCountdown(banExpiresDate, config.uid, displayName); 
+            
+            logoutBtn.onclick = async () => { 
+                try {
+                    await api.proxyRequest('auth/logout', 'POST');
+                    window.location.href = './login.html';
+                } catch(err) {
+                    console.error('Logout error:', err); 
+                    alert('خطا در خروج از حساب.'); 
+                }
+            }; 
+        }
+
+        function startSuspensionCountdown(targetDate, uid, displayName) { 
+            const countdownElements = { days: document.getElementById('s-days'), hours: document.getElementById('s-hours'), minutes: document.getElementById('s-minutes'), seconds: document.getElementById('s-seconds') }; 
+            const interval = setInterval(async () => { 
+                const distance = targetDate.getTime() - new Date().getTime(); 
+                if (distance < 0) { 
+                    clearInterval(interval); 
+                    try { 
+                        // Use proxy to update user status
+                        await api.proxyRequest(`users/${uid}/unban`, 'POST');
+                        console.log("مسدودیت کاربر به صورت خودکار رفع شد."); 
+                    } catch(e) { 
+                        console.error("خطا در رفع خودکار مسدودیت:", e); 
+                    } 
+                    await transitionToGame(displayName); 
+                    return; 
+                } 
+                const f = (n) => String(Math.floor(n)).padStart(2, '0'); 
+                countdownElements.days.textContent = f(distance / (1000 * 60 * 60 * 24)); 
+                countdownElements.hours.textContent = f((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)); 
+                countdownElements.minutes.textContent = f((distance % (1000 * 60 * 60)) / (1000 * 60)); 
+                countdownElements.seconds.textContent = f((distance % (1000 * 60)) / 1000); 
+            }, 1000); 
+        }
+
         function populateMaintenancePanel(config) { const bannerContainer = document.getElementById('maintenance-banner-container'); if (config.imageUrl) { document.getElementById('maintenance-banner').src = config.imageUrl; bannerContainer.style.display = 'block'; } else { bannerContainer.style.display = 'none'; } const titleEl = document.getElementById('maintenance-title'); titleEl.textContent = config.title || "در حال بروزرسانی"; if (config.titleColor) { titleEl.style.color = config.titleColor; } const messageEl = document.getElementById('maintenance-message'); messageEl.textContent = config.message || "به زودی باز خواهیم گشت."; if (config.textColor) { messageEl.style.color = config.textColor; } }
-        function handleMaintenanceFinish(auth, db) { document.getElementById('maintenance-title').textContent = "بروزرسانی به پایان رسید"; document.getElementById('maintenance-message').textContent = "در حال هدایت شما به بازی..."; const countdownElements = { days: document.getElementById('days'), hours: document.getElementById('hours'), minutes: document.getElementById('minutes'), seconds: document.getElementById('seconds') }; Object.values(countdownElements).forEach(el => el.textContent = '00'); setTimeout(() => { showView('loading'); startNewLoadingSequence(auth, db).catch(err => console.error("Error after maintenance:", err)); }, 2500); }
-        function startMaintenanceCountdown(targetDate, auth, db) { const countdownElements = { days: document.getElementById('days'), hours: document.getElementById('hours'), minutes: document.getElementById('minutes'), seconds: document.getElementById('seconds') }; const interval = setInterval(() => { const distance = targetDate.getTime() - new Date().getTime(); if (distance < 0) { clearInterval(interval); handleMaintenanceFinish(auth, db); return; } const f = (n) => String(Math.floor(n)).padStart(2, '0'); countdownElements.days.textContent = f(distance / (1000 * 60 * 60 * 24)); countdownElements.hours.textContent = f((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)); countdownElements.minutes.textContent = f((distance % (1000 * 60 * 60)) / (1000 * 60)); countdownElements.seconds.textContent = f((distance % (1000 * 60)) / 1000); }, 1000); }
+        
+        function handleMaintenanceFinish() { 
+            document.getElementById('maintenance-title').textContent = "بروزرسانی به پایان رسید"; 
+            document.getElementById('maintenance-message').textContent = "در حال هدایت شما به بازی..."; 
+            const countdownElements = { days: document.getElementById('days'), hours: document.getElementById('hours'), minutes: document.getElementById('minutes'), seconds: document.getElementById('seconds') }; 
+            Object.values(countdownElements).forEach(el => el.textContent = '00'); 
+            setTimeout(() => { 
+                showView('loading'); 
+                startNewLoadingSequence().catch(err => console.error("Error after maintenance:", err)); 
+            }, 2500); 
+        }
+
+        function startMaintenanceCountdown(targetDate) { 
+            const countdownElements = { days: document.getElementById('days'), hours: document.getElementById('hours'), minutes: document.getElementById('minutes'), seconds: document.getElementById('seconds') }; 
+            const interval = setInterval(() => { 
+                const distance = targetDate.getTime() - new Date().getTime(); 
+                if (distance < 0) { 
+                    clearInterval(interval); 
+                    handleMaintenanceFinish(); 
+                    return; 
+                } 
+                const f = (n) => String(Math.floor(n)).padStart(2, '0'); 
+                countdownElements.days.textContent = f(distance / (1000 * 60 * 60 * 24)); 
+                countdownElements.hours.textContent = f((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)); 
+                countdownElements.minutes.textContent = f((distance % (1000 * 60 * 60)) / (1000 * 60)); 
+                countdownElements.seconds.textContent = f((distance % (1000 * 60)) / 1000); 
+            }, 1000); 
+        }
 
         // --- [NEW] Core Application Logic with Task Runner ---
-
-        // Helper to simulate progress for quick, non-trackable async operations
         async function withSimulatedProgress(promise, onProgress) {
             let progress = 0;
             const interval = setInterval(() => {
                 if (progress < 95) {
-                    progress += Math.random() * 8 + 2; // Random increment
+                    progress += Math.random() * 8 + 2;
                     onProgress(Math.min(progress, 95));
                 }
             }, 120);
-
             try {
                 return await promise;
             } finally {
@@ -335,51 +411,46 @@
             }
         }
         
-        // The main task runner
-        async function runTaskSequence(tasks, auth, db) {
+        async function runTaskSequence(tasks) {
             const totalTasks = tasks.length;
-            let context = {}; // Shared context for tasks
-
+            let context = {};
             for (let i = 0; i < totalTasks; i++) {
                 const task = tasks[i];
-                
                 const result = await task.action(
                     (progress) => updateTaskStatus(`${task.name}...`, progress),
-                    context, auth, db
+                    context
                 );
-
                 context = { ...context, ...result };
                 updateOverallProgress(((i + 1) / totalTasks) * 100);
-                await delay(200); // Short delay for better UX
+                await delay(200);
             }
             return context;
         }
         
-        async function startNewLoadingSequence(auth, db) {
+        async function startNewLoadingSequence() {
             const loadingTasks = [
                 {
                     name: "احراز هویت کاربر",
-                    action: async (onProgress, context, auth) => {
-                        const promise = new Promise((resolve, reject) => {
-                            const unsubscribe = onAuthStateChanged(auth, user => {
-                                unsubscribe();
-                                if (user) resolve({ user });
-                                else reject({ type: 'NO_USER' });
-                            }, error => reject({ type: 'ERROR', error }));
+                    action: async (onProgress) => {
+                        const promise = api.proxyRequest('auth/status').then(response => {
+                            if (response && response.loggedIn && response.user) {
+                                return { user: response.user };
+                            }
+                            throw { type: 'NO_USER' };
                         });
                         return await withSimulatedProgress(promise, onProgress);
                     }
                 },
                 {
                     name: "دریافت اطلاعات بازیکن",
-                    action: async (onProgress, context, auth, db) => {
-                        const userDocRef = doc(db, 'users', context.user.uid);
-                        const userDocSnap = await withSimulatedProgress(getDoc(userDocRef), onProgress);
-                        if (!userDocSnap.exists()) {
-                            // This case might need specific handling, but for now we proceed
-                            return { displayName: context.user.displayName || 'بازیکن جدید' };
+                    action: async (onProgress, context) => {
+                        const userDoc = await withSimulatedProgress(api.proxyRequest(`users/${context.user.uid}`), onProgress);
+                        if (!userDoc) {
+                           return { displayName: context.user.displayName || 'بازیکن جدید' };
                         }
-                        return { userData: userDocSnap.data(), displayName: userDocSnap.data().displayName || context.user.displayName };
+                        // Add uid to userData for later use (like unbanning)
+                        const userData = { ...userDoc, uid: context.user.uid };
+                        return { userData: userData, displayName: userDoc.displayName || context.user.displayName };
                     }
                 },
                 {
@@ -387,7 +458,9 @@
                     action: async (onProgress, context) => {
                         const promise = new Promise((resolve, reject) => {
                             const userData = context.userData;
-                            if (userData && userData.isBanned === true && userData.banExpiresAt && userData.banExpiresAt.toDate() > new Date()) {
+                            // Convert timestamp from proxy (string/number) to Date object for comparison
+                            const banExpiresDate = userData.banExpiresAt ? new Date(userData.banExpiresAt) : null;
+                            if (userData && userData.isBanned === true && banExpiresDate && banExpiresDate > new Date()) {
                                 reject({ type: 'BANNED', config: userData });
                             } else {
                                 resolve();
@@ -406,11 +479,11 @@
             ];
 
             try {
-                const finalContext = await runTaskSequence(loadingTasks, auth, db);
+                const finalContext = await runTaskSequence(loadingTasks);
                 await transitionToGame(finalContext.displayName);
             } catch (rejection) {
                 if (rejection.type === 'BANNED') {
-                    populateSuspensionPanel(rejection.config, auth, db);
+                    populateSuspensionPanel(rejection.config);
                     showView('suspended');
                 } else if (rejection.type === 'NO_USER') {
                     showLoadingError('احراز هویت ناموفق بود. در حال انتقال به صفحه ورود...');
@@ -425,36 +498,29 @@
         
         async function runAppInitialization() {
             try {
-                const app = initializeApp(firebaseConfig);
-                const db = getFirestore(app);
-                const auth = getAuth(app);
-                
-                const maintenanceDocRef = doc(db, 'settings', 'maintenance');
-                const docSnap = await getDoc(maintenanceDocRef);
+                const config = await api.getConfig();
+                const maintenanceConfig = config.maintenance;
 
-                if (docSnap.exists() && docSnap.data().enabled === true) {
-                    const config = docSnap.data();
-                    populateMaintenancePanel(config);
+                if (maintenanceConfig && maintenanceConfig.enabled === true) {
+                    populateMaintenancePanel(maintenanceConfig);
                     showView('maintenance');
-                    if (config.endTime && typeof config.endTime.toDate === 'function') {
-                        const targetDate = config.endTime.toDate();
+                    if (maintenanceConfig.endTime) {
+                        const targetDate = new Date(maintenanceConfig.endTime); // Convert timestamp from proxy
                         if (targetDate.getTime() - new Date().getTime() < 0) {
-                            handleMaintenanceFinish(auth, db);
+                            handleMaintenanceFinish();
                         } else {
-                            startMaintenanceCountdown(targetDate, auth, db);
+                            startMaintenanceCountdown(targetDate);
                         }
                     } else {
                         document.querySelector('#maintenance-panel .countdown-timer').innerHTML = "<p>زمان پایان مشخص نشده است.</p>";
                     }
                 } else {
-                    // Loader is now visible from the start, delay removed.
-                    showView('loading'); // Ensure other views are hidden
+                    showView('loading');
                     updateTaskStatus('در حال آماده سازی...', null);
-                    await startNewLoadingSequence(auth, db);
+                    await startNewLoadingSequence();
                 }
             } catch (error) {
                 console.error("خطا در اتصال اولیه:", error);
-                // Removed delay to show error immediately
                 showView('loading');
                 showLoadingError('خطا در اتصال! اینترنت خود را بررسی کنید.');
             }
@@ -484,9 +550,6 @@
         }
 
         main();
-    </script>
-</body>
-</html>
     </script>
 </body>
 </html>
