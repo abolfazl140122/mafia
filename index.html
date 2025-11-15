@@ -10,7 +10,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
     
     <style>
-        /* CSS styles are exactly the same as your provided file, so they are omitted here for brevity */
         :root { --wood-dark: #0c0a09; --text-gold: #ffc947; --text-light: #e0dacc; --logo-glow-main: #ffdd00; --progress-bar-bg: rgba(0,0,0,0.4); --progress-bar-fill-start: #8c4843; --progress-bar-fill-end: #ffc947; --countdown-bg: rgba(0,0,0,0.3); --panel-glow: rgba(255, 201, 71, 0.5); --suspension-red: #e74c3c; --suspension-border: #c0392b; --suspension-glow: rgba(231, 76, 60, 0.5); --vh: 1vh; } @keyframes panel-intro { from { opacity: 0; transform: translateY(50px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } } * { margin: 0; padding: 0; box-sizing: border-box; } html, body { width: 100%; height: 100%; overflow: hidden; } body { font-family: 'Vazirmatn', sans-serif; background-color: var(--wood-dark); background-size: cover; background-position: center; background-repeat: no-repeat; color: var(--text-light); display: flex; align-items: center; justify-content: center; } #preloader-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: calc(var(--vh, 1vh) * 100); background-color: var(--wood-dark); z-index: 9999; transition: opacity 0.7s ease-in-out; } #bottom-loader { position: fixed; bottom: 0; left: 0; width: 100%; padding: 20px 40px 30px 40px; display: flex; flex-direction: column; align-items: center; gap: 15px; z-index: 100; transition: opacity 0.5s ease; backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); background: linear-gradient(to top, rgba(0,0,0,0.5), transparent); } #bottom-loader #progress-bar-container { width: 100%; max-width: 480px; height: 12px; background-color: var(--progress-bar-bg); border-radius: 6px; overflow: hidden; padding: 2px; border: 1px solid rgba(255, 201, 71, 0.2); box-shadow: inset 0 1px 3px rgba(0,0,0,0.5); } #bottom-loader #progress-bar-fill { width: 0%; height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--progress-bar-fill-start), var(--progress-bar-fill-end)); transition: width 0.4s cubic-bezier(0.65, 0, 0.35, 1); } #status-container { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 480px; font-size: 0.85rem; font-weight: 400; color: var(--text-light); opacity: 0.9; min-height: 1.2em; } #status-percentage { font-weight: 700; font-variant-numeric: tabular-nums; direction: ltr; } .panel { width: 90%; max-width: 480px; background: rgba(10, 5, 2, 0.7); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 24px; border: 1px solid rgba(255, 201, 71, 0.25); padding: 30px 40px; text-align: center; animation: panel-intro 1s cubic-bezier(0.25, 1, 0.5, 1); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5); } #maintenance-panel { box-shadow: 0 0 25px var(--panel-glow), 0 15px 45px rgba(0, 0, 0, 0.7); padding: 25px; } #maintenance-banner-container { width: 100%; margin-bottom: 25px; border-radius: 16px; overflow: hidden; background-color: rgba(0,0,0,0.2); border: 1px solid rgba(255, 201, 71, 0.2); } #maintenance-banner { width: 100%; height: auto; display: block; } #maintenance-title { font-size: 2rem; font-weight: 900; color: var(--text-gold); margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; } #maintenance-message { font-size: 1rem; line-height: 1.8; margin-bottom: 30px; color: var(--text-light); padding: 0 15px; } .countdown-timer { display: flex; flex-direction: row-reverse; justify-content: center; gap: 15px; } .time-block { background-color: var(--countdown-bg); padding: 15px; border-radius: 12px; border: 1px solid rgba(255, 201, 71, 0.15); min-width: 80px; display: flex; flex-direction: column; align-items: center; justify-content: center; } .time-value { font-size: 3rem; font-weight: 900; color: white; line-height: 1; } .time-label { font-size: 0.8rem; font-weight: 400; color: var(--text-light); margin-top: 8px; } #suspension-panel { border-color: var(--suspension-border); box-shadow: 0 0 25px var(--suspension-glow), 0 15px 45px rgba(0, 0, 0, 0.7); padding: 35px; } #suspension-user-info { display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; } #suspension-avatar { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 3px solid var(--suspension-red); box-shadow: 0 5px 15px rgba(0,0,0,0.5); margin-bottom: 15px; } #suspension-username { font-size: 1.5rem; font-weight: 700; color: var(--text-light); text-shadow: 1px 1px 3px #000; } #suspension-title { font-size: 2rem; color: var(--suspension-red); margin-bottom: 15px; font-weight: 900; } #suspension-reason { font-size: 1.1rem; margin-bottom: 25px; padding: 12px; background-color: rgba(0,0,0,0.3); border-radius: 8px; font-style: italic; border: 1px solid rgba(255,255,255,0.1); } #suspension-message { margin-bottom: 20px; font-size: 1rem; color: var(--text-light); } #suspension-countdown-timer { margin-bottom: 35px; } #suspension-countdown-timer .time-block { border-color: var(--suspension-border); background-color: rgba(231, 76, 60, 0.1); } #suspension-countdown-timer .time-value { color: #f8d7da; } #suspension-countdown-timer .time-label { color: #f5c6cb; } #logout-btn { background: linear-gradient(145deg, #616161, #3a3a3a); border: 1px solid #777; color: var(--text-light); padding: 12px 30px; border-radius: 8px; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: all 0.2s; } #logout-btn:hover { background: linear-gradient(145deg, #757575, #4f4f4f); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.3); } #logout-btn:active { transform: translateY(0); }
     </style>
 </head>
@@ -58,13 +57,11 @@
         // --- START OF MODIFIED SCRIPT ---
 
         // --- Core API Communication ---
-        const API_ENDPOINT = './mafianovin.php';
+        // [FIXED] Pointing to the absolute URL of your PHP server on ParsPack
+        const API_ENDPOINT = 'https://miko.freehost.io/mafianovin.php';
 
         async function apiCall(payload) {
-            // Get the authentication token saved during login
             const authToken = localStorage.getItem('firebaseAuthToken');
-            
-            // Add token to every request if it exists
             if (authToken) {
                 payload.authToken = authToken;
             }
@@ -77,14 +74,23 @@
                 });
 
                 if (!response.ok) {
-                    const errorData = await response.json();
-                    console.error('API Error:', errorData);
-                    throw new Error(errorData.error || `Request failed with status ${response.status}`);
+                    let errorText;
+                    try {
+                        const errorData = await response.json();
+                        errorText = errorData.error || `Request failed with status ${response.status}`;
+                    } catch (e) {
+                        errorText = `Request failed with status ${response.status}: ${response.statusText}`;
+                    }
+                    console.error('API Error:', errorText);
+                    throw new Error(errorText);
                 }
-                return response.json();
+
+                const responseText = await response.text();
+                return responseText ? JSON.parse(responseText) : {};
+
             } catch (error) {
                 console.error('Fetch Error:', error);
-                throw error; // Re-throw to be caught by the calling function
+                throw error;
             }
         }
 
@@ -123,11 +129,9 @@
             document.getElementById('suspension-avatar').src = config.avatarUrl || DEFAULT_AVATAR;
             document.getElementById('suspension-username').textContent = displayName;
             document.getElementById('suspension-reason').textContent = `دلیل: ${config.banReason || 'نامشخص'}`;
-            // Convert Firestore timestamp string from server back to Date object
             const banExpiresDate = new Date(config.banExpiresAt);
             startSuspensionCountdown(banExpiresDate, displayName);
             logoutBtn.onclick = () => {
-                // [MODIFIED] Clear local storage instead of calling Firebase signOut
                 localStorage.removeItem('firebaseAuthToken');
                 localStorage.removeItem('firebaseUserUid');
                 window.location.href = './login.html';
@@ -142,7 +146,6 @@
                     clearInterval(interval);
                     try {
                         const userUid = localStorage.getItem('firebaseUserUid');
-                        // [MODIFIED] Use apiCall to update the document
                         await apiCall({
                             action: 'update_document',
                             collection: 'users',
@@ -255,7 +258,6 @@
                 if (maintenanceSettings && maintenanceSettings.enabled === true) {
                     populateMaintenancePanel(maintenanceSettings);
                     showView('maintenance');
-                    // ... (Maintenance countdown logic remains the same)
                 } else {
                     showView('loading');
                     updateTaskStatus('در حال آماده سازی...', null);
