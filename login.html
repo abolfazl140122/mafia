@@ -20,19 +20,6 @@
             box-sizing: border-box;
         }
 
-        /* --- START: [NEW] Animation Keyframes --- */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(15px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        /* --- END: [NEW] Animation Keyframes --- */
-
         body {
             font-family: 'Vazirmatn', sans-serif;
             background-image: url('https://up.20script.ir/file/6195-file-000000001500622f9419de6c322df297-1-.jpg');
@@ -58,9 +45,6 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             border: 2px solid #5c4a3a;
             text-align: center;
-            /* --- START: [MODIFIED] Added animation --- */
-            animation: fadeIn 0.8s ease-out forwards;
-            /* --- END: [MODIFIED] Added animation --- */
         }
 
         .auth-title {
@@ -299,7 +283,7 @@
         }
         /* --- END: Modal Styles --- */
 
-        /* --- START: Suspension Modal Styles --- */
+        /* --- START: [NEW] Suspension Modal Styles --- */
         .modal-content.suspension {
             border-color: var(--suspension-border);
             box-shadow: 0 0 25px var(--suspension-glow), 0 15px 45px rgba(0, 0, 0, 0.7);
@@ -376,7 +360,7 @@
             margin-top: 8px;
         }
         #suspension-countdown-timer .time-label { color: #f5c6cb; }
-        /* --- END: Suspension Modal Styles --- */
+        /* --- END: [NEW] Suspension Modal Styles --- */
 
     </style>
 </head>
@@ -445,7 +429,7 @@
         </div>
     </div>
 
-    <!-- مودال کاربر مسدود شده -->
+    <!-- [NEW] مودال کاربر مسدود شده -->
     <div class="modal-overlay" id="suspension-notice-modal">
         <div class="modal-content suspension" style="text-align: center;">
             <div id="suspension-user-info">
@@ -505,8 +489,9 @@
         const confirmYesBtn = document.getElementById('confirm-yes-btn');
         const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
 
+        // [NEW] Suspension Modal Elements
         const suspensionModal = document.getElementById('suspension-notice-modal');
-        const closeSuspensionButton = document.getElementById('close-suspension-notice'); 
+        const closeSuspensionButton = document.getElementById('close-suspension-notice');
         
         const messageText = document.getElementById('message-text');
         const countdownTimer = document.getElementById('countdown-timer');
@@ -514,7 +499,7 @@
 
         // --- START: State Variables ---
         let countdownInterval = null;
-        let suspensionCountdownInterval = null;
+        let suspensionCountdownInterval = null; // [NEW]
         // --- END: State Variables ---
         
 
@@ -581,10 +566,13 @@
                 const userDoc = querySnapshot.docs[0];
                 const userData = userDoc.data();
                 
+                // --- [NEW] Ban Check ---
+                // بررسی می‌کند که آیا کاربر مسدود است و زمان مسدودیت هنوز تمام نشده است.
                 if (userData.isBanned === true && userData.banExpiresAt && userData.banExpiresAt.toDate() > new Date()) {
                     showSuspensionNotice(userData);
-                    return;
+                    return; // اجرای تابع متوقف می‌شود
                 }
+                // --- [END NEW] Ban Check ---
 
                 const now = new Date();
                 const cooldownUntil = userData.passwordResetCooldownUntil?.toDate();
@@ -621,10 +609,10 @@
         });
 
         closeSpamGuideButton.addEventListener('click', () => spamGuideModal.classList.remove('visible'));
-        closeSuspensionButton.addEventListener('click', () => suspensionModal.classList.remove('visible'));
+        closeSuspensionButton.addEventListener('click', () => suspensionModal.classList.remove('visible')); // [NEW]
         confirmCancelBtn.addEventListener('click', () => accountConfirmModal.classList.remove('visible'));
 
-        [spamGuideModal, accountConfirmModal, suspensionModal].forEach(modal => {
+        [spamGuideModal, accountConfirmModal, suspensionModal].forEach(modal => { // [NEW] suspensionModal added
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) {
                     modal.classList.remove('visible');
@@ -686,6 +674,7 @@
             countdownInterval = setInterval(updateTimer, 1000);
         }
 
+        // --- [START NEW] Suspension Functions ---
         function showSuspensionNotice(userData) {
             document.getElementById('suspension-avatar').src = userData.avatarUrl || 'https://i.imgur.com/T2bT1tG.png';
             document.getElementById('suspension-name').textContent = userData.displayName || 'کاربر';
@@ -711,6 +700,8 @@
                     clearInterval(suspensionCountdownInterval);
                     suspensionCountdownInterval = null;
                     Object.values(countdownElements).forEach(el => el.textContent = '00');
+                    // Optionally close the modal after countdown
+                    // suspensionModal.classList.remove('visible');
                     return;
                 }
 
@@ -724,6 +715,7 @@
             updateTimer();
             suspensionCountdownInterval = setInterval(updateTimer, 1000);
         }
+        // --- [END NEW] Suspension Functions ---
 
         function showMessage(message, type, countdownString = '') {
             if (countdownInterval && !countdownString) {
