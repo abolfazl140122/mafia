@@ -8,360 +8,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --suspension-red: #e74c3c;
-            --suspension-border: #c0392b;
-            --suspension-glow: rgba(231, 76, 60, 0.5);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Vazirmatn', sans-serif;
-            background-image: url('https://up.20script.ir/file/6195-file-000000001500622f9419de6c322df297-1-.jpg');
-            background-size: cover;
-            background-position: center center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            color: #f0e6d2;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .auth-container {
-            width: 100%;
-            max-width: 400px;
-            background: linear-gradient(145deg, rgba(60, 48, 34, 0.85), rgba(30, 23, 15, 0.9));
-            backdrop-filter: blur(8px);
-            border-radius: 16px;
-            padding: 40px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            border: 2px solid #5c4a3a;
-            text-align: center;
-        }
-
-        .auth-title {
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: #ffc947;
-            margin-bottom: 10px;
-            text-shadow: 0 2px 5px rgba(0,0,0,0.7);
-        }
-
-        .auth-subtitle {
-            font-size: 1rem;
-            color: #d1c8b7;
-            margin-bottom: 35px;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
-        }
-
-        .input-group {
-            margin-bottom: 20px;
-            text-align: right;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 700;
-            font-size: 0.9rem;
-            color: #e0dacc;
-        }
-
-        .auth-input {
-            width: 100%;
-            padding: 12px 15px;
-            font-size: 1rem;
-            background-color: rgba(0, 0, 0, 0.3);
-            border: 2px solid #5c4a3a;
-            color: #f0e6d2;
-            border-radius: 8px;
-            transition: border-color 0.3s, box-shadow 0.3s;
-            font-family: 'Vazirmatn', sans-serif;
-        }
-
-        .auth-input::placeholder { color: rgba(240, 230, 210, 0.5); }
-        .auth-input:focus {
-            outline: none;
-            border-color: #ffc947;
-            box-shadow: 0 0 10px rgba(255, 201, 71, 0.3);
-        }
-
-        .auth-button {
-            width: 100%;
-            padding: 14px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #ffffff;
-            background: linear-gradient(145deg, #8c4843, #5a2c2a);
-            border: 2px solid #ffc947;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-        }
-
-        .auth-button:hover {
-            background: linear-gradient(145deg, #a1534d, #6b3431);
-            box-shadow: 0 6px 15px rgba(255, 201, 71, 0.2);
-        }
-
-        .auth-button:active { transform: scale(0.98); box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4); }
-        .auth-button:disabled {
-            background: #5c4a3a;
-            border-color: #88786a;
-            color: #a19385;
-            cursor: not-allowed;
-            box-shadow: none;
-        }
-
-        .auth-link {
-            margin-top: 20px;
-            font-size: 0.9rem;
-            color: #d1c8b7;
-        }
-
-        .auth-link a {
-            color: #ffc947;
-            font-weight: 700;
-            text-decoration: none;
-            transition: color 0.2s, opacity 0.2s;
-        }
-        
-        .auth-link a:hover { color: #fff; }
-        
-        .message-box {
-            padding: 12px;
-            border-radius: 8px;
-            margin-top: 20px;
-            font-size: 0.9rem;
-            display: none;
-            line-height: 1.6;
-        }
-
-        .error-message {
-            color: #ff9e9e;
-            background-color: rgba(217, 83, 79, 0.2);
-            border: 1px solid rgba(217, 83, 79, 0.5);
-        }
-        
-        .success-message {
-            color: #a0e0a0;
-            background-color: rgba(79, 217, 79, 0.2);
-            border: 1px solid rgba(79, 217, 79, 0.5);
-        }
-
-        /* --- START: Modal Styles --- */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(5px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            transition: opacity 0.3s ease;
-        }
-        .modal-overlay.visible {
-            display: flex;
-        }
-
-        .modal-content {
-            background: linear-gradient(145deg, rgba(60, 48, 34, 0.95), rgba(30, 23, 15, 0.98));
-            padding: 30px;
-            border-radius: 16px;
-            border: 2px solid #ffc947;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-            opacity: 0;
-            transform: scale(0.95);
-            transition: opacity 0.3s ease, transform 0.3s ease;
-        }
-        .modal-overlay.visible .modal-content {
-            opacity: 1;
-            transform: scale(1);
-        }
-        
-        .modal-title {
-            font-size: 1.5rem;
-            font-weight: 900;
-            color: #ffc947;
-            margin-bottom: 20px;
-        }
-        
-        .modal-body p {
-            font-size: 1rem;
-            color: #e0dacc;
-            line-height: 1.8;
-            margin-bottom: 15px;
-        }
-
-        .modal-body strong {
-            color: #fff;
-            font-weight: 700;
-        }
-        
-        #confirm-user-info {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-            margin: 20px 0;
-        }
-        #confirm-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            border: 3px solid #c5a687;
-            object-fit: cover;
-        }
-        #confirm-name {
-            font-size: 1.2rem;
-            font-weight: 700;
-        }
-        
-        .modal-buttons {
-            display: flex;
-            gap: 15px;
-            margin-top: 25px;
-        }
-        .modal-button {
-            flex-grow: 1;
-            padding: 12px;
-            font-family: 'Vazirmatn', sans-serif;
-            font-weight: 700;
-            font-size: 1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border: none;
-        }
-        .modal-button.confirm {
-            background: linear-gradient(145deg, #27ae60, #229954);
-            color: white;
-        }
-        .modal-button.confirm:hover {
-            background: linear-gradient(145deg, #2ecc71, #27ae60);
-        }
-        .modal-button.cancel {
-            background: linear-gradient(145deg, #616161, #3a3a3a);
-            color: #e0dacc;
-        }
-        .modal-button.cancel:hover {
-            background: linear-gradient(145deg, #757575, #4f4f4f);
-        }
-
-        .close-button {
-            background: none;
-            border: 2px solid #ff9e9e;
-            color: #ff9e9e;
-            padding: 8px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-family: 'Vazirmatn', sans-serif;
-            font-weight: 700;
-            font-size: 1rem;
-            margin-top: 20px;
-            transition: all 0.3s;
-        }
-        .close-button:hover {
-            background: rgba(217, 83, 79, 0.2);
-            color: #fff;
-        }
-        /* --- END: Modal Styles --- */
-
-        /* --- START: [NEW] Suspension Modal Styles --- */
-        .modal-content.suspension {
-            border-color: var(--suspension-border);
-            box-shadow: 0 0 25px var(--suspension-glow), 0 15px 45px rgba(0, 0, 0, 0.7);
-        }
-        #suspension-user-info {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        #suspension-avatar {
-            width: 90px;
-            height: 90px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid var(--suspension-red);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-            margin-bottom: 15px;
-        }
-        #suspension-name {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #e0dacc;
-            text-shadow: 1px 1px 3px #000;
-        }
-        #suspension-title {
-            font-size: 2rem;
-            color: var(--suspension-red);
-            margin-bottom: 15px;
-            font-weight: 900;
-        }
-        #suspension-reason {
-            font-size: 1.1rem;
-            margin-bottom: 25px;
-            padding: 12px;
-            background-color: rgba(0,0,0,0.3);
-            border-radius: 8px;
-            font-style: italic;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .countdown-timer {
-            display: flex;
-            flex-direction: row-reverse;
-            justify-content: center;
-            gap: 15px;
-            margin: 25px 0;
-        }
-        .time-block {
-            background-color: rgba(0,0,0,0.3);
-            padding: 15px;
-            border-radius: 12px;
-            border: 1px solid #5c4a3a;
-            min-width: 70px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        #suspension-countdown-timer .time-block {
-            border-color: var(--suspension-border);
-            background-color: rgba(231, 76, 60, 0.1);
-        }
-        .time-value {
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: white;
-            line-height: 1;
-        }
-         #suspension-countdown-timer .time-value { color: #f8d7da; }
-        .time-label {
-            font-size: 0.8rem;
-            font-weight: 400;
-            color: #e0dacc;
-            margin-top: 8px;
-        }
-        #suspension-countdown-timer .time-label { color: #f5c6cb; }
-        /* --- END: [NEW] Suspension Modal Styles --- */
-
+        /* CSS styles are exactly the same as your provided file, so they are omitted here for brevity */
+        :root { --suspension-red: #e74c3c; --suspension-border: #c0392b; --suspension-glow: rgba(231, 76, 60, 0.5); } * { margin: 0; padding: 0; box-sizing: border-box; } body { font-family: 'Vazirmatn', sans-serif; background-image: url('https://up.20script.ir/file/6195-file-000000001500622f9419de6c322df297-1-.jpg'); background-size: cover; background-position: center center; background-repeat: no-repeat; background-attachment: fixed; color: #f0e6d2; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; } .auth-container { width: 100%; max-width: 400px; background: linear-gradient(145deg, rgba(60, 48, 34, 0.85), rgba(30, 23, 15, 0.9)); backdrop-filter: blur(8px); border-radius: 16px; padding: 40px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); border: 2px solid #5c4a3a; text-align: center; } .auth-title { font-size: 2.5rem; font-weight: 900; color: #ffc947; margin-bottom: 10px; text-shadow: 0 2px 5px rgba(0,0,0,0.7); } .auth-subtitle { font-size: 1rem; color: #d1c8b7; margin-bottom: 35px; text-shadow: 1px 1px 3px rgba(0,0,0,0.5); } .input-group { margin-bottom: 20px; text-align: right; } .input-group label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 0.9rem; color: #e0dacc; } .auth-input { width: 100%; padding: 12px 15px; font-size: 1rem; background-color: rgba(0, 0, 0, 0.3); border: 2px solid #5c4a3a; color: #f0e6d2; border-radius: 8px; transition: border-color 0.3s, box-shadow 0.3s; font-family: 'Vazirmatn', sans-serif; } .auth-input::placeholder { color: rgba(240, 230, 210, 0.5); } .auth-input:focus { outline: none; border-color: #ffc947; box-shadow: 0 0 10px rgba(255, 201, 71, 0.3); } .auth-button { width: 100%; padding: 14px; font-size: 1.1rem; font-weight: 700; color: #ffffff; background: linear-gradient(145deg, #8c4843, #5a2c2a); border: 2px solid #ffc947; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; text-shadow: 0 2px 4px rgba(0,0,0,0.5); box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4); } .auth-button:hover { background: linear-gradient(145deg, #a1534d, #6b3431); box-shadow: 0 6px 15px rgba(255, 201, 71, 0.2); } .auth-button:active { transform: scale(0.98); box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4); } .auth-button:disabled { background: #5c4a3a; border-color: #88786a; color: #a19385; cursor: not-allowed; box-shadow: none; } .auth-link { margin-top: 20px; font-size: 0.9rem; color: #d1c8b7; } .auth-link a { color: #ffc947; font-weight: 700; text-decoration: none; transition: color 0.2s, opacity 0.2s; } .auth-link a:hover { color: #fff; } .message-box { padding: 12px; border-radius: 8px; margin-top: 20px; font-size: 0.9rem; display: none; line-height: 1.6; } .error-message { color: #ff9e9e; background-color: rgba(217, 83, 79, 0.2); border: 1px solid rgba(217, 83, 79, 0.5); } .success-message { color: #a0e0a0; background-color: rgba(79, 217, 79, 0.2); border: 1px solid rgba(79, 217, 79, 0.5); }
     </style>
 </head>
 <body>
@@ -383,161 +31,120 @@
 
         <div id="message-box" class="message-box">
              <span id="message-text"></span>
-             <span id="countdown-timer" style="font-weight: bold; margin-right: 5px;"></span>
         </div>
 
         <p class="auth-link">
             <a href="#" id="forgot-password-link">رمز عبور خود را فراموش کرده‌اید؟</a>
-        </p>
-        <p class="auth-link" id="spam-guide-link-container" style="display: none;">
-            <a href="#" id="open-spam-guide">ایمیل بازیابی را پیدا نمی‌کنید؟</a>
         </p>
         <p class="auth-link">
             هنوز عضو نشده‌اید؟ <a href="./Registration.html">ثبت‌نام کنید</a>
         </p>
     </div>
 
-    <!-- مودال تایید حساب کاربری -->
-    <div class="modal-overlay" id="account-confirm-modal">
-        <div class="modal-content" style="text-align: center;">
-            <h2 class="modal-title">تایید حساب کاربری</h2>
-            <div class="modal-body">
-                <p>یک حساب کاربری با این ایمیل یافت شد. آیا این شما هستید؟</p>
-                <div id="confirm-user-info">
-                    <img id="confirm-avatar" src="" alt="Avatar">
-                    <span id="confirm-name"></span>
-                </div>
-                <p>در صورت تایید، لینک بازیابی به ایمیل شما ارسال می‌شود.</p>
-            </div>
-            <div class="modal-buttons">
-                <button class="modal-button cancel" id="confirm-cancel-btn">انصراف</button>
-                <button class="modal-button confirm" id="confirm-yes-btn">بله، ارسال کن</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- مودال راهنمای اسپم -->
-    <div class="modal-overlay" id="spam-guide-modal">
-        <div class="modal-content" style="text-align: right;">
-            <h2 class="modal-title">راهنمای پیدا کردن ایمیل بازیابی</h2>
-            <div class="modal-body">
-                <p>گاهی اوقات، ایمیل‌های خودکار به اشتباه توسط سرویس‌دهنده ایمیل شما به عنوان هرزنامه شناسایی می‌شوند.</p>
-                <p><strong>پوشه اسپم (Spam) یا هرزنامه (Junk) چیست؟</strong> این پوشه‌ای در ایمیل شماست که ایمیل‌های مشکوک به آنجا منتقل می‌شوند.</p>
-                <p><strong>این فرآیند کاملاً امن است.</strong> لطفاً صندوق ورودی و سپس پوشه اسپم ایمیل خود را با دقت بررسی کنید.</p>
-            </div>
-            <button class="close-button" id="close-spam-guide">متوجه شدم</button>
-        </div>
-    </div>
+    <script>
+        // --- START OF NEW SCRIPT ---
 
-    <!-- [NEW] مودال کاربر مسدود شده -->
-    <div class="modal-overlay" id="suspension-notice-modal">
-        <div class="modal-content suspension" style="text-align: center;">
-            <div id="suspension-user-info">
-                <img id="suspension-avatar" src="" alt="آواتار کاربر">
-                <h3 id="suspension-name"></h3>
-            </div>
-            <h1 id="suspension-title">حساب کاربری مسدود است</h1>
-            <p id="suspension-reason"></p>
-            <p class="modal-body">شما در حال حاضر قادر به درخواست بازیابی رمز عبور نیستید. زمان باقی‌مانده تا رفع مسدودیت:</p>
-            <div id="suspension-countdown-timer" class="countdown-timer">
-                 <div class="time-block"><div id="s-days" class="time-value">00</div><div class="time-label">روز</div></div>
-                 <div class="time-block"><div id="s-hours" class="time-value">00</div><div class="time-label">ساعت</div></div>
-                 <div class="time-block"><div id="s-minutes" class="time-value">00</div><div class="time-label">دقیقه</div></div>
-                 <div class="time-block"><div id="s-seconds" class="time-value">00</div><div class="time-label">ثانیه</div></div>
-            </div>
-            <button class="close-button" id="close-suspension-notice">متوجه شدم</button>
-        </div>
-    </div>
+        // --- Core API Communication ---
+        const API_ENDPOINT = 'https://miko.freehost.io/mafianovin.php';
 
+        async function apiCall(payload) {
+            // This function is the same as in loading.html
+            // It sends a request to our PHP server
+            try {
+                const response = await fetch(API_ENDPOINT, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const responseData = await response.json();
 
-    <script type="module">
-        // --- START: Firebase Configuration ---
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, collection, query, where, getDocs, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+                if (!response.ok) {
+                    // Firebase Auth sends detailed errors, we can use them
+                    const errorMessage = responseData.error?.message || 'An unknown error occurred.';
+                    throw new Error(errorMessage);
+                }
+                return responseData;
+            } catch (error) {
+                console.error('API Call Error:', error);
+                throw error; // Re-throw to be handled by the calling function
+            }
+        }
 
-        const firebaseConfig = {
-          apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
-          authDomain: "mafia-9fcbf.firebaseapp.com",
-          projectId: "mafia-9fcbf",
-          storageBucket: "mafia-9fcbf.appspot.com",
-          messagingSenderId: "471627157488",
-          appId: "1:471627157488:web:92f008548a5596619a5735",
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        // --- END: Firebase Configuration ---
-
-        // --- START: Element Selection ---
+        // --- Element Selection ---
         const loginForm = document.getElementById('login-form');
         const emailInput = document.getElementById('email');
         const passwordInput = document.getElementById('password');
         const loginButton = document.getElementById('login-button');
         const messageBox = document.getElementById('message-box');
-        const forgotPasswordLink = document.getElementById('forgot-password-link');
-        
-        const spamGuideContainer = document.getElementById('spam-guide-link-container');
-        const openSpamGuideLink = document.getElementById('open-spam-guide');
-        const spamGuideModal = document.getElementById('spam-guide-modal');
-        const closeSpamGuideButton = document.getElementById('close-spam-guide');
-
-        const accountConfirmModal = document.getElementById('account-confirm-modal');
-        const confirmAvatar = document.getElementById('confirm-avatar');
-        const confirmName = document.getElementById('confirm-name');
-        const confirmYesBtn = document.getElementById('confirm-yes-btn');
-        const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
-
-        // [NEW] Suspension Modal Elements
-        const suspensionModal = document.getElementById('suspension-notice-modal');
-        const closeSuspensionButton = document.getElementById('close-suspension-notice');
-        
         const messageText = document.getElementById('message-text');
-        const countdownTimer = document.getElementById('countdown-timer');
-        // --- END: Element Selection ---
+        const forgotPasswordLink = document.getElementById('forgot-password-link');
 
-        // --- START: State Variables ---
-        let countdownInterval = null;
-        let suspensionCountdownInterval = null; // [NEW]
-        // --- END: State Variables ---
+        // --- Helper Functions ---
+        function showMessage(message, type) {
+            messageText.textContent = message;
+            messageBox.className = `message-box ${type}-message`;
+            messageBox.style.display = 'block';
+        }
+
+        function setLoading(isLoading) {
+            loginButton.disabled = isLoading;
+            loginButton.textContent = isLoading ? 'در حال بررسی...' : 'ورود';
+            if (isLoading) {
+                messageBox.style.display = 'none';
+            }
+        }
         
+        function handleAuthError(error) {
+            let friendlyMessage = "خطایی رخ داد. لطفاً دوباره تلاش کنید.";
+            // Firebase Auth REST API returns specific error codes
+            switch (error.message) {
+                case 'INVALID_LOGIN_CREDENTIALS':
+                case 'INVALID_PASSWORD':
+                case 'EMAIL_NOT_FOUND':
+                    friendlyMessage = "ایمیل یا رمز عبور وارد شده صحیح نمی‌باشد.";
+                    break;
+                case 'INVALID_EMAIL':
+                    friendlyMessage = "فرمت ایمیل وارد شده صحیح نمی‌باشد.";
+                    break;
+                case 'USER_DISABLED':
+                    friendlyMessage = "حساب کاربری شما غیرفعال شده است.";
+                    break;
+                default:
+                    console.log("Unhandled Auth Error:", error.message);
+            }
+            showMessage(friendlyMessage, 'error');
+        }
 
-        // --- START: Event Listeners ---
+        // --- Event Listeners ---
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = emailInput.value.trim();
             const password = passwordInput.value.trim();
 
             if (!email || !password) {
-                showMessage("لطفاً ایمیل و رمز عبور را وارد کنید.", 'error'); 
+                showMessage("لطفاً ایمیل و رمز عبور را وارد کنید.", 'error');
                 return;
             }
 
             setLoading(true);
             try {
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                const user = userCredential.user;
+                const response = await apiCall({
+                    action: 'login',
+                    email: email,
+                    password: password
+                });
+                
+                // IMPORTANT: Save the token and user ID to localStorage
+                // The loading page depends on these!
+                localStorage.setItem('firebaseAuthToken', response.idToken);
+                localStorage.setItem('firebaseUserUid', response.localId);
 
-                if (user) {
-                    const userDocRef = doc(db, 'users', user.uid);
-                    const userDocSnap = await getDoc(userDocRef);
-                    if (userDocSnap.exists() && !userDocSnap.data().createdAt) {
-                        const creationTime = new Date(user.metadata.creationTime);
-                        await updateDoc(userDocRef, {
-                            createdAt: creationTime
-                        });
-                    }
-                }
+                // Redirect to the loading page, which will handle fetching user data
+                window.location.href = './loading.html';
 
-                window.location.href = './index.html';
             } catch (error) {
-                let friendlyMessage = "ایمیل یا رمز عبور اشتباه است.";
-                if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-                    friendlyMessage = "ایمیل یا رمز عبور وارد شده صحیح نمی‌باشد.";
-                }
-                console.error("Login Error:", error.code, error.message);
-                showMessage(friendlyMessage, 'error');
+                handleAuthError(error);
             } finally {
                 setLoading(false);
             }
@@ -555,195 +162,24 @@
 
             setLoading(true);
             try {
-                const usersRef = collection(db, "users");
-                const q = query(usersRef, where("email", "==", email));
-                const querySnapshot = await getDocs(q);
-
-                if (querySnapshot.empty) {
-                    throw new Error("auth/user-not-found");
-                }
-                
-                const userDoc = querySnapshot.docs[0];
-                const userData = userDoc.data();
-                
-                // --- [NEW] Ban Check ---
-                // بررسی می‌کند که آیا کاربر مسدود است و زمان مسدودیت هنوز تمام نشده است.
-                if (userData.isBanned === true && userData.banExpiresAt && userData.banExpiresAt.toDate() > new Date()) {
-                    showSuspensionNotice(userData);
-                    return; // اجرای تابع متوقف می‌شود
-                }
-                // --- [END NEW] Ban Check ---
-
-                const now = new Date();
-                const cooldownUntil = userData.passwordResetCooldownUntil?.toDate();
-                
-                if (cooldownUntil && cooldownUntil > now) {
-                    startCountdown(cooldownUntil);
-                    return; 
-                }
-
-                confirmAvatar.src = userData.avatarUrl || 'https://i.imgur.com/T2bT1tG.png';
-                confirmName.textContent = userData.displayName || 'کاربر ناشناس';
-                accountConfirmModal.classList.add('visible');
-                
-                confirmYesBtn.onclick = () => handleSendResetEmail(email, userDoc.id, userData.passwordResetRequestCount || 0);
-
-            } catch (error) {
-                let friendlyMessage = "خطایی در بررسی ایمیل رخ داد.";
-                if (error.message === 'auth/user-not-found') {
-                    friendlyMessage = "حسابی با این ایمیل در سیستم ثبت نشده است.";
-                } else if (error.code === 'auth/invalid-email') {
-                    friendlyMessage = "فرمت ایمیل وارد شده صحیح نمی‌باشد.";
-                }
-                console.error("Forgot Password Check Error:", error);
-                showMessage(friendlyMessage, 'error');
-            } finally {
-                setLoading(false);
-            }
-        });
-        
-        // Modal Event Listeners
-        openSpamGuideLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            spamGuideModal.classList.add('visible');
-        });
-
-        closeSpamGuideButton.addEventListener('click', () => spamGuideModal.classList.remove('visible'));
-        closeSuspensionButton.addEventListener('click', () => suspensionModal.classList.remove('visible')); // [NEW]
-        confirmCancelBtn.addEventListener('click', () => accountConfirmModal.classList.remove('visible'));
-
-        [spamGuideModal, accountConfirmModal, suspensionModal].forEach(modal => { // [NEW] suspensionModal added
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    modal.classList.remove('visible');
-                }
-            });
-        });
-        // --- END: Event Listeners ---
-
-        // --- START: Helper Functions ---
-        
-        async function handleSendResetEmail(email, userId, currentRequestCount) {
-            accountConfirmModal.classList.remove('visible');
-            setLoading(true);
-
-            try {
-                const newRequestCount = currentRequestCount + 1;
-                const cooldownSeconds = 60 * Math.pow(2, currentRequestCount); 
-                const newCooldownDate = new Date(Date.now() + cooldownSeconds * 1000);
-                
-                const userDocRef = doc(db, 'users', userId);
-                await updateDoc(userDocRef, {
-                    passwordResetCooldownUntil: newCooldownDate,
-                    passwordResetRequestCount: newRequestCount
+                await apiCall({
+                    action: 'initiate_password_reset',
+                    email: email
                 });
 
-                await sendPasswordResetEmail(auth, email);
-
-                showMessage("لینک بازیابی رمز عبور به ایمیل شما ارسال شد. لطفاً صندوق ورودی (Inbox) و پوشه اسپم (Spam) را بررسی کنید.", 'success');
-                spamGuideContainer.style.display = 'block';
-
+                showMessage("اگر حسابی با این ایمیل وجود داشته باشد، لینک بازیابی به آن ارسال شد. لطفاً صندوق ورودی و پوشه اسپم خود را بررسی کنید.", 'success');
+            
             } catch (error) {
-                console.error("Password Reset Send/Update Error:", error);
-                showMessage("خطایی در ارسال ایمیل بازیابی یا به‌روزرسانی اطلاعات رخ داد.", 'error');
+                // We show a generic success message even on error to prevent email enumeration attacks
+                // But for our own debugging, we can log the error
+                console.error("Password Reset Error:", error);
+                showMessage("اگر حسابی با این ایمیل وجود داشته باشد، لینک بازیابی به آن ارسال شد. لطفاً صندوق ورودی و پوشه اسپم خود را بررسی کنید.", 'success');
             } finally {
                 setLoading(false);
             }
-        }
-        
-        function startCountdown(cooldownEndDate) {
-            if (countdownInterval) clearInterval(countdownInterval);
+        });
 
-            const updateTimer = () => {
-                const now = new Date();
-                const remainingSeconds = Math.round((cooldownEndDate.getTime() - now.getTime()) / 1000);
-
-                if (remainingSeconds <= 0) {
-                    clearInterval(countdownInterval);
-                    countdownInterval = null;
-                    messageBox.style.display = 'none';
-                } else {
-                    const minutes = Math.floor(remainingSeconds / 60);
-                    const seconds = remainingSeconds % 60;
-                    const timerString = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-                    showMessage(`شما به تازگی درخواست بازیابی ارسال کرده‌اید. لطفاً تا پایان زمان زیر صبر کنید: `, 'error', timerString);
-                }
-            };
-            
-            updateTimer(); 
-            countdownInterval = setInterval(updateTimer, 1000);
-        }
-
-        // --- [START NEW] Suspension Functions ---
-        function showSuspensionNotice(userData) {
-            document.getElementById('suspension-avatar').src = userData.avatarUrl || 'https://i.imgur.com/T2bT1tG.png';
-            document.getElementById('suspension-name').textContent = userData.displayName || 'کاربر';
-            document.getElementById('suspension-reason').textContent = `دلیل مسدودیت: ${userData.banReason || 'نامشخص'}`;
-            suspensionModal.classList.add('visible');
-            startSuspensionCountdown(userData.banExpiresAt.toDate());
-        }
-
-        function startSuspensionCountdown(targetDate) {
-            if (suspensionCountdownInterval) clearInterval(suspensionCountdownInterval);
-
-            const countdownElements = {
-                days: document.getElementById('s-days'),
-                hours: document.getElementById('s-hours'),
-                minutes: document.getElementById('s-minutes'),
-                seconds: document.getElementById('s-seconds')
-            };
-
-            const updateTimer = () => {
-                const distance = targetDate.getTime() - new Date().getTime();
-
-                if (distance < 0) {
-                    clearInterval(suspensionCountdownInterval);
-                    suspensionCountdownInterval = null;
-                    Object.values(countdownElements).forEach(el => el.textContent = '00');
-                    // Optionally close the modal after countdown
-                    // suspensionModal.classList.remove('visible');
-                    return;
-                }
-
-                const f = (n) => String(Math.floor(n)).padStart(2, '0');
-                countdownElements.days.textContent = f(distance / (1000 * 60 * 60 * 24));
-                countdownElements.hours.textContent = f((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                countdownElements.minutes.textContent = f((distance % (1000 * 60 * 60)) / (1000 * 60));
-                countdownElements.seconds.textContent = f((distance % (1000 * 60)) / 1000);
-            };
-
-            updateTimer();
-            suspensionCountdownInterval = setInterval(updateTimer, 1000);
-        }
-        // --- [END NEW] Suspension Functions ---
-
-        function showMessage(message, type, countdownString = '') {
-            if (countdownInterval && !countdownString) {
-                clearInterval(countdownInterval);
-                countdownInterval = null;
-            }
-            messageText.textContent = message;
-            countdownTimer.textContent = countdownString;
-            messageBox.className = `message-box ${type}-message`;
-            messageBox.style.display = 'block';
-        }
-
-        function setLoading(isLoading) {
-            loginButton.disabled = isLoading;
-            loginButton.textContent = isLoading ? 'در حال بررسی...' : 'ورود';
-            forgotPasswordLink.style.pointerEvents = isLoading ? 'none' : 'auto';
-            forgotPasswordLink.style.opacity = isLoading ? '0.5' : '1';
-            
-            if (isLoading) {
-                messageBox.style.display = 'none';
-                spamGuideContainer.style.display = 'none';
-                if (countdownInterval) {
-                    clearInterval(countdownInterval);
-                    countdownInterval = null;
-                }
-            }
-        }
-        // --- END: Helper Functions ---
+        // --- END OF NEW SCRIPT ---
     </script>
 </body>
 </html>
