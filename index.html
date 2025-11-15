@@ -11,7 +11,7 @@
     
     <style>
         :root {
-            --wood-dark: #0c0a09;
+            --wood-dark: #0c0a09; /* Darker base for new background */
             --text-gold: #ffc947;
             --text-light: #e0dacc;
             --logo-glow-main: #ffdd00;
@@ -20,9 +20,11 @@
             --progress-bar-fill-end: #ffc947;
             --countdown-bg: rgba(0,0,0,0.3);
             --panel-glow: rgba(255, 201, 71, 0.5);
+            /* Suspension styles */
             --suspension-red: #e74c3c;
             --suspension-border: #c0392b;
             --suspension-glow: rgba(231, 76, 60, 0.5);
+            /* [NEW] Viewport height variable for mobile browsers */
             --vh: 1vh; 
         }
         @keyframes panel-intro { from { opacity: 0; transform: translateY(50px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
@@ -64,7 +66,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 15px;
+            gap: 15px; /* Increased gap */
             z-index: 100;
             transition: opacity 0.5s ease;
             backdrop-filter: blur(2px);
@@ -72,12 +74,13 @@
             background: linear-gradient(to top, rgba(0,0,0,0.5), transparent);
         }
         
+        /* [MODIFIED] Progress bar is now thicker */
         #bottom-loader #progress-bar-container {
             width: 100%;
             max-width: 480px;
-            height: 12px;
+            height: 12px; /* Increased from 8px */
             background-color: var(--progress-bar-bg);
-            border-radius: 6px;
+            border-radius: 6px; /* Increased from 4px */
             overflow: hidden;
             padding: 2px;
             border: 1px solid rgba(255, 201, 71, 0.2);
@@ -86,11 +89,12 @@
         #bottom-loader #progress-bar-fill {
             width: 0%;
             height: 100%;
-            border-radius: 4px;
+            border-radius: 4px; /* Increased from 2px */
             background: linear-gradient(90deg, var(--progress-bar-fill-start), var(--progress-bar-fill-end));
             transition: width 0.4s cubic-bezier(0.65, 0, 0.35, 1);
         }
         
+        /* [NEW] Container for status message and percentage */
         #status-container {
             display: flex;
             justify-content: space-between;
@@ -103,10 +107,13 @@
             opacity: 0.9;
             min-height: 1.2em;
         }
+        #status-message {
+             /* Styles are now mainly on the container */
+        }
         #status-percentage {
             font-weight: 700;
-            font-variant-numeric: tabular-nums;
-            direction: ltr;
+            font-variant-numeric: tabular-nums; /* Keeps width of numbers consistent */
+            direction: ltr; /* Percentages should be LTR */
         }
         
         .panel {
@@ -135,12 +142,15 @@
         .time-label { font-size: 0.8rem; font-weight: 400; color: var(--text-light); margin-top: 8px; }
 
         #suspension-panel { border-color: var(--suspension-border); box-shadow: 0 0 25px var(--suspension-glow), 0 15px 45px rgba(0, 0, 0, 0.7); padding: 35px; }
+        
         #suspension-user-info { display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; }
         #suspension-avatar { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 3px solid var(--suspension-red); box-shadow: 0 5px 15px rgba(0,0,0,0.5); margin-bottom: 15px; }
         #suspension-username { font-size: 1.5rem; font-weight: 700; color: var(--text-light); text-shadow: 1px 1px 3px #000; }
+        
         #suspension-title { font-size: 2rem; color: var(--suspension-red); margin-bottom: 15px; font-weight: 900; }
         #suspension-reason { font-size: 1.1rem; margin-bottom: 25px; padding: 12px; background-color: rgba(0,0,0,0.3); border-radius: 8px; font-style: italic; border: 1px solid rgba(255,255,255,0.1); }
         #suspension-message { margin-bottom: 20px; font-size: 1rem; color: var(--text-light); }
+        
         #suspension-countdown-timer { margin-bottom: 35px; }
         #suspension-countdown-timer .time-block { border-color: var(--suspension-border); background-color: rgba(231, 76, 60, 0.1); }
         #suspension-countdown-timer .time-value { color: #f8d7da; }
@@ -159,6 +169,7 @@
         <div id="progress-bar-container">
             <div id="progress-bar-fill"></div>
         </div>
+        <!-- [MODIFIED] Replaced <p> with a container for message and percentage -->
         <div id="status-container">
             <span id="status-message">در حال آماده سازی...</span>
             <span id="status-percentage"></span>
@@ -199,8 +210,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // این کانفیگ برای احراز هویت کاربر در مرورگر ضروری است و اطلاعات حساسی ندارد
         const firebaseConfig = {
             apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
             authDomain: "mafia-9fcbf.firebaseapp.com",
@@ -211,7 +222,13 @@
             measurementId: "G-0PDHDWC6NV"
         };
         
-        // --- DOM Elements & Helpers ---
+        const setVh = () => {
+            document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+        };
+        window.addEventListener('resize', setVh);
+        setVh(); 
+
+        // --- DOM Elements ---
         const progressBarFill = document.getElementById('progress-bar-fill');
         const statusMessageEl = document.getElementById('status-message');
         const statusPercentageEl = document.getElementById('status-percentage');
@@ -221,26 +238,28 @@
         const suspensionPanel = document.getElementById('suspension-panel');
         const logoutBtn = document.getElementById('logout-btn');
         const allViews = [bottomLoader, maintenancePanel, suspensionPanel];
-        
-        const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-        // --- View Management ---
+        // --- Constants ---
+        const MUSIC_URL = "https://raw.githubusercontent.com/abolfazl140122/mafia/main/dark-music-249503.mp3";
+        const MUSIC_CACHE_NAME = 'mafia-music-cache-v1';
+        const MUSIC_VERSION_KEY = 'mafia-music-version';
+        const DEFAULT_AVATAR = 'https://i.imgur.com/T2bT1tG.png';
+
         function showView(viewName) {
             allViews.forEach(view => view.style.display = 'none');
-            const viewMap = {
-                'loading': bottomLoader,
-                'maintenance': maintenancePanel,
-                'suspended': suspensionPanel
-            };
-            if (viewMap[viewName]) {
-                viewMap[viewName].style.display = viewName === 'loading' ? 'flex' : 'block';
+            switch (viewName) {
+                case 'loading': bottomLoader.style.display = 'flex'; break;
+                case 'maintenance': maintenancePanel.style.display = 'block'; break;
+                case 'suspended': suspensionPanel.style.display = 'block'; break;
+                default: console.error(`Unknown view: ${viewName}`);
             }
         }
         
-        // --- Progress & Status UI ---
+        // --- [MODIFIED] New Progress Update Functions ---
         const updateOverallProgress = (percentage) => {
             progressBarFill.style.width = `${percentage}%`;
         };
+
         const updateTaskStatus = (message, percentage) => {
             statusMessageEl.textContent = message;
             if (percentage !== null && percentage !== undefined) {
@@ -251,206 +270,197 @@
                 statusPercentageEl.textContent = '';
             }
         };
+        
         const showLoadingError = (message) => {
             updateOverallProgress(100);
             updateTaskStatus(message, null);
             progressBarFill.style.background = 'linear-gradient(90deg, #c0392b, #e74c3c)';
         };
 
-        // --- Music Handling ---
-        const MUSIC_URL = "https://raw.githubusercontent.com/abolfazl140122/mafia/main/dark-music-249503.mp3";
-        function playMusicFromBlob(blob) { try { const objectUrl = URL.createObjectURL(blob); backgroundMusic.src = objectUrl; backgroundMusic.volume = 0.4; backgroundMusic.play().catch(e => console.warn("Auto-play blocked", e)); } catch (error) { console.error("Error playing music blob", error); } }
+        // --- Helper Functions ---
+        const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+        
+        function playMusicFromBlob(blob) { /* ... (Function unchanged) ... */ try { const objectUrl = URL.createObjectURL(blob); backgroundMusic.src = objectUrl; backgroundMusic.volume = 0.4; backgroundMusic.play().catch(e => console.warn("پخش خودکار موسیقی توسط مرورگر مسدود شد.", e)); } catch (error) { console.error("خطا در ایجاد URL برای پخش موسیقی:", error); } }
+        function downloadAndCacheMusic(progressCallback) { /* ... (Function unchanged) ... */ return new Promise((resolve, reject) => { const xhr = new XMLHttpRequest(); xhr.open('GET', MUSIC_URL, true); xhr.responseType = 'blob'; xhr.onprogress = (event) => { if (event.lengthComputable) { const percentComplete = Math.round((event.loaded / event.total) * 100); progressCallback(percentComplete); } }; xhr.onload = async () => { if (xhr.status === 200) { const musicBlob = xhr.response; try { const cache = await caches.open(MUSIC_CACHE_NAME); await cache.put(MUSIC_URL, new Response(musicBlob)); localStorage.setItem(MUSIC_VERSION_KEY, MUSIC_URL); resolve(musicBlob); } catch (cacheError) { reject(cacheError); } } else { reject(new Error(`خطای شبکه در دانلود موسیقی: ${xhr.statusText}`)); } }; xhr.onerror = () => { reject(new Error('خطای شبکه در هنگام دانلود موسیقی.')); }; xhr.send(); }); }
+        
+        // [MODIFIED] Music handler now accepts a progress callback for the task runner
         async function handleBackgroundMusic(onProgress) {
-             try {
-                const cache = await caches.open('mafia-music-cache-v1');
-                let cachedResponse = await cache.match(MUSIC_URL);
-                if (cachedResponse) {
-                    onProgress(50);
-                    const musicBlob = await cachedResponse.blob();
-                    playMusicFromBlob(musicBlob);
-                    onProgress(100);
-                    return;
-                }
-                const xhr = new XMLHttpRequest();
-                xhr.open('GET', MUSIC_URL, true);
-                xhr.responseType = 'blob';
-                xhr.onprogress = (event) => event.lengthComputable && onProgress(Math.round((event.loaded / event.total) * 100));
-                xhr.onload = async () => {
-                    if (xhr.status === 200) {
-                        await cache.put(MUSIC_URL, new Response(xhr.response));
-                        playMusicFromBlob(xhr.response);
-                    }
-                };
-                xhr.send();
-            } catch (error) {
-                console.error('Music handler failed:', error);
-            }
-        }
-
-        // --- Game Transition ---
-        async function transitionToGame(displayName) {
-            showView('loading');
-            updateOverallProgress(100);
-            updateTaskStatus(`خوش آمدید، ${displayName}!`, null);
-            await delay(2000);
-            window.location.href = './main.html';
-        }
-        
-        // --- Countdown & Panel Population ---
-        function startCountdown(targetDate, elements, onFinish) {
-            const interval = setInterval(() => {
-                const distance = targetDate.getTime() - new Date().getTime();
-                if (distance < 0) {
-                    clearInterval(interval);
-                    if (onFinish) onFinish();
-                    return;
-                }
-                const f = (n) => String(Math.floor(n)).padStart(2, '0');
-                elements.days.textContent = f(distance / 86400000); // (1000 * 60 * 60 * 24)
-                elements.hours.textContent = f((distance % 86400000) / 3600000); // (1000 * 60 * 60)
-                elements.minutes.textContent = f((distance % 3600000) / 60000); // (1000 * 60)
-                elements.seconds.textContent = f((distance % 60000) / 1000);
-            }, 1000);
-        }
-
-        function populateSuspensionPanel(config, auth) {
-            document.getElementById('suspension-avatar').src = config.avatarUrl || 'https://i.imgur.com/T2bT1tG.png';
-            document.getElementById('suspension-username').textContent = config.displayName || 'کاربر';
-            document.getElementById('suspension-reason').textContent = `دلیل: ${config.banReason || 'نامشخص'}`;
-            logoutBtn.onclick = () => signOut(auth).then(() => window.location.href = './login.html');
-            
-            const countdownElements = {
-                days: document.getElementById('s-days'),
-                hours: document.getElementById('s-hours'),
-                minutes: document.getElementById('s-minutes'),
-                seconds: document.getElementById('s-seconds')
-            };
-            const targetDate = new Date(config.banExpiresAt); // <-- PHP sends string
-            startCountdown(targetDate, countdownElements, () => {
-                // Ban expired, just reload to re-check status.
-                // The PHP script will now return 'ok' status.
-                window.location.reload();
-            });
-        }
-        
-        function populateMaintenancePanel(config) {
-            const bannerContainer = document.getElementById('maintenance-banner-container');
-            if (config.imageUrl) {
-                document.getElementById('maintenance-banner').src = config.imageUrl;
-                bannerContainer.style.display = 'block';
-            } else {
-                bannerContainer.style.display = 'none';
-            }
-            document.getElementById('maintenance-title').textContent = config.title || "در حال بروزرسانی";
-            document.getElementById('maintenance-message').textContent = config.message || "به زودی باز خواهیم گشت.";
-        }
-        
-        // --- Core Application Logic (Using PHP middleware) ---
-
-        async function startLoadingSequence(auth) {
+            const cachedVersion = localStorage.getItem(MUSIC_VERSION_KEY);
             try {
-                // 1. Authenticate user on client-side
-                updateTaskStatus('احراز هویت کاربر...', null);
-                updateOverallProgress(10);
-                const user = await new Promise((resolve, reject) => {
-                    const unsubscribe = onAuthStateChanged(auth, u => {
-                        unsubscribe();
-                        if (u) resolve(u);
-                        else reject({ type: 'NO_USER' });
-                    }, error => reject({ type: 'ERROR', error }));
-                });
-                updateOverallProgress(25);
-
-                // 2. Check user status via our PHP server
-                updateTaskStatus('بررسی وضعیت حساب...', null);
-                const response = await fetch(`./mafianovin.php?action=checkUser&uid=${user.uid}`);
-                if (!response.ok) throw new Error(`Server error: ${response.status}`);
-                const data = await response.json();
-                
-                if (data.error) throw new Error(data.error);
-
-                updateOverallProgress(50);
-                
-                if (data.status === 'banned') {
-                    populateSuspensionPanel(data.config, auth);
-                    showView('suspended');
-                    return; // Stop loading process
+                if (cachedVersion === MUSIC_URL) {
+                    const cache = await caches.open(MUSIC_CACHE_NAME);
+                    const cachedResponse = await cache.match(MUSIC_URL);
+                    if (cachedResponse) {
+                        onProgress(50);
+                        const musicBlob = await cachedResponse.blob();
+                        playMusicFromBlob(musicBlob);
+                        onProgress(100);
+                        return;
+                    }
                 }
+                const musicBlob = await downloadAndCacheMusic(onProgress);
+                playMusicFromBlob(musicBlob);
+            } catch (error) {
+                console.error('فرایند مدیریت موسیقی با خطا مواجه شد:', error);
+                // Don't throw an error, just log it. Music is not critical.
+            }
+        }
 
-                // 3. Load game assets
-                updateTaskStatus('بارگذاری منابع...', 0);
-                await handleBackgroundMusic((progress) => {
-                    updateTaskStatus('بارگذاری منابع...', progress);
-                    updateOverallProgress(50 + (progress / 4)); // 50% to 75%
-                });
-                updateOverallProgress(75);
-                await delay(200);
+        async function transitionToGame(displayName) { /* ... (Function unchanged) ... */ showView('loading'); updateOverallProgress(100); updateTaskStatus(`خوش آمدید، ${displayName}!`, null); await delay(2000); window.location.href = './main.html'; }
+        
+        // --- View Population & Countdown Logic (All functions unchanged) ---
+        function populateSuspensionPanel(config, auth, db) { const displayName = config.displayName || 'کاربر'; document.getElementById('suspension-avatar').src = config.avatarUrl || DEFAULT_AVATAR; document.getElementById('suspension-username').textContent = displayName; document.getElementById('suspension-reason').textContent = `دلیل: ${config.banReason || 'نامشخص'}`; startSuspensionCountdown(config.banExpiresAt.toDate(), auth, db, displayName); logoutBtn.onclick = () => { signOut(auth).then(() => { window.location.href = './login.html'; }).catch(err => { console.error('Logout error:', err); alert('خطا در خروج از حساب.'); }); }; }
+        function startSuspensionCountdown(targetDate, auth, db, displayName) { const countdownElements = { days: document.getElementById('s-days'), hours: document.getElementById('s-hours'), minutes: document.getElementById('s-minutes'), seconds: document.getElementById('s-seconds') }; const interval = setInterval(async () => { const distance = targetDate.getTime() - new Date().getTime(); if (distance < 0) { clearInterval(interval); try { const userDocRef = doc(db, 'users', auth.currentUser.uid); await updateDoc(userDocRef, { isBanned: false, banReason: null, banExpiresAt: null }); console.log("مسدودیت کاربر به صورت خودکار رفع شد."); } catch(e) { console.error("خطا در رفع خودکار مسدودیت:", e); } await transitionToGame(displayName); return; } const f = (n) => String(Math.floor(n)).padStart(2, '0'); countdownElements.days.textContent = f(distance / (1000 * 60 * 60 * 24)); countdownElements.hours.textContent = f((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)); countdownElements.minutes.textContent = f((distance % (1000 * 60 * 60)) / (1000 * 60)); countdownElements.seconds.textContent = f((distance % (1000 * 60)) / 1000); }, 1000); }
+        function populateMaintenancePanel(config) { const bannerContainer = document.getElementById('maintenance-banner-container'); if (config.imageUrl) { document.getElementById('maintenance-banner').src = config.imageUrl; bannerContainer.style.display = 'block'; } else { bannerContainer.style.display = 'none'; } const titleEl = document.getElementById('maintenance-title'); titleEl.textContent = config.title || "در حال بروزرسانی"; if (config.titleColor) { titleEl.style.color = config.titleColor; } const messageEl = document.getElementById('maintenance-message'); messageEl.textContent = config.message || "به زودی باز خواهیم گشت."; if (config.textColor) { messageEl.style.color = config.textColor; } }
+        function handleMaintenanceFinish(auth, db) { document.getElementById('maintenance-title').textContent = "بروزرسانی به پایان رسید"; document.getElementById('maintenance-message').textContent = "در حال هدایت شما به بازی..."; const countdownElements = { days: document.getElementById('days'), hours: document.getElementById('hours'), minutes: document.getElementById('minutes'), seconds: document.getElementById('seconds') }; Object.values(countdownElements).forEach(el => el.textContent = '00'); setTimeout(() => { showView('loading'); startNewLoadingSequence(auth, db).catch(err => console.error("Error after maintenance:", err)); }, 2500); }
+        function startMaintenanceCountdown(targetDate, auth, db) { const countdownElements = { days: document.getElementById('days'), hours: document.getElementById('hours'), minutes: document.getElementById('minutes'), seconds: document.getElementById('seconds') }; const interval = setInterval(() => { const distance = targetDate.getTime() - new Date().getTime(); if (distance < 0) { clearInterval(interval); handleMaintenanceFinish(auth, db); return; } const f = (n) => String(Math.floor(n)).padStart(2, '0'); countdownElements.days.textContent = f(distance / (1000 * 60 * 60 * 24)); countdownElements.hours.textContent = f((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)); countdownElements.minutes.textContent = f((distance % (1000 * 60 * 60)) / (1000 * 60)); countdownElements.seconds.textContent = f((distance % (1000 * 60)) / 1000); }, 1000); }
 
-                // 4. Finalize and transition to game
-                updateTaskStatus('آماده سازی نهایی...', null);
-                updateOverallProgress(100);
-                const displayName = data.userData.displayName || user.displayName || 'بازیکن';
-                await transitionToGame(displayName);
+        // --- [NEW] Core Application Logic with Task Runner ---
 
+        // Helper to simulate progress for quick, non-trackable async operations
+        async function withSimulatedProgress(promise, onProgress) {
+            let progress = 0;
+            const interval = setInterval(() => {
+                if (progress < 95) {
+                    progress += Math.random() * 8 + 2; // Random increment
+                    onProgress(Math.min(progress, 95));
+                }
+            }, 120);
+
+            try {
+                return await promise;
+            } finally {
+                clearInterval(interval);
+                onProgress(100);
+            }
+        }
+        
+        // The main task runner
+        async function runTaskSequence(tasks, auth, db) {
+            const totalTasks = tasks.length;
+            let context = {}; // Shared context for tasks
+
+            for (let i = 0; i < totalTasks; i++) {
+                const task = tasks[i];
+                
+                const result = await task.action(
+                    (progress) => updateTaskStatus(`${task.name}...`, progress),
+                    context, auth, db
+                );
+
+                context = { ...context, ...result };
+                updateOverallProgress(((i + 1) / totalTasks) * 100);
+                await delay(200); // Short delay for better UX
+            }
+            return context;
+        }
+        
+        async function startNewLoadingSequence(auth, db) {
+            const loadingTasks = [
+                {
+                    name: "احراز هویت کاربر",
+                    action: async (onProgress, context, auth) => {
+                        const promise = new Promise((resolve, reject) => {
+                            const unsubscribe = onAuthStateChanged(auth, user => {
+                                unsubscribe();
+                                if (user) resolve({ user });
+                                else reject({ type: 'NO_USER' });
+                            }, error => reject({ type: 'ERROR', error }));
+                        });
+                        return await withSimulatedProgress(promise, onProgress);
+                    }
+                },
+                {
+                    name: "دریافت اطلاعات بازیکن",
+                    action: async (onProgress, context, auth, db) => {
+                        const userDocRef = doc(db, 'users', context.user.uid);
+                        const userDocSnap = await withSimulatedProgress(getDoc(userDocRef), onProgress);
+                        if (!userDocSnap.exists()) {
+                            // This case might need specific handling, but for now we proceed
+                            return { displayName: context.user.displayName || 'بازیکن جدید' };
+                        }
+                        return { userData: userDocSnap.data(), displayName: userDocSnap.data().displayName || context.user.displayName };
+                    }
+                },
+                {
+                    name: "بررسی وضعیت حساب",
+                    action: async (onProgress, context) => {
+                        const promise = new Promise((resolve, reject) => {
+                            const userData = context.userData;
+                            if (userData && userData.isBanned === true && userData.banExpiresAt && userData.banExpiresAt.toDate() > new Date()) {
+                                reject({ type: 'BANNED', config: userData });
+                            } else {
+                                resolve();
+                            }
+                        });
+                        return await withSimulatedProgress(promise, onProgress);
+                    }
+                },
+                {
+                    name: "بارگذاری منابع",
+                    action: async (onProgress) => {
+                        await handleBackgroundMusic(onProgress);
+                        return {};
+                    }
+                }
+            ];
+
+            try {
+                const finalContext = await runTaskSequence(loadingTasks, auth, db);
+                await transitionToGame(finalContext.displayName);
             } catch (rejection) {
-                if (rejection.type === 'NO_USER') {
-                    showLoadingError('احراز هویت ناموفق بود. در حال انتقال...');
+                if (rejection.type === 'BANNED') {
+                    populateSuspensionPanel(rejection.config, auth, db);
+                    showView('suspended');
+                } else if (rejection.type === 'NO_USER') {
+                    showLoadingError('احراز هویت ناموفق بود. در حال انتقال به صفحه ورود...');
                     await delay(2500);
                     window.location.href = './login.html';
                 } else {
-                    console.error("Loading sequence failed:", rejection);
-                    showLoadingError('خطا در بارگذاری. صفحه را رفرش کنید.');
+                    console.error("خطای جدی در فرآیند بارگذاری:", rejection.error || rejection);
+                    showLoadingError('خطا در بارگذاری. لطفاً صفحه را رفرش کنید.');
                 }
             }
         }
         
         async function runAppInitialization() {
-            const app = initializeApp(firebaseConfig);
-            const auth = getAuth(app);
-            
             try {
-                // Fetch initial status from our PHP server
-                const response = await fetch('./mafianovin.php?action=getStatus');
-                if (!response.ok) throw new Error(`Network error: ${response.statusText}`);
-                const data = await response.json();
+                const app = initializeApp(firebaseConfig);
+                const db = getFirestore(app);
+                const auth = getAuth(app);
                 
-                if (data.error) throw new Error(data.error);
+                const maintenanceDocRef = doc(db, 'settings', 'maintenance');
+                const docSnap = await getDoc(maintenanceDocRef);
 
-                if (data.status === 'maintenance') {
-                    populateMaintenancePanel(data.config);
+                if (docSnap.exists() && docSnap.data().enabled === true) {
+                    const config = docSnap.data();
+                    populateMaintenancePanel(config);
                     showView('maintenance');
-                    
-                    if (data.config.endTime) {
-                        const countdownElements = {
-                            days: document.getElementById('days'), hours: document.getElementById('hours'),
-                            minutes: document.getElementById('minutes'), seconds: document.getElementById('seconds')
-                        };
-                        const targetDate = new Date(data.config.endTime); // <-- PHP sends string
-                        if (targetDate > new Date()) {
-                            startCountdown(targetDate, countdownElements, () => window.location.reload());
+                    if (config.endTime && typeof config.endTime.toDate === 'function') {
+                        const targetDate = config.endTime.toDate();
+                        if (targetDate.getTime() - new Date().getTime() < 0) {
+                            handleMaintenanceFinish(auth, db);
                         } else {
-                            // Maintenance time has passed, reload to re-check
-                            window.location.reload();
+                            startMaintenanceCountdown(targetDate, auth, db);
                         }
+                    } else {
+                        document.querySelector('#maintenance-panel .countdown-timer').innerHTML = "<p>زمان پایان مشخص نشده است.</p>";
                     }
                 } else {
-                    // Game is OK, start the user-specific loading sequence
-                    showView('loading');
-                    await startLoadingSequence(auth);
+                    // Loader is now visible from the start, delay removed.
+                    showView('loading'); // Ensure other views are hidden
+                    updateTaskStatus('در حال آماده سازی...', null);
+                    await startNewLoadingSequence(auth, db);
                 }
             } catch (error) {
-                console.error("Initialization failed:", error);
+                console.error("خطا در اتصال اولیه:", error);
+                // Removed delay to show error immediately
                 showView('loading');
-                showLoadingError('خطا در اتصال به سرور! اینترنت را بررسی کنید.');
+                showLoadingError('خطا در اتصال! اینترنت خود را بررسی کنید.');
             }
         }
         
-        // --- Main Execution ---
         async function main() {
-            const setVh = () => document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
-            window.addEventListener('resize', setVh);
-            setVh();
-        
             const preloaderOverlay = document.getElementById('preloader-overlay');
             const body = document.body;
             const imageUrl = 'https://cdn.imgurl.ir/uploads/q9812_file_6917756f1e1d68.57033147.jpg';
@@ -469,11 +479,14 @@
                 startApp();
             } else {
                 img.onload = () => { body.style.backgroundImage = `url(${imageUrl})`; startApp(); };
-                img.onerror = () => { console.warn('Background image failed to load.'); startApp(); };
+                img.onerror = () => { console.warn('تصویر پس‌زمینه دانلود نشد.'); startApp(); };
             }
         }
 
         main();
+    </script>
+</body>
+</html>main();
     </script>
 </body>
 </html>
