@@ -11,263 +11,79 @@
     
     <style>
         :root {
-            --wood-dark: #0c0a09;
+            --wood-dark: #1a140f;
+            --wood-texture-url: url('https://www.transparenttextures.com/patterns/dark-wood.png');
+            --panel-bg-gradient: linear-gradient(145deg, #3c3022, #1e170f);
+            --panel-border: #5c4a3a;
             --text-gold: #ffc947;
             --text-light: #e0dacc;
+            --logo-glow-main: #ffdd00;
             --progress-bar-bg: rgba(0,0,0,0.4);
-            --progress-bar-fill-start: #ffc947;
-            --progress-bar-fill-end: #d97706;
+            --progress-bar-fill-start: #8c4843;
+            --progress-bar-fill-end: #ffc947;
             --countdown-bg: rgba(0,0,0,0.3);
-            --panel-bg: rgba(23, 17, 12, 0.85);
-            --panel-border: #4a3f35;
-            --panel-glow: rgba(255, 201, 71, 0.4);
+            --panel-glow: rgba(255, 201, 71, 0.5);
+            /* Suspension styles */
             --suspension-red: #e74c3c;
             --suspension-border: #c0392b;
             --suspension-glow: rgba(231, 76, 60, 0.5);
-            --vh: 1vh;
         }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes panel-intro { from { opacity: 0; transform: translateY(50px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
-        @keyframes glow {
-            0%, 100% { text-shadow: 0 0 5px var(--text-gold), 0 0 10px var(--text-gold); }
-            50% { text-shadow: 0 0 10px var(--text-gold), 0 0 20px var(--text-gold); }
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html, body {
-            width: 100%;
-            height: calc(var(--vh, 1vh) * 100);
-            overflow: hidden;
-        }
-
-        body {
-            font-family: 'Vazirmatn', sans-serif;
-            background: url('https://www.transparenttextures.com/patterns/dark-wood.png') var(--wood-dark);
-            color: var(--text-light);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            position: relative;
-        }
-
-        #preloader-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--wood-dark);
-            z-index: 1000;
-            animation: fadeIn 0.5s ease-in;
-            transition: opacity 0.8s ease-out;
-        }
-
-        #bottom-loader {
-            position: fixed;
-            bottom: 5vh;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            max-width: 600px;
-            z-index: 1001;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            animation: fadeIn 1s 0.5s ease-in both;
-        }
-
-        #progress-bar-container {
-            width: 100%;
-            height: 12px;
-            background-color: var(--progress-bar-bg);
-            border-radius: 10px;
-            border: 1px solid var(--panel-border);
-            overflow: hidden;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
-        }
-
-        #progress-bar-fill {
-            width: 0%;
-            height: 100%;
-            background: linear-gradient(90deg, var(--progress-bar-fill-start), var(--progress-bar-fill-end));
-            border-radius: 10px;
-            transition: width 0.3s ease-out;
-        }
-
-        #status-container {
-            display: flex;
-            justify-content: space-between;
-            font-size: 14px;
-            color: var(--text-light);
-            padding: 0 5px;
-        }
+        @keyframes logo-glow { 0%, 100% { filter: drop-shadow(0 0 8px var(--logo-glow-main)) drop-shadow(0 0 16px rgba(255, 221, 0, 0.5)); } 50% { filter: drop-shadow(0 0 16px var(--logo-glow-main)) drop-shadow(0 0 32px rgba(255, 221, 0, 0.7)); } }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+        body { font-family: 'Vazirmatn', sans-serif; background-color: var(--wood-dark); background-image: var(--wood-texture-url); color: var(--text-light); display: flex; align-items: center; justify-content: center; }
         
-        #status-message {
-            font-weight: 400;
-        }
-
-        #status-percentage {
-            font-weight: 700;
-            color: var(--text-gold);
-        }
+        .panel { width: 90%; max-width: 480px; background: var(--panel-bg-gradient); border-radius: 24px; border: 2px solid var(--panel-border); padding: 30px 40px; text-align: center; animation: panel-intro 1s cubic-bezier(0.25, 1, 0.5, 1); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5); }
         
-        .panel {
-            width: 90%;
-            max-width: 500px;
-            background-color: var(--panel-bg);
-            border: 2px solid var(--panel-border);
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 0 20px var(--panel-glow);
-            backdrop-filter: blur(5px);
-            animation: panel-intro 0.7s ease-out forwards;
-            z-index: 50;
-        }
-
-        .panel h1 {
-            font-size: 24px;
-            font-weight: 900;
-            color: var(--text-gold);
-            margin-bottom: 15px;
-            animation: glow 2s infinite;
-        }
-
-        .panel p {
-            font-size: 16px;
-            line-height: 1.7;
-            margin-bottom: 25px;
-        }
+        #logo-container { margin: 0 auto 25px auto; width: 180px; height: 180px; }
+        #logo { width: 100%; height: auto; animation: logo-glow 3s ease-in-out infinite; }
+        #title { font-size: 3rem; font-weight: 900; color: var(--text-gold); margin-bottom: 30px; text-shadow: 0 0 5px rgba(255, 201, 71, 0.5), 2px 2px 4px rgba(0,0,0,0.5); }
+        #progress-bar-container { width: 100%; height: 20px; background-color: var(--progress-bar-bg); border-radius: 10px; overflow: hidden; padding: 3px; margin-bottom: 15px; border: 1px solid #5c4a3a; box-shadow: inset 0 2px 5px rgba(0,0,0,0.5); }
+        #progress-bar-fill { width: 0%; height: 100%; border-radius: 7px; background: linear-gradient(90deg, var(--progress-bar-fill-start), var(--progress-bar-fill-end)); transition: width 0.4s cubic-bezier(0.65, 0, 0.35, 1); }
+        #status-message { font-size: 1rem; font-weight: 700; min-height: 24px; }
         
-        #maintenance-banner-container {
-            width: 100%;
-            margin-bottom: 20px;
-        }
+        #maintenance-panel { box-shadow: 0 0 25px var(--panel-glow), 0 15px 45px rgba(0, 0, 0, 0.7); padding: 25px; }
+        #maintenance-banner-container { width: 100%; margin-bottom: 25px; border-radius: 16px; overflow: hidden; background-color: rgba(0,0,0,0.2); border: 1px solid var(--panel-border); }
+        #maintenance-banner { width: 100%; height: auto; display: block; }
+        #maintenance-title { font-size: 2rem; font-weight: 900; color: var(--text-gold); margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        #maintenance-message { font-size: 1rem; line-height: 1.8; margin-bottom: 30px; color: var(--text-light); padding: 0 15px; }
         
-        #maintenance-banner {
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
-            border: 2px solid var(--panel-border);
-        }
+        .countdown-timer { display: flex; flex-direction: row-reverse; justify-content: center; gap: 15px; }
+        .time-block { background-color: var(--countdown-bg); padding: 15px; border-radius: 12px; border: 1px solid var(--panel-border); min-width: 80px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .time-value { font-size: 3rem; font-weight: 900; color: white; line-height: 1; }
+        .time-label { font-size: 0.8rem; font-weight: 400; color: var(--text-light); margin-top: 8px; }
 
-        .countdown-timer {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            direction: ltr;
-        }
-
-        .time-block {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .time-value {
-            font-size: 36px;
-            font-weight: 700;
-            color: var(--text-gold);
-            background-color: var(--countdown-bg);
-            padding: 10px 15px;
-            border-radius: 8px;
-            border: 1px solid var(--panel-border);
-            min-width: 60px;
-        }
-
-        .time-label {
-            font-size: 12px;
-            margin-top: 5px;
-            color: var(--text-light);
-        }
-
-        /* Suspension Panel Styles */
-        #suspension-panel {
-            box-shadow: 0 0 20px var(--suspension-glow);
-            border-color: var(--suspension-border);
-        }
-
-        #suspension-panel h1 {
-            color: var(--suspension-red);
-            animation: none;
-            text-shadow: 0 0 8px rgba(0,0,0,0.7);
-        }
+        /* --- Suspension Panel Styles --- */
+        #suspension-panel { border-color: var(--suspension-border); box-shadow: 0 0 25px var(--suspension-glow), 0 15px 45px rgba(0, 0, 0, 0.7); padding: 35px; }
         
-        #suspension-user-info {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
+        #suspension-user-info { display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; }
+        #suspension-avatar { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 3px solid var(--suspension-red); box-shadow: 0 5px 15px rgba(0,0,0,0.5); margin-bottom: 15px; }
+        #suspension-username { font-size: 1.5rem; font-weight: 700; color: var(--text-light); text-shadow: 1px 1px 3px #000; }
         
-        #suspension-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            border: 3px solid var(--suspension-border);
-        }
+        #suspension-title { font-size: 2rem; color: var(--suspension-red); margin-bottom: 15px; font-weight: 900; }
+        #suspension-reason { font-size: 1.1rem; margin-bottom: 25px; padding: 12px; background-color: rgba(0,0,0,0.3); border-radius: 8px; font-style: italic; border: 1px solid rgba(255,255,255,0.1); }
+        #suspension-message { margin-bottom: 20px; font-size: 1rem; color: var(--text-light); }
         
-        #suspension-username {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--text-light);
-        }
-        
-        #suspension-reason {
-            font-weight: 700;
-            background-color: var(--countdown-bg);
-            padding: 10px;
-            border-radius: 5px;
-            border-right: 4px solid var(--suspension-red);
-        }
+        #suspension-countdown-timer { margin-bottom: 35px; }
+        #suspension-countdown-timer .time-block { border-color: var(--suspension-border); background-color: rgba(231, 76, 60, 0.1); }
+        #suspension-countdown-timer .time-value { color: #f8d7da; }
+        #suspension-countdown-timer .time-label { color: #f5c6cb; }
 
-        .suspension-message {
-            font-size: 14px;
-            margin-bottom: 15px;
-        }
-        
-        #logout-btn {
-            margin-top: 25px;
-            padding: 12px 25px;
-            border: 2px solid var(--suspension-border);
-            background-color: var(--suspension-red);
-            color: white;
-            font-family: 'Vazirmatn', sans-serif;
-            font-size: 16px;
-            font-weight: 700;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        
-        #logout-btn:hover {
-            background-color: var(--suspension-border);
-            box-shadow: 0 0 15px var(--suspension-glow);
-        }
+        #logout-btn { background: linear-gradient(145deg, #616161, #3a3a3a); border: 1px solid #777; color: var(--text-light); padding: 12px 30px; border-radius: 8px; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+        #logout-btn:hover { background: linear-gradient(145deg, #757575, #4f4f4f); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
+        #logout-btn:active { transform: translateY(0); }
     </style>
 </head>
 <body>
 
-    <div id="preloader-overlay"></div>
-
-    <div id="bottom-loader" style="display: none;">
-        <div id="progress-bar-container">
-            <div id="progress-bar-fill"></div>
-        </div>
-        <div id="status-container">
-            <span id="status-message">در حال آماده سازی...</span>
-            <span id="status-percentage">0%</span>
-        </div>
+    <div id="loading-panel" class="panel">
+        <div id="logo-container"> <img id="logo" src="https://up.20script.ir/file/40b6-Copilot-20250812-110015-removebg-preview.png" alt="لوگوی شهر مافیا"> </div>
+        <h1 id="title">شهر مافیا</h1>
+        <div id="progress-bar-container"> <div id="progress-bar-fill"></div> </div>
+        <p id="status-message">در حال آماده سازی...</p>
     </div>
 
-    <!-- پنل حالت تعمیرات -->
     <div id="maintenance-panel" class="panel" style="display: none;">
         <div id="maintenance-banner-container"><img id="maintenance-banner" src="" alt="بنر بروزرسانی"></div>
         <h1 id="maintenance-title"></h1>
@@ -280,7 +96,6 @@
         </div>
     </div>
 
-    <!-- پنل کاربر مسدود شده -->
     <div id="suspension-panel" class="panel" style="display: none;">
         <div id="suspension-user-info">
             <img id="suspension-avatar" src="" alt="آواتار کاربر">
@@ -288,7 +103,7 @@
         </div>
         <h1 id="suspension-title">حساب کاربری مسدود است</h1>
         <p id="suspension-reason"></p>
-        <p class="suspension-message">زمان باقی‌مانده تا رفع مسدودیت:</p>
+        <p id="suspension-message">زمان باقی‌مانده تا رفع مسدودیت:</p>
         <div id="suspension-countdown-timer" class="countdown-timer">
              <div class="time-block"><div id="s-days" class="time-value">00</div><div class="time-label">روز</div></div>
              <div class="time-block"><div id="s-hours" class="time-value">00</div><div class="time-label">ساعت</div></div>
@@ -300,253 +115,240 @@
     
     <audio id="background-music" loop></audio>
     
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-            // --- CONFIGURATION ---
-            const API_URL = 'mafianovin.php'; // آدرس فایل PHP واسط شما
-            const API_SECRET_KEY = 'sjnrsontORFBioerrt4651renttn'; // کلید امنیتی شما
+        const firebaseConfig = {
+            apiKey: "AIzaSyADQNadPyy43TmSR2yCiKjoLBVMeAqT4Zg",
+            authDomain: "mafia-9fcbf.firebaseapp.com",
+            projectId: "mafia-9fcbf",
+            storageBucket: "mafia-9fcbf.appspot.com",
+            messagingSenderId: "471627157488",
+            appId: "1:471627157488:web:92f008548a5596619a5735",
+            measurementId: "G-0PDHDWC6NV"
+        };
+        
+        // --- DOM Elements ---
+        const progressBarFill = document.getElementById('progress-bar-fill');
+        const statusMessage = document.getElementById('status-message');
+        const backgroundMusic = document.getElementById('background-music');
+        const loadingPanel = document.getElementById('loading-panel');
+        const suspensionPanel = document.getElementById('suspension-panel');
+        const logoutBtn = document.getElementById('logout-btn');
+        
+        // --- Constants ---
+        const MUSIC_URL = "https://raw.githubusercontent.com/abolfazl140122/mafia/main/dark-music-249503.mp3";
+        const MUSIC_CACHE_NAME = 'mafia-music-cache-v1';
+        const MUSIC_VERSION_KEY = 'mafia-music-version';
+        const DEFAULT_AVATAR = 'https://i.imgur.com/T2bT1tG.png';
 
-            // --- DOM ELEMENTS ---
-            const elements = {
-                preloaderOverlay: document.getElementById('preloader-overlay'),
-                bottomLoader: document.getElementById('bottom-loader'),
-                progressBarFill: document.getElementById('progress-bar-fill'),
-                statusMessage: document.getElementById('status-message'),
-                statusPercentage: document.getElementById('status-percentage'),
-                maintenancePanel: document.getElementById('maintenance-panel'),
-                suspensionPanel: document.getElementById('suspension-panel'),
-                backgroundMusic: document.getElementById('background-music'),
+        // --- Helper Functions ---
+        const updateProgress = (percentage, message) => {
+            progressBarFill.style.width = `${percentage}%`;
+            if (message) statusMessage.textContent = message;
+        };
+        const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+        function playMusicFromBlob(blob) {
+            try {
+                const objectUrl = URL.createObjectURL(blob);
+                backgroundMusic.src = objectUrl;
+                backgroundMusic.volume = 0.4;
+                backgroundMusic.play().catch(e => console.warn("پخش خودکار موسیقی توسط مرورگر مسدود شد.", e));
+            } catch (error) { console.error("خطا در ایجاد URL برای پخش موسیقی:", error); }
+        }
+        function downloadAndCacheMusic(progressCallback) {
+            return new Promise((resolve, reject) => {
+                const xhr = new XMLHttpRequest();
+                xhr.open('GET', MUSIC_URL, true);
+                xhr.responseType = 'blob';
+                xhr.onprogress = (event) => { if (event.lengthComputable) { const percentComplete = Math.round((event.loaded / event.total) * 100); progressCallback(percentComplete); } };
+                xhr.onload = async () => { if (xhr.status === 200) { const musicBlob = xhr.response; try { const cache = await caches.open(MUSIC_CACHE_NAME); await cache.put(MUSIC_URL, new Response(musicBlob)); localStorage.setItem(MUSIC_VERSION_KEY, MUSIC_URL); resolve(musicBlob); } catch (cacheError) { reject(cacheError); } } else { reject(new Error(`خطای شبکه در دانلود موسیقی: ${xhr.statusText}`)); } };
+                xhr.onerror = () => { reject(new Error('خطای شبکه در هنگام دانلود موسیقی.')); };
+                xhr.send();
+            });
+        }
+        async function handleBackgroundMusic() {
+            const cachedVersion = localStorage.getItem(MUSIC_VERSION_KEY);
+            try {
+                if (cachedVersion === MUSIC_URL) {
+                    const cache = await caches.open(MUSIC_CACHE_NAME);
+                    const cachedResponse = await cache.match(MUSIC_URL);
+                    if (cachedResponse) { const musicBlob = await cachedResponse.blob(); playMusicFromBlob(musicBlob); return; }
+                }
+                const musicBlob = await downloadAndCacheMusic((percent) => { const overallProgress = 20 + (percent * 0.4); updateProgress(overallProgress, `در حال دریافت موسیقی... ${percent}%`); });
+                playMusicFromBlob(musicBlob);
+            } catch (error) { console.error('فرایند مدیریت موسیقی با خطا مواجه شد:', error); statusMessage.textContent = 'خطا در دریافت موسیقی پس‌زمینه.'; }
+        }
+        
+        // --- [NEW] Function to handle smooth transition from suspension to game ---
+        async function transitionToGame(displayName) {
+            suspensionPanel.style.display = 'none';
+            loadingPanel.style.display = 'block';
+            loadingPanel.style.animation = 'none';
+            requestAnimationFrame(() => { loadingPanel.style.animation = 'panel-intro 1s cubic-bezier(0.25, 1, 0.5, 1)'; });
+            
+            updateProgress(100, `مسدودیت شما رفع شد. خوش آمدید، ${displayName}!`);
+            await delay(2000);
+            window.location.href = './main.html';
+        }
+
+        // --- Suspension Panel Functions ---
+        function showSuspensionPanel(config, auth, db) { // [MODIFIED] Added db
+            loadingPanel.style.display = 'none';
+            suspensionPanel.style.display = 'block';
+
+            const displayName = config.displayName || 'کاربر';
+            document.getElementById('suspension-avatar').src = config.avatarUrl || DEFAULT_AVATAR;
+            document.getElementById('suspension-username').textContent = displayName;
+            document.getElementById('suspension-reason').textContent = `دلیل: ${config.banReason || 'نامشخص'}`;
+            
+            startSuspensionCountdown(config.banExpiresAt.toDate(), auth, db, displayName); // [MODIFIED] Pass db and displayName
+            
+            logoutBtn.onclick = () => {
+                signOut(auth).then(() => {
+                    window.location.href = './login.html';
+                }).catch(err => {
+                    console.error('Logout error:', err);
+                    alert('خطا در خروج از حساب.');
+                });
             };
-            
-            let countdownInterval = null;
+        }
+        
+        function startSuspensionCountdown(targetDate, auth, db, displayName) { // [MODIFIED] Signature updated
+            const countdownElements = { days: document.getElementById('s-days'), hours: document.getElementById('s-hours'), minutes: document.getElementById('s-minutes'), seconds: document.getElementById('s-seconds') };
+            const interval = setInterval(async () => {
+                const distance = targetDate.getTime() - new Date().getTime();
 
-            // --- HELPER FUNCTIONS ---
-
-            /**
-             * Handles API calls to the PHP proxy.
-             * @param {string} action - The action to perform (e.g., 'get', 'set').
-             * @param {string} path - The Firebase database path.
-             * @param {object|null} data - The data payload for 'set', 'update', 'push'.
-             * @returns {Promise<any>} - The data from the API response.
-             */
-            async function apiCall(action, path, data = null) {
-                try {
-                    const requestBody = {
-                        secret_key: API_SECRET_KEY,
-                        action: action,
-                        path: path,
-                    };
-                    if (data !== null) {
-                        requestBody.data = data;
+                // [MODIFIED] This is the core logic change.
+                if (distance < 0) {
+                    clearInterval(interval);
+                    try {
+                        const userDocRef = doc(db, 'users', auth.currentUser.uid);
+                        // Clean up all ban-related fields in Firestore.
+                        await updateDoc(userDocRef, { isBanned: false, banReason: null, banExpiresAt: null });
+                        console.log("مسدودیت کاربر به صورت خودکار رفع شد.");
+                    } catch(e) {
+                        console.error("خطا در رفع خودکار مسدودیت:", e);
                     }
-
-                    const response = await fetch(API_URL, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(requestBody),
-                    });
-
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-                    }
-
-                    const result = await response.json();
-                    if (result.status === 'error') {
-                        throw new Error(result.message);
-                    }
-                    
-                    return result.data;
-
-                } catch (error) {
-                    console.error('API Call Failed:', error);
-                    // Show a generic error message on the screen
-                    updateStatus('خطا در برقراری ارتباط با سرور', 100, true);
-                    throw error; // Re-throw to stop further execution
+                    // Instead of reloading, call the smooth transition function.
+                    await transitionToGame(displayName); 
+                    return;
                 }
-            }
-            
-            /**
-             * Updates the loading status message and progress bar.
-             * @param {string} message - The message to display.
-             * @param {number} percentage - The progress percentage (0-100).
-             * @param {boolean} isError - If true, styles the bar as an error.
-             */
-            function updateStatus(message, percentage, isError = false) {
-                elements.statusMessage.textContent = message;
-                elements.statusPercentage.textContent = `${Math.round(percentage)}%`;
-                elements.progressBarFill.style.width = `${percentage}%`;
-                if(isError) {
-                    elements.progressBarFill.style.background = 'var(--suspension-red)';
-                }
-            }
-            
-            /**
-             * Starts a countdown timer and updates the DOM elements.
-             * @param {string} endTime - The ISO 8601 timestamp for the countdown end.
-             * @param {string} prefix - The prefix for DOM element IDs ('s-' for suspension, '' for maintenance).
-             */
-            function startCountdown(endTime, prefix = '') {
-                if (countdownInterval) clearInterval(countdownInterval);
+                const f = (n) => String(Math.floor(n)).padStart(2, '0');
+                countdownElements.days.textContent = f(distance / (1000 * 60 * 60 * 24));
+                countdownElements.hours.textContent = f((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                countdownElements.minutes.textContent = f((distance % (1000 * 60 * 60)) / (1000 * 60));
+                countdownElements.seconds.textContent = f((distance % (1000 * 60)) / 1000);
+            }, 1000);
+        }
 
-                const end = new Date(endTime).getTime();
-
-                countdownInterval = setInterval(() => {
-                    const now = new Date().getTime();
-                    const distance = end - now;
-
-                    if (distance < 0) {
-                        clearInterval(countdownInterval);
-                        // Optional: Reload the page or show a message
-                        document.getElementById(`${prefix}days`).textContent = '00';
-                        document.getElementById(`${prefix}hours`).textContent = '00';
-                        document.getElementById(`${prefix}minutes`).textContent = '00';
-                        document.getElementById(`${prefix}seconds`).textContent = '00';
-                        return;
-                    }
-
-                    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-                    document.getElementById(`${prefix}days`).textContent = String(days).padStart(2, '0');
-                    document.getElementById(`${prefix}hours`).textContent = String(hours).padStart(2, '0');
-                    document.getElementById(`${prefix}minutes`).textContent = String(minutes).padStart(2, '0');
-                    document.getElementById(`${prefix}seconds`).textContent = String(seconds).padStart(2, '0');
-                }, 1000);
-            }
-
-            // --- UI LOGIC ---
-
-            function hideAllPanels() {
-                elements.maintenancePanel.style.display = 'none';
-                elements.suspensionPanel.style.display = 'none';
-                elements.bottomLoader.style.display = 'none';
-            }
-
-            function showMaintenance(data) {
-                hideAllPanels();
-                document.getElementById('maintenance-title').textContent = data.title || 'در دست تعمیر هستیم';
-                document.getElementById('maintenance-message').textContent = data.message || 'برای ارائه خدمات بهتر، سرورهای بازی به طور موقت از دسترس خارج شده‌اند. به زودی باز خواهیم گشت.';
-                const banner = document.getElementById('maintenance-banner');
-                if (data.bannerUrl) {
-                    banner.src = data.bannerUrl;
-                    banner.parentElement.style.display = 'block';
-                } else {
-                    banner.parentElement.style.display = 'none';
-                }
-                elements.maintenancePanel.style.display = 'block';
-                if (data.endTime) {
-                    startCountdown(data.endTime);
-                }
-            }
-
-            function showSuspension(data) {
-                hideAllPanels();
-                document.getElementById('suspension-username').textContent = data.username || 'کاربر';
-                document.getElementById('suspension-avatar').src = data.avatarUrl || 'https://via.placeholder.com/80';
-                document.getElementById('suspension-reason').textContent = `دلیل: ${data.reason || 'نامشخص'}`;
-                elements.suspensionPanel.style.display = 'block';
-                 if (data.endTime) {
-                    startCountdown(data.endTime, 's-');
-                }
-                document.getElementById('logout-btn').onclick = () => {
-                    // Your logout logic here (e.g., clear local storage, redirect)
-                    console.log("Logout button clicked");
-                };
-            }
-
-            async function runNormalLoad(data) {
-                elements.bottomLoader.style.display = 'flex';
-                
-                if (data.musicUrl) {
-                    elements.backgroundMusic.src = data.musicUrl;
-                    elements.backgroundMusic.play().catch(e => console.log("Music autoplay was blocked."));
-                }
-                
-                // Simulate loading assets
-                updateStatus('بررسی فایل‌های اولیه...', 10);
-                await new Promise(resolve => setTimeout(resolve, 500));
-                
-                updateStatus('دریافت اطلاعات کاربر...', 30);
-                await new Promise(resolve => setTimeout(resolve, 600));
-
-                updateStatus('بارگذاری منابع بازی...', 75);
-                await new Promise(resolve => setTimeout(resolve, 1200));
-
-                updateStatus('آماده‌سازی صحنه...', 95);
-                await new Promise(resolve => setTimeout(resolve, 400));
-                
-                updateStatus('ورود به بازی...', 100);
-                
-                // Fade out and redirect
-                elements.preloaderOverlay.style.opacity = '0';
-                elements.bottomLoader.style.opacity = '0';
-                
-                setTimeout(() => {
-                    console.log("Loading complete. Redirecting to game...");
-                    // window.location.href = data.gameUrl || '/game.html';
-                }, 800);
-            }
-
-            // --- MAIN EXECUTION ---
-            async function startLoadingSequence() {
-                try {
-                    // Step 1: Get the overall status from Firebase via PHP proxy
-                    const statusData = await apiCall('get', 'loading/status');
-
-                    if (!statusData || !statusData.mode) {
-                        throw new Error("Invalid status data received from server.");
-                    }
-
-                    // Step 2: Decide which panel to show based on the mode
-                    switch (statusData.mode) {
-                        case 'maintenance':
-                            showMaintenance(statusData);
-                            break;
-                        
-                        case 'suspended':
-                            // Here you would typically get the user's ID from local storage/session
-                            const userId = "user123"; // Replace with actual dynamic user ID
-                            const suspensionData = await apiCall('get', `users/${userId}/suspension`);
-                            const userData = await apiCall('get', `users/${userId}/profile`);
+        // --- Main Loading Logic ---
+        async function startNormalLoading(auth, db) {
+            updateProgress(10, '...برقراری ارتباط با سرورهای شهر');
+            const authPromise = new Promise((resolve, reject) => {
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        try {
+                            const userDocRef = doc(db, 'users', user.uid);
+                            const userDocSnap = await getDoc(userDocRef);
                             
-                            if (suspensionData && suspensionData.isSuspended) {
-                                showSuspension({ ...suspensionData, ...userData });
-                            } else {
-                                // If user is not actually suspended, proceed to normal load
-                                runNormalLoad(statusData);
+                            if (userDocSnap.exists()) {
+                                const userData = userDocSnap.data();
+                                if (userData.isBanned === true && userData.banExpiresAt && userData.banExpiresAt.toDate() > new Date()) {
+                                    // [MODIFIED] Reject with db instance for later use
+                                    reject({ type: 'BANNED', config: userData, db: db }); 
+                                    return;
+                                }
                             }
-                            break;
-                            
-                        case 'normal':
-                        default:
-                            runNormalLoad(statusData);
-                            break;
-                    }
-
-                } catch (error) {
-                    console.error("Failed to initialize loading sequence:", error);
-                    // The error message is already shown by apiCall's catch block
+                            updateProgress(70, '...در حال واکشی اطلاعات بازیکن');
+                            const displayName = (userDocSnap.exists() && userDocSnap.data().displayName) || user.displayName || 'بازیکن';
+                            resolve(displayName);
+                        } catch (error) { reject({ type: 'ERROR', error }); }
+                    } else { reject({ type: 'NO_USER' }); }
+                });
+            });
+            const musicPromise = handleBackgroundMusic();
+            try {
+                const [displayName] = await Promise.all([authPromise, musicPromise]);
+                updateProgress(100, `خوش آمدید، ${displayName}!`);
+                await delay(1500); 
+                window.location.href = './main.html';
+            } catch (rejection) {
+                if (rejection.type === 'BANNED') {
+                    // [MODIFIED] Pass db to the handler function
+                    showSuspensionPanel(rejection.config, auth, rejection.db);
+                } else if (rejection.type === 'NO_USER') {
+                    updateProgress(100, 'احراز هویت انجام نشد، در حال هدایت به صفحه ورود...');
+                    await delay(2000);
+                    window.location.href = './login.html';
+                } else {
+                    console.error("خطای جدی در فرآیند بارگذاری:", rejection.error);
+                    updateProgress(100);
+                    statusMessage.innerHTML = 'خطا در بارگذاری اطلاعات.<br>لطفاً صفحه را مجدداً بارگذاری کنید.';
+                    progressBarFill.style.background = 'linear-gradient(90deg, #c0392b, #e74c3c)';
                 }
             }
+        }
 
-            // --- INITIALIZATION ---
-            
-            // Fix for 100vh on mobile browsers
-            function setViewportHeight() {
-                let vh = window.innerHeight * 0.01;
-                document.documentElement.style.setProperty('--vh', `${vh}px`);
+        // --- Maintenance & Initializer ---
+        function showMaintenancePanel(config, auth, db) {
+            loadingPanel.style.display = 'none';
+            const maintenancePanel = document.getElementById('maintenance-panel');
+            maintenancePanel.style.display = 'block';
+            const bannerContainer = document.getElementById('maintenance-banner-container');
+            if (config.imageUrl) { document.getElementById('maintenance-banner').src = config.imageUrl; bannerContainer.style.display = 'block'; } else { bannerContainer.style.display = 'none'; }
+            const titleEl = document.getElementById('maintenance-title');
+            titleEl.textContent = config.title || "در حال بروزرسانی";
+            if (config.titleColor) { titleEl.style.color = config.titleColor; }
+            const messageEl = document.getElementById('maintenance-message');
+            messageEl.textContent = config.message || "به زودی باز خواهیم گشت.";
+            if (config.textColor) { messageEl.style.color = config.textColor; }
+            if (config.endTime && typeof config.endTime.toDate === 'function') { startCountdown(config.endTime.toDate(), auth, db); } else { document.querySelector('#maintenance-panel .countdown-timer').innerHTML = "<p>زمان پایان مشخص نشده است.</p>"; }
+        }
+        function startCountdown(targetDate, auth, db) {
+            const countdownElements = { days: document.getElementById('days'), hours: document.getElementById('hours'), minutes: document.getElementById('minutes'), seconds: document.getElementById('seconds') };
+            const interval = setInterval(() => {
+                const distance = targetDate.getTime() - new Date().getTime();
+                if (distance < 0) {
+                    clearInterval(interval);
+                    document.getElementById('maintenance-panel').style.display = 'none';
+                    const loadingPanel = document.getElementById('loading-panel');
+                    loadingPanel.style.display = 'block';
+                    loadingPanel.style.animation = 'none';
+                    requestAnimationFrame(() => { loadingPanel.style.animation = 'panel-intro 1s cubic-bezier(0.25, 1, 0.5, 1)'; });
+                    startNormalLoading(auth, db);
+                    return;
+                }
+                const f = (n) => String(Math.floor(n)).padStart(2, '0');
+                countdownElements.days.textContent = f(distance / (1000 * 60 * 60 * 24));
+                countdownElements.hours.textContent = f((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                countdownElements.minutes.textContent = f((distance % (1000 * 60 * 60)) / (1000 * 60));
+                countdownElements.seconds.textContent = f((distance % (1000 * 60)) / 1000);
+            }, 1000);
+        }
+        async function main() {
+            try {
+                const app = initializeApp(firebaseConfig);
+                const db = getFirestore(app);
+                const auth = getAuth(app);
+                const maintenanceDocRef = doc(db, 'settings', 'maintenance');
+                const docSnap = await getDoc(maintenanceDocRef);
+
+                if (docSnap.exists() && docSnap.data().enabled === true) {
+                    showMaintenancePanel(docSnap.data(), auth, db);
+                } else {
+                    startNormalLoading(auth, db);
+                }
+            } catch (error) {
+                console.error("خطا در اتصال اولیه:", error);
+                statusMessage.textContent = 'خطا در اتصال! اینترنت خود را بررسی کنید.';
             }
-            window.addEventListener('resize', setViewportHeight);
-            setViewportHeight(); // Initial call
-            
-            startLoadingSequence();
-        });
+        }
+        
+        main();
     </script>
 </body>
 </html>
